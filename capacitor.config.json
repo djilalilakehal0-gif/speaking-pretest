@@ -1,0 +1,6 @@
+{
+  "appId": "com.djilali.speakingpretest",
+  "appName": "Speaking Pre-Test",
+  "webDir": "www",
+  "android": { "allowMixedContent": false }
+}
