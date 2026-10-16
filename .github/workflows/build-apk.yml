@@ -1,0 +1,102 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to publish the APK to GitHub Releases
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Add microphone, storage and TTS permissions
+        run: |
+          M=android/app/src/main/AndroidManifest.xml
+          sed -i 's#<application#<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />\n    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />\n    <queries><intent><action android:name="android.intent.action.TTS_SERVICE" /></intent></queries>\n\n    <application#' $M
+          sed -i 's#<application#<application android:requestLegacyExternalStorage="true"#' $M
+          cat $M
+
+      - name: Set version (each build gets a higher number so updates install over the old app)
+        run: |
+          G=android/app/build.gradle
+          sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" $G
+          sed -i -E "s/versionName \"[^\"]*\"/versionName \"3.${{ github.run_number }}\"/" $G
+          grep -E "versionCode|versionName" $G
+
+      - name: Generate app icon and splash from logo
+        run: npx capacitor-assets generate --android --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff' --splashBackgroundColor '#ffffff' --splashBackgroundColorDark '#ffffff'
+
+      - name: Sync web code
+        run: npx cap sync android
+
+      - name: Prepare signing key
+        id: sign
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
+            echo "signed=true" >> $GITHUB_OUTPUT
+          else
+            echo "::warning::KEYSTORE_BASE64 secret is missing - building an unsigned-for-release DEBUG apk instead."
+            echo "signed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build signed release APK
+        if: steps.sign.outputs.signed == 'true'
+        working-directory: android
+        env:
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=$PWD/app/release.keystore \
+            -Pandroid.injected.signing.store.password="$KS_PASS" \
+            -Pandroid.injected.signing.key.alias=speakingpretest \
+            -Pandroid.injected.signing.key.password="$KS_PASS"
+          cp app/build/outputs/apk/release/app-release.apk ../SpeakingPreTest.apk
+
+      - name: Build debug APK (fallback, no secret)
+        if: steps.sign.outputs.signed != 'true'
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk ../SpeakingPreTest.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: speaking-pretest-apk
+          path: SpeakingPreTest.apk
+
+      - name: Publish to GitHub Releases (permanent download link)
+        if: steps.sign.outputs.signed == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v3.${{ github.run_number }}
+          name: Speaking Pre-Test 3.${{ github.run_number }}
+          make_latest: true
+          files: SpeakingPreTest.apk
+          body: |
+            تحميل التطبيق: افتح الملف SpeakingPreTest.apk على هاتف أندرويد واضغط «تثبيت».
+            Download SpeakingPreTest.apk on an Android phone and tap Install.
