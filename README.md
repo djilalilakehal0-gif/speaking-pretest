@@ -47,6 +47,20 @@ https://github.com/اسم-المستخدم/اسم-المستودع/releases/late
 - المعلّم: يفتح «المعلّم» ← كلمة السر ← يقرأ الرمز للطلاب. الرمز نفسه على كل الهواتف ويتغيّر كل 10 دقائق.
 - يُستحسن تقسيم الطلاب على صفوف (25–30 طالباً) واستعمال سماعات بميكروفون لتقليل الضجيج.
 
+## نسخة الويب: أسهل طريقة للآيفون
+
+تُنشر نسخة ويب من التطبيق تلقائياً مع كل رفع إلى `main`، على الرابط:
+
+```
+https://djilalilakehal0-gif.github.io/speaking-pretest/
+```
+
+**التفعيل (مرة واحدة):** Settings → Pages → في **Source** اختر **GitHub Actions**. ثم Actions → **Publish web version** → Run workflow.
+
+**على الآيفون:** افتح الرابط في **Safari** ← زر المشاركة ← **إضافة إلى الشاشة الرئيسية**. يظهر التطبيق بأيقونة المدرسة، ولا يحتاج كمبيوتر ولا حساب آبل. عند أول تسجيل اضغط **سماح** للميكروفون.
+
+الإجابات تُحفظ داخل Safari، لذلك يجب **مشاركتها** (واتساب مثلاً) بعد الاختبار، وعدم مسح بيانات Safari قبل ذلك.
+
 ## خامساً: نسخة الآيفون (iOS)
 
 تُبنى نسخة الآيفون تلقائياً على GitHub (على جهاز ماك تابع لـ GitHub)، فلا تحتاج ماك ولا Xcode. بعد كل رفع إلى `main`، أو من **Actions** ← **Build iOS app** ← **Run workflow**، يظهر الملف في **Releases** تحت الإصدار `ios-3.N`.
@@ -99,4 +113,5 @@ const CODE_SECRET='alfikr-almodi-speaking-pretest';
 | `capacitor.config.json` | اسم التطبيق ومعرّفه `com.djilali.speakingpretest` |
 | `package.json` | مكتبات Capacitor 7 (ميكروفون، ملفات، مشاركة، نطق احتياطي) |
 | `.github/workflows/build-apk.yml` | يبني ملف APK موقّعاً وينشره في Releases تلقائياً |
+| `.github/workflows/deploy-web.yml` | ينشر نسخة الويب على GitHub Pages (رابط للآيفون) |
 | `.github/workflows/build-ios.yml` | يبني ملف IPA للآيفون (موقّعاً إذا أُضيفت أسرار آبل) وينشره في Releases |
