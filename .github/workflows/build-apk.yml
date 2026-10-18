@@ -36,6 +36,17 @@ jobs:
           sed -i 's#<application#<application android:requestLegacyExternalStorage="true"#' $M
           cat $M
 
+      - name: Limit shared files to the app's share folder
+        run: |
+          # Answers are shared from cache/share/ only; the default config exposes the whole external storage
+          cat > android/app/src/main/res/xml/file_paths.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <paths xmlns:android="http://schemas.android.com/apk/res/android">
+              <cache-path name="share" path="share/" />
+          </paths>
+          XML
+          cat android/app/src/main/res/xml/file_paths.xml
+
       - name: Set version (each build gets a higher number so updates install over the old app)
         run: |
           G=android/app/build.gradle
