@@ -113,7 +113,7 @@ const CODE_SECRET='alfikr-almodi-speaking-pretest';
 | `assets/` | أيقونة التطبيق وشاشة البداية (من شعار المدرسة) |
 | `capacitor.config.json` | اسم التطبيق ومعرّفه `com.djilali.speakingpretest` |
 | `package.json` | مكتبات Capacitor 7 (ميكروفون، ملفات، مشاركة، نطق احتياطي) |
-| `.github/workflows/build-apk.yml` | يبني ملف APK موقّعاً وينشره في Releases تلقائياً |
+| `.github/workflows/build-apk-v3.yml` | يبني ملف APK موقّعاً وينشره في Releases تلقائياً |
 | `.github/workflows/pages.yml` | ينشر الموقع (آيفون) مع نموذج التصحيح التلقائي |
 | `.github/workflows/build-ios.yml` | يبني ملف IPA للآيفون (موقّعاً إذا أُضيفت أسرار آبل) وينشره في Releases |
 
