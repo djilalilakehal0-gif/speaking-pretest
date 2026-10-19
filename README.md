@@ -14,6 +14,7 @@
    - الاسم: `KEYSTORE_PASSWORD` ← الصق كلمة السر (20 حرفاً، بدون مسافات)
 
    المفتاح نفسه يُقرأ من السرّ `KEYSTORE_BASE64` إن وُجد، وإلا من الملف `KEYSTORE_BASE64.txt` في المستودع. هذا المفتاح يجعل كل نسخة جديدة تُثبَّت فوق القديمة على هواتف الطلاب بدون حذف. **لا تغيّر المفتاح بعد توزيع التطبيق**، وإلا سيضطر الطلاب لحذف التطبيق القديم.
+   **لا ترفع أبداً ملف `KEYSTORE_PASSWORD.txt`، واحتفظ به في مكان آمن.**
 
 4. اذهب إلى **Actions** ← **Build Android APK** ← **Run workflow**. انتظر حوالي 5 دقائق حتى تظهر علامة ✅.
 
@@ -49,13 +50,13 @@ https://github.com/اسم-المستخدم/اسم-المستودع/releases/late
 
 ## نسخة الويب: أسهل طريقة للآيفون
 
-تُنشر نسخة ويب من التطبيق تلقائياً مع كل رفع إلى `main`، على الرابط:
+تُنشر نسخة ويب من التطبيق تلقائياً مع كل رفع إلى `main` (الملف `.github/workflows/pages.yml`)، على الرابط:
 
 ```
 https://djilalilakehal0-gif.github.io/speaking-pretest/
 ```
 
-**التفعيل (مرة واحدة):** Settings → Pages → في **Source** اختر **GitHub Actions**. ثم Actions → **Publish web version** → Run workflow.
+**التفعيل (مرة واحدة):** Settings → Pages → في **Source** اختر **GitHub Actions**. ثم Actions → **Publish website** → Run workflow.
 
 **على الآيفون:** افتح الرابط في **Safari** ← زر المشاركة ← **إضافة إلى الشاشة الرئيسية**. يظهر التطبيق بأيقونة المدرسة، ولا يحتاج كمبيوتر ولا حساب آبل. عند أول تسجيل اضغط **سماح** للميكروفون.
 
@@ -113,5 +114,21 @@ const CODE_SECRET='alfikr-almodi-speaking-pretest';
 | `capacitor.config.json` | اسم التطبيق ومعرّفه `com.djilali.speakingpretest` |
 | `package.json` | مكتبات Capacitor 7 (ميكروفون، ملفات، مشاركة، نطق احتياطي) |
 | `.github/workflows/build-apk.yml` | يبني ملف APK موقّعاً وينشره في Releases تلقائياً |
-| `.github/workflows/deploy-web.yml` | ينشر نسخة الويب على GitHub Pages (رابط للآيفون) |
+| `.github/workflows/pages.yml` | ينشر الموقع (آيفون) مع نموذج التصحيح التلقائي |
 | `.github/workflows/build-ios.yml` | يبني ملف IPA للآيفون (موقّعاً إذا أُضيفت أسرار آبل) وينشره في Releases |
+
+---
+
+## الموقع (آيفون) والتصحيح التلقائي بالاستماع
+
+- الملف `.github/workflows/pages.yml` ينشر التطبيق كموقع على:
+  `https://djilalilakehal0-gif.github.io/speaking-pretest/`
+  ويضيف إليه نموذج التعرّف على الكلام (Whisper tiny، حوالي 40 ميغابايت).
+- يجب مرة واحدة: Settings → Pages → Source: **GitHub Actions**.
+- في «Saved answers» يضغط المعلّم «🤖 تصحيح تلقائي». يستمع التطبيق لكل تسجيل:
+  - **الألوان:** هل قال لون الحبر؟ وكم مرة قرأ الكلمة بدل اللون؟
+  - **الحروف:** هل قال سلسلة الحروف الصحيحة؟
+  - **الصور:** هل قال اسم الشيء الصحيح؟
+  - **الأسئلة:** يكتب نص كلام الطالب وعدد الكلمات في الدقيقة.
+- أول مرة يحتاج إنترنت على جهاز المعلّم لتحميل النموذج، ثم يُحفظ. الأصوات لا تخرج من الجهاز.
+- الدرجات التلقائية تظهر بعلامة 🤖 auto، ويمكن للمعلّم تعديلها.

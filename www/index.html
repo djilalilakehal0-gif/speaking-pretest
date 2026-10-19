@@ -4,11 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Speaking Pre-Test</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f3d3e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Pre-Test">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0f3d3e">
+<meta name="apple-mobile-web-app-title" content="Pre-Test">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="icon" href="img/logo.png">
 <style>
@@ -132,6 +133,18 @@ audio{width:100%}
 .item .h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:600}
 .item .h small{color:var(--slate);font-weight:500}
 .sess{border:0;box-shadow:var(--shadow);border-radius:18px;background:var(--surface);padding:14px;display:flex;flex-direction:column;gap:10px}
+.score{display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:var(--goldbg);border-radius:10px}
+.score label{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+.score input{width:72px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font:600 17px var(--font);text-align:center;background:#fff;color:var(--ink)}
+.score input:focus{outline:none;border-color:var(--navy2)}
+.score input.saved-ok{border-color:var(--green);box-shadow:0 0 0 3px rgba(31,127,85,.15)}
+.score span{color:var(--slate);font-weight:500}
+.auto{display:block;color:#3b5998;font-size:13px;margin-top:4px}.au-sum .auto{margin-top:2px}
+.acst{background:#eef3fb;border:1px solid #cdd9ee;color:#22365c;border-radius:10px;padding:10px 12px;font-size:14px}
+.af{font-style:normal;font-size:12px;color:#3b5998;font-weight:600}
+.trn{margin-top:6px;font-size:13px}.trn summary{cursor:pointer;color:#3b5998;font-weight:600}.trn p{margin:6px 0;color:var(--ink);line-height:1.5}
+.items{display:flex;flex-wrap:wrap;gap:4px}.items span{font-size:12px;border-radius:6px;padding:2px 6px}.items .ok{background:#e6f4ec;color:#1f7f55}.items .no{background:#fdecea;color:#b3261e}
+.sc-sum{margin-top:4px;font-size:13px}.sc-sum .graded{color:var(--green);font-weight:600}.sc-sum .ungraded{color:#a5641a;font-weight:500}
 .tag{font-size:12.5px;background:var(--goldbg);color:#8a5300;border-radius:999px;padding:3px 8px;font-weight:600}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0));transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 16px;border-radius:12px;font-weight:500;font-size:14px;z-index:9;max-width:90%;box-shadow:0 6px 20px rgba(15,61,62,.25)}
 
@@ -213,10 +226,18 @@ let RUN=0; // cancels running flows when we leave
    Any line without a recording falls back to the phone's text-to-speech. */
 const CLIPS={"Hello, and welcome. This is an evaluation of your speaking skills. It isn't graded, so don't worry. Listen carefully. You will have time to prepare silently. When you hear start speaking, tap the microphone and speak for one whole minute.": "audio/intro.mp3", "Listen carefully.": "audio/listen.mp3", "This is the last part of the first question. Listen carefully and take twenty seconds to prepare the answer.": "audio/q3lead.mp3", "Describe your usual school day. Tell me what you do from the time you wake up until you return home.": "audio/q1.mp3", "Look at the picture and describe what is happening. Tell me where the people are, what they are doing, and what might happen next.": "audio/q2.mp3", "Some students think that students should be allowed to use their phones at school. Do you agree or disagree? Explain why.": "audio/q3.mp3", "Start.": "audio/start.mp3", "Stop.": "audio/stop.mp3", "Start speaking.": "audio/startspeaking.mp3", "Thank you, stop.": "audio/thanksstop.mp3", "Thank you, let's repeat that with another sentence. Listen carefully. Quickly choose one of these four pictures.": "audio/choosepic.mp3", "Now we'll do something different. I will be showing you colored words and your task will be to say the color of the ink. Do not read the word. Just say the color it is written in. I'll show a new word every two seconds. Be quick. Tap the microphone to start.": "audio/task1.mp3", "This time I'll show you pictures of mathematical equations. Your task is to memorize the sequence of letters written under the equations. You'll have three seconds to memorize each sequence. Say the sequence when you see the white screen. Tap the microphone to start.": "audio/task2.mp3", "We came to the last task. This time I'll show you a sequence of different pictures and your task will be to say the name of the object you see. For each picture, you'll have two seconds. Tap the microphone to start.": "audio/task3.mp3", "Thank you.": "audio/thankyou.mp3", "That was all. Thank you for your participation. You did well.": "audio/finish.mp3"};
 let CUR=null;
-function playClip(src){return new Promise(res=>{try{if(CUR){CUR.pause();CUR=null}
-  const a=new Audio(src);CUR=a;let done=false;const end=()=>{if(done)return;done=true;if(CUR===a)CUR=null;res(true)};
-  a.onended=end;a.onpause=end;a.onerror=()=>{if(done)return;done=true;res(false)};
-  const pr=a.play();if(pr&&pr.catch)pr.catch(()=>{if(!done){done=true;res(false)}})}catch(e){res(false)}})}
+/* One shared audio element, unlocked on the first tap: iPhone Safari only lets
+   an element play by itself (after a timer) once a tap has started it. */
+const VO=new Audio();VO.preload='auto';VO.setAttribute('playsinline','');
+const SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+let VO_OK=false;
+function unlockAudio(){if(VO_OK)return;VO_OK=true;try{VO.src=SILENT;const p=VO.play();p&&p.catch&&p.catch(()=>{VO_OK=false})}catch(e){VO_OK=false}
+  try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}catch(e){}}
+['touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,unlockAudio,{capture:true,passive:true}));
+function playClip(src){return new Promise(res=>{let done=false;const fin=ok=>{if(done)return;done=true;VO.onended=VO.onpause=VO.onerror=null;if(CUR===VO)CUR=null;res(ok)};
+  try{VO.pause();VO.onended=()=>fin(true);VO.onpause=()=>{if(VO.src.indexOf(src)>=0&&!VO.ended&&VO.currentTime>0)fin(true)};VO.onerror=()=>fin(false);
+    VO.src=src;VO.currentTime=0;CUR=VO;const p=VO.play();if(p&&p.catch)p.catch(()=>fin(false));
+    setTimeout(()=>{if(!done&&VO.paused&&VO.currentTime===0)fin(false)},4000)}catch(e){fin(false)}})}
 async function say(text){
   if(CLIPS[text]&&await playClip(CLIPS[text]))return;
   const tts=P().TextToSpeech;
@@ -334,7 +355,7 @@ async function newSession(name){
   S={id:'s'+Date.now(),name,date:d.getTime(),stamp,count:0};await putS(S);
 }
 async function storeRec(key,label,res){
-  const rec={id:S.id+'_'+key,sid:S.id,key,label,blob:res.blob,mime:res.mime,ext:res.ext,dur:res.dur,at:Date.now()};
+  const rec={id:S.id+'_'+key,sid:S.id,key,label,blob:res.blob,mime:res.mime,ext:res.ext,dur:res.dur,marks:res.marks||null,at:Date.now()};
   await putR(rec);const all=await recsOf(S.id);S.count=all.length;await putS(S);
   const phone=await saveToPhone(S,rec);
   return {rec,phone};
@@ -529,11 +550,13 @@ async function taskShell({key,label,stepT,introEn,introAr,speak,body}){
   await new Promise(r=>btn.onclick=r);if(run!==RUN)return;stopSpeech();
   const rec=new Recorder(l=>{});
   try{await rec.start()}catch(e){toast('Microphone not allowed — السماح بالميكروفون مطلوب',3500);return taskShell(...arguments)}
+  MARKS=[];
   mb.innerHTML=`<div class="status"><span class="recdot"></span> Recording · جارٍ التسجيل</div>`;
   await body($('#stage'),run);
   if(run!==RUN){rec.stop();return null}
   mb.innerHTML='<div class="status">Saving… جارٍ الحفظ</div>';
-  const res=await rec.stop();const {rec:saved,phone}=await storeRec(key,label,res);
+  const res=await rec.stop();res.marks=MARKS.map(m=>({t:(m.t-rec.t0)/1000,w:m.w}));MARKS=[];
+  const {rec:saved,phone}=await storeRec(key,label,res);
   $('#stage').innerHTML='';
   mb.innerHTML=`<div class="saved">✓ Answer saved ${phone?'on the phone':''}<div class="ar" style="text-align:center;font-weight:600">تم حفظ الإجابة</div></div><audio controls src="${URL.createObjectURL(saved.blob)}"></audio>`;
   await say('Thank you.');
@@ -547,7 +570,7 @@ async function stroopIntro(){
     speak:"Now we'll do something different. I will be showing you colored words and your task will be to say the color of the ink. Do not read the word. Just say the color it is written in. I'll show a new word every two seconds. Be quick. Tap the microphone to start.",
     body:async(stage,run)=>{
       stage.innerHTML=`<div class="stage"><div class="stroop" id="w"></div></div><div class="bar" style="margin-top:10px"><i id="pb"></i></div>`;
-      for(let i=0;i<STROOP.length&&run===RUN;i++){const [w,c]=STROOP[i];const e=$('#w');e.textContent=w;e.style.color=c;$('#pb').style.width=((i+1)/STROOP.length*100)+'%';await sleep(2000)}
+      for(let i=0;i<STROOP.length&&run===RUN;i++){const [w,c]=STROOP[i];const e=$('#w');e.textContent=w;e.style.color=c;$('#pb').style.width=((i+1)/STROOP.length*100)+'%';mark(2);await sleep(2000)}
     }});
   if(ok)nextBtn(lettersIntro);
 }
@@ -562,7 +585,7 @@ async function lettersIntro(){
         stage.innerHTML=`<p class="mut" style="text-align:center;margin-bottom:8px">${i+1} / ${EQ.length}</p><div class="stage" style="background:#fbf3ea"><div class="eqs">${set.map(([a,b])=>`${a} + ${b} = ${a+b} → ${L(a+b)}`).join('<br>')}</div></div>`;
         await sleep(3000+ (set.length-3)*1000);if(run!==RUN)return;
         stage.innerHTML=`<p class="mut" style="text-align:center;margin-bottom:8px">${i+1} / ${EQ.length} — Say the letters · قل الحروف</p><div class="stage white"></div>`;
-        await sleep(3000+set.length*700);
+        mark((3000+set.length*700)/1000);await sleep(3000+set.length*700);
       }
     }});
   if(ok)nextBtn(namingIntro);
@@ -576,7 +599,7 @@ async function namingIntro(){
       OBJECTS.forEach(o=>{const i=new Image();i.src=`img/${o}.jpg`});
       for(let i=0;i<OBJECTS.length&&run===RUN;i++){
         stage.innerHTML=`<div class="stage white" style="padding:10px"><img src="img/${OBJECTS[i]}.jpg" style="max-width:100%;max-height:300px;border-radius:12px" alt=""></div><div class="bar" style="margin-top:10px"><i style="width:${(i+1)/OBJECTS.length*100}%"></i></div>`;
-        await sleep(2000);
+        mark(2);await sleep(2000);
       }
     }});
   if(ok)nextBtn(finish);
@@ -596,38 +619,295 @@ async function finish(){
   </div>`;
   renderRecs($('#lst'),S,recs);
   $('#shAll').onclick=()=>shareRecs(S,recs);$('#home').onclick=home;
+  autoScore(S,recs).catch(e=>console.warn('auto score',e));
   say('That was all. Thank you for your participation. You did well.');
 }
-function renderRecs(el,sess,recs){
+/* ================= AUTOMATIC SCORING (on the phone, no internet) =================
+   Runs when the student finishes. It measures the recordings themselves:
+   • Questions 1-3: speaking time, pauses, speech/silence ratio → fluency estimate /10
+   • Tasks 1-3: how many items the student answered and how fast (reaction time)
+   It cannot know if a word is RIGHT (that needs speech recognition), so the
+   teacher still marks correctness. ► Tune the constants below if needed. */
+let MARKS=[];const mark=w=>MARKS.push({t:Date.now(),w});
+const AUTO={frame:0.02,minPause:0.25,minSeg:0.1,minRT:0.15,targetSpeak:40};
+async function speechSegments(blob){
+  const ac=new (window.AudioContext||window.webkitAudioContext)();
+  let buf;try{buf=await ac.decodeAudioData(await blob.arrayBuffer())}finally{try{ac.close()}catch(e){}}
+  const d=buf.getChannelData(0),sr=buf.sampleRate,fl=Math.max(1,Math.round(sr*AUTO.frame)),db=[];
+  for(let i=0;i+fl<=d.length;i+=fl){let e=0;for(let j=i;j<i+fl;j++)e+=d[j]*d[j];db.push(10*Math.log10(e/fl+1e-12))}
+  const srt=[...db].sort((a,b)=>a-b),pc=q=>srt[Math.min(srt.length-1,Math.floor(q*srt.length))]||-120;
+  const noise=pc(.1),peak=pc(.98);const dur=d.length/sr;
+  if(!db.length||peak-noise<10||peak<-55)return {dur,segs:[]};
+  const thr=noise+Math.max(8,.3*(peak-noise));let segs=[],cur=null;
+  db.forEach((v,i)=>{const t=i*AUTO.frame;if(v>=thr){if(!cur)cur={s:t,e:t+AUTO.frame};else cur.e=t+AUTO.frame}else if(cur){segs.push(cur);cur=null}});if(cur)segs.push(cur);
+  const merged=[];for(const g of segs){const l=merged[merged.length-1];if(l&&g.s-l.e<AUTO.minPause)l.e=g.e;else merged.push({...g})}
+  return {dur,segs:merged.filter(g=>g.e-g.s>=AUTO.minSeg)};
+}
+const r1=v=>Math.round(v*10)/10;
+function fluencyOf({dur,segs}){
+  if(!segs.length)return {speak:0,ptr:0,pauses:0,pausesMin:0,meanPause:0,mlr:0,est:0,dur:r1(dur)};
+  const speak=segs.reduce((a,g)=>a+g.e-g.s,0),span=segs[segs.length-1].e-segs[0].s;
+  const gaps=segs.slice(1).map((g,i)=>g.s-segs[i].e),ptr=span>0?speak/span:1;
+  const est=Math.round(10*(.5*Math.min(speak/AUTO.targetSpeak,1)+.5*Math.max(0,Math.min(1,(ptr-.3)/.5))));
+  return {speak:r1(speak),ptr:Math.round(ptr*100),pauses:gaps.length,pausesMin:r1(gaps.length/Math.max(span/60,1/60)),
+    meanPause:r1(gaps.length?gaps.reduce((a,b)=>a+b,0)/gaps.length:0),mlr:r1(speak/(gaps.length+1)),est,dur:r1(dur)};
+}
+function reactionOf({segs},marks){
+  if(!marks||!marks.length)return null;let answered=0;const rts=[];
+  marks.forEach(m=>{const g=segs.find(g=>g.s>=m.t+AUTO.minRT&&g.s<=m.t+m.w+.3);if(g){answered++;rts.push(g.s-m.t)}});
+  rts.sort((a,b)=>a-b);
+  return {n:marks.length,answered,rtMean:rts.length?Math.round(1000*rts.reduce((a,b)=>a+b,0)/rts.length):null,rtMedian:rts.length?Math.round(1000*rts[Math.floor(rts.length/2)]):null};
+}
+async function autoScore(sess,recs){
+  const out={};
+  for(const r of recs){try{const sg=await speechSegments(r.blob);
+    out[r.key]=SPEAK_KEYS.includes(r.key)?fluencyOf(sg):(reactionOf(sg,r.marks)||{n:0,answered:null})}catch(e){out[r.key]={error:true}}}
+  sess.auto=out;sess.autoAt=Date.now();await putS(sess);return out;
+}
+function autoLine(sess,key){
+  const a=sess.auto&&sess.auto[key];if(!a)return '';if(a.error)return '<small class="auto">Auto: could not analyse · تعذّر التحليل</small>';
+  const tx=sess.asr&&sess.asr[key];
+  const trn=tx?`<details class="trn"><summary>📝 What the student said · ما قاله الطالب</summary><p>${esc(tx.text||'—')}</p>${tx.items?`<div class="items">${tx.items.map((it,i)=>`<span class="${it.ok?'ok':'no'}">${i+1}. ${esc(it.exp)}${it.ok?' ✓':` → ${esc(it.said||'—')}`}</span>`).join('')}</div>`:''}</details>`:'';
+  if(SPEAK_KEYS.includes(key))return `<small class="auto">🤖 Auto: fluency ≈ <b>${a.est}/10</b> · speaking ${a.speak}s · ${a.pauses} pauses · speech ${a.ptr}%${a.wpm!=null?` · ${a.wpm} words/min`:''}</small>${trn}`;
+  if(a.answered==null)return trn;
+  return `<small class="auto">🤖 Auto: ${a.correct!=null?`correct <b>${a.correct}/${a.n}</b> · `:''}answered ${a.answered}/${a.n}${a.rtMean!=null?` · reaction time ${a.rtMean} ms`:''}${a.readWord?` · read the word ${a.readWord}×`:''}</small>${trn}`;
+}
+function autoSummary(s){
+  if(!s.auto)return '';const q=SPEAK_KEYS.map(k=>s.auto[k]&&s.auto[k].est).filter(v=>v!=null);
+  const parts=[];if(q.length)parts.push(`fluency ≈ ${q.reduce((a,b)=>a+b,0)}/${q.length*10}`);
+  [['T1_colors','Colours'],['T2_letters','Letters'],['T3_pictures','Pictures']].forEach(([k,l])=>{const a=s.auto[k];if(a&&a.answered!=null)parts.push(`${l} ${a.correct!=null?a.correct+' correct':a.answered+' answered'}/${a.n}${a.rtMean!=null?' ('+a.rtMean+' ms)':''}`)});
+  return parts.length?`<div class="auto">🤖 ${parts.join(' · ')}</div>`:'';
+}
+
+
+/* ================= SPEECH RECOGNITION CORRECTION (teacher) =================
+   The teacher presses "Auto-correct": the app listens to every recording with
+   Whisper (OpenAI's speech-recognition model, running inside the app) and checks
+   the words: ink colours, letter sequences, picture names, and answer texts.
+   The model (~40 MB) is downloaded once from the school website, then cached. */
+const ASR_BASE=(/github\.io$/.test(location.hostname)||location.hostname==='localhost')?new URL('asr/',location.href).href:'https://djilalilakehal0-gif.github.io/speaking-pretest/asr/';
+let ASR=null,WM=null;
+async function loadASR(onP){
+  if(ASR)return ASR;
+  const T=await import(ASR_BASE+'transformers.min.js');
+  T.env.allowLocalModels=true;T.env.allowRemoteModels=false;T.env.localModelPath=ASR_BASE+'models/';
+  T.env.useBrowserCache=false;T.env.backends.onnx.wasm.wasmPaths=ASR_BASE;
+  T.env.backends.onnx.wasm.numThreads=self.crossOriginIsolated?Math.max(1,Math.min(4,(navigator.hardwareConcurrency||2))):1;
+  ASR=await T.pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{dtype:'q8',device:'wasm',progress_callback:onP});
+  WM={T,model:ASR.model,tok:ASR.tokenizer,proc:ASR.processor};
+  return ASR;
+}
+/* Closed-vocabulary listening: for each answer we already know the possible words
+   (the colours, the object names, the letters). Whisper hears the clip once and then
+   rates how well each possible answer matches the sound; the best match wins. This is
+   far more reliable for single words than free transcription. */
+const WP=[50258,50259,50359,50363],WEOT=50257; // <|startoftranscript|><|en|><|transcribe|><|notimestamps|> … <|endoftext|>
+async function wEncode(clip){const {input_features}=await WM.proc(clip);
+  return (await WM.model._prepare_encoder_decoder_kwargs_for_generation({model_inputs:{input_features},generation_config:{}})).encoder_outputs}
+function lsmRow(d,o,V){let m=-1e30;for(let k=0;k<V;k++)if(d[o+k]>m)m=d[o+k];let z=0;for(let k=0;k<V;k++)z+=Math.exp(d[o+k]-m);return m+Math.log(z)}
+async function wScore(h,texts){const {T,model,tok}=WM;
+  const seqs=texts.map(t=>[...WP,...tok.encode(' '+t,{add_special_tokens:false}),WEOT]);const n=seqs.length,Lx=Math.max(...seqs.map(q=>q.length));
+  const ids=new BigInt64Array(n*Lx);seqs.forEach((q,i)=>{for(let j=0;j<Lx;j++)ids[i*Lx+j]=BigInt(q[j]??WEOT)});
+  const out=await model.forward({encoder_outputs:T.cat(Array.from({length:n},()=>h),0),decoder_input_ids:new T.Tensor('int64',ids,[n,Lx])});
+  const V=out.logits.dims[2],d=out.logits.data;
+  return seqs.map((q,i)=>{let lp=0;for(let j=WP.length;j<q.length;j++){const o=(i*Lx+j-1)*V;lp+=d[o+q[j]]-lsmRow(d,o,V)}return lp});
+}
+async function pcm16k(blob){
+  const ac=new (window.AudioContext||window.webkitAudioContext)();let buf;
+  try{buf=await ac.decodeAudioData(await blob.arrayBuffer())}finally{try{ac.close()}catch(e){}}
+  const OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+  const off=new OAC(1,Math.max(1,Math.ceil(buf.duration*16000)),16000);const src=off.createBufferSource();src.buffer=buf;src.connect(off.destination);src.start();
+  return (await off.startRendering()).getChannelData(0);
+}
+const nw=w=>String(w).toLowerCase().replace(/[^a-z]/g,'');
+const COLOR_ALIAS={gray:'grey',golden:'gold',turquoise:'turquoise',turquois:'turquoise',purple:'purple',violet:'purple'};
+const COLORS=new Set([...Object.values(INK).map(c=>c.toLowerCase()),...STROOP.map(x=>x[0].toLowerCase()),'gray','orange','white']);
+const colorOf=w=>{w=nw(w);w=COLOR_ALIAS[w]||w;return COLORS.has(w)?w:null};
+const LETTER_WORDS={a:'A',ay:'A',eh:'A',b:'B',be:'B',bee:'B',c:'C',see:'C',sea:'C',si:'C',d:'D',dee:'D',e:'E',f:'F',ef:'F',eff:'F',g:'G',gee:'G',ji:'G',h:'H',aitch:'H',haitch:'H',i:'I',eye:'I',ai:'I',j:'J',jay:'J',k:'K',kay:'K',l:'L',el:'L',ell:'L',m:'M',em:'M',n:'N',en:'N',o:'O',oh:'O',p:'P',pee:'P',pea:'P',q:'Q',cue:'Q',queue:'Q',r:'R',ar:'R',are:'R',s:'S',es:'S',ess:'S',t:'T',tee:'T',tea:'T',u:'U',you:'U',v:'V',vee:'V',w:'W',x:'X',ex:'X',y:'Y',why:'Y',z:'Z',zed:'Z',zee:'Z'};
+function lettersOf(word){const raw=String(word).replace(/[^A-Za-z]/g,'');if(!raw)return [];
+  if(raw.length>1&&raw.length<=8&&raw===raw.toUpperCase())return raw.split('');
+  const m=LETTER_WORDS[raw.toLowerCase()];return m?[m]:[];}
+const OBJ_SYN={book:['book','notebook'],pencil:['pencil'],chair:['chair'],bed:['bed'],table:['table','desk'],train:['train'],door:['door'],phone:['phone','telephone','mobile','smartphone','cellphone'],house:['house','home'],eggs:['egg','eggs'],glass:['glass'],elephant:['elephant'],fish:['fish'],car:['car'],flower:['flower','flowers'],jacket:['jacket','coat'],mouse:['mouse'],pot:['pot','saucepan'],boot:['boot','boots'],sun:['sun']};
+async function transcribe(pcm,segs){
+  const asr=await loadASR();
+  const r=await asr(pcm,{language:'en',task:'transcribe',return_timestamps:'word',chunk_length_s:30,stride_length_s:5});
+  let words=(r.chunks||[]).map(c=>({w:c.text.trim(),s:c.timestamp[0],e:c.timestamp[1]==null?c.timestamp[0]+0.3:c.timestamp[1]})).filter(x=>x.w);
+  if(segs&&segs.length)words=words.filter(x=>segs.some(g=>x.e>=g.s-0.15&&x.s<=g.e+0.15)); // drop words heard in silence
+  return {text:words.map(x=>x.w).join(' '),words};
+}
+/* Tasks: each answer is a short word said inside its own time window, so every window is
+   cut out and heard on its own (Whisper is much more accurate on short clips). Windows
+   with no voice are skipped, so the model cannot "imagine" words in silence. */
+const GRACE={T1_colors:0.5,T2_letters:0.8,T3_pictures:0.5};
+const cap=w=>w.charAt(0).toUpperCase()+w.slice(1);
+const OTHER=['Um.','I don\'t know.']; // "none of the answers"
+function vocabFor(key){
+  if(key==='T1_colors'){const c=[...new Set([...Object.values(INK),'Orange','White'].map(w=>w.toLowerCase()))];return c.map(w=>({w,t:cap(w)+'.'}))}
+  if(key==='T3_pictures'){const v=[];OBJECTS.forEach(o=>(OBJ_SYN[o]||[o]).forEach(w=>v.push({w,o,t:cap(w)+'.'})));return v}
+  return []}
+let WLET=null;
+function letterTokens(){if(WLET)return WLET;const m=new Map(),tok=WM.tok;
+  for(let c=0;c<26;c++)for(const v of [' '+L(c),L(c)]){const t=tok.encode(v,{add_special_tokens:false});if(t.length===1)m.set(t[0],L(c))}
+  for(const v of [',','.',' ,',' .','-',' -','...']){const t=tok.encode(v,{add_special_tokens:false});if(t.length===1)m.set(t[0],'')}
+  return WLET=m}
+async function wLetters(h,max=16){const {T,model}=WM,allow=letterTokens();const seq=[...WP];let out='';
+  for(let k=0;k<max;k++){const o=await model.forward({encoder_outputs:h,decoder_input_ids:new T.Tensor('int64',BigInt64Array.from(seq.map(BigInt)),[1,seq.length])});
+    const V=o.logits.dims[2],d=o.logits.data,off=(seq.length-1)*V;let best=WEOT,bv=d[off+WEOT];
+    for(const t of allow.keys())if(d[off+t]>bv){bv=d[off+t];best=t}
+    if(best===WEOT)break;seq.push(best);out+=allow.get(best)}
+  return out}
+const spell=x=>x.split('').join(', ')+'.';
+async function transcribeWindows(pcm,marks,segs,grace,key){
+  await loadASR();const out=[];
+  for(const [i,m] of marks.entries()){const a=m.t,b=m.t+m.w+grace;
+    const voiced=segs.filter(g=>g.e>a&&g.s<b);if(!voiced.length){out.push(null);continue} // silence = no answer
+    const s0=Math.max(0,a,voiced[0].s-0.3),s1=Math.min(b,voiced[voiced.length-1].e+0.3,pcm.length/16000);
+    const clip=new Float32Array(Math.round((s1-s0)*16000)+16000);clip.set(pcm.subarray(Math.round(s0*16000),Math.round(s1*16000)),8000);
+    const h=await wEncode(clip);
+    if(key==='T2_letters'){ // free letter listening, then check: does the correct sequence fit the sound better than what was heard?
+      const exp=EQ[i].map(([x,y])=>L(x+y)).join('');const heard=await wLetters(h);
+      if(!heard){out.push({w:'',t:'(no letters)'});continue}
+      if(heard===exp){out.push({w:exp,t:exp});continue}
+      const [se,sh]=await wScore(h,[spell(exp),spell(heard)]);out.push(se>=sh?{w:exp,t:exp}:{w:heard,t:heard});continue}
+    const voc=vocabFor(key),all=[...voc,...OTHER.map(t=>({w:null,t}))];const sc=[];
+    for(let k=0;k<all.length;k+=32)sc.push(...await wScore(h,all.slice(k,k+32).map(x=>x.t)));
+    let bv=-1e9,bi=0,fo=-1e9,fi=-1;sc.forEach((v,k)=>{if(all[k].w){if(v>bv){bv=v;bi=k}}else if(v>fo){fo=v;fi=k}});
+    out.push(fo>bv+1.5?{w:'',t:all[fi].t.replace('.','')}:all[bi])}
+  return out;
+}
+const toks=t=>String(t).split(/[\s,.;:!?\-]+/).filter(Boolean);
+function checkStroop(picks){let correct=0,readWord=0;const items=[];
+  picks.forEach((p,i)=>{const exp=INK[STROOP[i][1]].toLowerCase(),printed=STROOP[i][0].toLowerCase();const said=p&&p.w?colorOf(p.w)||p.w:null;
+    const ok=said===exp;if(ok)correct++;else if(said&&said===printed)readWord++;items.push({exp,said:said||(p?p.t:''),ok})});
+  return {correct,n:picks.length,readWord,items}}
+function checkLetters(picks){let correct=0,letters=0,total=0;const items=[];
+  picks.forEach((p,i)=>{const exp=EQ[i].map(([a,b])=>L(a+b));const got=p&&p.w?p.w.split(''):[];
+    const ok=got.join('')===exp.join('');if(ok)correct++;exp.forEach((c,k)=>{total++;if(got[k]===c)letters++});items.push({exp:exp.join(''),said:got.join('')||(p?p.t:''),ok})});
+  return {correct,n:picks.length,letters,lettersTotal:total,items}}
+function checkNaming(picks){let correct=0;const items=[];
+  picks.forEach((p,i)=>{const obj=OBJECTS[i];const ok=!!(p&&p.o===obj);if(ok)correct++;items.push({exp:obj,said:p?(p.w||p.t):'',ok})});
+  return {correct,n:picks.length,items}}
+async function asrCorrect(sess,onStep){
+  const recs=(await recsOf(sess.id)).sort((a,b)=>a.key.localeCompare(b.key));
+  sess.auto=sess.auto||{};sess.asr=sess.asr||{};
+  for(const [i,r] of recs.entries()){onStep&&onStep(r.label,i,recs.length);
+    const sg=await speechSegments(r.blob);const pcm=await pcm16k(r.blob);const task=!SPEAK_KEYS.includes(r.key)&&r.marks&&r.marks.length;
+    let tr,texts;if(task){texts=await transcribeWindows(pcm,r.marks,sg.segs,GRACE[r.key]||0.5,r.key);tr={text:texts.map(p=>p?(p.w||p.t):'—').join(' · ')}}else tr=await transcribe(pcm,sg.segs);
+    sess.asr[r.key]={text:tr.text};const a=sess.auto[r.key]=SPEAK_KEYS.includes(r.key)?fluencyOf(sg):(reactionOf(sg,r.marks)||{n:0});
+    if(SPEAK_KEYS.includes(r.key)){const span=sg.segs.length?sg.segs[sg.segs.length-1].e-sg.segs[0].s:0;a.words=tr.words.length;
+      a.wpm=span>0?Math.round(tr.words.length/(span/60)):0;
+      a.est=Math.round(10*(.35*Math.min(a.speak/AUTO.targetSpeak,1)+.35*Math.max(0,Math.min(1,(a.ptr/100-.3)/.5))+.3*Math.min(a.wpm/100,1)));}
+    else if(task){const chk=r.key==='T1_colors'?checkStroop(texts):r.key==='T2_letters'?checkLetters(texts):checkNaming(texts);
+      Object.assign(a,{correct:chk.correct,readWord:chk.readWord,letters:chk.letters,lettersTotal:chk.lettersTotal});sess.asr[r.key].items=chk.items;}
+  }
+  // fill the teacher's empty score boxes with the automatic result
+  sess.scores=sess.scores||{};sess.autoFilled=sess.autoFilled||{};
+  for(const x of SCORING){const a=sess.auto[x.key];if(!a)continue;const v=SPEAK_KEYS.includes(x.key)?a.est:a.correct;
+    if(v==null)continue;if(sess.scores[x.key]==null||sess.autoFilled[x.key]){sess.scores[x.key]=v;sess.autoFilled[x.key]=true}}
+  sess.asrAt=Date.now();await putS(sess);
+}
+
+/* ================= TEACHER SCORING =================
+   The teacher listens to each recording and enters a score.
+   ► Change the maximum marks here if the study uses another scale. */
+const SCORING=[
+  {key:'Q1',label:'Question 1',max:10,hint:'Speaking fluency · طلاقة التحدث'},
+  {key:'Q2',label:'Question 2',max:10,hint:'Speaking fluency · طلاقة التحدث'},
+  {key:'Q3',label:'Question 3',max:10,hint:'Speaking fluency · طلاقة التحدث'},
+  {key:'T1_colors',label:'Task 1 · Colours',max:STROOP.length,hint:'Correct colours · عدد الألوان الصحيحة'},
+  {key:'T2_letters',label:'Task 2 · Letters',max:EQ.length,hint:'Correct sequences · عدد السلاسل الصحيحة'},
+  {key:'T3_pictures',label:'Task 3 · Pictures',max:OBJECTS.length,hint:'Correct names · عدد الأسماء الصحيحة'}];
+const SPEAK_KEYS=['Q1','Q2','Q3'];
+const scoreOf=(s,k)=>(s.scores&&s.scores[k]!=null&&s.scores[k]!=='')?+s.scores[k]:null;
+function scoreSummary(s){
+  const got=SCORING.filter(x=>scoreOf(s,x.key)!=null).length;
+  if(!got)return '<span class="ungraded">Not graded yet · لم يُصحَّح بعد</span>';
+  const sp=SPEAK_KEYS.map(k=>scoreOf(s,k)).filter(v=>v!=null);
+  const spMax=SCORING.filter(x=>SPEAK_KEYS.includes(x.key)).reduce((a,x)=>a+x.max,0);
+  const parts=[`Speaking ${sp.reduce((a,b)=>a+b,0)}/${spMax}`];
+  SCORING.filter(x=>!SPEAK_KEYS.includes(x.key)).forEach(x=>{const v=scoreOf(s,x.key);if(v!=null)parts.push(`${x.label.split(' · ')[1]} ${v}/${x.max}`)});
+  return `<span class="graded">${got===SCORING.length?'✓ ':''}${parts.join(' · ')}</span>${got<SCORING.length?` <span class="ungraded">(${got}/${SCORING.length})</span>`:''}`;
+}
+function renderRecs(el,sess,recs,grading,onScore){
   if(!recs.length){el.innerHTML='<p class="mut">No recordings.</p>';return}
-  el.innerHTML=recs.map((r,i)=>`<div class="item"><div class="h">${esc(r.label)}<small>${Math.round(r.dur||0)} s</small></div>
+  el.innerHTML=recs.map((r,i)=>{const sc=SCORING.find(x=>x.key===r.key);const v=scoreOf(sess,r.key);
+    return `<div class="item"><div class="h">${esc(r.label)}<small>${Math.round(r.dur||0)} s</small></div>
     <audio controls preload="none" src="${URL.createObjectURL(r.blob)}"></audio>
-    <button class="btn small ghost" data-i="${i}">📤 Share</button></div>`).join('');
+    ${grading&&sc?`<div class="score"><label>Score · الدرجة<input type="number" inputmode="numeric" min="0" max="${sc.max}" step="1" data-k="${sc.key}" value="${v==null?'':v}" placeholder="–"><span>/ ${sc.max}</span>${sess.autoFilled&&sess.autoFilled[sc.key]?'<em class="af">🤖 auto</em>':''}</label><small class="mut">${sc.hint}</small>${autoLine(sess,r.key)}</div>`:''}
+    <button class="btn small ghost" data-i="${i}">📤 Share</button></div>`}).join('');
   el.querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>shareRecs(sess,[recs[+b.dataset.i]]));
+  el.querySelectorAll('input[data-k]').forEach(inp=>inp.onchange=async()=>{
+    const sc=SCORING.find(x=>x.key===inp.dataset.k);let v=inp.value.trim();
+    if(v!==''){v=Math.round(+v);if(isNaN(v)){inp.value='';return}v=Math.max(0,Math.min(sc.max,v));inp.value=v}
+    sess.scores=sess.scores||{};if(v==='')delete sess.scores[sc.key];else sess.scores[sc.key]=v;if(sess.autoFilled)delete sess.autoFilled[sc.key];
+    const af=inp.parentElement.querySelector('.af');if(af)af.remove();
+    await putS(sess);inp.classList.add('saved-ok');setTimeout(()=>inp.classList.remove('saved-ok'),900);onScore&&onScore()});
+}
+async function exportScores(){
+  const ss=(await allS()).filter(s=>s.count>0).sort((a,b)=>a.date-b.date);
+  if(!ss.length){toast('No students yet · لا يوجد طلاب بعد');return}
+  const q=v=>{v=v==null?'':String(v);return /[",\n;]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  const spMax=SCORING.filter(x=>SPEAK_KEYS.includes(x.key)).reduce((a,x)=>a+x.max,0);
+  for(const s of ss)if(!s.auto){try{await autoScore(s,await recsOf(s.id))}catch(e){}}
+  const A=(s,k,f)=>{const a=s.auto&&s.auto[k];return a&&a[f]!=null?a[f]:''};
+  const autoHead=[...SPEAK_KEYS.flatMap(k=>[`AUTO ${k} fluency est (/10)`,`AUTO ${k} speaking time (s)`,`AUTO ${k} pauses`,`AUTO ${k} mean pause (s)`,`AUTO ${k} speech ratio (%)`,`AUTO ${k} mean length of run (s)`]),
+    ...['T1_colors','T2_letters','T3_pictures'].flatMap(k=>[`AUTO ${k} correct`,`AUTO ${k} answered`,`AUTO ${k} items`,`AUTO ${k} mean RT (ms)`,`AUTO ${k} median RT (ms)`]),
+    'AUTO T1 read-the-word errors','AUTO T2 letters correct',...SPEAK_KEYS.flatMap(k=>[`AUTO ${k} words/min`,`AUTO ${k} transcript`])];
+  const autoRow=s=>[...SPEAK_KEYS.flatMap(k=>['est','speak','pauses','meanPause','ptr','mlr'].map(f=>A(s,k,f))),...['T1_colors','T2_letters','T3_pictures'].flatMap(k=>['correct','answered','n','rtMean','rtMedian'].map(f=>A(s,k,f))),
+    A(s,'T1_colors','readWord'),A(s,'T2_letters','letters'),...SPEAK_KEYS.flatMap(k=>[A(s,k,'wpm'),(s.asr&&s.asr[k]&&s.asr[k].text)||''])];
+  const head=['Student','Date',...SCORING.map(x=>`${x.label} (/${x.max})`),`Speaking total (/${spMax})`,'Graded',...autoHead];
+  const rows=ss.map(s=>{const sp=SPEAK_KEYS.map(k=>scoreOf(s,k));const done=SCORING.filter(x=>scoreOf(s,x.key)!=null).length;
+    return [s.name,new Date(s.date).toLocaleString(),...SCORING.map(x=>scoreOf(s,x.key)),sp.every(v=>v!=null)?sp.reduce((a,b)=>a+b,0):'',`${done}/${SCORING.length}`,...autoRow(s)]});
+  const csv='﻿'+[head,...rows].map(r=>r.map(q).join(',')).join('\r\n');
+  const name=`SpeakingPreTest_scores_${new Date().toISOString().slice(0,10)}.csv`;
+  const fs=P().Filesystem,sh=P().Share;
+  if(isNative()&&fs&&sh){try{const w=await fs.writeFile({path:`share/${name}`,data:csv,directory:'CACHE',encoding:'utf8',recursive:true});
+    await sh.share({title:'Speaking Pre-Test scores',files:[w.uri],dialogTitle:'Export scores'});return}catch(e){if(String(e).match(/cancel/i))return;console.warn(e)}}
+  const blob=new Blob([csv],{type:'text/csv'});
+  try{const f=new File([blob],name,{type:'text/csv'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Speaking Pre-Test scores'});return}}catch(e){if(e.name==='AbortError')return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('Scores file downloaded · تم تنزيل ملف الدرجات');
 }
 
 async function savedScreen(){
   RUN++;stopSpeech();step('Saved');
   const ss=(await allS()).filter(s=>s.count>0).sort((a,b)=>b.date-a.date);
   M.innerHTML=`<div class="screen"><div class="row" style="align-items:center"><h2>🎤 Saved answers</h2><button class="btn small ghost" id="bk" style="flex:0;white-space:nowrap">← Back</button></div>
-    <p class="ar mut">كل إجابات الطلاب محفوظة هنا على الهاتف.</p>
+    <p class="ar mut">كل إجابات الطلاب محفوظة هنا على الهاتف. اضغط «Listen & grade» لسماع الإجابات وكتابة الدرجات.</p>
+    <button class="btn" id="acAll">🤖 Auto-correct all students · تصحيح تلقائي للجميع</button>
+    <div class="acst" id="acst" hidden></div>
+    <button class="btn ghost" id="exp">📊 Export all scores (CSV) · تصدير الدرجات</button>
     <div class="list" id="ss">${ss.length?'':'<p class="mut">No saved answers yet · لا توجد إجابات بعد</p>'}</div></div>`;
-  $('#bk').onclick=home;
+  $('#bk').onclick=home;$('#exp').onclick=exportScores;
+  $('#acAll').onclick=async()=>{const st=$('#acst'),btn=$('#acAll');const todo=ss.filter(s=>!s.asrAt);
+    if(!todo.length){toast('All students are already auto-corrected · تم تصحيح الجميع');return}
+    btn.disabled=true;st.hidden=false;
+    try{st.textContent='Loading speech model… جارٍ تحميل نموذج التعرّف على الكلام (مرة واحدة، يحتاج إنترنت)';
+      await loadASR(p=>{if(p&&p.status==='progress'&&p.file&&/onnx/.test(p.file))st.textContent=`Downloading model ${Math.round(p.progress||0)}% · تحميل النموذج`});
+      for(const [i,s] of todo.entries()){await asrCorrect(s,(lab,k,n)=>{st.textContent=`🤖 ${s.name} (${i+1}/${todo.length}) — ${lab} (${k+1}/${n})… جارٍ الاستماع والتصحيح`})}
+      st.textContent=`✓ Done: ${todo.length} students corrected · تم التصحيح`;setTimeout(savedScreen,1200);
+    }catch(e){console.warn(e);st.textContent='⚠️ Could not load the speech model. Check the internet connection and try again. · تعذّر تحميل النموذج، تحقّق من الإنترنت';btn.disabled=false}};
   const box=$('#ss');
   for(const s of ss){
     const d=document.createElement('div');d.className='sess';
-    d.innerHTML=`<div class="item h" style="border:0;padding:0;background:none;flex-direction:row"><div><div style="font-weight:800">${esc(s.name)}</div><small class="mut">${new Date(s.date).toLocaleString()} · ${s.count} 🎤</small></div></div>
-      <div class="row"><button class="btn small" data-a="open">▶ Listen</button><button class="btn small" data-a="share">📤 Share</button><button class="btn small ghost" data-a="del">🗑</button></div><div class="list" hidden></div>`;
+    d.innerHTML=`<div class="item h" style="border:0;padding:0;background:none;flex-direction:row"><div><div style="font-weight:800">${esc(s.name)}</div><small class="mut">${new Date(s.date).toLocaleString()} · ${s.count} 🎤</small><div class="sc-sum">${scoreSummary(s)}</div><div class="au-sum">${autoSummary(s)}</div></div></div>
+      <div class="row"><button class="btn small" data-a="open">▶ Listen & grade</button><button class="btn small" data-a="share">📤 Share</button><button class="btn small ghost" data-a="del">🗑</button></div>
+      <button class="btn small ghost" data-a="ac">${s.asrAt?'🤖 Auto-corrected ✓ (run again)':'🤖 Auto-correct this student · تصحيح تلقائي'}</button><div class="list" hidden></div>`;
     const lst=d.querySelector('.list');
-    d.querySelector('[data-a=open]').onclick=async()=>{if(!lst.hidden){lst.hidden=true;return}renderRecs(lst,s,(await recsOf(s.id)).sort((a,b)=>a.key.localeCompare(b.key)));lst.hidden=false};
+    d.querySelector('[data-a=open]').onclick=async()=>{if(!lst.hidden){lst.hidden=true;return}renderRecs(lst,s,(await recsOf(s.id)).sort((a,b)=>a.key.localeCompare(b.key)),true,()=>{d.querySelector('.sc-sum').innerHTML=scoreSummary(s)});lst.hidden=false};
     d.querySelector('[data-a=share]').onclick=async()=>shareRecs(s,(await recsOf(s.id)).sort((a,b)=>a.key.localeCompare(b.key)));
+    d.querySelector('[data-a=ac]').onclick=async e=>{const b=e.currentTarget;b.disabled=true;
+      try{b.textContent='Loading model… تحميل النموذج';await loadASR();await asrCorrect(s,(lab,k,n)=>{b.textContent=`🤖 ${lab} (${k+1}/${n})…`});savedScreen()}
+      catch(err){console.warn(err);b.disabled=false;b.textContent='⚠️ Failed — check internet · تحقّق من الإنترنت'}};
     d.querySelector('[data-a=del]').onclick=async()=>{if(confirm(`Delete ${s.name}'s answers? / حذف إجابات ${s.name}؟`)){await delSession(s.id);savedScreen()}};
     box.appendChild(d);
+    if(!s.auto)recsOf(s.id).then(rs=>autoScore(s,rs)).then(()=>{d.querySelector('.au-sum').innerHTML=autoSummary(s)}).catch(()=>{});
   }
 }
 
 /* Android back button */
 try{P().App&&P().App.addListener('backButton',()=>home())}catch(e){}
+/* Offline support for the iPhone / web version (not needed inside the Android app) */
+if('serviceWorker' in navigator&&!isNative()&&(location.protocol==='https:'||location.hostname==='localhost')){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 home();
 </script>
 </body>

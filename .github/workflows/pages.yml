@@ -1,0 +1,65 @@
+name: Publish website (iPhone + automatic correction)
+
+# Publishes the app as a website at https://djilalilakehal0-gif.github.io/speaking-pretest/
+# together with the speech-recognition model (Whisper tiny, ~40 MB) used by the
+# teacher's "Auto-correct" button. Runs after every upload to the main branch.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Copy the app
+        run: |
+          mkdir -p _site
+          cp -r www/. _site/
+          # old links that end with /www/ keep working
+          mkdir -p _site/www
+          printf '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=../"><a href="../">Speaking Pre-Test</a>' > _site/www/index.html
+          touch _site/.nojekyll
+
+      - name: Add the speech-recognition model (Whisper tiny)
+        run: |
+          mkdir -p /tmp/m && cd /tmp/m
+          npm pack sts-whisper-tiny@1.0.0
+          tar -xzf sts-whisper-tiny-1.0.0.tgz
+          npm install --no-save --ignore-scripts @huggingface/transformers@3.7.5
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p _site/asr/models
+          cp -r /tmp/m/package/models/Xenova _site/asr/models/
+          D=/tmp/m/node_modules/@huggingface/transformers/dist
+          cp $D/transformers.min.js $D/ort-wasm-simd-threaded.jsep.mjs $D/ort-wasm-simd-threaded.jsep.wasm _site/asr/
+          ls -la _site/asr _site/asr/models/Xenova/whisper-tiny/onnx
+          test -f _site/asr/models/Xenova/whisper-tiny/onnx/decoder_model_merged_quantized.onnx
+          test -f _site/asr/models/Xenova/whisper-tiny/onnx/encoder_model_quantized.onnx
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
