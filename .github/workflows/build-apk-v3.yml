@@ -3,6 +3,7 @@ name: Build Android APK
 on:
   push:
     branches: [main]
+  pull_request:       # test build on pull requests (unsigned, nothing is published)
   workflow_dispatch:
 
 permissions:
@@ -36,6 +37,17 @@ jobs:
           sed -i 's#<application#<application android:requestLegacyExternalStorage="true"#' $M
           cat $M
 
+      - name: Limit shared files to the app's share folder
+        run: |
+          # Answers are shared from cache/share/ only; the default config exposes the whole external storage
+          cat > android/app/src/main/res/xml/file_paths.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <paths xmlns:android="http://schemas.android.com/apk/res/android">
+              <cache-path name="share" path="share/" />
+          </paths>
+          XML
+          cat android/app/src/main/res/xml/file_paths.xml
+
       - name: Set version (each build gets a higher number so updates install over the old app)
         run: |
           G=android/app/build.gradle
@@ -49,15 +61,28 @@ jobs:
       - name: Sync web code
         run: npx cap sync android
 
+      - name: Test build (pull requests only)
+        if: github.event_name == 'pull_request'
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
       - name: Prepare signing key
+        if: github.event_name != 'pull_request'
         env:
           KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KS_B64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
+          # The key comes from the KEYSTORE_BASE64 secret, or else from KEYSTORE_BASE64.txt in the repository
+          if [ ! -f release.keystore ] && [ -n "$KS_B64" ]; then
+            printf '%s' "$KS_B64" | tr -d ' \r\n' | base64 -d > release.keystore
+          fi
           if [ ! -f release.keystore ] && [ -f KEYSTORE_BASE64.txt ]; then
             tr -d ' \r\n' < KEYSTORE_BASE64.txt | base64 -d > release.keystore
           fi
           if [ ! -f release.keystore ]; then
-            echo "::error::release.keystore is missing from the repository. Upload it to the main folder of the repository."
+            echo "::error::Signing key missing. Add the KEYSTORE_BASE64 secret (or KEYSTORE_BASE64.txt) to the repository."
             exit 1
           fi
           if [ -z "$KS_PASS" ]; then
@@ -65,13 +90,14 @@ jobs:
             exit 1
           fi
           if ! keytool -list -keystore release.keystore -storepass "$KS_PASS" > /dev/null 2>&1; then
-            echo "::error::KEYSTORE_PASSWORD is wrong. Copy it again from KEYSTORE_PASSWORD.txt (20 characters, no spaces)."
+            echo "::error::KEYSTORE_PASSWORD is wrong. Copy it again (20 characters, no spaces)."
             exit 1
           fi
           cp release.keystore android/app/release.keystore
           echo "Signing key OK"
 
       - name: Build signed release APK
+        if: github.event_name != 'pull_request'
         working-directory: android
         env:
           KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -85,11 +111,13 @@ jobs:
           cp app/build/outputs/apk/release/app-release.apk ../SpeakingPreTest.apk
 
       - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
         with:
           name: speaking-pretest-apk
           path: SpeakingPreTest.apk
 
       - name: Publish to GitHub Releases (permanent download link)
+        if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v3.${{ github.run_number }}
