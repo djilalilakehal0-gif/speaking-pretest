@@ -1,0 +1,13 @@
+/* Offline cache for the iPhone / web version. Bump VERSION after every change. */
+const VERSION='pretest-v5',ASR_CACHE='asr-v1'; // the speech model stays cached across versions
+const FILES=["./",  "audio/choosepic.mp3",  "audio/finish.mp3",  "audio/intro.mp3",  "audio/listen.mp3",  "audio/q1.mp3",  "audio/q2.mp3",  "audio/q3.mp3",  "audio/q3lead.mp3",  "audio/start.mp3",  "audio/startspeaking.mp3",  "audio/stop.mp3",  "audio/task1.mp3",  "audio/task2.mp3",  "audio/task3.mp3",  "audio/thanksstop.mp3",  "audio/thankyou.mp3",  "fonts/plex-400.woff2",  "fonts/plex-500.woff2",  "fonts/plex-600.woff2",  "fonts/plex-700.woff2",  "fonts/plexar-400.woff2",  "fonts/plexar-500.woff2",  "fonts/plexar-600.woff2",  "fonts/plexar-700.woff2",  "img/apple-touch-icon.png",  "img/bed.jpg",  "img/book.jpg",  "img/boot.jpg",  "img/car.jpg",  "img/chair.jpg",  "img/door.jpg",  "img/eggs.jpg",  "img/elephant.jpg",  "img/fish.jpg",  "img/flower.jpg",  "img/glass.jpg",  "img/house.jpg",  "img/icon-192.png",  "img/icon-512.png",  "img/jacket.jpg",  "img/logo.png",  "img/mouse.jpg",  "img/pencil.jpg",  "img/phone.jpg",  "img/pot.jpg",  "img/scene1.jpg",  "img/scene2.jpg",  "img/scene3.jpg",  "img/scene4.jpg",  "img/sun.jpg",  "img/table.jpg",  "img/train.jpg",  "index.html",  "manifest.webmanifest"];
+self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VERSION&&k!==ASR_CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
+/* Adds the "cross-origin isolation" headers so the speech model can use every processor core
+   (much faster automatic correction). All files are on this site, so nothing else changes. */
+function isolate(res){if(!res||res.status===0||res.type==='opaque')return res;const h=new Headers(res.headers);
+  h.set('Cross-Origin-Opener-Policy','same-origin');h.set('Cross-Origin-Embedder-Policy','require-corp');h.set('Cross-Origin-Resource-Policy','same-origin');
+  return new Response(res.body,{status:res.status,statusText:res.statusText,headers:h})}
+self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=new URL(e.request.url);if(u.origin!==location.origin)return;
+  const store=u.pathname.includes('/asr/')?ASR_CACHE:VERSION;
+  e.respondWith(caches.match(e.request,{ignoreSearch:true}).then(r=>r||fetch(e.request).then(res=>{if(res.ok){const c=res.clone();caches.open(store).then(x=>x.put(e.request,c))}return res}).catch(()=>caches.match('./index.html'))).then(isolate))});

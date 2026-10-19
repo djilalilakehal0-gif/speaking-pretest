@@ -9,12 +9,9 @@
 1. **ارفع كل محتوى هذا المجلد** إلى المستودع، واستبدل الملفات القديمة. يجب أن تشمل المجلدين `assets` و `.github` (المجلد `.github` مخفي على الماك؛ اضغط `Cmd + Shift + .` لإظهاره).
 2. **اجعل المستودع عامّاً (Public)** حتى يستطيع الطلاب التحميل بدون حساب:
    Settings → General → أسفل الصفحة → Change visibility → Public.
-3. **أضف مفتاح التوقيع (سرّان)**:
-   Settings → Secrets and variables → Actions → **New repository secret**
-   - الاسم: `KEYSTORE_BASE64` ← الصق النص الطويل من ملف `مفاتيح-التوقيع.txt`
-   - الاسم: `KEYSTORE_PASSWORD` ← الصق كلمة السر من نفس الملف
-
-   هذا المفتاح يجعل كل نسخة جديدة تُثبَّت فوق القديمة على هواتف الطلاب بدون حذف. **احتفظ بملف `مفاتيح-التوقيع.txt` في مكان آمن، ولا ترفعه إلى GitHub.**
+3. **مفتاح التوقيع**: الملف `KEYSTORE_BASE64.txt` موجود في المستودع، وكلمة سرّه محفوظة في السرّ `KEYSTORE_PASSWORD`
+   (Settings → Secrets and variables → Actions). لا تحذف `KEYSTORE_BASE64.txt` ولا `.github/workflows/build-apk-v3.yml`.
+   **لا ترفع أبداً ملف `KEYSTORE_PASSWORD.txt`، واحتفظ به في مكان آمن.**
 
 4. اذهب إلى **Actions** ← **Build Android APK** ← **Run workflow**. انتظر حوالي 5 دقائق حتى تظهر علامة ✅.
 
@@ -72,4 +69,21 @@ const CODE_SECRET='alfikr-almodi-speaking-pretest';
 | `assets/` | أيقونة التطبيق وشاشة البداية (من شعار المدرسة) |
 | `capacitor.config.json` | اسم التطبيق ومعرّفه `com.djilali.speakingpretest` |
 | `package.json` | مكتبات Capacitor 7 (ميكروفون، ملفات، مشاركة، نطق احتياطي) |
-| `.github/workflows/build-apk.yml` | يبني ملف APK موقّعاً وينشره في Releases تلقائياً |
+| `.github/workflows/build-apk-v3.yml` | يبني ملف APK موقّعاً وينشره في Releases تلقائياً |
+| `.github/workflows/pages.yml` | ينشر الموقع (آيفون) مع نموذج التصحيح التلقائي |
+
+---
+
+## الموقع (آيفون) والتصحيح التلقائي بالاستماع
+
+- الملف `.github/workflows/pages.yml` ينشر التطبيق كموقع على:
+  `https://djilalilakehal0-gif.github.io/speaking-pretest/`
+  ويضيف إليه نموذج التعرّف على الكلام (Whisper tiny، حوالي 40 ميغابايت).
+- يجب مرة واحدة: Settings → Pages → Source: **GitHub Actions**.
+- في «Saved answers» يضغط المعلّم «🤖 تصحيح تلقائي». يستمع التطبيق لكل تسجيل:
+  - **الألوان:** هل قال لون الحبر؟ وكم مرة قرأ الكلمة بدل اللون؟
+  - **الحروف:** هل قال سلسلة الحروف الصحيحة؟
+  - **الصور:** هل قال اسم الشيء الصحيح؟
+  - **الأسئلة:** يكتب نص كلام الطالب وعدد الكلمات في الدقيقة.
+- أول مرة يحتاج إنترنت على جهاز المعلّم لتحميل النموذج، ثم يُحفظ. الأصوات لا تخرج من الجهاز.
+- الدرجات التلقائية تظهر بعلامة 🤖 auto، ويمكن للمعلّم تعديلها.
