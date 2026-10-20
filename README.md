@@ -62,6 +62,16 @@ https://djilalilakehal0-gif.github.io/speaking-pretest/
 
 الإجابات تُحفظ داخل Safari، لذلك يجب **مشاركتها** (واتساب مثلاً) بعد الاختبار، وعدم مسح بيانات Safari قبل ذلك.
 
+## صفحة التعريف بالتطبيق
+
+صفحة تعريفية متحرّكة (تتحرك مع السكرول) تشرح التطبيق، وفيها أزرار: بدء الاختبار، تحميل أندرويد، وتطبيق المعلّم:
+
+```
+https://djilalilakehal0-gif.github.io/speaking-pretest/intro/
+```
+
+الملف `www/intro/index.html`. مكتبات التحريك (GSAP و Lenis) محفوظة داخل `www/intro/vendor/`، فلا تحتاج الصفحة إلى أي موقع خارجي.
+
 ## خامساً: نسخة الآيفون (iOS)
 
 تُبنى نسخة الآيفون تلقائياً على GitHub (على جهاز ماك تابع لـ GitHub)، فلا تحتاج ماك ولا Xcode. بعد كل رفع إلى `main`، أو من **Actions** ← **Build iOS app** ← **Run workflow**، يظهر الملف في **Releases** تحت الإصدار `ios-3.N`.
@@ -109,6 +119,7 @@ const CODE_SECRET='alfikr-almodi-speaking-pretest';
 | `www/index.html` | التطبيق كله (الأسئلة، التسجيل، وضع المعلّم) |
 | `www/img/` | صور الأسئلة والمهام والشعار |
 | `www/audio/` | الصوت النسائي المسجّل (16 جملة)، يعمل بدون إنترنت |
+| `www/intro/` | صفحة التعريف المتحرّكة بالتطبيق |
 | `www/fonts/` | خط IBM Plex داخل التطبيق، يعمل بدون إنترنت |
 | `assets/` | أيقونة التطبيق وشاشة البداية (من شعار المدرسة) |
 | `capacitor.config.json` | اسم التطبيق ومعرّفه `com.djilali.speakingpretest` |
