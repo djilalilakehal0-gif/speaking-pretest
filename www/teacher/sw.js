@@ -1,5 +1,5 @@
 /* Teacher app: works offline for listening again, and turns on all processor cores for the speech model. */
-const VERSION='teacher-v2',ASR_CACHE='asr-v1';
+const VERSION='teacher-v3',ASR_CACHE='asr-v1';
 const FILES=['./','index.html','manifest.webmanifest','../img/logo.png','../img/icon-192.png','../fonts/plex-400.woff2','../fonts/plex-600.woff2','../fonts/plexar-400.woff2','../fonts/plexar-600.woff2'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('teacher-')&&k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

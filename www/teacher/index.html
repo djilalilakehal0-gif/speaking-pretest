@@ -202,6 +202,9 @@ table.grades{border-collapse:collapse;width:100%;min-width:760px;font-variant-nu
 .grades td{white-space:nowrap}
 .play{appearance:none;border:0;width:28px;height:28px;border-radius:50%;background:#e7f0ef;color:var(--navy);font-size:11px;margin-inline-end:6px;cursor:pointer;vertical-align:middle}
 .play:hover{background:var(--navy);color:#fff}.play.on{background:var(--accent);color:#10282a}
+.del{appearance:none;border:0;background:none;font-size:16px;cursor:pointer;opacity:.45;padding:4px 6px;border-radius:8px}
+.del:hover{opacity:1;background:#fdecea}
+.btn.danger{color:var(--red);border-color:#f1c4c0}.btn.danger:hover{border-color:var(--red)}
 </style>
 </head>
 <body>
@@ -459,6 +462,8 @@ const getStudents=()=>tx('students','readonly',st=>st.getAll());
 const putStudent=s=>tx('students','readwrite',st=>st.put(s));
 const getAudio=id=>tx('audio','readonly',st=>st.get(id));
 const putAudio=(id,b)=>tx('audio','readwrite',st=>st.put(b,id));
+async function forgetLocal(s){await tx('students','readwrite',st=>st.delete(s.id));
+  for(const r of (s.recs||[]))await tx('audio','readwrite',st=>st.delete(r.file));delete REC[s.id]}
 
 /* ---------- connection to the Google script ---------- */
 const CFG={url:LS.get('t_url')||'',key:LS.get('t_key')||''};
@@ -504,17 +509,22 @@ async function saveGrades(s){
 }
 
 /* ---------- refresh from the sheet ---------- */
-let STUDENTS=[],LAST=null,BUSY=null,OPEN=null;
+let STUDENTS=[],LAST=null,BUSY=null,OPEN=null,CUR=null;
 async function refresh(){
   const j=await api({a:'list'});LS.set('t_sheet',j.sheet||'');
   const local=Object.fromEntries((await getStudents()).map(s=>[s.id,s]));
+  const onSheet=new Set();
   for(const r of j.students){
+    if(r.teacher&&r.teacher.deleted)continue;       // hidden by the teacher
+    onSheet.add(r.id);
     const l=local[r.id];
     const s=Object.assign(l||{},{id:r.id,name:r.name||(l&&l.name)||'…',date:r.date||(l&&l.date),phone:r.phone,recs:r.recs});
     // the newest teacher work wins (this device or another teacher device)
     if(!l||!l.teacher||(r.teacher&&(r.teacher.t||0)>=(l.teacher.t||0))&&!l.dirty)s.teacher=r.teacher||{};
     view(s);await putStudent(s);local[r.id]=s;
   }
+  // students deleted (here or on another teacher device) disappear from this device too
+  for(const s of Object.values(local))if(!onSheet.has(s.id)&&!s.dirty){await forgetLocal(s);delete local[s.id]}
   // grades that could not be sent before
   for(const s of Object.values(local))if(s.dirty){view(s);try{await apiPost({a:'grade',sid:s.id,data:s.teacher});s.dirty=false;await putStudent(s)}catch(e){}}
   STUDENTS=Object.values(local).map(view).sort((a,b)=>(b.date||0)-(a.date||0));LAST=new Date();
@@ -528,17 +538,31 @@ async function autoCorrectQueue(){
     setStatus('🤖 Loading the speech model… · تحميل نموذج الاستماع (مرة واحدة)');
     await loadASR(p=>{if(p&&p.status==='progress'&&p.file&&/onnx/.test(p.file))setStatus(`🤖 Downloading the speech model ${Math.round(p.progress||0)}% · تحميل النموذج`)});
     for(const s of todo){
+      if(!STUDENTS.some(x=>x.id===s.id))continue;   // deleted meanwhile
+      CUR=s.id;
       try{
         await loadRecs(s,(n,t)=>setStatus(`⬇️ ${s.name}: recordings ${n}/${t} · تحميل التسجيلات`));
         await asrCorrect(s,(lab,k,n)=>setStatus(`🤖 ${s.name}: ${lab} (${k+1}/${n})… · جارٍ الاستماع والتصحيح`));
+        if(!STUDENTS.some(x=>x.id===s.id))continue;   // deleted while it was being corrected
         await saveGrades(s);
         toast(`✓ ${s.name} corrected · تم تصحيح ${s.name}`);
         if(!OPEN)drawTable();
       }catch(e){console.warn('auto-correct',s.name,e);s.failed=true}
     }
-  }finally{BUSY=null;setStatus('')}
+  }finally{BUSY=null;CUR=null;setStatus('')}
 }
 
+/* ---------- delete a student (recordings go to the Drive bin, recoverable for 30 days) ---------- */
+async function deleteStudent(s){
+  if(!confirm(`Delete ${s.name}? Their grades and recordings will be removed.\nحذف ${s.name}؟ ستُحذف درجاته وتسجيلاته.`))return false;
+  try{await apiPost({a:'delete',sid:s.id})}
+  catch(e){ // older Google script without "delete": hide the student instead
+    if(e.message!=='action')throw e;
+    s.teacher=Object.assign({},s.teacher||{},{deleted:true,t:Date.now()});await apiPost({a:'grade',sid:s.id,data:s.teacher})}
+  if(PLAYER&&!PLAYER.paused)PLAYER.pause();
+  await forgetLocal(s);STUDENTS=STUDENTS.filter(x=>x.id!==s.id);
+  toast(`🗑 ${s.name} deleted · تم حذف ${s.name}`);return true;
+}
 /* ---------- screens ---------- */
 function setStatus(t){const e=$('#busy');if(!e)return;e.hidden=!t;e.textContent=t}
 function setupScreen(err){
@@ -583,11 +607,14 @@ function drawTable(){
     const q=SPEAK_KEYS.map(k=>val(s,k));const tot=q.every(Boolean)?q.reduce((a,x)=>a+x.v,0):null;
     const st=s.asrAt?'<span class="pill ok">✓</span>':complete(s)?(BUSY?'<span class="pill run">🤖</span>':'<span class="pill">⏳</span>'):`<span class="pill">${(s.recs||[]).length}/${expected(s)}</span>`;
     return `<tr data-id="${esc(s.id)}"><th>${esc(s.name)}<small>${s.date?new Date(s.date).toLocaleString([], {dateStyle:'short',timeStyle:'short'}):''}</small></th>
-      ${cell(s,'Q1')}${cell(s,'Q2')}${cell(s,'Q3')}<td class="tot">${tot==null?'–':tot}</td>${cell(s,'T1_colors')}${cell(s,'T2_letters')}${cell(s,'T3_pictures')}<td>${st}</td></tr>`}).join('');
-  $('#tbl').innerHTML=STUDENTS.length?`<table class="grades"><thead><tr><th>Student · الطالب</th><th>Q1<small>/10</small></th><th>Q2<small>/10</small></th><th>Q3<small>/10</small></th><th>Speaking<small>/${sp}</small></th><th>Colours<small>/36</small></th><th>Letters<small>/12</small></th><th>Pictures<small>/20</small></th><th></th></tr></thead><tbody>${rows}</tbody></table>`
+      ${cell(s,'Q1')}${cell(s,'Q2')}${cell(s,'Q3')}<td class="tot">${tot==null?'–':tot}</td>${cell(s,'T1_colors')}${cell(s,'T2_letters')}${cell(s,'T3_pictures')}<td>${st}</td><td><button class="del" data-del="1" title="Delete · حذف" aria-label="Delete student">🗑</button></td></tr>`}).join('');
+  $('#tbl').innerHTML=STUDENTS.length?`<table class="grades"><thead><tr><th>Student · الطالب</th><th>Q1<small>/10</small></th><th>Q2<small>/10</small></th><th>Q3<small>/10</small></th><th>Speaking<small>/${sp}</small></th><th>Colours<small>/36</small></th><th>Letters<small>/12</small></th><th>Pictures<small>/20</small></th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table>`
     :'<p class="mut" style="text-align:center;padding:30px 10px">No students yet. Results appear here automatically when a student finishes.<br><span class="ar">لا يوجد طلاب بعد. تظهر النتائج هنا تلقائياً عندما ينهي الطالب الاختبار.</span></p>';
   $('#tbl').querySelectorAll('tr[data-id]').forEach(tr=>{const s=STUDENTS.find(s=>s.id===tr.dataset.id);
-    tr.onclick=e=>{const b=e.target.closest('button[data-play]');if(b){e.stopPropagation();playRec(b,s,b.dataset.play);return}PLAYER.pause();studentScreen(s)}});
+    tr.onclick=async e=>{const b=e.target.closest('button[data-play]');if(b){e.stopPropagation();playRec(b,s,b.dataset.play);return}
+      if(e.target.closest('button[data-del]')){e.stopPropagation();if(CUR===s.id){toast('Please wait, this student is being corrected · انتظر، يجري تصحيح هذا الطالب');return}
+        try{if(await deleteStudent(s))drawTable()}catch(err){toast('⚠️ Could not delete — check the internet · تعذّر الحذف')}return}
+      PLAYER.pause();studentScreen(s)}});
   const done=STUDENTS.filter(s=>s.asrAt).length;
   $('#sum').innerHTML=`<b>${STUDENTS.length}</b> students · طالب &nbsp;·&nbsp; <b>${done}</b> corrected · مصحَّح${LAST?` &nbsp;·&nbsp; updated ${LAST.toLocaleTimeString([], {timeStyle:'short'})}`:''}`;
 }
@@ -612,8 +639,11 @@ async function studentScreen(s){
     <div class="sc-sum">${scoreSummary(s)}</div><div class="au-sum">${autoSummary(s)}</div>
     <button class="btn" id="ac">${s.asrAt?'🤖 Correct again by listening · إعادة التصحيح':'🤖 Correct by listening · صحّح بالاستماع'}</button>
     <div class="acst" id="st" hidden></div>
-    <div class="list" id="lst"><p class="mut">Loading recordings… · تحميل التسجيلات</p></div></div>`;
+    <div class="list" id="lst"><p class="mut">Loading recordings… · تحميل التسجيلات</p></div>
+    <button class="btn ghost danger" id="del">🗑 Delete this student · حذف هذا الطالب</button></div>`;
   $('#bk').onclick=()=>{mainScreen()};
+  $('#del').onclick=async()=>{if(CUR===s.id){toast('Please wait, this student is being corrected · انتظر، يجري تصحيح هذا الطالب');return}
+    try{if(await deleteStudent(s))mainScreen()}catch(err){toast('⚠️ Could not delete — check the internet · تعذّر الحذف')}};
   const st=$('#st');
   let recs=[];
   try{recs=await loadRecs(s,(n,t)=>{st.hidden=false;st.textContent=`⬇️ ${n}/${t}`});st.hidden=true}catch(e){st.hidden=false;st.textContent='⚠️ Could not download the recordings · تعذّر تحميل التسجيلات'}
