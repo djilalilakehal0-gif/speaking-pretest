@@ -193,6 +193,28 @@ body.home main{padding-top:0}
 .cheer span{display:block;font-size:20px;font-weight:700;color:var(--gold);direction:rtl}
 @keyframes cheer{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}25%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-62%) scale(.96)}}
 @keyframes pop{0%{transform:scale(.3)}100%{transform:scale(1)}}
+.prhead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.prnote{font-size:13px;font-weight:700;color:var(--slate);background:#fff;border:2px dashed var(--line);border-radius:999px;padding:4px 12px 2px}
+.prans{display:flex;flex-direction:column;gap:10px;background:#e7f7ef;border:2px solid #bfe8d3;border-radius:24px;padding:16px;color:#1a7a55}
+.prans>b{font-size:17px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{background:#fff;border-radius:999px;padding:6px 14px 4px;font-weight:700;color:var(--ink);font-size:17px;box-shadow:0 2px 0 #bfe8d3}
+.chips span s{color:var(--slate);font-weight:500}
+.chips.big span{font-size:28px;min-width:56px;text-align:center}
+.wcount{text-align:center;font-weight:700;color:var(--slate);margin-bottom:8px}
+.wordrow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.wordrow .stage{min-height:190px;padding:10px}
+.wordrow .stroop{font-size:clamp(30px,9.5vw,50px);text-align:center;word-break:break-word}
+.wmic{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:96px}
+.mic.mini{width:92px;height:92px;border-width:5px;box-shadow:0 0 0 7px rgba(240,180,41,.25),0 10px 20px rgba(30,33,86,.22)}
+.mic.mini svg{width:38px;height:38px}
+.mic.mini.rec::after{inset:-9px}
+.wlbl{font-weight:800;font-size:14px;color:var(--navy);text-align:center;white-space:nowrap}
+.wtip{text-align:center;font-weight:600;color:var(--slate);margin:12px 0 8px}
+.wq{font-size:40px;font-weight:800;color:#d9d2c3;letter-spacing:8px}
+.mockbtn{display:flex;flex-direction:column;align-items:center;gap:2px;background:linear-gradient(180deg,#2fc4b5,#1a9a8e);box-shadow:0 5px 0 #11695f,0 10px 20px rgba(34,179,166,.25)}
+.mockbtn small{font-weight:600;font-size:13px;opacity:.9}
+.mockbtn:active{box-shadow:0 1px 0 #11695f}
 </style>
 </head>
 <body>
@@ -235,21 +257,47 @@ function toast(t,ms=2200){const e=$('#toast');e.textContent=t;e.hidden=false;cle
 
 /* ---------- celebration: fireworks + confetti after every finished answer ---------- */
 const CHEERS=[['Great job!','أحسنت!'],['Well done!','ممتاز!'],['Excellent!','رائع!'],['Super!','عمل رائع!'],['Amazing!','مذهل!']];
+/* fireworks sound, made on the phone (no file): a happy chime, then launches, bangs and crackles */
+let FXA=null;
+function fxCtx(){try{if(!FXA)FXA=new (window.AudioContext||window.webkitAudioContext)();if(FXA.state==='suspended')FXA.resume();return FXA}catch(e){return null}}
+['touchend','click'].forEach(ev=>document.addEventListener(ev,()=>{if(FXA&&FXA.state==='suspended')FXA.resume()},{capture:true,passive:true}));
+function fxNoise(a,dur){const b=a.createBuffer(1,Math.ceil(a.sampleRate*dur),a.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=a.createBufferSource();s.buffer=b;return s}
+function fxSound(delays,big){
+  const a=fxCtx();if(!a)return;const t0=a.currentTime+.03,out=a.createGain();out.gain.value=big?.55:.45;out.connect(a.destination);
+  [523.25,659.25,783.99,1046.5].forEach((f,i)=>{ // chime: C-E-G-C
+    const o=a.createOscillator(),g=a.createGain(),t=t0+i*.09;o.type='triangle';o.frequency.value=f;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.22,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+(i===3?.9:.35));o.connect(g).connect(out);o.start(t);o.stop(t+1)});
+  delays.forEach(d=>{const t=t0+d/1000;
+    const w=fxNoise(a,.35),wf=a.createBiquadFilter(),wg=a.createGain(); // launch whoosh
+    const tw=Math.max(t0,t-.3);
+    wf.type='bandpass';wf.Q.value=4;wf.frequency.setValueAtTime(500,tw);wf.frequency.exponentialRampToValueAtTime(3500,t);
+    wg.gain.setValueAtTime(0,tw);wg.gain.linearRampToValueAtTime(.18,(tw+t)/2);wg.gain.linearRampToValueAtTime(0,t);
+    w.connect(wf).connect(wg).connect(out);w.start(tw);
+    const n=fxNoise(a,1),f=a.createBiquadFilter(),g=a.createGain(); // bang
+    f.type='lowpass';f.frequency.setValueAtTime(2600,t);f.frequency.exponentialRampToValueAtTime(180,t+.8);
+    g.gain.setValueAtTime(.9,t);g.gain.exponentialRampToValueAtTime(.001,t+.9);n.connect(f).connect(g).connect(out);n.start(t);
+    for(let k=0;k<14;k++){const ct=t+.18+Math.random()*.9,c=fxNoise(a,.03),cf=a.createBiquadFilter(),cg=a.createGain(); // crackles
+      cf.type='highpass';cf.frequency.value=2500+Math.random()*3000;cg.gain.setValueAtTime(.25*Math.random()+.08,ct);cg.gain.exponentialRampToValueAtTime(.001,ct+.03);
+      c.connect(cf).connect(cg).connect(out);c.start(ct)}
+  });
+}
 const FX={parts:[],run:false,cv:null,g:null};
 function celebrate(big){
   const c=CHEERS[Math.floor(Math.random()*CHEERS.length)];
   document.querySelectorAll('.cheer').forEach(e=>e.remove());
   const ch=document.createElement('div');ch.className='cheer';ch.setAttribute('role','status');
   ch.innerHTML=`<b>${big?'🏆':'🎉'} ${c[0]}</b><span>${c[1]}</span>`;document.body.appendChild(ch);setTimeout(()=>ch.remove(),2300);
+  const bursts=big?8:4,delays=[];for(let b=0;b<bursts;b++)delays.push((b?delays[b-1]:250)+(b?260+Math.random()*160:0));
+  try{fxSound(delays,big)}catch(e){}
   if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   if(!FX.cv){FX.cv=document.createElement('canvas');FX.cv.id='fx';document.body.appendChild(FX.cv);FX.g=FX.cv.getContext('2d')}
   const W=innerWidth,H=innerHeight,dpr=Math.min(2,window.devicePixelRatio||1);
   if(FX.cv.width!==W*dpr||FX.cv.height!==H*dpr){FX.cv.width=W*dpr;FX.cv.height=H*dpr}FX.g.setTransform(dpr,0,0,dpr,0,0);
   const COLS=['#f0b429','#ffd166','#ff7a59','#22b3a6','#5b6cff','#ff5fa2','#7ee081'];
   const rnd=(a,b)=>a+Math.random()*(b-a),col=()=>COLS[Math.floor(Math.random()*COLS.length)];
-  const now=performance.now(),bursts=big?8:4;
+  const now=performance.now();
   for(let b=0;b<bursts;b++){ // fireworks: each burst explodes a little later than the previous one
-    const x=rnd(.15,.85)*W,y=rnd(.12,.42)*H,t=now+b*rnd(260,420),n=big?70:55,k=col(),k2=col();
+    const x=rnd(.15,.85)*W,y=rnd(.12,.42)*H,t=now+delays[b],n=big?70:55,k=col(),k2=col();
     for(let i=0;i<n;i++){const a=Math.PI*2*i/n+rnd(-.08,.08),s=rnd(2.2,6.2);
       FX.parts.push({f:1,x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,c:i%3?k:k2,t,life:rnd(55,85),age:0,r:rnd(1.8,3)})}
   }
@@ -274,7 +322,7 @@ function fxLoop(ts){
 }
 const STAGES=['Question 1/3','Question 2/3','Question 3/3','Task 1/3','Task 2/3','Task 3/3'];
 function step(t){if(t)document.body.classList.remove('home');$('#stepLbl').textContent=t||'';const tr=$('#track');if(!tr)return;
-  let k=STAGES.indexOf(t);if(t==='Intro')k=-1;else if(t==='Done')k=6;else if(k<0){tr.hidden=true;return}
+  let k=STAGES.indexOf(t);const mm=/^Mock (\d)\/6$/.exec(t||'');if(mm)k=+mm[1]-1;if(t==='Intro')k=-1;else if(t==='Done')k=6;else if(k<0){tr.hidden=true;return}
   tr.hidden=false;[...tr.children].forEach((e,i)=>{e.className=i<k?'done':i===k?'now':''})}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 const MIC_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v4"/><path d="M8 21h8"/></svg>';
@@ -431,7 +479,7 @@ function micBlock(id){return `<div class="micwrap" id="${id}">
   <div class="status rt" hidden><span class="recdot"></span><span class="tm">0:00</span></div>
   <div class="bar" style="width:100%" hidden><i></i></div>
 </div>`}
-function useMic(root,{key,label,maxSec=60,autoStart=false,run}){
+function useMic(root,{key,label,maxSec=60,autoStart=false,run,practice=false}){
   return new Promise(resolve=>{
     const btn=root.querySelector('.mic'),lbl=root.querySelector('.miclabel'),rt=root.querySelector('.rt'),tm=root.querySelector('.tm'),bar=root.querySelector('.bar'),bi=bar.querySelector('i');
     let rec=null,timer=null,t0=0,busy=false;
@@ -450,6 +498,10 @@ function useMic(root,{key,label,maxSec=60,autoStart=false,run}){
       btn.disabled=true;lbl.textContent='Saving…';
       const res=await rec.stop();rec=null;
       if(run!==RUN)return resolve(null);
+      if(practice){ // practice answer: listen back, nothing is saved or sent
+        root.innerHTML=`<div class="saved">✓ Good! Listen to yourself<div class="ar" style="text-align:center;font-weight:600">أحسنت! استمع إلى إجابتك — هذا تدريب ولا يُحفظ</div></div>
+          <audio controls src="${URL.createObjectURL(res.blob)}"></audio>`;
+        celebrate();return resolve({blob:res.blob,practice:true})}
       const {rec:saved,phone}=await storeRec(key,label,res);
       root.innerHTML=`<div class="saved">✓ Answer saved ${phone?'on the phone':''}<div class="ar" style="text-align:center;font-weight:600">تم حفظ الإجابة</div></div>
         <audio controls src="${URL.createObjectURL(saved.blob)}"></audio>`;
@@ -467,7 +519,7 @@ function useMic(root,{key,label,maxSec=60,autoStart=false,run}){
    ► Change TEACHER_PASSWORD and CODE_SECRET before building for the school. */
 const TEACHER_PASSWORD='2027';
 const CODE_SECRET='alfikr-almodi-speaking-pretest';
-const CODE_MINUTES=10;
+const CODE_MINUTES=17;
 function hash32(str){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}
   h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (h2>>>0)*4096+(h1>>>20)}
 const slotNow=()=>Math.floor(Date.now()/(CODE_MINUTES*60000));
@@ -493,7 +545,7 @@ function teacherScreen(){
       <p class="mut" id="tl"></p>
     </div>
     <div class="card"><p class="mut">• The code is the same on all phones and changes every ${CODE_MINUTES} minutes.<br>• Students can’t start the test without it.<br>• Phones must have the correct time (automatic time).</p>
-      <p class="ar mut" style="margin-top:8px">• الرمز نفسه على كل الهواتف ويتغيّر كل ${CODE_MINUTES} دقائق.<br>• لا يستطيع الطالب بدء الاختبار بدونه.<br>• يجب أن تكون ساعة الهاتف مضبوطة تلقائياً.</p></div>
+      <p class="ar mut" style="margin-top:8px">• الرمز نفسه على كل الهواتف ويتغيّر كل ${CODE_MINUTES} دقيقة.<br>• لا يستطيع الطالب بدء الاختبار بدونه.<br>• يجب أن تكون ساعة الهاتف مضبوطة تلقائياً.</p></div>
     <button class="btn" id="sv">🎤 Saved answers · الإجابات المحفوظة</button>
     <button class="btn ghost" id="bk">← Back · رجوع</button></div>`;
   const run=RUN;
@@ -521,6 +573,7 @@ function home(){
       <input class="name" id="cd" inputmode="numeric" maxlength="4" placeholder="• • • •" autocomplete="off" style="text-align:center;letter-spacing:10px;font-size:24px">
       <button class="btn accent" id="go">Start the test · ابدأ الاختبار</button>
     </div>
+    <button class="btn mockbtn" id="mock">🧪 Mock test (the day before) · الاختبار التجريبي<small>No code · not graded · بدون رمز ولا يُحسب</small></button>
     <button class="btn ghost teacher-link" id="tch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Teacher mode · المعلم</button>
     <div class="card about">
       <span class="tag" style="align-self:flex-start">About this application · حول التطبيق</span>
@@ -540,7 +593,7 @@ function home(){
     const c=$('#cd').value.trim();
     if(!codeOk(c)){toast(c?'Wrong code — الرمز غير صحيح، اسأل المعلم':'Wait for your teacher’s code — انتظر رمز المعلم',3000);$('#cd').value='';$('#cd').focus();return}
     await newSession(n);intro()};
-  $('#tch').onclick=()=>askPassword(teacherScreen);
+  $('#tch').onclick=()=>askPassword(teacherScreen);$('#mock').onclick=mockIntro;
 }
 
 async function intro(){
@@ -550,9 +603,183 @@ async function intro(){
     <p>This is an evaluation of your speaking skills. It isn't graded, so don't worry. Listen carefully to each question. You will have time to prepare silently. When you hear <b>“Start speaking”</b>, tap the <b>microphone</b> 🎤 and answer for about one minute. Your answer is saved automatically.</p>
     <p class="ar">هذا تقييم لمهارة التحدث لديك، وليس عليه درجات فلا تقلق. استمع جيداً لكل سؤال، وسيكون لديك وقت للتحضير بصمت. عندما تسمع <b>«Start speaking»</b> اضغط على <b>الميكروفون</b> 🎤 وأجب لمدة دقيقة تقريباً. تُحفظ إجابتك تلقائياً.</p>
   </div><button class="btn" id="nx">Continue · متابعة</button></div>`;
-  $('#nx').onclick=()=>{stopSpeech();speaking(1)};
+  $('#nx').onclick=()=>{stopSpeech();practice()};
   try{await getMic()}catch(e){toast('Please allow the microphone — يرجى السماح بالميكروفون',3500)}
   if(run===RUN)say(`Hello, and welcome. This is an evaluation of your speaking skills. It isn't graded, so don't worry. Listen carefully. You will have time to prepare silently. When you hear start speaking, tap the microphone and speak for one whole minute.`);
+}
+
+/* ================= PRACTICE (not graded, nothing is saved or sent) =================
+   Four short warm-up items so the student learns how each part works before the real test. */
+const PR_Q={en:"What is your favourite food? Why do you like it?",ar:"ما هو طعامك المفضّل؟ ولماذا تحبّه؟"};
+const PR_STROOP=[["Green","#ff0000"],["Table","#002060"],["Red","#00b050"],["Book","#7030a0"]];
+const PR_EQ=[[1,1],[2,3],[3,3]];
+const PR_PICS=[["🍎","apple"],["🐱","cat"],["⚽","ball"]];
+function prShell(n,title,titleAr,html){
+  M.innerHTML=`<div class="screen">
+    <div class="prhead"><span class="tag">🎯 Practice ${n}/4 · تدريب</span><span class="prnote">Not graded · لا يُحسب</span></div>
+    <div class="card" style="display:flex;flex-direction:column;gap:8px"><h2>${title}</h2><p class="ar mut">${titleAr}</p></div>
+    ${html}
+    <button class="btn ghost small" id="skip" style="align-self:center">Skip practice · تخطّي التدريب ⏭</button></div>`;
+  $('#skip').onclick=()=>{stopSpeech();ready()};
+}
+function prNext(fn,label='Next practice →',labelAr='التدريب التالي'){
+  const s=M.querySelector('.screen'),k=$('#skip');
+  k.insertAdjacentHTML('beforebegin',`<button class="btn" id="nx">${label} · ${labelAr}</button>`);
+  $('#nx').onclick=()=>{stopSpeech();fn()};
+}
+function prAnswer(html){return `<div class="prans"><b>✓ The answer · الإجابة</b>${html}</div>`}
+
+async function practice(){ // 1) a short speaking question with the real timing, but shorter
+  const run=++RUN;step('Practice');
+  prShell(1,'Speaking question','سؤال تحدّث قصير — مثل أسئلة الاختبار لكن أقصر',
+    `<div class="card"><p class="q">${PR_Q.en}</p><p class="qar ar" style="margin-top:6px">${PR_Q.ar}</p></div>
+     <div class="status" id="st">🔊 Listen carefully… استمع جيداً</div><div id="zone"></div>`);
+  const st=$('#st'),zone=$('#zone');
+  await say('Listen carefully.');if(run!==RUN)return;await say(PR_Q.en);if(run!==RUN)return;
+  await say('Start.');if(run!==RUN)return;
+  st.innerHTML='🤫 Prepare silently · حضّر إجابتك بصمت';zone.innerHTML=ringHTML('rg');
+  if(!await countdown($('#rg'),10,null,run))return;
+  st.innerHTML='🎤 Start speaking! · ابدأ التحدث';zone.innerHTML=micBlock('mb');
+  await say('Start speaking.');if(run!==RUN)return;
+  const ok=await useMic($('#mb'),{key:'practice',label:'Practice',maxSec:20,run,practice:true});
+  if(!ok||run!==RUN)return;
+  st.textContent='Thank you! · شكراً';say('Thank you, stop.');
+  prNext(practiceColours);
+}
+async function practiceColours(){ // 2) say the INK colour
+  const run=++RUN;
+  prShell(2,'Colours: say the <u>ink colour</u>','الألوان: كل كلمة وحدها — اضغط 🎤 بجانبها وقل <b>لون الحبر</b>، ولا تقرأ الكلمة',
+    `<div id="pz"><button class="btn accent" id="go">▶ Start · ابدأ</button></div>`);
+  say("Say the color of the ink. Do not read the word.");
+  $('#go').onclick=async()=>{stopSpeech();const z=$('#pz');
+    if(!await colourWords(z,run,PR_STROOP))return;
+    z.innerHTML=prAnswer(`<div class="chips">${PR_STROOP.map(([w,c])=>`<span><s>${w}</s> → <b style="color:${c}">${INK[c]}</b></span>`).join('')}</div>`);
+    celebrate();prNext(practiceLetters)};
+}
+async function practiceLetters(){ // 3) remember the letters, say them on the white screen
+  const run=++RUN;
+  prShell(3,'Letters: remember the letters','الحروف: احفظ الحروف، وعندما تختفي يعمل الميكروفون وحده — قل الحروف بالترتيب',
+    `<div id="pz"><button class="btn accent" id="go">▶ Start · ابدأ</button></div>`);
+  say("Memorize the letters. Say them when you see the white screen.");
+  $('#go').onclick=async()=>{stopSpeech();const z=$('#pz');
+    if(!await letterSets(z,run,[PR_EQ]))return;
+    z.innerHTML=prAnswer(`<div class="chips big">${PR_EQ.map(([a,b])=>`<span>${L(a+b)}</span>`).join('')}</div>`);
+    celebrate();prNext(practicePictures)};
+}
+async function practicePictures(){ // 4) name the pictures quickly
+  const run=++RUN;
+  prShell(4,'Pictures: say the name','الصور: قل اسم الشيء بالإنجليزية بسرعة',
+    `<div id="pz"><button class="btn accent" id="go">▶ Start · ابدأ</button></div>`);
+  say("Say the name of the object you see.");
+  $('#go').onclick=async()=>{stopSpeech();const z=$('#pz');
+    for(let i=0;i<PR_PICS.length;i++){if(run!==RUN)return;
+      z.innerHTML=`<div class="stage white"><div style="font-size:150px;line-height:1">${PR_PICS[i][0]}</div></div><div class="bar" style="margin-top:10px"><i style="width:${(i+1)/PR_PICS.length*100}%"></i></div>`;await sleep(2200)}
+    if(run!==RUN)return;
+    z.innerHTML=prAnswer(`<div class="chips">${PR_PICS.map(([e,n])=>`<span>${e} ${n}</span>`).join('')}</div>`);
+    celebrate();prNext(ready,'I’m ready','أنا مستعد')};
+}
+function ready(){ // end of practice → real test
+  RUN++;stopSpeech();step('Practice');
+  M.innerHTML=`<div class="screen"><section class="donehero"><div class="ok" style="font-size:36px">🚀</div>
+    <h1>Now the real test!</h1><p>Great practice, ${esc(S.name)}. The real test starts now. Your answers will be saved.</p>
+    <p class="ar" style="text-align:center">أحسنت في التدريب! الآن يبدأ الاختبار الحقيقي، وستُحفظ إجاباتك.</p></section>
+    <button class="btn accent" id="nx">Start the test · ابدأ الاختبار</button></div>`;
+  $('#nx').onclick=()=>{stopSpeech();speaking(1)};
+}
+
+/* ================= MOCK TEST (the day before the exam) =================
+   The whole test with the real timing, but with DIFFERENT questions, words, letters and pictures.
+   No start code, not graded, nothing is saved or sent to the teacher. */
+const MOCK_Q=[{en:"Tell me about your best friend. What do you like to do together?",ar:"حدّثني عن صديقك المفضّل. ماذا تحبّان أن تفعلا معاً؟"},
+  {en:"Describe your favourite place in your town. What can people see and do there?",ar:"صف مكانك المفضّل في مدينتك. ماذا يمكن للناس أن يروا ويفعلوا هناك؟"},
+  {en:"Some people think that homework should be stopped. Do you agree or disagree? Explain why.",ar:"يرى بعض الناس أنه يجب إلغاء الواجبات المنزلية. هل توافق أم تعارض؟ اشرح السبب."}];
+const MOCK_STROOP=[["Yellow","#ff0000"],["Chair","#00b050"],["Blue","#ffff00"],["Purple","#000000"],["River","#002060"],["Green","#7030a0"],
+  ["Black","#808080"],["Window","#843c0c"],["Pink","#00b050"],["Red","#002060"],["Garden","#ff0000"],["Grey","#e696e0"]];
+const MOCK_EQ=[[[2,2],[1,2],[3,4]],[[1,1],[2,4],[3,2],[1,7]],[[3,3],[1,4],[2,1],[2,6]],[[1,3],[2,5],[1,1],[3,5],[2,2]]];
+const MOCK_PICS=[["🍌","banana"],["🐶","dog"],["🚲","bicycle"],["🌙","moon"],["✈️","plane"],["🔑","key"],["🎈","balloon"],["🐦","bird"]];
+const clipText=f=>Object.keys(CLIPS).find(k=>CLIPS[k]===f)||'';
+let MOCK={name:'',ans:[]};
+function mockShell(k,title,titleAr,html){ // k = 1..6
+  step(`Mock ${k}/6`);
+  M.innerHTML=`<div class="screen">
+    <div class="prhead"><span class="tag">🧪 Mock test · اختبار تجريبي</span><span class="prnote">Not graded · لا يُحسب</span></div>
+    <div class="card" style="display:flex;flex-direction:column;gap:8px"><h2>${title}</h2><p class="ar mut">${titleAr}</p></div>
+    ${html}
+    <button class="btn ghost small" id="mx" style="align-self:center">✕ Leave the mock test · الخروج</button></div>`;
+  $('#mx').onclick=()=>{stopSpeech();home()};
+}
+function mockNext(fn,label='Next →',labelAr='التالي'){
+  $('#mx').insertAdjacentHTML('beforebegin',`<button class="btn" id="nx">${label} · ${labelAr}</button>`);
+  $('#nx').onclick=()=>{stopSpeech();fn()};
+}
+function mockIntro(){
+  RUN++;stopSpeech();MOCK={name:($('#nm')&&$('#nm').value.trim())||'',ans:[]};
+  step('Mock');window.scrollTo(0,0);
+  M.innerHTML=`<div class="screen"><section class="donehero"><div class="ok" style="font-size:36px">🧪</div>
+    <h1>Mock test</h1><p>Try the whole test today, exactly like tomorrow — same parts, same timing, but different questions.</p>
+    <p class="ar" style="text-align:center">جرّب الاختبار كاملاً اليوم، تماماً مثل الغد: نفس الأجزاء ونفس الوقت، لكن بأسئلة مختلفة.</p></section>
+    <div class="card"><p>✔ No start code · بدون رمز<br>✔ Not graded · لا يُحسب<br>✔ Nothing is sent to the teacher · لا يُرسَل شيء إلى المعلّم</p></div>
+    <div class="card"><p><b>6 parts · ستة أجزاء:</b> 3 speaking questions, colours, letters, pictures.</p><p class="ar mut">3 أسئلة تحدّث، ثم الألوان، ثم الحروف، ثم الصور.</p></div>
+    <button class="btn accent" id="go">▶ Start the mock test · ابدأ الاختبار التجريبي</button>
+    <button class="btn ghost" id="bk">← Back · رجوع</button></div>`;
+  $('#go').onclick=async()=>{try{await getMic()}catch(e){toast('Please allow the microphone — يرجى السماح بالميكروفون',3500);return}mockSpeak(1)};
+  $('#bk').onclick=home;
+}
+async function mockSpeak(n){
+  const run=++RUN,Q=MOCK_Q[n-1],prep=n===3?20:30;
+  mockShell(n,`Question ${n} · السؤال ${n}`,'استمع، حضّر بصمت، ثم تكلّم عندما تسمع «Start speaking»',
+    `<div class="card"><p class="q">${Q.en}</p><p class="qar ar" style="margin-top:6px">${Q.ar}</p></div>
+     <div class="status" id="st">🔊 Listen carefully… استمع جيداً</div><div id="zone"></div>`);
+  const st=$('#st'),zone=$('#zone');
+  await say('Listen carefully.');if(run!==RUN)return;await say(Q.en);if(run!==RUN)return;
+  await say('Start.');if(run!==RUN)return;
+  st.innerHTML='🤫 Prepare silently · حضّر إجابتك بصمت';zone.innerHTML=ringHTML('rg');
+  if(!await countdown($('#rg'),prep,null,run))return;
+  st.textContent='Stop. Get ready… توقف واستعد';zone.innerHTML='';await say('Stop.');if(run!==RUN)return;await sleep(600);
+  st.innerHTML='🎤 Start speaking! · ابدأ التحدث';zone.innerHTML=micBlock('mb');
+  await say('Start speaking.');if(run!==RUN)return;
+  const r=await useMic($('#mb'),{key:'mock',label:'Mock',maxSec:60,run,practice:true});
+  if(!r||run!==RUN)return;MOCK.ans[n-1]=r.blob||null;
+  st.textContent='Thank you! · شكراً';say('Thank you, stop.');
+  mockNext(n<3?()=>mockSpeak(n+1):mockColours);
+}
+function mockTask(k,title,titleAr,speakFile,body,answers,next){
+  const run=++RUN;
+  mockShell(k,title,titleAr,`<div id="pz"><button class="btn accent" id="go">▶ Start · ابدأ</button></div>`);
+  const t=clipText(speakFile);if(t)say(t);
+  $('#go').onclick=async()=>{stopSpeech();const z=$('#pz');
+    if(!await body(z,run)||run!==RUN)return;
+    z.innerHTML=prAnswer(answers);celebrate();say('Thank you.');mockNext(next)};
+}
+function mockColours(){
+  mockTask(4,'Colours: say the <u>ink colour</u>','الألوان: اضغط 🎤 بجانب الكلمة وقل <b>لون الحبر</b>، ولا تقرأ الكلمة','audio/task1.mp3',
+    (z,run)=>colourWords(z,run,MOCK_STROOP),
+    `<div class="chips">${MOCK_STROOP.map(([w,c])=>`<span><s>${w}</s> → <b style="color:${c}">${INK[c]}</b></span>`).join('')}</div>`,mockLetters);
+}
+function mockLetters(){
+  mockTask(5,'Letters: remember the letters','الحروف: احفظ الحروف، وعندما تختفي يعمل الميكروفون وحده — قلها بالترتيب','audio/task2.mp3',
+    (z,run)=>letterSets(z,run,MOCK_EQ),
+    `<div class="chips">${MOCK_EQ.map((s,i)=>`<span>${i+1}. ${s.map(([a,b])=>L(a+b)).join(' ')}</span>`).join('')}</div>`,mockPictures);
+}
+function mockPictures(){
+  mockTask(6,'Pictures: say the name','الصور: قل اسم الشيء بالإنجليزية بسرعة — صورة كل ثانيتين','audio/task3.mp3',
+    async(z,run)=>{for(let i=0;i<MOCK_PICS.length;i++){if(run!==RUN)return false;
+      z.innerHTML=`<p class="wcount">${i+1} / ${MOCK_PICS.length} — <span class="recdot"></span> Say the name · قل الاسم</p><div class="stage white"><div style="font-size:150px;line-height:1">${MOCK_PICS[i][0]}</div></div>
+        <div class="bar" style="margin-top:10px"><i style="width:${(i+1)/MOCK_PICS.length*100}%"></i></div>`;
+      if(i===0)try{z.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}await sleep(2000)}return run===RUN},
+    `<div class="chips">${MOCK_PICS.map(([e,n])=>`<span>${e} ${n}</span>`).join('')}</div>`,mockDone);
+}
+function mockDone(){
+  RUN++;stopSpeech();step('Mock 6/6');window.scrollTo(0,0);
+  M.innerHTML=`<div class="screen"><section class="donehero"><div class="ok" style="font-size:36px">🏆</div>
+    <h1>Mock test finished!</h1><p>Well done${MOCK.name?', '+esc(MOCK.name):''}! Tomorrow's test is exactly like this. Sleep well and don't worry.</p>
+    <p class="ar" style="text-align:center">أحسنت! اختبار الغد مثل هذا تماماً. نَم جيداً ولا تقلق.</p></section>
+    <div class="card"><h2>🎧 Listen to your answers</h2><p class="ar mut">استمع إلى إجاباتك — هي على هاتفك فقط ولم تُرسَل</p>
+      <div class="list" style="margin-top:10px">${MOCK_Q.map((q,i)=>MOCK.ans[i]?`<div class="item"><div class="h">Question ${i+1}</div><small class="mut">${esc(q.en)}</small><audio controls src="${URL.createObjectURL(MOCK.ans[i])}"></audio></div>`:'').join('')}</div></div>
+    <button class="btn accent" id="again">↺ Try again · أعد المحاولة</button>
+    <button class="btn ghost" id="hm">🏠 Home · الرئيسية</button></div>`;
+  celebrate(true);say('That was all. Thank you for your participation. You did well.');
+  $('#again').onclick=mockIntro;$('#hm').onclick=home;
 }
 
 async function speaking(n){
@@ -624,30 +851,62 @@ async function taskShell({key,label,stepT,introEn,introAr,speak,body}){
   return run===RUN;
 }
 
+
+/* colours: one word at a time, with its own microphone next to it.
+   The student taps the microphone, says the ink colour, and after 2 seconds the next word appears. */
+async function colourWords(stage,run,list,onTap){
+  for(let i=0;i<list.length;i++){if(run!==RUN)return false;const [w,c]=list[i];
+    stage.innerHTML=`<p class="wcount">${i+1} / ${list.length}</p>
+      <div class="wordrow"><div class="stage"><div class="stroop" style="color:${c}">${esc(w)}</div></div>
+        <div class="wmic"><button class="mic mini ready" id="wm" aria-label="Tap and say the colour">${MIC_SVG}</button><span class="wlbl">Tap · اضغط</span></div></div>
+      <p class="wtip">Tap 🎤 and say the <b>ink colour</b> · اضغط 🎤 وقل <b>لون الحبر</b></p>
+      <div class="bar"><i id="pb" style="width:${i/list.length*100}%"></i></div>`;
+    if(i===0)try{stage.querySelector('.wordrow').scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}
+    const b=$('#wm');await new Promise(r=>b.onclick=r);if(run!==RUN)return false;
+    onTap&&onTap();b.onclick=null;b.classList.remove('ready');b.classList.add('rec');b.innerHTML=STOP_SVG;
+    stage.querySelector('.wlbl').innerHTML='<span class="recdot"></span> Say it! · قلها';
+    requestAnimationFrame(()=>{const pb=$('#pb');if(pb)pb.style.width=((i+1)/list.length*100)+'%'});
+    await sleep(2000);
+  }
+  return run===RUN;
+}
 async function stroopIntro(){
   const ok=await taskShell({key:'T1_colors',label:'Task 1 · Colours',stepT:'Task 1/3',
-    introEn:"Now we'll do something different. I will show you coloured words. Say the <b>colour of the ink</b>. Do not read the word. A new word appears every two seconds. Be quick.",
-    introAr:"الآن سنقوم بشيء مختلف. سأعرض عليك كلمات ملوّنة. قل <b>لون الحبر</b> الذي كُتبت به الكلمة، ولا تقرأ الكلمة. تظهر كلمة جديدة كل ثانيتين. كن سريعاً.",
+    introEn:"Now we'll do something different. I will show you coloured words, one at a time. Tap the <b>microphone next to the word</b> and say the <b>colour of the ink</b>. Do not read the word. After two seconds the next word appears. Be quick.",
+    introAr:"الآن سنقوم بشيء مختلف. سأعرض عليك كلمات ملوّنة، كلمة واحدة في كل مرة. اضغط <b>الميكروفون بجانب الكلمة</b> وقل <b>لون الحبر</b> الذي كُتبت به، ولا تقرأ الكلمة. بعد ثانيتين تظهر الكلمة التالية. كن سريعاً.",
     speak:"Now we'll do something different. I will be showing you colored words and your task will be to say the color of the ink. Do not read the word. Just say the color it is written in. I'll show a new word every two seconds. Be quick. Tap the microphone to start.",
     body:async(stage,run)=>{
-      stage.innerHTML=`<div class="stage"><div class="stroop" id="w"></div></div><div class="bar" style="margin-top:10px"><i id="pb"></i></div>`;
-      for(let i=0;i<STROOP.length&&run===RUN;i++){const [w,c]=STROOP[i];const e=$('#w');e.textContent=w;e.style.color=c;$('#pb').style.width=((i+1)/STROOP.length*100)+'%';mark(2);await sleep(2000)}
+      await colourWords(stage,run,STROOP,()=>mark(2)); // the answer window starts when the student taps
     }});
   if(ok)nextBtn(lettersIntro);
 }
+
+/* letters: the equations are shown to memorise; when they disappear the microphone next to the white
+   screen turns on BY ITSELF, the student says the letters, and the next set appears automatically. */
+async function letterSets(stage,run,sets,onTap){
+  for(let i=0;i<sets.length;i++){if(run!==RUN)return false;const set=sets[i],n=sets.length>1?`${i+1} / ${sets.length}`:'';
+    stage.innerHTML=`<p class="wcount">${n}${n?' — ':''}Memorise · احفظ 👀</p><div class="stage" style="background:#fbf3ea"><div class="eqs">${set.map(([a,b])=>`${a} + ${b} = ${a+b} → ${L(a+b)}`).join('<br>')}</div></div>`;
+    if(i===0)try{stage.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}
+    await sleep(3000+(set.length-3)*1000);if(run!==RUN)return false;
+    const w=3000+set.length*700;
+    stage.innerHTML=`<p class="wcount">${n}${n?' — ':''}Say the letters · قل الحروف</p>
+      <div class="wordrow"><div class="stage white"><div class="wq">? ? ?</div></div>
+        <div class="wmic"><div class="mic mini rec" id="wm" aria-hidden="true">${MIC_SVG}</div><span class="wlbl"><span class="recdot"></span> Listening · أستمع</span></div></div>
+      <p class="wtip">🎤 Say the <b>letters in order</b> now · قل <b>الحروف بالترتيب</b> الآن</p>
+      <div class="bar"><i id="pb" style="width:${i/sets.length*100}%"></i></div>`;
+    onTap&&onTap(w/1000); // the answer window starts as soon as the letters disappear
+    requestAnimationFrame(()=>{const pb=$('#pb');if(pb){pb.style.transition=`width ${w}ms linear`;pb.style.width=((i+1)/sets.length*100)+'%'}});
+    await sleep(w);
+  }
+  return run===RUN;
+}
 async function lettersIntro(){
   const ok=await taskShell({key:'T2_letters',label:'Task 2 · Letters',stepT:'Task 2/3',
-    introEn:"I'll show you mathematical equations. <b>Memorise the letters</b> written next to the equations. When you see the <b>white screen</b>, say the sequence of letters.",
-    introAr:"سأعرض عليك معادلات رياضية. <b>احفظ تسلسل الحروف</b> المكتوبة بجانب المعادلات. عندما تظهر <b>الشاشة البيضاء</b>، قل الحروف بالترتيب.",
+    introEn:"I'll show you mathematical equations. <b>Memorise the letters</b> written next to the equations. When the letters disappear, the <b>microphone turns on by itself</b>: say the letters in order. The next set appears automatically.",
+    introAr:"سأعرض عليك معادلات رياضية. <b>احفظ تسلسل الحروف</b> المكتوبة بجانب المعادلات. عندما تختفي الحروف <b>يعمل الميكروفون تلقائياً</b>: قل الحروف بالترتيب. تظهر المجموعة التالية تلقائياً.",
     speak:"This time I'll show you pictures of mathematical equations. Your task is to memorize the sequence of letters written under the equations. You'll have three seconds to memorize each sequence. Say the sequence when you see the white screen. Tap the microphone to start.",
     body:async(stage,run)=>{
-      for(let i=0;i<EQ.length&&run===RUN;i++){
-        const set=EQ[i];
-        stage.innerHTML=`<p class="mut" style="text-align:center;margin-bottom:8px">${i+1} / ${EQ.length}</p><div class="stage" style="background:#fbf3ea"><div class="eqs">${set.map(([a,b])=>`${a} + ${b} = ${a+b} → ${L(a+b)}`).join('<br>')}</div></div>`;
-        await sleep(3000+ (set.length-3)*1000);if(run!==RUN)return;
-        stage.innerHTML=`<p class="mut" style="text-align:center;margin-bottom:8px">${i+1} / ${EQ.length} — Say the letters · قل الحروف</p><div class="stage white"></div>`;
-        mark((3000+set.length*700)/1000);await sleep(3000+set.length*700);
-      }
+      await letterSets(stage,run,EQ,w=>mark(w));
     }});
   if(ok)nextBtn(namingIntro);
 }
@@ -738,7 +997,7 @@ async function autoScore(sess,recs){
 function autoLine(sess,key){
   const a=sess.auto&&sess.auto[key];if(!a)return '';if(a.error)return '<small class="auto">Auto: could not analyse · تعذّر التحليل</small>';
   const tx=sess.asr&&sess.asr[key];
-  const trn=tx?`<details class="trn"><summary>📝 What the student said · ما قاله الطالب</summary><p>${esc(tx.text||'—')}</p>${tx.items?`<div class="items">${tx.items.map((it,i)=>`<span class="${it.ok?'ok':'no'}">${i+1}. ${esc(it.exp)}${it.ok?' ✓':` → ${esc(it.said||'—')}`}</span>`).join('')}</div>`:''}</details>`:'';
+  const trn=tx?`<details class="trn"${key==='T2_letters'?' open':''}><summary>📝 What the student said · ما قاله الطالب</summary><p>${esc(tx.text||'—')}</p>${tx.items?`<div class="items">${tx.items.map((it,i)=>`<span class="${it.ok?'ok':'no'}">${i+1}. ${esc(it.exp)}${it.ok?' ✓':` → ${esc(it.said||'—')}`}</span>`).join('')}</div>`:''}</details>`:'';
   if(SPEAK_KEYS.includes(key))return `<small class="auto">🤖 Auto: fluency ≈ <b>${a.est}/10</b> · speaking ${a.speak}s · ${a.pauses} pauses · speech ${a.ptr}%${a.wpm!=null?` · ${a.wpm} words/min`:''}</small>${trn}`;
   if(a.answered==null)return trn;
   return `<small class="auto">🤖 Auto: ${a.correct!=null?`correct <b>${a.correct}/${a.n}</b> · `:''}answered ${a.answered}/${a.n}${a.rtMean!=null?` · reaction time ${a.rtMean} ms`:''}${a.readWord?` · read the word ${a.readWord}×`:''}</small>${trn}`;

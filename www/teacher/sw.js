@@ -1,6 +1,6 @@
 /* Teacher app: works offline for listening again, and turns on all processor cores for the speech model. */
-const VERSION='teacher-v4',ASR_CACHE='asr-v1';
-const FILES=['./','index.html','manifest.webmanifest','../img/logo.png','../img/icon-192.png','../fonts/baloo-400.woff2','../fonts/baloo-600.woff2','../fonts/baloo-700.woff2','../fonts/baloo-ar-400.woff2','../fonts/baloo-ar-600.woff2','../fonts/baloo-ar-700.woff2'];
+const VERSION='teacher-v12',ASR_CACHE='asr-v1';
+const FILES=['./','index.html','manifest.webmanifest','../img/logo.png','../img/icon-192.png','../fonts/baloo-400.woff2','../fonts/baloo-600.woff2','../fonts/baloo-700.woff2','../fonts/baloo-ar-400.woff2','../fonts/baloo-ar-600.woff2','../fonts/baloo-ar-700.woff2','../fonts/ruqaa-700.woff2'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('teacher-')&&k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 function isolate(res){if(!res||res.status===0||res.type==='opaque')return res;const h=new Headers(res.headers);
