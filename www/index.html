@@ -215,6 +215,9 @@ body.home main{padding-top:0}
 .mockbtn{display:flex;flex-direction:column;align-items:center;gap:2px;background:linear-gradient(180deg,#2fc4b5,#1a9a8e);box-shadow:0 5px 0 #11695f,0 10px 20px rgba(34,179,166,.25)}
 .mockbtn small{font-weight:600;font-size:13px;opacity:.9}
 .mockbtn:active{box-shadow:0 1px 0 #11695f}
+.c321{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 0}
+.c321 b{width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:58px;font-weight:800;color:var(--navy);background:#fff;border:5px solid var(--accent);box-shadow:0 0 0 10px rgba(240,180,41,.2);animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.c321 span{font-weight:800;color:var(--navy);font-size:17px}
 </style>
 </head>
 <body>
@@ -332,7 +335,7 @@ let RUN=0; // cancels running flows when we leave
 /* ---------- speech ----------
    Recorded female voice (audio/*.mp3, same on every phone, works offline).
    Any line without a recording falls back to the phone's text-to-speech. */
-const CLIPS={"Hello, and welcome. This is an evaluation of your speaking skills. It isn't graded, so don't worry. Listen carefully. You will have time to prepare silently. When you hear start speaking, tap the microphone and speak for one whole minute.": "audio/intro.mp3", "Listen carefully.": "audio/listen.mp3", "This is the last part of the first question. Listen carefully and take twenty seconds to prepare the answer.": "audio/q3lead.mp3", "Describe your usual school day. Tell me what you do from the time you wake up until you return home.": "audio/q1.mp3", "Look at the picture and describe what is happening. Tell me where the people are, what they are doing, and what might happen next.": "audio/q2.mp3", "Some students think that students should be allowed to use their phones at school. Do you agree or disagree? Explain why.": "audio/q3.mp3", "Start.": "audio/start.mp3", "Stop.": "audio/stop.mp3", "Start speaking.": "audio/startspeaking.mp3", "Thank you, stop.": "audio/thanksstop.mp3", "Thank you, let's repeat that with another sentence. Listen carefully. Quickly choose one of these four pictures.": "audio/choosepic.mp3", "Now we'll do something different. I will be showing you colored words and your task will be to say the color of the ink. Do not read the word. Just say the color it is written in. I'll show a new word every two seconds. Be quick. Tap the microphone to start.": "audio/task1.mp3", "This time I'll show you pictures of mathematical equations. Your task is to memorize the sequence of letters written under the equations. You'll have three seconds to memorize each sequence. Say the sequence when you see the white screen. Tap the microphone to start.": "audio/task2.mp3", "We came to the last task. This time I'll show you a sequence of different pictures and your task will be to say the name of the object you see. For each picture, you'll have two seconds. Tap the microphone to start.": "audio/task3.mp3", "Thank you.": "audio/thankyou.mp3", "That was all. Thank you for your participation. You did well.": "audio/finish.mp3"};
+const CLIPS={"Hello, and welcome. This is an evaluation of your speaking skills. It isn't graded, so don't worry. Listen carefully. You will have time to prepare silently. When you hear start speaking, speak for one whole minute.": "audio/intro.mp3", "Listen carefully.": "audio/listen.mp3", "This is the last part of the first question. Listen carefully and take twenty seconds to prepare the answer.": "audio/q3lead.mp3", "Describe your usual school day. Tell me what you do from the time you wake up until you return home.": "audio/q1.mp3", "Look at the picture and describe what is happening. Tell me where the people are, what they are doing, and what might happen next.": "audio/q2.mp3", "Some students think that students should be allowed to use their phones at school. Do you agree or disagree? Explain why.": "audio/q3.mp3", "Start.": "audio/start.mp3", "Stop.": "audio/stop.mp3", "Start speaking.": "audio/startspeaking.mp3", "Thank you, stop.": "audio/thanksstop.mp3", "Thank you, let's repeat that with another sentence. Listen carefully. Quickly choose one of these four pictures.": "audio/choosepic.mp3", "Now we'll do something different. I will be showing you colored words and your task will be to say the color of the ink. Do not read the word. Just say the color it is written in. I'll show a new word every two seconds. Be quick.": "audio/task1.mp3", "This time I'll show you pictures of mathematical equations. Your task is to memorize the sequence of letters written under the equations. You'll have three seconds to memorize each sequence. Say the sequence when you see the white screen.": "audio/task2.mp3", "We came to the last task. This time I'll show you a sequence of different pictures and your task will be to say the name of the object you see. For each picture, you'll have two seconds.": "audio/task3.mp3", "Thank you.": "audio/thankyou.mp3", "That was all. Thank you for your participation. You did well.": "audio/finish.mp3"};
 let CUR=null;
 /* One shared audio element, unlocked on the first tap: iPhone Safari only lets
    an element play by itself (after a timer) once a tap has started it. */
@@ -475,7 +478,7 @@ async function storeRec(key,label,res){
    Returns the saved recording. */
 function micBlock(id){return `<div class="micwrap" id="${id}">
   <button class="mic ready" aria-label="Record">${MIC_SVG}</button>
-  <div class="miclabel">Tap the microphone and answer<div class="ar mut" style="text-align:center">اضغط على الميكروفون وأجب</div></div>
+  <div class="miclabel">The microphone starts by itself<div class="ar mut" style="text-align:center">يعمل الميكروفون وحده</div></div>
   <div class="status rt" hidden><span class="recdot"></span><span class="tm">0:00</span></div>
   <div class="bar" style="width:100%" hidden><i></i></div>
 </div>`}
@@ -600,12 +603,12 @@ async function intro(){
   const run=++RUN;step('Intro');
   M.innerHTML=`<div class="screen"><div class="card" style="display:flex;flex-direction:column;gap:10px">
     <h2>Hello, ${esc(S.name)} 👋</h2>
-    <p>This is an evaluation of your speaking skills. It isn't graded, so don't worry. Listen carefully to each question. You will have time to prepare silently. When you hear <b>“Start speaking”</b>, tap the <b>microphone</b> 🎤 and answer for about one minute. Your answer is saved automatically.</p>
-    <p class="ar">هذا تقييم لمهارة التحدث لديك، وليس عليه درجات فلا تقلق. استمع جيداً لكل سؤال، وسيكون لديك وقت للتحضير بصمت. عندما تسمع <b>«Start speaking»</b> اضغط على <b>الميكروفون</b> 🎤 وأجب لمدة دقيقة تقريباً. تُحفظ إجابتك تلقائياً.</p>
+    <p>This is an evaluation of your speaking skills. It isn't graded, so don't worry. Listen carefully to each question. You will have time to prepare silently. When you hear <b>“Start speaking”</b>, the <b>microphone</b> 🎤 turns on by itself: answer for about one minute. Your answer is saved automatically.</p>
+    <p class="ar">هذا تقييم لمهارة التحدث لديك، وليس عليه درجات فلا تقلق. استمع جيداً لكل سؤال، وسيكون لديك وقت للتحضير بصمت. عندما تسمع <b>«Start speaking»</b> يعمل <b>الميكروفون</b> 🎤 وحده، فأجب لمدة دقيقة تقريباً. تُحفظ إجابتك تلقائياً.</p>
   </div><button class="btn" id="nx">Continue · متابعة</button></div>`;
   $('#nx').onclick=()=>{stopSpeech();practice()};
   try{await getMic()}catch(e){toast('Please allow the microphone — يرجى السماح بالميكروفون',3500)}
-  if(run===RUN)say(`Hello, and welcome. This is an evaluation of your speaking skills. It isn't graded, so don't worry. Listen carefully. You will have time to prepare silently. When you hear start speaking, tap the microphone and speak for one whole minute.`);
+  if(run===RUN)say(`Hello, and welcome. This is an evaluation of your speaking skills. It isn't graded, so don't worry. Listen carefully. You will have time to prepare silently. When you hear start speaking, speak for one whole minute.`);
 }
 
 /* ================= PRACTICE (not graded, nothing is saved or sent) =================
@@ -641,16 +644,16 @@ async function practice(){ // 1) a short speaking question with the real timing,
   if(!await countdown($('#rg'),10,null,run))return;
   st.innerHTML='🎤 Start speaking! · ابدأ التحدث';zone.innerHTML=micBlock('mb');
   await say('Start speaking.');if(run!==RUN)return;
-  const ok=await useMic($('#mb'),{key:'practice',label:'Practice',maxSec:20,run,practice:true});
+  const ok=await useMic($('#mb'),{key:'practice',label:'Practice',maxSec:20,run,practice:true,autoStart:true});
   if(!ok||run!==RUN)return;
   st.textContent='Thank you! · شكراً';say('Thank you, stop.');
   prNext(practiceColours);
 }
 async function practiceColours(){ // 2) say the INK colour
   const run=++RUN;
-  prShell(2,'Colours: say the <u>ink colour</u>','الألوان: كل كلمة وحدها — اضغط 🎤 بجانبها وقل <b>لون الحبر</b>، ولا تقرأ الكلمة',
+  prShell(2,'Colours: say the <u>ink colour</u>','الألوان: كل كلمة وحدها، والميكروفون يعمل وحده — قل <b>لون الحبر</b>، ولا تقرأ الكلمة',
     `<div id="pz"><button class="btn accent" id="go">▶ Start · ابدأ</button></div>`);
-  say("Say the color of the ink. Do not read the word.");
+  autoGo(run,say("Say the color of the ink. Do not read the word."));
   $('#go').onclick=async()=>{stopSpeech();const z=$('#pz');
     if(!await colourWords(z,run,PR_STROOP))return;
     z.innerHTML=prAnswer(`<div class="chips">${PR_STROOP.map(([w,c])=>`<span><s>${w}</s> → <b style="color:${c}">${INK[c]}</b></span>`).join('')}</div>`);
@@ -660,7 +663,7 @@ async function practiceLetters(){ // 3) remember the letters, say them on the wh
   const run=++RUN;
   prShell(3,'Letters: remember the letters','الحروف: احفظ الحروف، وعندما تختفي يعمل الميكروفون وحده — قل الحروف بالترتيب',
     `<div id="pz"><button class="btn accent" id="go">▶ Start · ابدأ</button></div>`);
-  say("Memorize the letters. Say them when you see the white screen.");
+  autoGo(run,say("Memorize the letters. Say them when you see the white screen."));
   $('#go').onclick=async()=>{stopSpeech();const z=$('#pz');
     if(!await letterSets(z,run,[PR_EQ]))return;
     z.innerHTML=prAnswer(`<div class="chips big">${PR_EQ.map(([a,b])=>`<span>${L(a+b)}</span>`).join('')}</div>`);
@@ -670,7 +673,7 @@ async function practicePictures(){ // 4) name the pictures quickly
   const run=++RUN;
   prShell(4,'Pictures: say the name','الصور: قل اسم الشيء بالإنجليزية بسرعة',
     `<div id="pz"><button class="btn accent" id="go">▶ Start · ابدأ</button></div>`);
-  say("Say the name of the object you see.");
+  autoGo(run,say("Say the name of the object you see."));
   $('#go').onclick=async()=>{stopSpeech();const z=$('#pz');
     for(let i=0;i<PR_PICS.length;i++){if(run!==RUN)return;
       z.innerHTML=`<div class="stage white"><div style="font-size:150px;line-height:1">${PR_PICS[i][0]}</div></div><div class="bar" style="margin-top:10px"><i style="width:${(i+1)/PR_PICS.length*100}%"></i></div>`;await sleep(2200)}
@@ -738,7 +741,7 @@ async function mockSpeak(n){
   st.textContent='Stop. Get ready… توقف واستعد';zone.innerHTML='';await say('Stop.');if(run!==RUN)return;await sleep(600);
   st.innerHTML='🎤 Start speaking! · ابدأ التحدث';zone.innerHTML=micBlock('mb');
   await say('Start speaking.');if(run!==RUN)return;
-  const r=await useMic($('#mb'),{key:'mock',label:'Mock',maxSec:60,run,practice:true});
+  const r=await useMic($('#mb'),{key:'mock',label:'Mock',maxSec:60,run,practice:true,autoStart:true});
   if(!r||run!==RUN)return;MOCK.ans[n-1]=r.blob||null;
   st.textContent='Thank you! · شكراً';say('Thank you, stop.');
   mockNext(n<3?()=>mockSpeak(n+1):mockColours);
@@ -746,13 +749,13 @@ async function mockSpeak(n){
 function mockTask(k,title,titleAr,speakFile,body,answers,next){
   const run=++RUN;
   mockShell(k,title,titleAr,`<div id="pz"><button class="btn accent" id="go">▶ Start · ابدأ</button></div>`);
-  const t=clipText(speakFile);if(t)say(t);
+  const t=clipText(speakFile);autoGo(run,t?say(t):Promise.resolve());
   $('#go').onclick=async()=>{stopSpeech();const z=$('#pz');
     if(!await body(z,run)||run!==RUN)return;
     z.innerHTML=prAnswer(answers);celebrate();say('Thank you.');mockNext(next)};
 }
 function mockColours(){
-  mockTask(4,'Colours: say the <u>ink colour</u>','الألوان: اضغط 🎤 بجانب الكلمة وقل <b>لون الحبر</b>، ولا تقرأ الكلمة','audio/task1.mp3',
+  mockTask(4,'Colours: say the <u>ink colour</u>','الألوان: الميكروفون يعمل وحده — قل <b>لون الحبر</b>، ولا تقرأ الكلمة','audio/task1.mp3',
     (z,run)=>colourWords(z,run,MOCK_STROOP),
     `<div class="chips">${MOCK_STROOP.map(([w,c])=>`<span><s>${w}</s> → <b style="color:${c}">${INK[c]}</b></span>`).join('')}</div>`,mockLetters);
 }
@@ -805,7 +808,7 @@ async function speaking(n){
   await sleep(600);
   st.innerHTML='🎤 Start speaking! · ابدأ التحدث';zone.innerHTML=micBlock('mb');
   await say('Start speaking.');if(run!==RUN)return;
-  const rec=await useMic($('#mb'),{key:`Q${n}`,label:`Question ${n}`,maxSec:60,run});
+  const rec=await useMic($('#mb'),{key:`Q${n}`,label:`Question ${n}`,maxSec:60,run,autoStart:true});
   if(!rec||run!==RUN)return;
   st.textContent='Thank you! · شكراً';say('Thank you, stop.');
   zone.insertAdjacentHTML('beforeend',`<div class="row" style="margin-top:12px"><button class="btn ghost" id="again">↺ Record again</button><button class="btn" id="nx">Next →</button></div>`);
@@ -814,7 +817,7 @@ async function speaking(n){
 }
 function speakAgain(n){ // re-record directly (no prep)
   const run=++RUN;const zone=$('#zone');$('#st').innerHTML='🎤 Start speaking! · ابدأ التحدث';zone.innerHTML=micBlock('mb');
-  useMic($('#mb'),{key:`Q${n}`,label:`Question ${n}`,maxSec:60,run}).then(rec=>{if(!rec||run!==RUN)return;
+  useMic($('#mb'),{key:`Q${n}`,label:`Question ${n}`,maxSec:60,run,autoStart:true}).then(rec=>{if(!rec||run!==RUN)return;
     zone.insertAdjacentHTML('beforeend',`<div class="row" style="margin-top:12px"><button class="btn ghost" id="again">↺ Record again</button><button class="btn" id="nx">Next →</button></div>`);
     $('#again').onclick=()=>speakAgain(n);$('#nx').onclick=()=>n<3?speaking(n+1):stroopIntro()});
 }
@@ -828,14 +831,25 @@ async function choosePic(){
 }
 
 /* ----- generic recorded task: student taps mic to begin, whole task is recorded ----- */
+/* 3-2-1 before the microphone turns on by itself */
+async function count321(el,run){
+  for(const n of [3,2,1]){if(run!==RUN||!el.isConnected)return false;
+    el.innerHTML=`<div class="c321"><b>${n}</b><span>🎤 Get ready · استعد</span></div>`;await sleep(800)}
+  return run===RUN;
+}
+/* practice / mock: after the instructions, start by itself (the Start button still works to begin sooner) */
+function autoGo(run,speech){
+  speech.then(async()=>{const z=$('#pz'),g=$('#go');if(run!==RUN||!z||!g)return;const go=g.onclick;
+    await sleep(400);if(run!==RUN||!$('#go'))return;if(!await count321(z,run))return;go&&go()});
+}
 async function taskShell({key,label,stepT,introEn,introAr,speak,body}){
   const run=++RUN;step(stepT);
   M.innerHTML=`<div class="screen"><div class="card" style="display:flex;flex-direction:column;gap:8px"><span class="tag" style="align-self:flex-start">${label}</span><p>${introEn}</p><p class="ar mut">${introAr}</p></div>
     ${micBlock('mb')}<div id="stage"></div></div>`;
-  const mb=$('#mb');mb.querySelector('.miclabel').innerHTML='Tap the microphone to start<div class="ar mut" style="text-align:center">اضغط على الميكروفون للبدء</div>';
-  say(speak);
-  const btn=mb.querySelector('.mic');
-  await new Promise(r=>btn.onclick=r);if(run!==RUN)return;stopSpeech();
+  const mb=$('#mb');mb.querySelector('.miclabel').innerHTML='Listen… the microphone starts by itself<div class="ar mut" style="text-align:center">استمع… سيعمل الميكروفون وحده</div>';
+  const btn=mb.querySelector('.mic');btn.classList.remove('ready');
+  await Promise.race([say(speak),new Promise(r=>btn.onclick=r)]);if(run!==RUN)return;stopSpeech(); // a tap still starts sooner
+  await sleep(300);if(!await count321(mb,run))return;
   const rec=new Recorder(l=>{});
   try{await rec.start()}catch(e){toast('Microphone not allowed — السماح بالميكروفون مطلوب',3500);return taskShell(...arguments)}
   MARKS=[];
@@ -852,19 +866,17 @@ async function taskShell({key,label,stepT,introEn,introAr,speak,body}){
 }
 
 
-/* colours: one word at a time, with its own microphone next to it.
-   The student taps the microphone, says the ink colour, and after 2 seconds the next word appears. */
+/* colours: one word at a time, with its own microphone next to it that turns on BY ITSELF.
+   The student says the ink colour, and after 2 seconds the next word appears. */
 async function colourWords(stage,run,list,onTap){
   for(let i=0;i<list.length;i++){if(run!==RUN)return false;const [w,c]=list[i];
     stage.innerHTML=`<p class="wcount">${i+1} / ${list.length}</p>
       <div class="wordrow"><div class="stage"><div class="stroop" style="color:${c}">${esc(w)}</div></div>
-        <div class="wmic"><button class="mic mini ready" id="wm" aria-label="Tap and say the colour">${MIC_SVG}</button><span class="wlbl">Tap · اضغط</span></div></div>
-      <p class="wtip">Tap 🎤 and say the <b>ink colour</b> · اضغط 🎤 وقل <b>لون الحبر</b></p>
+        <div class="wmic"><div class="mic mini rec" id="wm" aria-hidden="true">${MIC_SVG}</div><span class="wlbl"><span class="recdot"></span> Say it! · قلها</span></div></div>
+      <p class="wtip">🎤 Say the <b>ink colour</b> now · قل <b>لون الحبر</b> الآن</p>
       <div class="bar"><i id="pb" style="width:${i/list.length*100}%"></i></div>`;
     if(i===0)try{stage.querySelector('.wordrow').scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}
-    const b=$('#wm');await new Promise(r=>b.onclick=r);if(run!==RUN)return false;
-    onTap&&onTap();b.onclick=null;b.classList.remove('ready');b.classList.add('rec');b.innerHTML=STOP_SVG;
-    stage.querySelector('.wlbl').innerHTML='<span class="recdot"></span> Say it! · قلها';
+    onTap&&onTap(); // the answer window starts when the word appears
     requestAnimationFrame(()=>{const pb=$('#pb');if(pb)pb.style.width=((i+1)/list.length*100)+'%'});
     await sleep(2000);
   }
@@ -872,11 +884,11 @@ async function colourWords(stage,run,list,onTap){
 }
 async function stroopIntro(){
   const ok=await taskShell({key:'T1_colors',label:'Task 1 · Colours',stepT:'Task 1/3',
-    introEn:"Now we'll do something different. I will show you coloured words, one at a time. Tap the <b>microphone next to the word</b> and say the <b>colour of the ink</b>. Do not read the word. After two seconds the next word appears. Be quick.",
-    introAr:"الآن سنقوم بشيء مختلف. سأعرض عليك كلمات ملوّنة، كلمة واحدة في كل مرة. اضغط <b>الميكروفون بجانب الكلمة</b> وقل <b>لون الحبر</b> الذي كُتبت به، ولا تقرأ الكلمة. بعد ثانيتين تظهر الكلمة التالية. كن سريعاً.",
-    speak:"Now we'll do something different. I will be showing you colored words and your task will be to say the color of the ink. Do not read the word. Just say the color it is written in. I'll show a new word every two seconds. Be quick. Tap the microphone to start.",
+    introEn:"Now we'll do something different. I will show you coloured words, one at a time. The <b>microphone turns on by itself</b>: say the <b>colour of the ink</b>. Do not read the word. After two seconds the next word appears. Be quick.",
+    introAr:"الآن سنقوم بشيء مختلف. سأعرض عليك كلمات ملوّنة، كلمة واحدة في كل مرة. <b>يعمل الميكروفون وحده</b>: قل <b>لون الحبر</b> الذي كُتبت به، ولا تقرأ الكلمة. بعد ثانيتين تظهر الكلمة التالية. كن سريعاً.",
+    speak:"Now we'll do something different. I will be showing you colored words and your task will be to say the color of the ink. Do not read the word. Just say the color it is written in. I'll show a new word every two seconds. Be quick.",
     body:async(stage,run)=>{
-      await colourWords(stage,run,STROOP,()=>mark(2)); // the answer window starts when the student taps
+      await colourWords(stage,run,STROOP,()=>mark(2));
     }});
   if(ok)nextBtn(lettersIntro);
 }
@@ -904,7 +916,7 @@ async function lettersIntro(){
   const ok=await taskShell({key:'T2_letters',label:'Task 2 · Letters',stepT:'Task 2/3',
     introEn:"I'll show you mathematical equations. <b>Memorise the letters</b> written next to the equations. When the letters disappear, the <b>microphone turns on by itself</b>: say the letters in order. The next set appears automatically.",
     introAr:"سأعرض عليك معادلات رياضية. <b>احفظ تسلسل الحروف</b> المكتوبة بجانب المعادلات. عندما تختفي الحروف <b>يعمل الميكروفون تلقائياً</b>: قل الحروف بالترتيب. تظهر المجموعة التالية تلقائياً.",
-    speak:"This time I'll show you pictures of mathematical equations. Your task is to memorize the sequence of letters written under the equations. You'll have three seconds to memorize each sequence. Say the sequence when you see the white screen. Tap the microphone to start.",
+    speak:"This time I'll show you pictures of mathematical equations. Your task is to memorize the sequence of letters written under the equations. You'll have three seconds to memorize each sequence. Say the sequence when you see the white screen.",
     body:async(stage,run)=>{
       await letterSets(stage,run,EQ,w=>mark(w));
     }});
@@ -914,7 +926,7 @@ async function namingIntro(){
   const ok=await taskShell({key:'T3_pictures',label:'Task 3 · Pictures',stepT:'Task 3/3',
     introEn:"We came to the last task. I'll show you different pictures. <b>Say the name</b> of the object you see. You have two seconds for each picture.",
     introAr:"وصلنا إلى المهمة الأخيرة. سأعرض عليك صوراً مختلفة. <b>قل اسم</b> الشيء الذي تراه. لديك ثانيتان لكل صورة.",
-    speak:"We came to the last task. This time I'll show you a sequence of different pictures and your task will be to say the name of the object you see. For each picture, you'll have two seconds. Tap the microphone to start.",
+    speak:"We came to the last task. This time I'll show you a sequence of different pictures and your task will be to say the name of the object you see. For each picture, you'll have two seconds.",
     body:async(stage,run)=>{
       OBJECTS.forEach(o=>{const i=new Image();i.src=`img/${o}.jpg`});
       for(let i=0;i<OBJECTS.length&&run===RUN;i++){
