@@ -211,6 +211,80 @@ body.home main{padding-top:0}
 .wlbl{font-weight:800;font-size:14px;color:var(--navy);text-align:center;white-space:nowrap}
 .wtip{text-align:center;font-weight:600;color:var(--slate);margin:12px 0 8px}
 .wq{font-size:40px;font-weight:800;color:#d9d2c3;letter-spacing:8px}
+.mockbtn{display:flex;flex-direction:column;align-items:center;gap:2px;background:linear-gradient(180deg,#2fc4b5,#1a9a8e);box-shadow:0 5px 0 #11695f,0 10px 20px rgba(34,179,166,.25)}
+.mockbtn small{font-weight:600;font-size:13px;opacity:.9}
+.mockbtn:active{box-shadow:0 1px 0 #11695f}
+.c321{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 0}
+.c321 b{width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:58px;font-weight:800;color:var(--navy);background:#fff;border:5px solid var(--accent);box-shadow:0 0 0 10px rgba(240,180,41,.2);animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.c321 span{font-weight:800;color:var(--navy);font-size:17px}
+
+/* ===== THEME C — premium dark & gold ===== */
+@font-face{font-family:Readex;src:url(../fonts/readex-300.woff2) format('woff2');font-weight:300;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2190-21FF}
+@font-face{font-family:Readex;src:url(../fonts/readex-ar-300.woff2) format('woff2');font-weight:300;font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF}
+@font-face{font-family:Readex;src:url(../fonts/readex-400.woff2) format('woff2');font-weight:400;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2190-21FF}
+@font-face{font-family:Readex;src:url(../fonts/readex-ar-400.woff2) format('woff2');font-weight:400;font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF}
+@font-face{font-family:Readex;src:url(../fonts/readex-500.woff2) format('woff2');font-weight:500;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2190-21FF}
+@font-face{font-family:Readex;src:url(../fonts/readex-ar-500.woff2) format('woff2');font-weight:500;font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF}
+@font-face{font-family:Readex;src:url(../fonts/readex-600.woff2) format('woff2');font-weight:600;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2190-21FF}
+@font-face{font-family:Readex;src:url(../fonts/readex-ar-600.woff2) format('woff2');font-weight:600;font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF}
+@font-face{font-family:Readex;src:url(../fonts/readex-700.woff2) format('woff2');font-weight:700;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2190-21FF}
+@font-face{font-family:Readex;src:url(../fonts/readex-ar-700.woff2) format('woff2');font-weight:700;font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF}
+.card::before{display:none}body{background-image:none}:root{--navy:#f5b841;--navy2:#f7c869;--paper:#0d1124;--surface:rgba(255,255,255,.06);--ink:#f1f3fb;--slate:#a6acc8;--line:rgba(255,255,255,.12);--accent:#f5b841;--gold:#f5b841;--gold2:#f5b841;--goldbg:rgba(245,184,65,.12);
+ --font:Readex,system-ui,sans-serif;--font-ar:Readex,system-ui,sans-serif;--shadow:0 10px 30px rgba(0,0,0,.35)}
+html,body{font-size:16px;background:#0d1124}
+body{background:radial-gradient(900px 500px at 10% -10%,#2b2a6e,transparent 60%),radial-gradient(800px 500px at 110% 20%,#1b4a5e,transparent 60%),#0d1124;background-attachment:fixed}
+.app{background:transparent}
+h1,h2{color:#fff;font-weight:600}.q{color:#fff;font-weight:500}.q::before{color:var(--gold)}
+header.top{background:rgba(13,17,36,.6);backdrop-filter:blur(14px);border-radius:0 0 24px 24px;box-shadow:none;border-bottom:1px solid var(--line)}
+header.top .step{background:linear-gradient(180deg,#ffd27a,#f5b841);box-shadow:none}
+.card{background:rgba(255,255,255,.06);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);color:var(--ink)}
+.btn{border-radius:16px;background:linear-gradient(180deg,#ffd27a,#f5b841);color:#1a1530;box-shadow:0 8px 24px rgba(245,184,65,.25);font-weight:700}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.accent{background:linear-gradient(180deg,#ffd27a,#f5b841);color:#1a1530;box-shadow:0 8px 24px rgba(245,184,65,.3)}
+.btn.ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid var(--line);box-shadow:none}
+.mockbtn{background:rgba(45,212,191,.12)!important;color:#5eead4!important;border:1px solid rgba(45,212,191,.35);box-shadow:none!important}
+.tag{background:rgba(245,184,65,.14);color:#ffd27a;box-shadow:none;border:1px solid rgba(245,184,65,.35)}
+input.name{background:rgba(255,255,255,.06);border:1px solid var(--line);color:#fff;border-radius:14px}
+input.name::placeholder{color:#8088ab}
+.status{background:rgba(255,255,255,.06);border:1px solid var(--line);color:#ffd27a}
+.welcome{background:transparent;border-radius:0}.welcome::before{border:1px solid rgba(245,184,65,.18);box-shadow:none}
+.welcome h1{font-size:40px;background:linear-gradient(180deg,#fff,#c9cdf0);-webkit-background-clip:text;color:transparent;text-shadow:none}
+.welcome .crest{box-shadow:0 0 0 2px rgba(245,184,65,.8),0 0 40px rgba(245,184,65,.25);animation:none}
+.areas svg{background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.about{color:var(--slate)}.about b{color:#fff}.teacher-link{color:#fff}
+.mic{background:linear-gradient(160deg,#ffd27a,#f5b841);color:#1a1530;border:0;box-shadow:0 0 0 10px rgba(245,184,65,.12),0 0 50px rgba(245,184,65,.35)}
+.mic.rec{background:linear-gradient(160deg,#ff8a8a,#e5484d);color:#fff}
+.stage{border-radius:20px;border:1px solid var(--line)}
+.wlbl,.miclabel,.wcount,.wtip,.mut{color:var(--slate)}.miclabel{color:#fff}
+.donehero{background:rgba(255,255,255,.06);border:1px solid var(--line);backdrop-filter:blur(16px)}
+.saved{background:rgba(33,150,106,.15);border-color:rgba(33,150,106,.4);color:#7ee2b0}
+.ring circle:first-child{stroke:rgba(255,255,255,.12)}.ring .num{color:#fff}
+.toast{background:#1a1f3d}
+.bar{background:rgba(255,255,255,.12)}.welcome h1{font-size:34px;white-space:nowrap}
+
+/* readable dark text on the light boxes */
+.eqs,.chips span,.prans,.c321 b{color:#1d1e38}
+.chips span s{color:#6b6f86}
+.item{background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.item .h small{color:var(--slate)}
+.sess{background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.score input{background:rgba(255,255,255,.08);color:#fff;border-color:var(--line)}
+.prnote{background:rgba(255,255,255,.06);border-color:var(--line);color:var(--slate)}
+.form .lbl{color:#ffd27a}
+.cheer{background:#171c3a;color:#fff;border-color:#f5b841}
+.cheer span{color:#ffd27a}
+.recdot{background:#ff6b6b}
+.mic.mini.rec,.mic.rec{color:#fff}
+.pics button{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.05)}
+.bigpic{border:1px solid var(--line)}
+audio{filter:invert(.9) hue-rotate(180deg);border-radius:30px}
+.teacher-link:hover{color:#fff;border-color:#f5b841}
+.btn.small{box-shadow:none}
+.c321 b{background:#fff}
+.c321 span{color:#ffd27a}
+.sendst{border-width:1px}
+.ring circle.arc{stroke:#f5b841}
+input.name:focus{background:rgba(255,255,255,.1);border-color:#f5b841;box-shadow:0 0 0 4px rgba(245,184,65,.18)}
 
 body{background:var(--paper)}
 .app{max-width:1100px}
@@ -319,6 +393,33 @@ table.asheet{border-collapse:separate;border-spacing:0;font-size:14px}
   .fit1 .front .pa{font-size:12.5px}.fit1 .front .plines{line-height:1.35}.fit1 .front .pgrid{gap:2px 12px;font-size:13px}
   .fit2 .front .pa{font-size:11.5px}.fit2 .front .plines{line-height:1.25}.fit2 .front .pgrid{grid-template-columns:repeat(4,1fr);gap:1px 8px;font-size:12px}.fit2 .front .pq{margin-bottom:3px}.fit2 .phead img{width:24mm;height:24mm}
   .fit3 .front .pa{font-size:10px}.fit3 .front .plines{line-height:1.2}.fit3 .front .pq p{font-size:12px}.fit3 .front .pgrid{grid-template-columns:repeat(4,1fr);gap:0 8px;font-size:11px}.fit3 .front .pq{margin-bottom:2px}.fit3 .phead img{width:20mm;height:20mm}.fit3 .front h3{margin:4px 0 1px}.fit3 .pcirc{width:12mm;height:12mm}.pback{font-size:13px}.pturn{margin-top:auto;font-size:12px}.pfoot{margin-top:auto;font-size:11px}}
+.grades thead th{background:#1b2146;color:#ffd27a}.grades thead th small{color:#a6acc8}
+.grades th,.grades td{border-bottom:1px solid rgba(255,255,255,.08)}.grades tbody tr:hover{background:rgba(255,255,255,.04)}
+.grades td.tc,.legend .tc{color:#fff}.grades td.au,.legend .au{color:#8fb4ff}.grades td.na{color:#5c6386}
+.tblwrap{background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.pill{background:rgba(255,255,255,.08);color:var(--slate)}.pill.ok{background:rgba(33,150,106,.2);color:#7ee2b0}.pill.run{background:rgba(143,180,255,.15)}
+.play{background:rgba(245,184,65,.15);color:#ffd27a}.play:hover{background:#f5b841;color:#1a1530}
+.del{color:#fff}.del:hover{background:rgba(229,72,77,.2)}
+.auto-t{background:rgba(255,255,255,.05);border-color:var(--line);color:#fff}
+.auto{color:#8fb4ff}.af{color:#8fb4ff}.acst{background:rgba(143,180,255,.1);border-color:rgba(143,180,255,.3);color:#c9d8ff}
+.ans-h{color:#ffd27a}.ans-text{background:rgba(255,255,255,.05);border:1px solid var(--line);color:#f1f3fb}
+.arow{background:rgba(255,255,255,.04);border:1px solid var(--line)}.arow.ok{border-color:rgba(126,226,176,.4)}.arow.no{border-color:rgba(255,120,120,.45);background:rgba(229,72,77,.08)}
+.arow.ok .asaid{color:#7ee2b0}.arow.no .asaid{color:#ff8f8f}
+.asheet th,.asheet td{background:#141936;color:#e8eaf6;border-bottom:1px solid rgba(255,255,255,.08);border-inline-end:1px solid rgba(255,255,255,.06)}
+.asheet thead th,.asheet thead .c1,.asheet thead .c2{background:#1b2146;color:#ffd27a}
+.asheet thead .lnk{color:#fff}
+.asheet td.c3{color:#ffd27a}.asheet tr.grp td{background:#2a2550;color:#ffd27a}
+.asheet td.ok{color:#7ee2b0}.asheet td.no{color:#ff8f8f;background:#2a1730}.asheet td.wait{color:#5c6386}
+.asheet .c2{box-shadow:2px 0 0 rgba(255,255,255,.1)}
+.asheet td.c2 span,.arow .aw span{background:#e4e4e4;padding:2px 8px;border-radius:6px;display:inline-block}
+.legend .ok{color:#7ee2b0}.legend .no{color:#ff8f8f}
+.btn.danger{color:#ff8f8f;background:rgba(229,72,77,.08);border-color:rgba(229,72,77,.4)}
+.paper,.paper *{color-scheme:light}
+@media print{body{background:#fff!important}}
+.devcard{display:grid;grid-template-columns:260px 1fr;gap:22px;align-items:center}
+.qrbox{background:#fff;border-radius:18px;padding:10px;width:260px;height:260px}.qrbox svg{width:100%;height:100%;display:block}
+.devsteps p{margin:4px 0;line-height:1.6}.devwarn{margin-top:10px;font-size:13px;color:#ffd27a}
+@media (max-width:640px){.devcard{grid-template-columns:1fr;justify-items:center}}
 .btn.danger{color:var(--red);border-color:#f1c4c0}.btn.danger:hover{border-color:var(--red)}
 </style>
 </head>
@@ -332,6 +433,7 @@ table.asheet{border-collapse:separate;border-spacing:0;font-size:14px}
   <main id="main"></main>
 </div>
 <div class="toast" id="toast" hidden></div>
+<script src="qrcode.js"></script>
 <script>
 /* ================= DATA ================= */
 const Q1 = {en:"Describe your usual school day. Tell me what you do from the time you wake up until you return home.",
@@ -581,7 +683,11 @@ async function forgetLocal(s){await tx('students','readwrite',st=>st.delete(s.id
   for(const r of (s.recs||[]))await tx('audio','readwrite',st=>st.delete(r.file));delete REC[s.id]}
 
 /* ---------- connection to the Google script ---------- */
+(function(){ // opened from a "connect" link: #u=<script>&k=<key> — save it and remove it from the address bar
+  try{const h=new URLSearchParams(location.hash.slice(1));const u=h.get('u'),k=h.get('k');
+    if(u&&k){LS.set('t_url',u);LS.set('t_key',k);history.replaceState(null,'',location.pathname+location.search)}}catch(e){}})();
 const CFG={url:LS.get('t_url')||'',key:LS.get('t_key')||''};
+const DEV=LS.get('t_dev')||(()=>{const d='d'+Math.random().toString(36).slice(2,9);LS.set('t_dev',d);return d})();
 async function api(params){
   const u=CFG.url+(CFG.url.includes('?')?'&':'?')+new URLSearchParams({...params,k:CFG.key,t:Date.now()});
   const r=await fetch(u,{redirect:'follow',cache:'no-store'});const j=await r.json();
@@ -644,9 +750,24 @@ async function refresh(){
   for(const s of Object.values(local))if(s.dirty){view(s);try{await apiPost({a:'grade',sid:s.id,data:s.teacher});s.dirty=false;await putStudent(s)}catch(e){}}
   STUDENTS=Object.values(local).map(view).sort((a,b)=>(b.date||0)-(a.date||0));LAST=new Date();
 }
+/* Several teacher devices may be open: before correcting a student, this device writes
+   "I am correcting" on the sheet, waits, and checks that no other device did the same. */
+const CLAIM_MS=15*60000;
+async function claim(s){
+  try{
+    const now=()=>Date.now();const busy=t=>t&&t.claim&&t.claim.by!==DEV&&now()-t.claim.at<CLAIM_MS;
+    let j=await api({a:'list'});let r=j.students.find(x=>x.id===s.id);
+    if(!r||(r.teacher&&(r.teacher.asrAt||r.teacher.deleted))||busy(r.teacher))return false;
+    const data=Object.assign({},r.teacher||{},{claim:{by:DEV,at:now()},t:(r.teacher&&r.teacher.t)||0});
+    await apiPost({a:'grade',sid:s.id,data});
+    await sleep(2500+Math.random()*1500);
+    j=await api({a:'list'});r=j.students.find(x=>x.id===s.id);
+    return !!(r&&r.teacher&&r.teacher.claim&&r.teacher.claim.by===DEV&&!r.teacher.asrAt);
+  }catch(e){return true} // offline check failed: correct anyway (results are the same)
+}
 async function autoCorrectQueue(){
   if(BUSY||LS.get('t_auto')==='0')return;
-  const todo=STUDENTS.filter(s=>!s.asrAt&&complete(s)&&!s.failed);
+  const todo=STUDENTS.filter(s=>!s.asrAt&&complete(s)&&!s.failed&&!(s.teacher&&s.teacher.claim&&s.teacher.claim.by!==DEV&&Date.now()-s.teacher.claim.at<CLAIM_MS));
   if(!todo.length)return;
   BUSY=true;
   try{
@@ -654,6 +775,7 @@ async function autoCorrectQueue(){
     await loadASR(p=>{if(p&&p.status==='progress'&&p.file&&/onnx/.test(p.file))setStatus(`🤖 Downloading the speech model ${Math.round(p.progress||0)}% · تحميل النموذج`)});
     for(const s of todo){
       if(!STUDENTS.some(x=>x.id===s.id))continue;   // deleted meanwhile
+      if(!await claim(s))continue;                    // another teacher device is correcting this student
       CUR=s.id;
       try{
         await loadRecs(s,(n,t)=>setStatus(`⬇️ ${s.name}: recordings ${n}/${t} · تحميل التسجيلات`));
@@ -737,13 +859,13 @@ function mainScreen(){
   OPEN=null;const sheet=LS.get('t_sheet');
   M.innerHTML=`<div class="screen wide">
     <div class="tbar"><div><h1>Results · النتائج</h1><div class="mut" id="sum"></div></div>
-      <div class="tact"><button class="btn small" id="rf">⟳ Refresh</button><button class="btn small accent" id="ash">📄 Answers sheet · ورقة الإجابات</button><button class="btn small ghost" id="csv">📊 CSV</button>${sheet?`<a class="btn small ghost" href="${esc(sheet)}" target="_blank" rel="noopener">📗 Sheet</a>`:''}<button class="btn small ghost" id="cfg">⚙︎</button></div></div>
+      <div class="tact"><button class="btn small" id="rf">⟳ Refresh</button><button class="btn small accent" id="ash">📄 Answers sheet · ورقة الإجابات</button><button class="btn small ghost" id="csv">📊 CSV</button>${sheet?`<a class="btn small ghost" href="${esc(sheet)}" target="_blank" rel="noopener">📗 Sheet</a>`:''}<button class="btn small ghost" id="dev">📱 Add a device · إضافة جهاز</button><button class="btn small ghost" id="cfg">⚙︎</button></div></div>
     <label class="auto-t"><input type="checkbox" id="au" ${LS.get('t_auto')==='0'?'':'checked'}> 🤖 Correct new students automatically by listening · صحّح الطلاب الجدد تلقائياً بالاستماع</label>
     <div class="acst" id="busy" hidden></div>
     <div class="tblwrap" id="tbl"></div>
     <p class="mut legend">▶ listen to the answer · استمع للإجابة &nbsp; ≈ phone estimate (before listening) · تقدير الهاتف &nbsp; <span class="au">■</span> automatic · تلقائي &nbsp; <span class="tc">■</span> teacher · المعلّم</p>
   </div>`;
-  $('#rf').onclick=()=>tick(true);$('#csv').onclick=exportCSV;$('#ash').onclick=()=>answersSheet();$('#cfg').onclick=()=>setupScreen();
+  $('#rf').onclick=()=>tick(true);$('#csv').onclick=exportCSV;$('#ash').onclick=()=>answersSheet();$('#cfg').onclick=()=>setupScreen();$('#dev').onclick=deviceScreen;
   $('#au').onchange=e=>{LS.set('t_auto',e.target.checked?'1':'0');if(e.target.checked)autoCorrectQueue()};
   drawTable();if(BUSY)setStatus('🤖 …');
 }
@@ -933,6 +1055,25 @@ function answersSheet(){
     const csv='\ufeff'+out.map(r=>r.map(q).join(',')).join('\r\n');
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`SpeakingPreTest_answers_${new Date().toISOString().slice(0,10)}.csv`;a.click()};
 }
+function deviceScreen(){
+  OPEN=null;const link=new URL('./',location.href).href+'#'+new URLSearchParams({u:CFG.url,k:CFG.key});
+  M.innerHTML=`<div class="screen wide"><div class="tbar"><div><h1>Add a device · إضافة جهاز</h1>
+    <div class="mut">Open the teacher app on more phones or computers — every device gets the answers automatically.</div>
+    <div class="mut ar">افتح تطبيق المعلّم على هواتف أو حواسيب أخرى — كل جهاز تصله الإجابات تلقائياً.</div></div>
+    <div class="tact"><button class="btn small" id="bk">← Back</button></div></div>
+    <div class="card devcard"><div id="qr" class="qrbox"></div>
+      <div class="devsteps"><p><b>1.</b> Scan this code with the other phone's camera · امسح الرمز بكاميرا الهاتف الآخر</p>
+      <p><b>2.</b> It opens the teacher app already connected · يفتح تطبيق المعلّم مربوطاً مباشرة</p>
+      <p><b>3.</b> On iPhone: Share → Add to Home Screen · في الآيفون: مشاركة ← إضافة إلى الشاشة الرئيسية</p>
+      <p class="mut" style="margin-top:8px">Or send this link · أو أرسل هذا الرابط:</p>
+      <input class="name" id="lk" dir="ltr" readonly value="${esc(link)}">
+      <button class="btn small accent" id="cp" style="margin-top:8px">📋 Copy the link · نسخ الرابط</button>
+      <p class="devwarn">🔒 The link contains the teacher key — share it only with teachers. · الرابط فيه مفتاح المعلّم، أرسله للمعلمين فقط.</p></div></div></div>`;
+  try{const q=qrcode(0,'M');q.addData(link);q.make();$('#qr').innerHTML=q.createSvgTag({cellSize:6,margin:3,scalable:true})}
+  catch(e){$('#qr').innerHTML='<p class="mut">QR not available · الرمز غير متوفر</p>'}
+  $('#bk').onclick=mainScreen;
+  $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(link)}catch(e){$('#lk').select();document.execCommand('copy')}toast('✓ Link copied · تم نسخ الرابط')};
+}
 async function tick(manual){
   try{await refresh();if(!OPEN)drawTable();autoCorrectQueue()}
   catch(e){if(manual)toast('⚠️ Could not update — check the internet · تعذّر التحديث');if(e.message==='key')setupScreen('Wrong teacher key · مفتاح المعلّم خاطئ')}
@@ -943,7 +1084,8 @@ async function start(){
   mainScreen();loop();
 }
 let LOOP=null;
-function loop(){tick();if(!LOOP)LOOP=setInterval(()=>{if(!document.hidden)tick()},20000)}
+function loop(){tick();if(!LOOP){LOOP=setInterval(()=>{if(!document.hidden)tick()},10000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});addEventListener('focus',()=>tick());addEventListener('online',()=>tick())}}
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 start();
 
