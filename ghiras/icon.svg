@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="110" fill="#f7f2e6"/>
+  <path d="M110 250a146 146 0 0 1 292 0" fill="none" stroke="#b8993f" stroke-width="7"/>
+  <path d="M256 150c-8-34 12-58 40-62-2 34-16 56-40 62z" fill="#2d5a35"/>
+  <path d="M256 150c8-26-4-44-28-50 0 26 10 42 28 50z" fill="#4c8a50"/>
+  <text x="256" y="290" text-anchor="middle" font-size="150" font-weight="700" fill="#2d5a35" font-family="'Aref Ruqaa','Amiri',serif">غراس</text>
+  <path d="M120 370c50-10 100 0 136 28 36-28 86-38 136-28-40 40-90 52-136 66-46-14-96-26-136-66z" fill="#2d5a35"/>
+  <path d="M256 398c0 20 0 40 0 66" stroke="#b8993f" stroke-width="6"/>
+</svg>
