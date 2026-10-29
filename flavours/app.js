@@ -105,7 +105,7 @@ if (gl) {
         gl.texParameteri(gl.TEXTURE_2D, k, v);
       t.ready = true; schedule();
     };
-    img.src = `img/${name}.png`;
+    img.src = (window.SPRITES && SPRITES[name]) || `img/${name}.png`;
     return t;
   })();
   layers.forEach(l => { l.tex = load(l.name); });
