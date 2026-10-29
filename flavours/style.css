@@ -14,7 +14,7 @@ body{background-color:var(--bg);color:var(--ink);font:400 clamp(16px,1.6vw,20px)
 .bag:hover{transform:scale(1.05)}
 .bag:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 
-.flavour{position:relative;min-height:160vh;display:grid;place-items:start center;overflow:clip;padding-top:45vh}
+.flavour{position:relative;min-height:160vh;display:grid;place-items:start center;overflow:clip;padding-top:20vh}
 .copy{position:relative;z-index:2;text-align:center;padding:0 24px;max-width:36rem}
 .eyebrow{font-weight:700;letter-spacing:.2em;text-transform:uppercase;font-size:.75rem;opacity:.7}
 h1{font-size:clamp(2.6rem,9vw,6.5rem);line-height:.95;margin:.3em 0 .4em;font-weight:900;letter-spacing:-.03em}
@@ -29,3 +29,10 @@ h1{font-size:clamp(2.6rem,9vw,6.5rem);line-height:.95;margin:.3em 0 .4em;font-we
 
 .hero{display:block;width:min(320px,70vw);height:auto;aspect-ratio:1;object-fit:cover;margin:0 auto 1.5rem;
   border-radius:50%;box-shadow:0 24px 50px -18px var(--ink);transition:box-shadow 600ms}
+
+/* Mobile : moins d'espace avant la photo */
+@media (max-width:600px){.flavour{padding-top:18vh}}
+
+/* le conteneur de données des ingrédients ne doit pas former une ligne de la grille */
+.ingredients{position:absolute}
+.flavour{align-content:start}
