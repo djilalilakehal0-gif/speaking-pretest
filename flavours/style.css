@@ -1,7 +1,7 @@
 :root{--ease:cubic-bezier(.2,.7,.2,1)}
 :root,[data-flavour="burger"]{--bg:rgb(243,232,222);--ink:rgb(74,44,30)}
 :root[data-flavour="pizza"]{--bg:rgb(250,225,214);--ink:rgb(150,30,24)}
-:root[data-flavour="kebab"]{--bg:rgb(238,230,200);--ink:rgb(48,76,40)}
+:root[data-flavour="kebab"]{--bg:rgb(247,214,160);--ink:rgb(122,48,12)}
 
 *{box-sizing:border-box;margin:0}
 body{background-color:var(--bg);color:var(--ink);font:400 clamp(16px,1.6vw,20px)/1.5 system-ui,sans-serif;
