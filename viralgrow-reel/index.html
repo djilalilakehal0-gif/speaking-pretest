@@ -93,6 +93,20 @@ function icon(name, cx, cy, r, color) {
   g.restore();
 }
 
+/* ---------- photos ---------- */
+// focus = where the subject sits in the photo (0..1), so crops stay on the faces
+const PHOTOS = [
+  { src: 'photos/p1.jpg', fx: .54, fy: .42 }, { src: 'photos/p2.jpg', fx: .56, fy: .40 },
+  { src: 'photos/p3.jpg', fx: .43, fy: .55 }, { src: 'photos/p4.jpg', fx: .62, fy: .50 },
+];
+window.photosReady = Promise.all(PHOTOS.map(p => new Promise(res => { p.img = new Image(); p.img.onload = p.img.onerror = res; p.img.src = p.src; })));
+function drawPhoto(i, x, y, w, h, zoom = 1, fx, fy) {   // cover-fit crop around the focus point
+  const p = PHOTOS[i % PHOTOS.length], im = p.img; if (!im.naturalWidth) return;
+  const sc = Math.max(w / im.naturalWidth, h / im.naturalHeight) * zoom, sw = w / sc, sh = h / sc;
+  const sx = clamp((fx ?? p.fx) * im.naturalWidth - sw / 2, 0, im.naturalWidth - sw), sy = clamp((fy ?? p.fy) * im.naturalHeight - sh / 2, 0, im.naturalHeight - sh);
+  g.drawImage(im, sx, sy, sw, sh, x, y, w, h);
+}
+
 /* ---------- precomputed data ---------- */
 const NET = [{ x: 0, y: 0, l: 0, p: -1, b: .15, a: 0 }];
 for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2 + .35; NET.push({ x: Math.cos(a) * 200, y: Math.sin(a) * 200 * .9, l: 1, p: 0, b: .5 + i * .045, a }); }
@@ -110,8 +124,8 @@ const CONF = Array.from({ length: 110 }, (_, i) => ({
   c: [C.lime, C.violet, C.pink, C.cyan, '#fff'][i % 5], k: i % 3,
 }));
 const ORB = [
-  ['play', 0, C.lime], ['heart', 0, C.pink], ['chat', 1, C.cyan], ['share', 1, C.lime],
-  ['camera', 1, C.violet], ['star', 2, C.lime], ['trend', 2, C.pink], ['eye', 2, C.cyan],
+  ['play', 0, C.lime], ['photo0', 0, C.lime], ['chat', 1, C.cyan], ['photo1', 1, C.pink],
+  ['share', 1, C.lime], ['photo2', 2, C.violet], ['star', 2, C.lime], ['photo3', 2, C.cyan],
 ];
 
 /* ---------- global layers ---------- */
@@ -246,7 +260,7 @@ function s3(t) {
   g.fillStyle = C.lime; g.beginPath(); g.arc(262, 208, 7 + Math.sin(lt * 9) * 2, 0, 7); g.fill();
   T('Growth · Live', 286, 217, { s: 30, w: 700 });
   [['7D', 0], ['30D', 1], ['90D', 0]].forEach(([s, on], i) => { const x = 1330 + i * 100; rr(x, 186, 88, 44, 22); g.fillStyle = on ? C.lime : 'rgba(255,255,255,.07)'; g.fill(); T(s, x + 44, 216, { f: MONO, s: 20, w: 700, a: 'center', c: on ? C.bg : C.dim }); });
-  g.beginPath(); g.arc(1660, 208, 22, 0, 7); g.fillStyle = linGrad(1640, 190, 1680, 230, [[0, C.pink], [1, C.violet]]); g.fill();
+  g.save(); g.beginPath(); g.arc(1660, 208, 24, 0, 7); g.clip(); drawPhoto(0, 1636, 184, 48, 48, 2.2, .54, .4); g.restore(); g.strokeStyle = C.lime; g.lineWidth = 3; g.beginPath(); g.arc(1660, 208, 26, 0, 7); g.stroke();
 
   // KPI cards
   const cards = [['FOLLOWERS', fmt(1284930 * E.outCubic(P(lt, .5, 2.2))), '+24.8%', C.lime, 0],
@@ -333,7 +347,11 @@ function s4(t) {
   g.fillStyle = linGrad(0, -ph / 2, 0, ph / 2, [[0, '#2a1260'], [1, '#6b1b5e']]); g.fillRect(-pw / 2, -ph / 2, pw, ph);
   [[C.pink, 0], [C.cyan, 2], [C.violet, 4], [C.lime, 6]].forEach(([c, ph_], i) => { const bx = Math.sin(lt * 1.3 + ph_) * 130, by = Math.cos(lt * 1.1 + ph_ * 1.3) * 230; g.fillStyle = radGrad(bx, by, 260, [[0, c + 'aa'], [1, c + '00']]); g.fillRect(-pw / 2, -ph / 2, pw, ph); });
   // creator silhouette
-  g.fillStyle = 'rgba(8,6,20,.55)'; g.beginPath(); g.arc(0, -40 + Math.sin(lt * 4) * 4, 74, 0, 7); g.fill(); g.beginPath(); g.ellipse(0, 190, 150, 130, 0, Math.PI, 0); g.fill();
+  const order = [1, 0, 2, 3], seg = .625, pi = Math.min(3, Math.floor(lt / seg)), pu = (lt - pi * seg) / seg;
+  const sx0 = -pw / 2 + 14, sy0 = -ph / 2 + 14, sw0 = pw - 28, sh0 = ph - 28;
+  [pi - 1, pi].forEach(k => { if (k < 0) return; const a = k === pi ? E.outCubic(P(pu, 0, .22)) : 1; g.globalAlpha = a; drawPhoto(order[k], sx0, sy0, sw0, sh0, 1.0 + .22 * (k === pi ? pu : 1) + (k === 3 ? .1 : 0)); });
+  g.globalAlpha = 1;
+  g.fillStyle = linGrad(0, -ph / 2, 0, ph / 2, [[0, 'rgba(20,6,50,.55)'], [.35, 'rgba(20,6,50,0)'], [.6, 'rgba(20,6,50,0)'], [1, 'rgba(60,8,60,.85)']]); g.fillRect(sx0, sy0, sw0, sh0);
   T('Following   |   For You', 0, -ph / 2 + 80, { f: MONO, s: 17, w: 700, a: 'center', c: '#fff', al: .9 });
   g.fillStyle = '#fff'; g.fillRect(-26, -ph / 2 + 96, 52, 3);
   // actions
@@ -405,11 +423,12 @@ function s6(t) {
   }).sort((a, b) => a.depth - b.depth);
   items.forEach(o => {
     const p = E.outBack(P(lt, .35 + o.i * .07, .8 + o.i * .07)); if (p <= 0) return;
-    const sc = (.72 + .38 * o.depth) * p, r = 62;
+    const sc = (.72 + .38 * o.depth) * p, r = o.name.startsWith('photo') ? 78 : 62;
     g.save(); g.translate(o.x, o.y); g.rotate(-rot); g.scale(sc, sc);
     glow(o.col, 30); rr(-r, -r, r * 2, r * 2, 30); g.fillStyle = '#15151f'; g.fill(); noGlow();
     rr(-r, -r, r * 2, r * 2, 30); g.strokeStyle = o.col; g.lineWidth = 3; g.stroke();
-    icon(o.name, 0, 0, r, o.col);
+    if (o.name.startsWith('photo')) { g.save(); rr(-r + 4, -r + 4, r * 2 - 8, r * 2 - 8, 26); g.clip(); drawPhoto(+o.name[5], -r, -r, r * 2, r * 2, 1.15 + .1 * Math.sin(lt * 2 + o.i)); g.restore(); }
+    else icon(o.name, 0, 0, r, o.col);
     g.restore();
   });
   g.restore();
@@ -431,6 +450,15 @@ function s7(t) {
   const tp = E.outExpo(P(lt, .45, .85));
   g.save(); g.beginPath(); g.rect(0, 560, W, 150); g.clip();
   T('GROW LOUDER.', W / 2, 660 + (1 - tp) * 120, { s: 92, w: 900, a: 'center', ls: 6, c: '#fff' }); g.restore();
+  const ax0 = W / 2 - 250;
+  for (let k = 0; k < 4; k++) {
+    const ap = E.outBack(P(lt, .45 + k * .07, .8 + k * .07)); if (ap <= 0) continue;
+    g.save(); g.translate(ax0 + k * 62, 950); g.scale(ap, ap);
+    g.beginPath(); g.arc(0, 0, 45, 0, 7); g.fillStyle = C.bg; g.fill();
+    g.save(); g.beginPath(); g.arc(0, 0, 40, 0, 7); g.clip(); drawPhoto(k, -40, -40, 80, 80, k === 3 ? 1.4 : 2.0); g.restore();
+    g.restore();
+  }
+  T('Join 120K+ creators', ax0 + 3 * 62 + 66, 962, { s: 34, w: 700, c: '#fff', al: E.outCubic(P(lt, .75, 1.05)) });
   const bp = E.outBack(P(lt, .7, 1.1));
   if (bp > 0) {
     g.save(); g.translate(W / 2, 830); g.scale(bp, bp);

@@ -12,6 +12,7 @@ const path = require('path');
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
   await page.goto('file://' + path.join(__dirname, 'index.html') + '?capture');
   await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(() => window.photosReady);
   const FPS = await page.evaluate(() => window.FPS), DUR = await page.evaluate(() => window.DUR);
   const shot = async t => { await page.evaluate(t => window.renderAt(t), t); return page.screenshot({ type: 'png', clip: { x: 0, y: 0, width: 1920, height: 1080 } }); };
 
