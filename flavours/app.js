@@ -125,30 +125,39 @@ if (gl) {
     gl.uniform2f(u.res, canvas.width, canvas.height);
     gl.uniform1i(u.tex, 0);
     const W = innerWidth, H = innerHeight;
+    const k = Math.min(Math.max(W / 1200, 0.42), 1);   // échelle des ingrédients selon la largeur d'écran
     for (const sec of sections) {
       const r = sec.getBoundingClientRect();
       if (r.bottom < 0 || r.top > H) continue;
+      const texts = [...sec.querySelectorAll('h1, .copy > p')].map(e => e.getBoundingClientRect());
       for (const l of layers) {
         if (l.section !== sec || !l.tex.ready) continue;
-        const y = r.top + (l.top / 100) * r.height - (1 - l.s) * r.top + l.size / 2;
-        const x = (l.left / 100) * W + l.size / 2;
+        const size = l.size * k;
+        const y = r.top + (l.top / 100) * r.height - (1 - l.s) * r.top + size / 2;
+        const x = Math.min((l.left / 100) * W, W - size) + size / 2;   // reste entièrement dans l'écran
         // fondu : l'ingrédient s'efface en approchant le haut/bas de sa section au lieu d'être coupé net
         const edge = Math.min(y - r.top, r.bottom - y);
         let alpha = Math.min(Math.max(edge / FADE, 0), 1);
         // à droite, l'ingrédient s'efface avant d'atteindre le bouton « Ajouter au sac » (barre du haut)
         // idem à gauche, avant le logo « Trois saveurs »
-        if (x + l.size / 2 > W - BTN_ZONE_W || x - l.size / 2 < LOGO_ZONE_W) {
-          const clear = Math.min(Math.max((y - l.size / 2 - BTN_ZONE_H) / 120, 0), 1);
+        if (x + size / 2 > W - BTN_ZONE_W || x - size / 2 < LOGO_ZONE_W) {
+          const clear = Math.min(Math.max((y - size / 2 - BTN_ZONE_H) / 120, 0), 1);
           alpha *= clear;
         }
         if (alpha <= 0) continue;
-        const blurPx = l.blur * MAX_BLUR;
-        const ext = 1 + (blurPx * 1.5) / (l.size / 2);           // marge pour que le flou ne soit pas rogné
+        // l'ingrédient s'estompe quand il passe derrière le titre ou le texte
+        for (const t of texts) {
+          const hx = size / 2 * 0.8;
+          const gap = Math.max(t.left - (x + hx), x - hx - t.right, t.top - (y + hx), y - hx - t.bottom);
+          alpha *= 0.12 + 0.88 * Math.min(Math.max(gap / 50, 0), 1);   // fondu progressif, sans à-coup
+        }
+        const blurPx = l.blur * MAX_BLUR * k;
+        const ext = 1 + (blurPx * 1.5) / (size / 2);           // marge pour que le flou ne soit pas rogné
         gl.uniform2f(u.pos, x * dpr, y * dpr);
-        gl.uniform1f(u.half, (l.size / 2) * ext * dpr);
+        gl.uniform1f(u.half, (size / 2) * ext * dpr);
         gl.uniform1f(u.rot, (l.rot + r.top * l.s * 0.04) * Math.PI / 180);
         gl.uniform1f(u.ext, ext);
-        gl.uniform1f(u.radius, blurPx / l.size * 2);              // en UV (-1…1 sur l.size px)
+        gl.uniform1f(u.radius, blurPx / size * 2);              // en UV (-1…1 sur size px)
         gl.uniform1f(u.fade, l.blur);
         gl.uniform1f(u.alpha, alpha * alpha * (3 - 2 * alpha));
         gl.bindTexture(gl.TEXTURE_2D, l.tex);
