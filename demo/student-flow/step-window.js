@@ -155,7 +155,7 @@
       listeners.forEach((fn) => fn(state()));
     }
 
-    // The clock: only on screen and in a shown tab, a quarter second at
+    // The clock (one tick per display frame, 60 fps on a 60 Hz screen): only on screen and in a shown tab, a quarter second at
     // most per tick, looping; still under reduced motion.
     let shown = false;
     let last = performance.now();
@@ -167,7 +167,9 @@
       { threshold: 0.3 },
     );
     io.observe(el);
-    const timer = setInterval(() => {
+    let raf = 0;
+    const frame = () => {
+      raf = requestAnimationFrame(frame);
       const now = performance.now();
       const dt = Math.min(0.25, (now - last) / 1000);
       last = now;
@@ -180,7 +182,8 @@
       }
       at = { i, t };
       render();
-    }, 40);
+    };
+    raf = requestAnimationFrame(frame);
 
     function play(i) {
       at = { i, t: still ? steps[i].dur : 0 };
@@ -220,7 +223,7 @@
         return () => listeners.delete(fn);
       },
       destroy() {
-        clearInterval(timer);
+        cancelAnimationFrame(raf);
         io.disconnect();
         ro.disconnect();
         el.replaceChildren();
