@@ -10,6 +10,7 @@ sections.forEach(s => io.observe(s));
 
 // Ingrédients : vitesse 0,2–0,6 × scroll ; profondeur = vitesse (petit/lent = loin, grand/rapide = proche)
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FADE = 220; // px de fondu aux bords de section
 const MAX_BLUR = 7; // px de flou (écran) pour l'ingrédient le plus lointain
 const layers = [];
 sections.forEach((section, si) => {
@@ -58,6 +59,7 @@ if (gl) {
     uniform float u_ext;              // ratio quad / sprite (>=1)
     uniform float u_radius;           // rayon de flou en UV sprite (profondeur de champ)
     uniform float u_fade;             // voile atmosphérique selon la profondeur
+    uniform float u_alpha;            // fondu aux frontières de section
     varying vec2 v_uv;
     vec4 tap(vec2 uv){
       vec2 t = uv*.5+.5;
@@ -77,7 +79,7 @@ if (gl) {
       }
       col.rgb *= 1. - u_fade*.18;     // légère atténuation des plans lointains
       col *= 1. - u_fade*.25;         // et transparence
-      gl_FragColor = col;
+      gl_FragColor = col * u_alpha;
     }`));
   gl.linkProgram(prog); gl.useProgram(prog);
 
@@ -88,9 +90,8 @@ if (gl) {
   gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
   const U = n => gl.getUniformLocation(prog, n);
   const u = { res: U('u_res'), pos: U('u_pos'), half: U('u_half'), rot: U('u_rot'),
-              ext: U('u_ext'), radius: U('u_radius'), fade: U('u_fade'), tex: U('u_tex') };
+              ext: U('u_ext'), radius: U('u_radius'), fade: U('u_fade'), alpha: U('u_alpha'), tex: U('u_tex') };
   gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-  gl.enable(gl.SCISSOR_TEST);
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 
   const textures = {};
@@ -119,20 +120,21 @@ if (gl) {
 
   const draw = () => {
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.disable(gl.SCISSOR_TEST); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.enable(gl.SCISSOR_TEST);
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform2f(u.res, canvas.width, canvas.height);
     gl.uniform1i(u.tex, 0);
     const W = innerWidth, H = innerHeight;
     for (const sec of sections) {
       const r = sec.getBoundingClientRect();
       if (r.bottom < 0 || r.top > H) continue;
-      // chaque saveur reste découpée à sa section
-      const y0 = Math.max(r.top, 0), y1 = Math.min(r.bottom, H);
-      gl.scissor(0, Math.round((H - y1) * dpr), canvas.width, Math.round((y1 - y0) * dpr));
       for (const l of layers) {
         if (l.section !== sec || !l.tex.ready) continue;
         const y = r.top + (l.top / 100) * r.height - (1 - l.s) * r.top + l.size / 2;
         const x = (l.left / 100) * W + l.size / 2;
+        // fondu : l'ingrédient s'efface en approchant le haut/bas de sa section au lieu d'être coupé net
+        const edge = Math.min(y - r.top, r.bottom - y);
+        const alpha = Math.min(Math.max(edge / FADE, 0), 1);
+        if (alpha <= 0) continue;
         const blurPx = l.blur * MAX_BLUR;
         const ext = 1 + (blurPx * 1.5) / (l.size / 2);           // marge pour que le flou ne soit pas rogné
         gl.uniform2f(u.pos, x * dpr, y * dpr);
@@ -141,6 +143,7 @@ if (gl) {
         gl.uniform1f(u.ext, ext);
         gl.uniform1f(u.radius, blurPx / l.size * 2);              // en UV (-1…1 sur l.size px)
         gl.uniform1f(u.fade, l.blur);
+        gl.uniform1f(u.alpha, alpha * alpha * (3 - 2 * alpha));
         gl.bindTexture(gl.TEXTURE_2D, l.tex);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
