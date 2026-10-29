@@ -1,0 +1,24 @@
+:root{--ease:cubic-bezier(.2,.7,.2,1)}
+:root,[data-flavour="burger"]{--bg:rgb(243,232,222);--ink:rgb(74,44,30)}
+:root[data-flavour="pizza"]{--bg:rgb(250,225,214);--ink:rgb(150,30,24)}
+:root[data-flavour="kebab"]{--bg:rgb(238,230,200);--ink:rgb(48,76,40)}
+
+*{box-sizing:border-box;margin:0}
+body{background-color:var(--bg);color:var(--ink);font:400 clamp(16px,1.6vw,20px)/1.5 system-ui,sans-serif;
+  transition:background-color 600ms,color 600ms}
+
+.top{position:fixed;inset:0 0 auto;z-index:10;display:flex;justify-content:space-between;align-items:center;
+  padding:18px clamp(16px,4vw,48px);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.8rem}
+.bag{font:inherit;letter-spacing:.06em;cursor:pointer;border:0;border-radius:999px;padding:.8em 1.6em;
+  background:var(--ink);color:var(--bg);transition:background-color 600ms,color 600ms,transform .2s}
+.bag:hover{transform:scale(1.05)}
+.bag:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+
+.flavour{position:relative;min-height:160vh;display:grid;place-items:start center;overflow:clip;padding-top:45vh}
+.copy{position:relative;z-index:2;text-align:center;padding:0 24px;max-width:36rem}
+.eyebrow{font-weight:700;letter-spacing:.2em;text-transform:uppercase;font-size:.75rem;opacity:.7}
+h1{font-size:clamp(2.6rem,9vw,6.5rem);line-height:.95;margin:.3em 0 .4em;font-weight:900;letter-spacing:-.03em}
+
+.ingredient{position:absolute;z-index:1;pointer-events:none;will-change:transform;user-select:none}
+
+@media (prefers-reduced-motion:reduce){body,.bag{transition:none}}
