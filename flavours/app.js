@@ -10,7 +10,8 @@ sections.forEach(s => io.observe(s));
 
 // Ingrédients : vitesse 0,2–0,6 × scroll ; profondeur = vitesse (petit/lent = loin, grand/rapide = proche)
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const FADE = 220; // px de fondu aux bords de section
+const FADE = 220;     // px de fondu en fin de section
+const FADE_TOP = 60;  // px de fondu en début de section
 const BTN_ZONE_W = 260, LOGO_ZONE_W = 260, BTN_ZONE_H = 90; // zones du bouton (droite) et du logo (gauche) dans la barre du haut
 const MAX_BLUR = 7; // px de flou (écran) pour l'ingrédient le plus lointain
 const layers = [];
@@ -136,7 +137,7 @@ if (gl) {
         const y = r.top + (l.top / 100) * r.height - (1 - l.s) * r.top + size / 2;
         const x = Math.min((l.left / 100) * W, W - size) + size / 2;   // reste entièrement dans l'écran
         // fondu : l'ingrédient s'efface en approchant le haut/bas de sa section au lieu d'être coupé net
-        const edge = Math.min(y - r.top, r.bottom - y);
+        const edge = Math.min((y - r.top) * (FADE / FADE_TOP), r.bottom - y);   // fondu plus court en début de section
         let alpha = Math.min(Math.max(edge / FADE, 0), 1);
         // à droite, l'ingrédient s'efface avant d'atteindre le bouton « Ajouter au sac » (barre du haut)
         // idem à gauche, avant le logo « Trois saveurs »
@@ -149,7 +150,7 @@ if (gl) {
         for (const t of texts) {
           const hx = size / 2 * 0.8;
           const gap = Math.max(t.left - (x + hx), x - hx - t.right, t.top - (y + hx), y - hx - t.bottom);
-          alpha *= 0.12 + 0.88 * Math.min(Math.max(gap / 50, 0), 1);   // fondu progressif, sans à-coup
+          alpha *= 0.3 + 0.7 * Math.min(Math.max(gap / 30, 0), 1);   // fondu progressif, sans à-coup
         }
         const blurPx = l.blur * MAX_BLUR * k;
         const ext = 1 + (blurPx * 1.5) / (size / 2);           // marge pour que le flou ne soit pas rogné
