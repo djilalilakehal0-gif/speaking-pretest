@@ -148,9 +148,9 @@ if (gl) {
         if (alpha <= 0) continue;
         // l'ingrédient s'estompe quand il passe derrière le titre ou le texte
         for (const t of texts) {
-          const hx = size / 2 * 0.65;
+          const hx = size / 2 * 0.72;
           const gap = Math.max(t.left - (x + hx), x - hx - t.right, t.top - (y + hx), y - hx - t.bottom);
-          alpha *= 0.55 + 0.45 * Math.min(Math.max(gap / 20, 0), 1);   // fondu progressif, sans à-coup
+          alpha *= 0.4 + 0.6 * Math.min(Math.max(gap / 24, 0), 1);   // fondu progressif, sans à-coup
         }
         const blurPx = l.blur * MAX_BLUR * k;
         const ext = 1 + (blurPx * 1.5) / (size / 2);           // marge pour que le flou ne soit pas rogné
