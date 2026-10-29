@@ -11,6 +11,7 @@ sections.forEach(s => io.observe(s));
 // Ingrédients : vitesse 0,2–0,6 × scroll ; profondeur = vitesse (petit/lent = loin, grand/rapide = proche)
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FADE = 220; // px de fondu aux bords de section
+const BTN_ZONE_W = 260, BTN_ZONE_H = 90; // zone du bouton en haut à droite
 const MAX_BLUR = 7; // px de flou (écran) pour l'ingrédient le plus lointain
 const layers = [];
 sections.forEach((section, si) => {
@@ -133,7 +134,12 @@ if (gl) {
         const x = (l.left / 100) * W + l.size / 2;
         // fondu : l'ingrédient s'efface en approchant le haut/bas de sa section au lieu d'être coupé net
         const edge = Math.min(y - r.top, r.bottom - y);
-        const alpha = Math.min(Math.max(edge / FADE, 0), 1);
+        let alpha = Math.min(Math.max(edge / FADE, 0), 1);
+        // à droite, l'ingrédient s'efface avant d'atteindre le bouton « Ajouter au sac » (barre du haut)
+        if (x + l.size / 2 > W - BTN_ZONE_W) {
+          const clear = Math.min(Math.max((y - l.size / 2 - BTN_ZONE_H) / 120, 0), 1);
+          alpha *= clear;
+        }
         if (alpha <= 0) continue;
         const blurPx = l.blur * MAX_BLUR;
         const ext = 1 + (blurPx * 1.5) / (l.size / 2);           // marge pour que le flou ne soit pas rogné
