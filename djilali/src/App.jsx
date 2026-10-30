@@ -9,15 +9,27 @@ gsap.registerPlugin(useGSAP)
 const MOTION =
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1
 
-// Column layout: how far the image must rise to clear the details block stacked beneath it
-function lift(panel) {
+// Column layout: the details stack over the image, so fit the image into the space above them.
+// The first panel also reserves room for the floating nav.
+function fitImage(panel, isFirst) {
   const img = panel.querySelector('[data-image]')
   const details = panel.querySelector('[data-details]')
   const padB = parseFloat(getComputedStyle(img.parentElement).paddingBottom) || 0
-  const imageBottom = (panel.clientHeight - padB) / 2 + (img.offsetHeight * 1.06) / 2
-  const detailsTop = panel.clientHeight - details.offsetHeight - 24
-  const imageTop = (panel.clientHeight - padB) / 2 - (img.offsetHeight * 1.06) / 2
-  return Math.max(14, Math.min(imageBottom - detailsTop + 10, imageTop - 8))
+  // The panel is still mid-expansion here, so measure the size it will settle at (flex-grow 2.6 of 2.6 + 0.7 + 0.7)
+  const height = panel.parentElement.clientHeight * (2.6 / 4)
+  // Same for the image: its max-height tracks the settled panel, so derive its settled size
+  const imgH = Math.min(
+    window.innerHeight * 0.46,
+    height - padB,
+    panel.clientWidth * 0.86 * (img.naturalHeight / img.naturalWidth || 0.75),
+  )
+  const top = isFirst ? 76 : 12
+  const bottom = height - details.offsetHeight - 24 - 12
+  const avail = bottom - top
+  const scale = Math.min(1.06, Math.max(avail, 0) / imgH)
+  const y = (top + bottom) / 2 - (height - padB) / 2
+  // Too little room left (tiny screens, first panel under the nav): hide it rather than overlap the text
+  return { scale, y, hide: avail < 56 }
 }
 
 export default function App() {
@@ -49,10 +61,11 @@ export default function App() {
 
         to(panel, { flexGrow: isActive ? 2.6 : idle ? 1 : 0.7, duration: 1.05, ease: 'power4.out' })
 
+        const fit = isActive && !isDesktop ? fitImage(panel, i === 0) : null
         to(q('[data-image]'), {
-          scale: isActive ? 1.06 : idle ? 1 : 0.92,
-          // Column layout: details stack over the image, so lift it clear of the text
-          y: isActive ? (isDesktop ? -14 : -lift(panel)) : 0,
+          scale: isActive ? (fit ? fit.scale : 1.06) : idle ? 1 : 0.92,
+          y: isActive ? (fit ? fit.y : -14) : 0,
+          autoAlpha: fit?.hide ? 0 : 1,
           duration: 1.05,
           ease: 'power4.out',
         })
