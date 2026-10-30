@@ -5,7 +5,7 @@ export const products = [
     name: 'Mapple Noir',
     finish: 'Midnight Gold',
     price: '$299.00',
-    image: '/products/noir.png',
+    image: `${import.meta.env.BASE_URL}products/noir.png`,
     description:
       'Matte black anodized aluminum with brushed gold hardware. Studio-grade 40mm drivers and adaptive noise cancellation, tuned for depth.',
     specs: ['Active NC', '40h battery', 'Hi-Res audio'],
@@ -26,7 +26,7 @@ export const products = [
     name: 'djilali lakehal',
     finish: 'Polar Silver',
     price: '$249.00',
-    image: '/products/frost.png',
+    image: `${import.meta.env.BASE_URL}products/frost.png`,
     description:
       'Polished silver with breathable knit mesh in arctic white. The same signature sound, wrapped in a finish that stays cool all day.',
     specs: ['Active NC', '40h battery', 'Ultra-light'],
@@ -47,7 +47,7 @@ export const products = [
     name: 'djilali Moss',
     finish: 'Forest Bronze',
     price: '$279.00',
-    image: '/products/moss.png',
+    image: `${import.meta.env.BASE_URL}products/moss.png`,
     description:
       'Deep forest green paired with warm bronze accents. A quiet, organic colorway with spatial audio that feels like open air.',
     specs: ['Active NC', '40h battery', 'Spatial audio'],
