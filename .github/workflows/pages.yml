@@ -40,6 +40,15 @@ jobs:
           printf '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=../"><a href="../">Speaking Pre-Test</a>' > _site/www/index.html
           touch _site/.nojekyll
 
+      - name: Build and add the djilali store landing
+        run: |
+          cd djilali
+          npm ci
+          npm run build
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p _site/djilali
+          cp -r djilali/dist/. _site/djilali/
+
       - name: Add the speech-recognition model (Whisper tiny)
         run: |
           mkdir -p /tmp/m && cd /tmp/m
