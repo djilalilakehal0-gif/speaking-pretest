@@ -32,6 +32,9 @@ function fitImage(panel, isFirst) {
   return { scale, y, hide: avail < 56 }
 }
 
+// Touch devices drive the panels with taps; their synthetic mouse events would fight the layout animation
+const canHover = () => window.matchMedia('(hover: hover)').matches
+
 export default function App() {
   const [active, setActive] = useState(null)
   const root = useRef(null)
@@ -90,6 +93,8 @@ export default function App() {
         }
 
         const items = q('[data-details]').children
+        // A not-yet-started delayed reveal from a previous panel switch survives overwrite: 'auto', so cancel it
+        gsap.killTweensOf(items)
         if (isActive) {
           gsap.fromTo(
             items,
@@ -145,7 +150,7 @@ export default function App() {
       </header>
 
       {/* Panels */}
-      <main className="flex h-full w-full flex-col md:flex-row" onMouseLeave={() => setActive(null)}>
+      <main className="flex h-full w-full flex-col md:flex-row" onMouseLeave={() => canHover() && setActive(null)}>
         {products.map((p, i) => {
           const t = p.theme
           const isActive = active === i
@@ -155,7 +160,7 @@ export default function App() {
               data-panel
               tabIndex={0}
               aria-label={p.name}
-              onMouseEnter={() => setActive(i)}
+              onMouseEnter={() => canHover() && setActive(i)}
               onFocus={() => setActive(i)}
               onClick={() => setActive(i)}
               className="relative min-h-0 min-w-0 cursor-pointer overflow-hidden outline-none"
