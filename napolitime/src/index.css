@@ -97,6 +97,9 @@
 }
 .steam-wisp { animation: steam var(--dur, 5s) var(--delay, 0s) cubic-bezier(.4, 0, .4, 1) infinite; transform-origin: bottom center; will-change: transform, opacity; }
 
+@keyframes kenburns { from { transform: scale(1.04); } to { transform: scale(1.14) translate3d(-1.5%, -1%, 0); } }
+.kenburns { animation: kenburns 18s ease-in-out infinite alternate; transform-origin: 50% 40%; }
+
 @keyframes spin-slow { to { transform: rotate(360deg); } }
 .spin-slow { animation: spin-slow 80s linear infinite; }
 

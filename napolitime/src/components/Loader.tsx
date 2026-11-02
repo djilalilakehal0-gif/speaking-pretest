@@ -38,13 +38,13 @@ export function Loader({ onDone }: { onDone: () => void }) {
           transition={{ duration: reduced ? 0.2 : 0.9, ease: [0.76, 0, 0.24, 1] }}
         >
           <motion.div initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 160, damping: 14 }}>
-            <LogoMark size={96} spin />
+            <LogoMark size={150} spin />
           </motion.div>
           <div className="mt-7 flex overflow-hidden display text-5xl tracking-[0.06em] sm:text-6xl" aria-hidden>
             {letters.map((l, i) => (
               <motion.span
                 key={i}
-                className={i >= 6 ? 'text-tomato' : 'text-cream'}
+                className={i >= 6 ? 'text-gold' : 'text-cream'}
                 initial={{ y: '110%' }} animate={{ y: '0%' }}
                 transition={{ delay: 0.25 + i * 0.045, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               >

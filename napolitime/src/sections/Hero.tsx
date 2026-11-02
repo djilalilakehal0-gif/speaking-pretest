@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { Embers } from '../components/Embers'
-import { Steam } from '../components/Steam'
+import { LogoMark } from '../components/Logo'
+import { openStatus } from '../lib/hours'
 import { MagneticButton } from '../components/MagneticButton'
 import { ArrowIcon, StarIcon } from '../components/icons/Icons'
-import { Basil, Tomato, Chili, Pepper } from '../components/Ingredients'
+import { Basil, Tomato, Chili } from '../components/Ingredients'
 import { photo } from '../lib/img'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
@@ -16,15 +17,15 @@ const ease = [0.16, 1, 0.3, 1] as const
 
 export function Hero({ ready }: { ready: boolean }) {
   const root = useRef<HTMLElement>(null)
-  const pizza = photo('hero-pizza')
-  const burger = photo('hero-burger')
+  const store = photo('storefront')
+  const [status, setStatus] = useState<ReturnType<typeof openStatus> | null>(null)
+  useEffect(() => setStatus(openStatus()), [])
 
   useGSAP(() => {
     const mm = gsap.matchMedia()
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: 0.6 } })
-      tl.to('[data-px="pizza"]', { yPercent: -18, rotate: 25, ease: 'none' }, 0)
-        .to('[data-px="burger"]', { yPercent: -45, ease: 'none' }, 0)
+      tl.to('[data-px="store"]', { yPercent: -10, ease: 'none' }, 0)
         .to('[data-px="copy"]', { yPercent: 30, opacity: 0.1, ease: 'none' }, 0)
         .to('[data-px="glow"]', { scale: 1.4, opacity: 0.4, ease: 'none' }, 0)
         .to('[data-px="ing"]', { yPercent: -120, ease: 'none', stagger: 0.02 }, 0)
@@ -45,7 +46,7 @@ export function Hero({ ready }: { ready: boolean }) {
         {/* Copy */}
         <motion.div data-px="copy" initial="hidden" animate={show} variants={{ shown: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } } }} className="relative z-10 order-1">
           <motion.p variants={{ hidden: { opacity: 0, y: 20 }, shown: { opacity: 1, y: 0, transition: { duration: 0.8, ease } } }} className="eyebrow flex items-center gap-3">
-            <span className="h-px w-10 bg-gold" /> Pizza napoletana · Gourmet burgers
+            <span className="h-px w-10 bg-gold" /> Pizza · Burger · Sandwich · Tacos
           </motion.p>
           <h1 id="hero-title" className="display mt-5 text-[clamp(3.4rem,10.5vw,8.6rem)] text-cream" aria-label="Real flavor. Unforgettable moments.">
             {['REAL', 'FLAVOR.', 'UNFORGETTABLE', 'MOMENTS.'].map((w, i) => (
@@ -71,58 +72,56 @@ export function Hero({ ready }: { ready: boolean }) {
           </motion.div>
         </motion.div>
 
-        {/* Food stage */}
-        <div className="relative order-2 mx-auto aspect-square w-full max-w-[min(92vw,640px)] lg:max-w-none">
+        {/* Storefront */}
+        <div className="relative order-2 mx-auto w-full max-w-[min(92vw,600px)] lg:max-w-none">
           <motion.div
-            data-px="pizza"
-            initial={{ scale: 0.6, opacity: 0, rotate: -60 }}
-            animate={ready ? { scale: 1, opacity: 1, rotate: 0 } : {}}
-            transition={{ duration: 1.6, ease }}
-            className="absolute right-0 top-0 aspect-square w-[86%]"
+            data-px="store"
+            initial={{ opacity: 0, y: 60, scale: 0.92, rotate: 2 }}
+            animate={ready ? { opacity: 1, y: 0, scale: 1, rotate: 0 } : {}}
+            transition={{ duration: 1.4, ease }}
+            className="relative"
           >
-            <div className="absolute inset-[-6%] rounded-full bg-[radial-gradient(circle,rgba(245,185,66,.25),transparent_62%)] blur-2xl" aria-hidden />
-            <div className="relative h-full w-full overflow-hidden rounded-full shadow-[0_60px_120px_-30px_rgba(0,0,0,.9),0_0_0_1px_rgba(245,185,66,.15)]">
+            <div className="absolute -inset-[8%] -z-10 rounded-full bg-[radial-gradient(circle,rgba(245,185,66,.28),transparent_62%)] blur-2xl" aria-hidden />
+            <div className="relative aspect-[1151/1220] overflow-hidden rounded-[2rem] shadow-[0_60px_120px_-30px_rgba(0,0,0,.95),0_0_0_1px_rgba(245,185,66,.25)]">
               <img
-                src={pizza.src} srcSet={pizza.srcSet} sizes="(min-width:1024px) 50vw, 90vw"
-                alt="Freshly baked Neapolitan pizza with blistered crust, tomato and basil"
+                src={store.src} srcSet={store.srcSet} sizes="(min-width:1024px) 46vw, 92vw"
+                alt="The NAPOLITIME restaurant front at night: illuminated sign, open door and the counter inside"
                 fetchPriority="high" decoding="async"
-                className="spin-slow h-full w-full scale-[1.32] object-cover"
+                className="kenburns h-full w-full object-cover"
               />
-              <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_35%_30%,rgba(255,220,160,.18),transparent_45%),radial-gradient(circle,transparent_55%,rgba(0,0,0,.55)_100%)]" aria-hidden />
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(16,16,16,.75)_100%)]" aria-hidden />
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5 pr-28 sm:p-6 sm:pr-36">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-gold">Pizza · Burger · Sandwich · Tacos</p>
+                  <p className="display mt-1 text-2xl text-cream sm:text-3xl">Qualité · Goût · Convivialité</p>
+                </div>
+              </div>
             </div>
-            <Steam className="absolute -top-[22%] left-[10%] h-[55%] w-[80%]" />
           </motion.div>
 
           <motion.div
-            data-px="burger"
-            initial={{ x: -80, y: 60, opacity: 0, scale: 0.8 }}
-            animate={ready ? { x: 0, y: 0, opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 1.4, delay: 0.25, ease }}
-            className="absolute -bottom-[4%] left-[-6%] w-[62%]"
+            initial={{ scale: 0, rotate: -40 }} animate={ready ? { scale: 1, rotate: -8 } : {}}
+            transition={{ type: 'spring', stiffness: 150, damping: 13, delay: 0.9 }}
+            className="absolute -bottom-6 -right-3 sm:-bottom-8 sm:-right-6"
           >
-            <img
-              src={burger.src} srcSet={burger.srcSet} sizes="(min-width:1024px) 34vw, 60vw"
-              alt="Juicy gourmet cheeseburger with melted cheddar"
-              decoding="async"
-              className="w-full [mask-image:radial-gradient(ellipse_52%_48%_at_50%_52%,#000_60%,transparent_100%)] drop-shadow-[0_40px_60px_rgba(0,0,0,.8)]"
-            />
+            <LogoMark size={96} className="sm:!h-[128px] sm:!w-[128px]" />
           </motion.div>
+
+          {status && (
+            <motion.div
+              initial={{ y: -20, opacity: 0 }} animate={ready ? { y: 0, opacity: 1 } : {}}
+              transition={{ delay: 1.2, duration: 0.6, ease }}
+              className="absolute left-4 top-[30%] inline-flex sm:left-auto sm:right-4 sm:top-[42%] items-center gap-2 rounded-full bg-ink/80 px-3.5 py-2 text-xs font-bold text-cream backdrop-blur"
+            >
+              <span className={`h-2 w-2 rounded-full ${status.open ? 'animate-pulse bg-[#9be07c]' : 'bg-tomato'}`} />
+              {status.open ? 'Open now' : status.label}
+            </motion.div>
+          )}
 
           {/* Floating ingredients */}
-          <div data-px="ing" className="float absolute left-[8%] top-[6%] w-[11%]" style={{ ['--dur' as string]: '7s', ['--r' as string]: '-20deg' }}><Basil /></div>
-          <div data-px="ing" className="float absolute right-[2%] top-[78%] w-[10%]" style={{ ['--dur' as string]: '6s', ['--delay' as string]: '1s', ['--r' as string]: '15deg' }}><Tomato /></div>
-          <div data-px="ing" className="float absolute left-[40%] top-[-2%] w-[7%]" style={{ ['--dur' as string]: '5.5s', ['--delay' as string]: '.5s', ['--r' as string]: '35deg' }}><Chili /></div>
-          <div data-px="ing" className="float absolute bottom-[6%] right-[30%] w-[6%]" style={{ ['--dur' as string]: '8s', ['--delay' as string]: '2s' }}><Pepper /></div>
-
-          <motion.div
-            initial={{ scale: 0, rotate: -30 }} animate={ready ? { scale: 1, rotate: -12 } : {}}
-            transition={{ type: 'spring', stiffness: 160, damping: 12, delay: 1.1 }}
-            className="absolute right-[2%] top-[58%] flex h-24 w-24 flex-col items-center justify-center rounded-full bg-gold text-center text-ink shadow-xl sm:h-28 sm:w-28"
-          >
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em]">Since</span>
-            <span className="display text-3xl leading-none sm:text-4xl">1889</span>
-            <span className="text-[9px] font-semibold uppercase tracking-[0.16em]">recipe</span>
-          </motion.div>
+          <div data-px="ing" className="float absolute -right-3 top-[30%] w-[11%]" style={{ ['--dur' as string]: '7s', ['--r' as string]: '-20deg' }}><Basil /></div>
+          <div data-px="ing" className="float absolute -left-4 top-[58%] w-[9%]" style={{ ['--dur' as string]: '6s', ['--delay' as string]: '1s', ['--r' as string]: '15deg' }}><Tomato /></div>
+          <div data-px="ing" className="float absolute -top-4 left-[46%] w-[7%]" style={{ ['--dur' as string]: '5.5s', ['--delay' as string]: '.5s', ['--r' as string]: '35deg' }}><Chili /></div>
         </div>
       </div>
 
