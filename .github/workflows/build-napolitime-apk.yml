@@ -1,0 +1,126 @@
+name: Build NAPOLITIME Android APK
+
+# Builds the NAPOLITIME restaurant site (napolitime/) as an Android app with Capacitor
+# and publishes NAPOLITIME.apk to GitHub Releases (tag napolitime-1.N).
+
+on:
+  push:
+    branches: [main]
+    paths: ['napolitime/**', '.github/workflows/build-napolitime-apk.yml']
+  pull_request:       # test build on pull requests (unsigned, nothing is published)
+    paths: ['napolitime/**', '.github/workflows/build-napolitime-apk.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to publish the APK to GitHub Releases
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: napolitime
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the website
+        env:
+          VITE_ORDER_ENDPOINT: ${{ vars.NAPOLITIME_ORDER_ENDPOINT }}
+          VITE_NEWSLETTER_ENDPOINT: ${{ vars.NAPOLITIME_NEWSLETTER_ENDPOINT }}
+        run: npm run build
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Set version (each build gets a higher number so updates install over the old app)
+        run: |
+          G=android/app/build.gradle
+          sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" $G
+          sed -i -E "s/versionName \"[^\"]*\"/versionName \"1.${{ github.run_number }}\"/" $G
+          grep -E "versionCode|versionName" $G
+
+      - name: Generate app icon and splash from the NAPOLITIME logo
+        run: npx capacitor-assets generate --android --iconBackgroundColor '#101010' --iconBackgroundColorDark '#101010' --splashBackgroundColor '#101010' --splashBackgroundColorDark '#101010'
+
+      - name: Sync web code
+        run: npx cap sync android
+
+      - name: Test build (pull requests only)
+        if: github.event_name == 'pull_request'
+        working-directory: napolitime/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Prepare signing key
+        if: github.event_name != 'pull_request'
+        working-directory: .
+        env:
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KS_B64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          # Same signing key as the Speaking Pre-Test app (KEYSTORE_BASE64.txt or the KEYSTORE_BASE64 secret)
+          if [ -f KEYSTORE_BASE64.txt ]; then
+            tr -d ' \r\n' < KEYSTORE_BASE64.txt | base64 -d > release.keystore
+          fi
+          if [ ! -s release.keystore ] && [ -n "$KS_B64" ]; then
+            printf '%s' "$KS_B64" | tr -d ' \r\n' | base64 -d > release.keystore
+          fi
+          if [ ! -f release.keystore ]; then
+            echo "::error::Signing key missing. Add the KEYSTORE_BASE64 secret (or KEYSTORE_BASE64.txt) to the repository."
+            exit 1
+          fi
+          if [ -z "$KS_PASS" ]; then
+            echo "::error::The KEYSTORE_PASSWORD secret is missing. Add it in Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          if ! keytool -list -keystore release.keystore -storepass "$KS_PASS" > /dev/null 2>&1; then
+            echo "::error::KEYSTORE_PASSWORD is wrong."
+            exit 1
+          fi
+          cp release.keystore napolitime/android/app/release.keystore
+          echo "Signing key OK"
+
+      - name: Build signed release APK
+        if: github.event_name != 'pull_request'
+        working-directory: napolitime/android
+        env:
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=$PWD/app/release.keystore \
+            -Pandroid.injected.signing.store.password="$KS_PASS" \
+            -Pandroid.injected.signing.key.alias=speakingpretest \
+            -Pandroid.injected.signing.key.password="$KS_PASS"
+          cp app/build/outputs/apk/release/app-release.apk ../NAPOLITIME.apk
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          name: napolitime-apk
+          path: napolitime/NAPOLITIME.apk
+
+      - name: Publish to GitHub Releases (permanent download link)
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: napolitime-1.${{ github.run_number }}
+          name: NAPOLITIME 1.${{ github.run_number }}
+          make_latest: false   # the Speaking Pre-Test APK stays the "latest" download
+          files: napolitime/NAPOLITIME.apk
+          body: |
+            تطبيق NAPOLITIME لأندرويد: حمّل الملف NAPOLITIME.apk على الهاتف واضغط «تثبيت».
+            NAPOLITIME for Android: download NAPOLITIME.apk on an Android phone and tap Install.

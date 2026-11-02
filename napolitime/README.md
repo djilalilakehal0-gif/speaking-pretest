@@ -59,3 +59,30 @@ Customer details are kept in memory only; the browser stores just the cart (prod
 * Custom animated SVG icon set in `src/components/icons/Icons.tsx`: stroke draw-on, flame flicker, scooter wheels, clock hands, cart bounce, heart/plus→check/menu→close morphs.
 * `prefers-reduced-motion` is respected everywhere (Framer `MotionConfig`, GSAP `matchMedia`, CSS, canvas particles off).
 * Skip link, focus-trapped dialogs with Escape, labelled controls, live regions for cart updates and errors.
+
+## Android app
+
+The same site is packaged as an Android app with [Capacitor](https://capacitorjs.com) (`capacitor.config.json`, app id `com.napolitime.app`).
+
+**Automatic build:** every push to `main` that touches `napolitime/` runs
+`.github/workflows/build-napolitime-apk.yml` (or run it by hand: Actions → *Build NAPOLITIME Android APK* → Run workflow).
+It publishes a signed `NAPOLITIME.apk` in Releases under the tag `napolitime-1.N`. Permanent download link:
+
+```
+https://github.com/djilalilakehal0-gif/speaking-pretest/releases/download/napolitime-1.<N>/NAPOLITIME.apk
+```
+
+The APK is signed with the same key and `KEYSTORE_PASSWORD` secret as the Speaking Pre-Test app, and every build gets a
+higher version number, so new versions install over the old one.
+
+**Local build** (needs Android Studio or the Android SDK + JDK 21):
+
+```bash
+npm run android:sync     # build the site and copy it into android/
+npx cap open android     # open in Android Studio, or: cd android && ./gradlew assembleDebug
+```
+
+App behaviour: the hardware back button closes the cart / product details / menu first, then scrolls to the top, then
+exits; phone, e-mail, map and social links open the phone's dialer, mail app, Maps or browser.
+Icon and splash screen come from `assets/` (regenerate with `node scripts/make-app-assets.cjs`).
+The app works offline for browsing once installed (all photos and fonts are bundled); ordering follows the same rules as the website.

@@ -1,0 +1,24 @@
+{
+  "appId": "com.napolitime.app",
+  "appName": "NAPOLITIME",
+  "webDir": "dist",
+  "backgroundColor": "#101010",
+  "android": {
+    "allowMixedContent": false,
+    "adjustMarginsForEdgeToEdge": "auto"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 600,
+      "launchAutoHide": true,
+      "backgroundColor": "#101010",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#101010",
+      "overlaysWebView": false
+    }
+  }
+}
