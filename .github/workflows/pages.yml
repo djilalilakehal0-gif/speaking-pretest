@@ -49,6 +49,18 @@ jobs:
           mkdir -p _site/djilali
           cp -r djilali/dist/. _site/djilali/
 
+      - name: Build and add the NAPOLITIME restaurant site
+        env:
+          VITE_ORDER_ENDPOINT: ${{ vars.NAPOLITIME_ORDER_ENDPOINT }}
+          VITE_NEWSLETTER_ENDPOINT: ${{ vars.NAPOLITIME_NEWSLETTER_ENDPOINT }}
+        run: |
+          cd napolitime
+          npm ci
+          npm run build
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p _site/napolitime
+          cp -r napolitime/dist/. _site/napolitime/
+
       - name: Add the speech-recognition model (Whisper tiny)
         run: |
           mkdir -p /tmp/m && cd /tmp/m
