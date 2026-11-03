@@ -3,7 +3,7 @@ const en = {
   meta: {
     title: 'Djilali — Software Developer | Full-Stack Engineer',
     description:
-      'Djilali — Software Developer and Full-Stack Engineer designing and building high-performance web applications and immersive digital experiences.',
+      'Djilali — Software Developer and Full-Stack Engineer building high-performance web applications and helping companies and administrations find the right digital solutions.',
     ogAlt: 'Djilali — Software Developer | Full-Stack Engineer',
   },
   site: {
@@ -109,8 +109,15 @@ const en = {
     eyebrow: 'Services',
     titleLead: 'What I can build',
     titleHighlight: 'for you.',
-    text: 'From a single landing page to a complete product — engineered end-to-end with the same attention to detail.',
+    text: 'From the right idea to a complete product — advice, design and engineering with the same attention to detail.',
+    consultCta: 'Discuss your organization’s needs',
+    featured: 'For organizations',
     items: {
+      consult: {
+        title: 'Digital Consulting for Companies & Public Administrations',
+        text: 'I help companies and administrations understand their needs, find the right digital solutions and propose practical ideas tailored to their goals, budget and teams.',
+        points: ['Needs analysis & digital audit', 'Tailored solution proposals', 'Clear digital transformation roadmap', 'Support from idea to launch'],
+      },
       web: {
         title: 'Website Development',
         text: 'Fast, responsive marketing sites and landing pages with SEO and motion built in from day one.',
