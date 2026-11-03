@@ -2,7 +2,7 @@ import type { Project } from '@/content/site'
 import { asset } from '@/lib/asset'
 
 /** Preview for a project card: the real screenshot when available, otherwise a designed UI mock. */
-export function ProjectVisual({ project, priority = false }: { project: Project; priority?: boolean }) {
+export function ProjectVisual({ project, alt, priority = false }: { project: Project; alt: string; priority?: boolean }) {
   if (project.image) {
     const sm = project.image.replace(/\.webp$/, '-sm.webp')
     return (
@@ -10,7 +10,7 @@ export function ProjectVisual({ project, priority = false }: { project: Project;
         src={asset(project.image)}
         srcSet={`${asset(sm)} 720w, ${asset(project.image)} 1200w`}
         sizes="(min-width: 1024px) 60vw, 100vw"
-        alt={`${project.title} — screenshot of the live website`}
+        alt={alt}
         width={1200}
         height={750}
         loading={priority ? 'eager' : 'lazy'}
@@ -20,8 +20,8 @@ export function ProjectVisual({ project, priority = false }: { project: Project;
     )
   }
   return (
-    <div role="img" aria-label={`${project.title} — interface concept preview`} className="size-full">
-      {project.visual === 'devspace' ? <DashboardMock /> : <ShopMock />}
+    <div role="img" aria-label={alt} dir="ltr" className="size-full">
+      {project.id === 'devspace' ? <DashboardMock /> : <ShopMock />}
     </div>
   )
 }

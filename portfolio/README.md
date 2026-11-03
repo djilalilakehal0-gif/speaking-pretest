@@ -13,19 +13,30 @@ npm run typecheck   # TypeScript check
 npm run build       # static site in out/
 ```
 
+## Languages
+
+The site is available in three languages, with a switcher (EN · FR · ع) in the header and the mobile menu:
+
+| Language | URL | Text file |
+| --- | --- | --- |
+| English | `/portfolio/` | `src/content/locales/en.ts` |
+| Français | `/portfolio/fr/` | `src/content/locales/fr.ts` |
+| العربية (right-to-left) | `/portfolio/ar/` | `src/content/locales/ar.ts` |
+
+All three files have the same keys, and TypeScript fails the build if one is missing. The Arabic page uses the Readex Pro font, has no letter-spacing (which would break Arabic letter joining) and mirrors arrows and the timeline. Each page declares its language alternates (`hreflang`) for search engines.
+
 ## Editing content
 
-Text, links, projects, tech stack, stats and timeline are all in **`src/content/site.ts`**.
+- **Text in each language:** `src/content/locales/{en,fr,ar}.ts`.
+- **Shared data** (the same in every language) is in **`src/content/site.ts`**:
 
 | What | Where |
 | --- | --- |
-| Name, title, tagline, location, availability | `site` |
 | Email, phone, LinkedIn, X, Instagram (empty = hidden) | `contact`, `socials` |
-| Hero, About text, the three pillars | `hero`, `about` |
 | Statistics (use real numbers only; `null` hides one) | `stats` |
 | Tech stack | `stack` |
-| Projects (`concept: true` adds a "Concept" label) | `projects` |
-| Services, timeline, workflow | `services`, `journey`, `workflow` |
+| Projects: links, tags, screenshot (`concept: true` adds a "Concept" label) | `projects` |
+| Timeline links | `journey` |
 
 ### Photos
 

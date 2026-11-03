@@ -1,11 +1,13 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { animate, useInView, useReducedMotion } from 'motion/react'
-import { about, site, stats } from '@/content/site'
+import { site, stats } from '@/content/site'
+import type { Dictionary } from '@/content/i18n'
 import { asset } from '@/lib/asset'
 import { Reveal } from '../ui/Reveal'
 
-export function About() {
+export function About({ t }: { t: Pick<Dictionary, 'about' | 'site'> }) {
+  const about = t.about
   const shown = stats.filter((s) => s.value !== null)
   return (
     <section id="about" aria-labelledby="about-title" className="section">
@@ -19,7 +21,7 @@ export function About() {
               <source srcSet={asset(site.portrait.src)} type="image/webp" />
               <img
                 src={asset(site.portrait.fallback)}
-                alt={site.portrait.alt}
+                alt={t.site.portraitAlt}
                 width={site.portrait.width}
                 height={site.portrait.height}
                 loading="lazy"
@@ -31,7 +33,7 @@ export function About() {
             <figcaption className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-3">
               <div className="glass rounded-2xl px-4 py-3">
                 <p className="text-base font-semibold tracking-tight">{site.name}</p>
-                <p className="text-xs text-muted">{site.title}</p>
+                <p className="text-xs text-muted">{t.site.title}</p>
               </div>
               <span className="glass grid size-12 shrink-0 place-items-center rounded-2xl font-mono text-sm text-cyan">&lt;/&gt;</span>
             </figcaption>
@@ -44,7 +46,7 @@ export function About() {
           </Reveal>
           <Reveal delay={0.06}>
             <h2 id="about-title" className="h-section mt-5 text-balance">
-              Engineering Ideas Into <span className="text-gradient animate-gradient">Reality.</span>
+              {about.titleLead} <span className="text-gradient animate-gradient">{about.titleHighlight}</span>
             </h2>
           </Reveal>
           <Reveal delay={0.12}>
@@ -53,9 +55,9 @@ export function About() {
 
           <ul className="mt-12 grid gap-4 sm:grid-cols-3">
             {about.pillars.map((p, i) => (
-              <Reveal as="li" key={p.n} delay={0.08 * i}>
+              <Reveal as="li" key={p.title} delay={0.08 * i}>
                 <div className="border-beam glass group h-full rounded-2xl p-6 transition-transform duration-500 hover:-translate-y-1">
-                  <span className="font-mono text-xs text-dim transition-colors group-hover:text-cyan">{p.n}</span>
+                  <span className="font-mono text-xs text-dim transition-colors group-hover:text-cyan">{String(i + 1).padStart(2, '0')}</span>
                   <h3 className="mt-8 text-lg font-semibold tracking-tight">{p.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted">{p.text}</p>
                 </div>
@@ -65,8 +67,8 @@ export function About() {
 
           <dl className={`mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line ${shown.length >= 4 ? 'md:grid-cols-4' : 'md:grid-cols-3'}`}>
             {shown.map((s) => (
-              <div key={s.label} className={`flex flex-col-reverse justify-end gap-2 bg-bg p-6 ${shown.length % 2 && s === shown[shown.length - 1] ? 'col-span-2 md:col-span-1' : ''}`}>
-                <dt className="text-sm leading-snug text-muted">{s.label}</dt>
+              <div key={s.key} className={`flex flex-col-reverse justify-end gap-2 bg-bg p-6 ${shown.length % 2 && s === shown[shown.length - 1] ? 'col-span-2 md:col-span-1' : ''}`}>
+                <dt className="text-sm leading-snug text-muted">{about.stats[s.key]}</dt>
                 <dd className="text-4xl font-semibold tracking-tight md:text-5xl">
                   <Counter value={s.value!} />
                   <span className="text-gradient">{s.suffix}</span>
