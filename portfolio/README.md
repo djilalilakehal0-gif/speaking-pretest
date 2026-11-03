@@ -48,15 +48,15 @@ DEVSPACE and NEXORA are example **concepts**. They are labelled "Concept" on the
 
 ## Contact form
 
-The site is static, so it has no server of its own. The form sends a JSON `POST` (`name`, `email`, `subject`, `message`) to whatever endpoint you set:
+The site is static, so it has no server of its own. The form picks the first channel that is configured:
 
-1. Create a form endpoint, for example at [Formspree](https://formspree.io): a new form gives a URL like `https://formspree.io/f/abcdwxyz`. A serverless function of your own also works.
-2. For the GitHub Pages build: **Settings → Secrets and variables → Actions → Variables → New repository variable**. Name it `PORTFOLIO_CONTACT_ENDPOINT` and paste the URL as the value.
-3. For local builds: copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_CONTACT_ENDPOINT`.
+1. **Form endpoint** (`NEXT_PUBLIC_CONTACT_ENDPOINT`, e.g. Formspree): the message is POSTed as JSON (`name`, `email`, `subject`, `message`) and delivered without leaving the page.
+2. **WhatsApp (active now)** (`contact.whatsapp` in `src/content/site.ts`): the button reads "Send via WhatsApp". It opens WhatsApp (the app on phones, WhatsApp Web on computers) with the message ready for your number, and the visitor presses send. Nothing is stored on the site, and the message text follows the page language.
+3. **Email** (`contact.email`): opens the visitor's email app with the message ready.
 
-A public form URL is safe to put in client code. **Never put secret API keys in `NEXT_PUBLIC_*` variables.**
+Even with an endpoint set, the WhatsApp card stays in "Prefer a direct line?". To switch WhatsApp off, set `whatsapp: ''`.
 
-Without an endpoint, the form falls back to opening the visitor's email app if `contact.email` is set. With neither, the form tells the visitor it isn't connected yet and points to your profiles. It never pretends a message was sent.
+To use an endpoint instead: create one (for example at [Formspree](https://formspree.io)). For GitHub Pages, add it as the repository variable `PORTFOLIO_CONTACT_ENDPOINT` (**Settings → Secrets and variables → Actions → Variables**). For local builds, set it in `.env.local`. A public form URL is safe in client code. **Never put secret API keys in `NEXT_PUBLIC_*` variables.**
 
 ## Deployment
 

@@ -175,6 +175,12 @@ const en = {
     directText:
       'I usually reply within a couple of working days. Share as much context as you like — goals, timeline, links or references.',
     phone: 'Phone',
+    whatsapp: 'WhatsApp',
+    sendWhatsapp: 'Send via WhatsApp',
+    privacyWhatsapp: 'Your message opens in WhatsApp — nothing is stored on this site.',
+    whatsappOpened: 'WhatsApp is open with your message ready — just press send.',
+    whatsappRetry: 'Nothing opened? Open WhatsApp',
+    waIntro: 'Hello Djilali! I’m contacting you from your portfolio.',
     email: 'Email',
     status: 'Status',
     location: 'Location',

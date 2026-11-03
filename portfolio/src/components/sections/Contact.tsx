@@ -1,7 +1,7 @@
 'use client'
 import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { AlertCircle, ArrowUpRight, CheckCircle2, Loader2, Mail, Phone, Send } from 'lucide-react'
+import { AlertCircle, ArrowUpRight, CheckCircle2, Loader2, Mail, MessageCircle, Phone, Send } from 'lucide-react'
 import { contact, socials } from '@/content/site'
 import { fill, type Dictionary } from '@/content/i18n'
 import { Magnetic } from '../ui/Magnetic'
@@ -10,7 +10,7 @@ import { SocialIcon } from '../ui/SocialIcon'
 
 type Field = 'name' | 'email' | 'subject' | 'message'
 type Values = Record<Field, string>
-type Status = { kind: 'idle' | 'sending' | 'sent' | 'mailto' | 'error'; message?: string }
+type Status = { kind: 'idle' | 'sending' | 'sent' | 'mailto' | 'whatsapp' | 'error'; message?: string; url?: string }
 
 const EMPTY: Values = { name: '', email: '', subject: '', message: '' }
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
@@ -30,6 +30,7 @@ function validate(v: Values, m: T['errors']): Partial<Record<Field, string>> {
 type Props = { t: T; site: Pick<Dictionary['site'], 'availability' | 'location'>; ui: Pick<Dictionary['ui'], 'newTab' | 'startProject'> }
 
 export function Contact({ t, site, ui }: Props) {
+  const useWhatsapp = !contact.endpoint && !!contact.whatsapp
   const [values, setValues] = useState<Values>(EMPTY)
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({})
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({})
@@ -88,6 +89,22 @@ export function Contact({ t, site, ui }: Props) {
             : t.fail,
         })
       }
+      return
+    }
+
+    if (contact.whatsapp) {
+      const text = [
+        t.waIntro,
+        '',
+        `${t.name}: ${payload.name}`,
+        `${t.emailLabel}: ${payload.email}`,
+        `${t.subject}: ${payload.subject}`,
+        '',
+        payload.message,
+      ].join('\n')
+      const url = `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(text)}`
+      window.open(url, '_blank', 'noopener,noreferrer')
+      setStatus({ kind: 'whatsapp', url })
       return
     }
 
@@ -174,6 +191,26 @@ export function Contact({ t, site, ui }: Props) {
                       <span dir="ltr" className="block truncate text-sm tabular-nums">{contact.phoneDisplay}</span>
                     </span>
                     <ArrowUpRight className="size-4 text-dim rtl:-scale-x-100 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
+                  </a>
+                </li>
+              )}
+              {contact.whatsapp && (
+                <li>
+                  <a
+                    href={`https://wa.me/${contact.whatsapp}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-4 rounded-2xl border border-line p-4 transition-colors hover:border-line-strong hover:bg-white/[0.03]"
+                  >
+                    <span className="grid size-11 place-items-center rounded-xl bg-[#25d366]/10 text-[#25d366]">
+                      <MessageCircle className="size-[18px]" aria-hidden />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-xs text-dim">{t.whatsapp}</span>
+                      <span dir="ltr" className="block truncate text-sm tabular-nums">{contact.phoneDisplay}</span>
+                    </span>
+                    <ArrowUpRight className="size-4 text-dim rtl:-scale-x-100 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
+                    <span className="sr-only">{ui.newTab}</span>
                   </a>
                 </li>
               )}
@@ -264,11 +301,11 @@ export function Contact({ t, site, ui }: Props) {
                     </>
                   ) : (
                     <>
-                      {t.send} <Send className="size-4 rtl:-scale-x-100 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
+                      {useWhatsapp ? t.sendWhatsapp : t.send} <Send className="size-4 rtl:-scale-x-100 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
                     </>
                   )}
                 </button>
-                <p className="text-xs text-dim">{t.privacy}</p>
+                <p className="text-xs text-dim">{useWhatsapp ? t.privacyWhatsapp : t.privacy}</p>
               </div>
 
               <div aria-live="polite" role="status" className="mt-6 empty:hidden">
@@ -281,6 +318,14 @@ export function Contact({ t, site, ui }: Props) {
                   {status.kind === 'mailto' && (
                     <Notice key="mailto" tone="ok">
                       {fill(t.mailto, { email: contact.email })}
+                    </Notice>
+                  )}
+                  {status.kind === 'whatsapp' && (
+                    <Notice key="wa" tone="ok">
+                      {t.whatsappOpened}{' '}
+                      <a href={status.url} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4">
+                        {t.whatsappRetry}
+                      </a>
                     </Notice>
                   )}
                   {status.kind === 'error' && (

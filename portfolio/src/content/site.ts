@@ -35,6 +35,11 @@ export const contact = {
   /** Phone in international format (digits only after +). Empty = hidden. */
   phone: '+33755244752',
   phoneDisplay: '+33 7 55 24 47 52',
+  /**
+   * WhatsApp number (international, digits only, no + or 00). Empty = off.
+   * Without a form endpoint, "Send" opens WhatsApp with the message ready for this number.
+   */
+  whatsapp: '33755244752',
   /** Public form endpoint (Formspree, Getform, your own function). Set NEXT_PUBLIC_CONTACT_ENDPOINT. */
   endpoint: process.env.NEXT_PUBLIC_CONTACT_ENDPOINT || '',
 }
