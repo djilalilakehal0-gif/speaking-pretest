@@ -61,19 +61,29 @@ jobs:
           mkdir -p _site/napolitime
           cp -r napolitime/dist/. _site/napolitime/
 
-      - name: Build and add the DJILALI developer portfolio
-        env:
-          NEXT_PUBLIC_BASE_PATH: /speaking-pretest/portfolio
-          NEXT_PUBLIC_SITE_URL: https://djilalilakehal0-gif.github.io/speaking-pretest/portfolio
-          NEXT_PUBLIC_CONTACT_ENDPOINT: ${{ vars.PORTFOLIO_CONTACT_ENDPOINT }}
-          NEXT_TELEMETRY_DISABLED: 1
+      - name: Redirect the old portfolio address to djilali.pages.dev
+        # The portfolio now lives on Cloudflare Pages (https://djilali.pages.dev, built from portfolio/).
+        # Old links (/portfolio/, /portfolio/fr/, /portfolio/ar/) forward there, keeping the language and #section.
         run: |
-          cd portfolio
-          npm ci
-          npm run build
-          cd "$GITHUB_WORKSPACE"
-          mkdir -p _site/portfolio
-          cp -r portfolio/out/. _site/portfolio/
+          NEW=https://djilali.pages.dev
+          for p in "" fr/ ar/; do
+            mkdir -p "_site/portfolio/$p"
+            cat > "_site/portfolio/${p}index.html" <<HTML
+          <!doctype html>
+          <html lang="${p%/}"><head><meta charset="utf-8">
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>DJILALI</title>
+          <link rel="canonical" href="$NEW/$p">
+          <meta name="robots" content="noindex">
+          <meta http-equiv="refresh" content="0; url=$NEW/$p">
+          <script>location.replace("$NEW/$p" + location.hash)</script>
+          </head><body style="background:#04060d;color:#eef1ff;font-family:system-ui;text-align:center;padding:40px">
+          <p><a style="color:#7aa2ff" href="$NEW/$p">$NEW/$p</a></p>
+          </body></html>
+          HTML
+          done
+          sed -i '0,/lang=""/s//lang="en"/' _site/portfolio/index.html
+          cat _site/portfolio/ar/index.html
 
       - name: Add the speech-recognition model (Whisper tiny)
         run: |

@@ -4,9 +4,9 @@ import type { NextConfig } from 'next'
 // Set NEXT_PUBLIC_BASE_PATH when it is served from a sub-folder, e.g. "/speaking-pretest/portfolio".
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
 
-// Absolute site URL (canonical links, Open Graph). Netlify provides its own address in URL,
-// Cloudflare Pages in CF_PAGES_URL; NEXT_PUBLIC_SITE_URL always wins when set.
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.URL || process.env.CF_PAGES_URL || ''
+// Absolute site URL (canonical links, Open Graph). Set NEXT_PUBLIC_SITE_URL on the host
+// (Cloudflare Pages: https://djilali.pages.dev); otherwise src/content/site.ts uses that address.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
 
 const nextConfig: NextConfig = {
   output: 'export',

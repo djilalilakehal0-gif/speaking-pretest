@@ -3,7 +3,7 @@
 Personal portfolio for Djilali, Software Developer and Full-Stack Engineer.
 Next.js 16 (App Router, static export), React 19, TypeScript, Tailwind CSS 4, Motion for React, Lucide icons and Geist fonts.
 
-The Pages workflow publishes it at **https://djilalilakehal0-gif.github.io/speaking-pretest/portfolio/**.
+Published on Cloudflare Pages at **https://djilali.pages.dev** (`/fr/`, `/ar/`). The old GitHub Pages address `…/speaking-pretest/portfolio/` redirects there.
 
 ```bash
 cd portfolio
@@ -19,9 +19,9 @@ The site is available in three languages, with a switcher (EN · FR · ع) in th
 
 | Language | URL | Text file |
 | --- | --- | --- |
-| English | `/portfolio/` | `src/content/locales/en.ts` |
-| Français | `/portfolio/fr/` | `src/content/locales/fr.ts` |
-| العربية (right-to-left) | `/portfolio/ar/` | `src/content/locales/ar.ts` |
+| English | `/` | `src/content/locales/en.ts` |
+| Français | `/fr/` | `src/content/locales/fr.ts` |
+| العربية (right-to-left) | `/ar/` | `src/content/locales/ar.ts` |
 
 All three files have the same keys, and TypeScript fails the build if one is missing. The Arabic page uses the Readex Pro font, has no letter-spacing (which would break Arabic letter joining) and mirrors arrows and the timeline. Each page declares its language alternates (`hreflang`) for search engines.
 
@@ -56,28 +56,32 @@ The site is static, so it has no server of its own. The form picks the first cha
 
 Even with an endpoint set, the WhatsApp card stays in "Prefer a direct line?". To switch WhatsApp off, set `whatsapp: ''`.
 
-To use an endpoint instead: create one (for example at [Formspree](https://formspree.io)). For GitHub Pages, add it as the repository variable `PORTFOLIO_CONTACT_ENDPOINT` (**Settings → Secrets and variables → Actions → Variables**). For local builds, set it in `.env.local`. A public form URL is safe in client code. **Never put secret API keys in `NEXT_PUBLIC_*` variables.**
+To use an endpoint instead: create one (for example at [Formspree](https://formspree.io)). In Cloudflare, add it as `NEXT_PUBLIC_CONTACT_ENDPOINT` (project **djilali → Settings → Variables and Secrets**) and redeploy. For local builds, set it in `.env.local`. A public form URL is safe in client code. **Never put secret API keys in `NEXT_PUBLIC_*` variables.**
 
 ## Deployment
 
-### Netlify (address without "github", e.g. `https://djilali.netlify.app`)
+### Cloudflare Pages (live: https://djilali.pages.dev)
 
-`netlify.toml` at the repository root holds all the settings: base `portfolio`, build `npm ci && npm run build`, publish `out`, Node 22. It also skips builds when nothing in `portfolio/` changed.
+Cloudflare builds the site automatically on every push to `main`. The project `djilali` (**Workers & Pages**) uses these settings:
 
-1. Sign in at [app.netlify.com](https://app.netlify.com) with **GitHub**.
-2. **Add new project → Import an existing project → GitHub →** `speaking-pretest`. The settings are filled in from `netlify.toml`; click **Deploy**.
-3. **Project configuration → Change project name →** `djilali` (or any free name). The site becomes `https://djilali.netlify.app`.
-4. **Deploys → Trigger deploy** once more, so canonical and Open Graph links use the new name. Netlify passes its address to the build as `URL`.
+| Setting | Value |
+| --- | --- |
+| Production branch | `main` |
+| Framework preset | None |
+| Root directory | `portfolio` |
+| Build command | `npm ci && npm run build` |
+| Build output directory | `out` |
+| Environment variables | `NODE_VERSION=22`, `NEXT_PUBLIC_SITE_URL=https://djilali.pages.dev` |
 
-After that, every push to `main` that touches `portfolio/` redeploys automatically. A custom domain (e.g. `djilali.dev`) can be added later under **Domain management**.
+To use your own domain later (e.g. `djilali.com`): open the project, go to **Custom domains → Set up a custom domain**, then update `NEXT_PUBLIC_SITE_URL` and redeploy. For a contact-form endpoint, add `NEXT_PUBLIC_CONTACT_ENDPOINT` under **Settings → Variables and Secrets**.
 
-### GitHub Pages
+### Old GitHub Pages address
 
-`.github/workflows/pages.yml` builds with `NEXT_PUBLIC_BASE_PATH=/speaking-pretest/portfolio`.
+`.github/workflows/pages.yml` no longer builds the portfolio. It publishes small redirect pages at `/speaking-pretest/portfolio/`, `/fr/` and `/ar/` that forward to `https://djilali.pages.dev` and keep the language and `#section`.
 
 ### Other hosts
 
-Build with an empty `NEXT_PUBLIC_BASE_PATH`, set `NEXT_PUBLIC_SITE_URL` to the final address and serve `out/`. Cloudflare Pages also passes its address automatically (`CF_PAGES_URL`).
+Build with an empty `NEXT_PUBLIC_BASE_PATH`, set `NEXT_PUBLIC_SITE_URL` to the final address and serve `out/`. To serve from a sub-folder, set `NEXT_PUBLIC_BASE_PATH` (e.g. `/portfolio`).
 
 ## Performance & accessibility notes
 

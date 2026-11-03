@@ -150,7 +150,7 @@ const CODE_SECRET='alfikr-almodi-speaking-pretest';
 
 ## الموقع الشخصي (Portfolio)
 
-- الرابط: `https://djilalilakehal0-gif.github.io/speaking-pretest/portfolio/`
-- بثلاث لغات: الإنجليزية `/portfolio/`، والفرنسية `/portfolio/fr/`، والعربية `/portfolio/ar/` (من اليمين إلى اليسار).
+- الرابط: **`https://djilali.pages.dev`** (منشور على Cloudflare Pages ويتحدّث تلقائياً مع كل رفع إلى `main`). الرابط القديم `…/speaking-pretest/portfolio/` يحوّل إليه.
+- بثلاث لغات: الإنجليزية `/`، والفرنسية `/fr/`، والعربية `/ar/` (من اليمين إلى اليسار).
 - النصوص في `portfolio/src/content/locales/` (ملف لكل لغة)، والروابط والمشاريع ورقم الهاتف في `portfolio/src/content/site.ts`.
-- لتفعيل نموذج التواصل: أضف المتغيّر `PORTFOLIO_CONTACT_ENDPOINT` في Settings → Secrets and variables → Actions → Variables (مثلاً رابط Formspree). التفاصيل في `portfolio/README.md`.
+- نموذج التواصل يرسل عبر واتساب. التفاصيل وطرق أخرى في `portfolio/README.md`.
