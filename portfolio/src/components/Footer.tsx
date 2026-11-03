@@ -1,4 +1,4 @@
-import { nav, site, socials } from '@/content/site'
+import { contact, nav, site, socials } from '@/content/site'
 import { Logo } from './ui/Logo'
 import { SocialIcon } from './ui/SocialIcon'
 import { BackToTop } from './BackToTop'
@@ -16,6 +16,11 @@ export function Footer() {
               <span className="text-lg font-semibold tracking-[0.18em]">{site.brand}</span>
             </a>
             <p className="mt-4 leading-relaxed text-muted">{site.tagline}</p>
+            {contact.phone && (
+              <a href={`tel:${contact.phone}`} className="mt-4 inline-block text-sm tabular-nums text-soft transition-colors hover:text-ink">
+                {contact.phoneDisplay}
+              </a>
+            )}
           </div>
           <nav aria-label="Footer" className="grid grid-cols-2 gap-x-12 gap-y-3 sm:grid-cols-3">
             {nav.map((n) => (

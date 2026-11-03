@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
-import { site } from '@/content/site'
+import { contact, site } from '@/content/site'
 import './globals.css'
 
 const ogImage = { url: '/img/og.jpg', width: 1200, height: 630, alt: `${site.name} — ${site.title}` }
@@ -42,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     '@type': 'Person',
     name: site.name,
     jobTitle: site.title,
+    ...(contact.phone ? { telephone: contact.phone } : {}),
     url: site.url,
     image: `${site.url.replace(/\/$/, '')}/img/portrait.jpg`,
   }

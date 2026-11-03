@@ -1,7 +1,7 @@
 'use client'
 import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { AlertCircle, ArrowUpRight, CheckCircle2, Loader2, Mail, Send } from 'lucide-react'
+import { AlertCircle, ArrowUpRight, CheckCircle2, Loader2, Mail, Phone, Send } from 'lucide-react'
 import { contact, contactCopy, site, socials } from '@/content/site'
 import { Magnetic } from '../ui/Magnetic'
 import { Reveal } from '../ui/Reveal'
@@ -95,7 +95,9 @@ export function Contact() {
 
     setStatus({
       kind: 'error',
-      message: 'The contact form is not connected yet. Please reach out through one of the profiles listed here.',
+      message: contact.phone
+          ? `The contact form is not connected yet. Please call or message me at ${contact.phoneDisplay}.`
+          : 'The contact form is not connected yet. Please reach out through one of the profiles listed here.',
     })
   }
 
@@ -156,6 +158,20 @@ export function Contact() {
               I usually reply within a couple of working days. Share as much context as you like — goals, timeline, links or references.
             </p>
             <ul className="mt-8 space-y-3">
+              {contact.phone && (
+                <li>
+                  <a href={`tel:${contact.phone}`} className="group flex items-center gap-4 rounded-2xl border border-line p-4 transition-colors hover:border-line-strong hover:bg-white/[0.03]">
+                    <span className="grid size-11 place-items-center rounded-xl bg-white/[0.05]">
+                      <Phone className="size-[18px]" aria-hidden />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-xs text-dim">Phone</span>
+                      <span className="block truncate text-sm tabular-nums">{contact.phoneDisplay}</span>
+                    </span>
+                    <ArrowUpRight className="size-4 text-dim transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
+                  </a>
+                </li>
+              )}
               {contact.email && (
                 <li>
                   <a href={`mailto:${contact.email}`} className="group flex items-center gap-4 rounded-2xl border border-line p-4 transition-colors hover:border-line-strong hover:bg-white/[0.03]">

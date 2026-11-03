@@ -20,7 +20,7 @@ Text, links, projects, tech stack, stats and timeline are all in **`src/content/
 | What | Where |
 | --- | --- |
 | Name, title, tagline, location, availability | `site` |
-| Email, LinkedIn, X, Instagram (empty = hidden) | `contact`, `socials` |
+| Email, phone, LinkedIn, X, Instagram (empty = hidden) | `contact`, `socials` |
 | Hero, About text, the three pillars | `hero`, `about` |
 | Statistics (use real numbers only; `null` hides one) | `stats` |
 | Tech stack | `stack` |

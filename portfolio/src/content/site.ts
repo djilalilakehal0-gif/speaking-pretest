@@ -38,6 +38,9 @@ export const site = {
  */
 export const contact = {
   email: '', // e.g. 'hello@yourdomain.com'
+  /** Phone in international format (digits only after +). Empty = hidden. */
+  phone: '+33755244752',
+  phoneDisplay: '+33 7 55 24 47 52',
   /** Public form endpoint (Formspree, Getform, your own function). Set NEXT_PUBLIC_CONTACT_ENDPOINT. */
   endpoint: process.env.NEXT_PUBLIC_CONTACT_ENDPOINT || '',
 }
