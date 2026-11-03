@@ -5,7 +5,7 @@ const fr: Dictionary = {
   meta: {
     title: 'Djilali — Développeur logiciel | Ingénieur Full-Stack',
     description:
-      'Djilali — Développeur logiciel et ingénieur Full-Stack : conception et développement d’applications web performantes et d’expériences numériques immersives.',
+      'Djilali — Développeur logiciel et ingénieur Full-Stack : développement d’applications web performantes et conseil aux entreprises et administrations pour trouver les bonnes solutions numériques.',
     ogAlt: 'Djilali — Développeur logiciel | Ingénieur Full-Stack',
   },
   site: {
@@ -111,8 +111,15 @@ const fr: Dictionary = {
     eyebrow: 'Services',
     titleLead: 'Ce que je peux créer',
     titleHighlight: 'pour vous.',
-    text: 'D’une simple page d’accueil à un produit complet, conçu de bout en bout avec la même exigence du détail.',
+    text: 'De la bonne idée au produit complet : conseil, conception et développement avec la même exigence du détail.',
+    consultCta: 'Parlons des besoins de votre structure',
+    featured: 'Pour les organisations',
     items: {
+      consult: {
+        title: 'Conseil numérique pour entreprises et administrations',
+        text: 'J’accompagne les entreprises et les administrations pour comprendre leurs besoins, trouver les bonnes solutions numériques et proposer des idées concrètes adaptées à leurs objectifs, leur budget et leurs équipes.',
+        points: ['Analyse des besoins et audit numérique', 'Solutions proposées sur mesure', 'Feuille de route claire pour la transformation numérique', 'Accompagnement de l’idée au lancement'],
+      },
       web: {
         title: 'Développement de sites web',
         text: 'Des sites vitrines et landing pages rapides et responsives, avec SEO et animations intégrés dès le départ.',

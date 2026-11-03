@@ -162,8 +162,9 @@ export const projects: Project[] = [
   },
 ]
 
-export type ServiceKey = 'web' | 'stack' | 'ui' | 'perf'
-export const services: ServiceKey[] = ['web', 'stack', 'ui', 'perf']
+export type ServiceKey = 'consult' | 'web' | 'stack' | 'ui' | 'perf'
+/** The first service is shown as a wide featured card. */
+export const services: ServiceKey[] = ['consult', 'web', 'stack', 'ui', 'perf']
 
 /** Journey timeline — real milestones only (text per language in the dictionaries). */
 export type JourneyKey = 'napolitime' | 'store' | 'pretest'
