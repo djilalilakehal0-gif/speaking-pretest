@@ -60,8 +60,24 @@ To use an endpoint instead: create one (for example at [Formspree](https://forms
 
 ## Deployment
 
-- **GitHub Pages:** handled by `.github/workflows/pages.yml`, which builds with `NEXT_PUBLIC_BASE_PATH=/speaking-pretest/portfolio`.
-- **Vercel / Netlify / own domain:** build with an empty `NEXT_PUBLIC_BASE_PATH`, set `NEXT_PUBLIC_SITE_URL` to the final URL (used for Open Graph and canonical links) and serve `out/`.
+### Netlify (address without "github", e.g. `https://djilali.netlify.app`)
+
+`netlify.toml` at the repository root holds all the settings: base `portfolio`, build `npm ci && npm run build`, publish `out`, Node 22. It also skips builds when nothing in `portfolio/` changed.
+
+1. Sign in at [app.netlify.com](https://app.netlify.com) with **GitHub**.
+2. **Add new project → Import an existing project → GitHub →** `speaking-pretest`. The settings are filled in from `netlify.toml`; click **Deploy**.
+3. **Project configuration → Change project name →** `djilali` (or any free name). The site becomes `https://djilali.netlify.app`.
+4. **Deploys → Trigger deploy** once more, so canonical and Open Graph links use the new name. Netlify passes its address to the build as `URL`.
+
+After that, every push to `main` that touches `portfolio/` redeploys automatically. A custom domain (e.g. `djilali.dev`) can be added later under **Domain management**.
+
+### GitHub Pages
+
+`.github/workflows/pages.yml` builds with `NEXT_PUBLIC_BASE_PATH=/speaking-pretest/portfolio`.
+
+### Other hosts
+
+Build with an empty `NEXT_PUBLIC_BASE_PATH`, set `NEXT_PUBLIC_SITE_URL` to the final address and serve `out/`. Cloudflare Pages also passes its address automatically (`CF_PAGES_URL`).
 
 ## Performance & accessibility notes
 
