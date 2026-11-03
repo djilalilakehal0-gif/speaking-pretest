@@ -61,6 +61,20 @@ jobs:
           mkdir -p _site/napolitime
           cp -r napolitime/dist/. _site/napolitime/
 
+      - name: Build and add the DJILALI developer portfolio
+        env:
+          NEXT_PUBLIC_BASE_PATH: /speaking-pretest/portfolio
+          NEXT_PUBLIC_SITE_URL: https://djilalilakehal0-gif.github.io/speaking-pretest/portfolio
+          NEXT_PUBLIC_CONTACT_ENDPOINT: ${{ vars.PORTFOLIO_CONTACT_ENDPOINT }}
+          NEXT_TELEMETRY_DISABLED: 1
+        run: |
+          cd portfolio
+          npm ci
+          npm run build
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p _site/portfolio
+          cp -r portfolio/out/. _site/portfolio/
+
       - name: Add the speech-recognition model (Whisper tiny)
         run: |
           mkdir -p /tmp/m && cd /tmp/m

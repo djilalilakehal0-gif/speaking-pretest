@@ -145,3 +145,11 @@ const CODE_SECRET='alfikr-almodi-speaking-pretest';
   {"url": "https://script.google.com/macros/s/…/exec"}
   ```
 - ملف السكربت `Code.gs` **لا يُرفع إلى GitHub** لأن فيه مفتاح المعلّم.
+
+---
+
+## الموقع الشخصي (Portfolio)
+
+- الرابط: `https://djilalilakehal0-gif.github.io/speaking-pretest/portfolio/`
+- المجلد `portfolio/` (Next.js). كل النصوص والروابط والمشاريع في الملف `portfolio/src/content/site.ts`.
+- لتفعيل نموذج التواصل: أضف المتغيّر `PORTFOLIO_CONTACT_ENDPOINT` في Settings → Secrets and variables → Actions → Variables (مثلاً رابط Formspree). التفاصيل في `portfolio/README.md`.
