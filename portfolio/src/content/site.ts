@@ -14,7 +14,7 @@ export const site = {
   brand: 'DJILALI',
   name: 'Djilali',
   /** Absolute URL of the English home page (other languages live at /fr/ and /ar/). */
-  url: (process.env.NEXT_PUBLIC_SITE_URL || `${PAGES}/portfolio`).replace(/\/$/, ''),
+  url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://djilali.pages.dev').replace(/\/$/, ''),
   /** Official portrait (public/img). Replace the files to change the photo everywhere. */
   portrait: {
     src: '/img/portrait.webp',
