@@ -2,6 +2,7 @@ import { Cursor } from '@/components/Cursor'
 import { Footer } from '@/components/Footer'
 import { Nav } from '@/components/Nav'
 import { PageVisibility } from '@/components/PageVisibility'
+import { WhatsAppButton } from '@/components/WhatsAppButton'
 import { Hero } from '@/components/hero/Hero'
 import { Projects } from '@/components/projects/Projects'
 import { About } from '@/components/sections/About'
@@ -27,6 +28,7 @@ export function HomePage({ lang }: { lang: Locale }) {
       </main>
       <Footer t={{ nav: t.nav, ui: t.ui, footer: t.footer, site: t.site }} />
       <div aria-hidden className="grain" />
+      <WhatsAppButton label={t.contact.waFab} message={t.contact.waIntro} newTab={t.ui.newTab} />
       <Cursor label={t.ui.cursorView} />
       <PageVisibility />
     </>

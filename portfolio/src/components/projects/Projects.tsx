@@ -30,7 +30,11 @@ export function Projects({ t }: { t: T }) {
           />
           <Reveal delay={0.15}>
             <p className="font-mono text-xs text-dim">
-              {fill(t.count, { n: String(projects.length).padStart(2, '0'), c: projects.filter((p) => p.concept).length })}
+              {(() => {
+                const c = projects.filter((p) => p.concept).length
+                const n = String(projects.length).padStart(2, '0')
+                return c ? fill(t.count, { n, c }) : fill(t.countOnly, { n })
+              })()}
             </p>
           </Reveal>
         </div>

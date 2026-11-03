@@ -112,7 +112,7 @@ export const stats: { key: StatKey; value: number | null; suffix?: string }[] = 
   { key: 'years', value: null, suffix: '+' },
 ]
 
-export type ProjectId = 'napolitime' | 'devspace' | 'nexora'
+export type ProjectId = 'napolitime' | 'pretest' | 'store'
 export type Project = {
   id: ProjectId
   n: string
@@ -139,20 +139,26 @@ export const projects: Project[] = [
     accent: '#ff7a45',
   },
   {
-    id: 'devspace',
+    id: 'pretest',
     n: '02',
-    title: 'DEVSPACE',
-    tags: ['Next.js', 'TypeScript', 'PostgreSQL', 'Charts'],
-    concept: true,
-    accent: '#5b8cff',
+    title: 'SPEAKING PRE-TEST',
+    tags: ['JavaScript', 'Capacitor', 'Transformers.js', 'Google Apps Script'],
+    image: '/img/projects/pretest.webp',
+    concept: false,
+    live: `${PAGES}/`,
+    source: REPO,
+    accent: '#f5c451',
   },
   {
-    id: 'nexora',
+    id: 'store',
     n: '03',
-    title: 'NEXORA',
-    tags: ['Next.js', 'Node.js', 'MongoDB', 'Stripe-ready'],
-    concept: true,
-    accent: '#a77bff',
+    title: 'DJILALI STORE',
+    tags: ['React', 'Vite', 'Tailwind CSS', 'GSAP'],
+    image: '/img/projects/store.webp',
+    concept: false,
+    live: `${PAGES}/djilali/`,
+    source: `${REPO}/tree/main/djilali`,
+    accent: '#9fcf8f',
   },
 ]
 
