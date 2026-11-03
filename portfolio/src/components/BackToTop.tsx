@@ -1,7 +1,7 @@
 'use client'
 import { ArrowUp } from 'lucide-react'
 
-export function BackToTop() {
+export function BackToTop({ label }: { label: string }) {
   return (
     <button
       type="button"
@@ -10,7 +10,7 @@ export function BackToTop() {
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
         document.querySelector<HTMLElement>('#top a, #top button')?.focus({ preventScroll: true })
       }}
-      aria-label="Back to top"
+      aria-label={label}
       className="group relative grid size-11 place-items-center overflow-hidden rounded-full border border-line-strong bg-white/[0.04] text-ink transition-colors hover:bg-white hover:text-bg"
     >
       <ArrowUp className="size-4 transition-transform duration-500 group-hover:-translate-y-[150%]" aria-hidden />

@@ -7,7 +7,7 @@ import { useFinePointer } from '@/lib/hooks'
  * - grows over links/buttons, shows "View" over elements with data-cursor="view"
  * - transforms only (GPU), and the rAF loop sleeps once the ring has caught up
  */
-export function Cursor() {
+export function Cursor({ label = 'View' }: { label?: string }) {
   const enabled = useFinePointer()
   const dot = useRef<HTMLDivElement>(null)
   const ring = useRef<HTMLDivElement>(null)
@@ -78,7 +78,7 @@ export function Cursor() {
     <>
       <div ref={ring} aria-hidden className="cursor-ring pointer-events-none fixed left-0 top-0 z-[100] opacity-0" data-state="default">
         <span className="cursor-ring__shape">
-          <span className="cursor-ring__label">View</span>
+          <span className="cursor-ring__label">{label}</span>
         </span>
       </div>
       <div ref={dot} aria-hidden className="cursor-dot pointer-events-none fixed left-0 top-0 z-[101] opacity-0" data-state="default" />

@@ -1,7 +1,8 @@
 /**
  * ─────────────────────────────────────────────────────────────────────────────
- *  ALL EDITABLE PORTFOLIO CONTENT LIVES IN THIS FILE.
- *  Change text, links, projects, stack and milestones here — no component edits needed.
+ *  SHARED PORTFOLIO DATA (same in every language): links, contact, photos,
+ *  tech stack, projects, numbers.
+ *  All visible TEXT lives in src/content/locales/{en,fr,ar}.ts.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 import type { BrandIconKey } from '@/lib/brand-icons'
@@ -12,28 +13,21 @@ const PAGES = 'https://djilalilakehal0-gif.github.io/speaking-pretest'
 export const site = {
   brand: 'DJILALI',
   name: 'Djilali',
-  title: 'Software Developer | Full-Stack Engineer',
-  role: 'Full-Stack Developer',
-  tagline: 'Clean code, creative engineering and interfaces that feel effortless.',
-  url: process.env.NEXT_PUBLIC_SITE_URL || `${PAGES}/portfolio`,
-  description:
-    'Djilali — Software Developer and Full-Stack Engineer designing and building high-performance web applications and immersive digital experiences.',
+  /** Absolute URL of the English home page (other languages live at /fr/ and /ar/). */
+  url: (process.env.NEXT_PUBLIC_SITE_URL || `${PAGES}/portfolio`).replace(/\/$/, ''),
   /** Official portrait (public/img). Replace the files to change the photo everywhere. */
   portrait: {
     src: '/img/portrait.webp',
     srcSmall: '/img/portrait-sm.webp',
     fallback: '/img/portrait.jpg',
     avatar: '/img/avatar.webp',
-    alt: 'Djilali, software developer, standing in his workspace holding a laptop',
     width: 800,
     height: 1200,
   },
-  availability: 'Available for select projects',
-  location: 'Remote · Worldwide',
 }
 
 /**
- * Contact details. Leave a value empty ("") to hide that link everywhere.
+ * Contact details. Leave a value empty ("") to hide it everywhere.
  * `email` is also used as the fallback for the contact form when no endpoint is configured.
  */
 export const contact = {
@@ -53,40 +47,15 @@ export const socials: { key: SocialKey; label: string; href: string }[] = [
   { key: 'instagram', label: 'Instagram', href: '' },
 ].filter((s) => s.href) as { key: SocialKey; label: string; href: string }[]
 
-export const nav = [
-  { id: 'about', label: 'About' },
-  { id: 'stack', label: 'Stack' },
-  { id: 'work', label: 'Work' },
-  { id: 'services', label: 'Services' },
-  { id: 'journey', label: 'Journey' },
-  { id: 'contact', label: 'Contact' },
-]
-
-export const hero = {
-  badge: 'Available for select projects',
-  headline: ['Building Digital', 'Experiences That Feel'],
-  highlight: 'Extraordinary.',
-  text: 'I design and develop high-performance digital products, modern web applications, and immersive user experiences through clean code and creative engineering.',
-  primaryCta: { label: 'Explore My Work', href: '#work' },
-  secondaryCta: { label: "Let's Talk", href: '#contact' },
-}
-
-export const about = {
-  eyebrow: 'About',
-  title: 'Engineering Ideas Into Reality.',
-  text: 'I’m a software developer passionate about transforming complex problems into elegant, scalable, and user-friendly digital solutions. I combine technical precision, thoughtful design, and modern engineering practices to build meaningful products.',
-  pillars: [
-    { n: '01', title: 'Clean Code', text: 'Maintainable, scalable, and well-structured software.' },
-    { n: '02', title: 'Creative Thinking', text: 'Turning ambitious ideas into intuitive digital experiences.' },
-    { n: '03', title: 'Performance First', text: 'Building fast, accessible, and reliable applications.' },
-  ],
-}
+/** Section ids in page order (labels come from the dictionaries). */
+export const navIds = ['about', 'stack', 'work', 'services', 'journey', 'contact'] as const
+export type NavId = (typeof navIds)[number]
 
 export type TechItem = { name: string; icon: BrandIconKey | 'vscode' | 'api' }
-export const stack: { category: string; blurb: string; items: TechItem[] }[] = [
+export type StackKey = 'frontend' | 'backend' | 'databases' | 'tools'
+export const stack: { key: StackKey; items: TechItem[] }[] = [
   {
-    category: 'Frontend',
-    blurb: 'Interfaces that are fast, accessible and pixel-precise.',
+    key: 'frontend',
     items: [
       { name: 'React', icon: 'react' },
       { name: 'Next.js', icon: 'nextjs' },
@@ -98,8 +67,7 @@ export const stack: { category: string; blurb: string; items: TechItem[] }[] = [
     ],
   },
   {
-    category: 'Backend',
-    blurb: 'APIs and services built to be predictable and scalable.',
+    key: 'backend',
     items: [
       { name: 'Node.js', icon: 'nodejs' },
       { name: 'Express', icon: 'express' },
@@ -108,8 +76,7 @@ export const stack: { category: string; blurb: string; items: TechItem[] }[] = [
     ],
   },
   {
-    category: 'Databases',
-    blurb: 'Relational and document data, modelled with care.',
+    key: 'databases',
     items: [
       { name: 'PostgreSQL', icon: 'postgresql' },
       { name: 'MongoDB', icon: 'mongodb' },
@@ -117,8 +84,7 @@ export const stack: { category: string; blurb: string; items: TechItem[] }[] = [
     ],
   },
   {
-    category: 'Tools',
-    blurb: 'A workflow that keeps shipping smooth.',
+    key: 'tools',
     items: [
       { name: 'Git', icon: 'git' },
       { name: 'GitHub', icon: 'github' },
@@ -130,24 +96,23 @@ export const stack: { category: string; blurb: string; items: TechItem[] }[] = [
 ]
 
 /**
- * Statistics shown in the About section. Every value must be true for you — edit freely.
+ * Statistics in the About section. Every value must be true for you.
  * `value: null` hides a stat (e.g. add your years of experience when you want it shown).
  */
-export const stats: { label: string; value: number | null; suffix?: string }[] = [
-  { label: 'Projects shipped', value: 3, suffix: '+' },
-  { label: 'Technologies in my stack', value: stack.reduce((n, c) => n + c.items.length, 0) },
-  { label: 'Platforms — Web, Android, iOS', value: 3 },
-  { label: 'Years of experience', value: null, suffix: '+' },
+export type StatKey = 'projects' | 'tech' | 'platforms' | 'years'
+export const stats: { key: StatKey; value: number | null; suffix?: string }[] = [
+  { key: 'projects', value: 3, suffix: '+' },
+  { key: 'tech', value: stack.reduce((n, c) => n + c.items.length, 0) },
+  { key: 'platforms', value: 3 },
+  { key: 'years', value: null, suffix: '+' },
 ]
 
-export type ProjectVisual = 'napolitime' | 'devspace' | 'nexora'
+export type ProjectId = 'napolitime' | 'devspace' | 'nexora'
 export type Project = {
+  id: ProjectId
   n: string
   title: string
-  category: string
-  description: string
   tags: string[]
-  visual: ProjectVisual
   /** Screenshot in /public (optional). Without it a designed preview is rendered. */
   image?: string
   /** true = demonstration concept, labelled as such until replaced with real work. */
@@ -158,13 +123,10 @@ export type Project = {
 }
 export const projects: Project[] = [
   {
+    id: 'napolitime',
     n: '01',
     title: 'NAPOLITIME',
-    category: 'Restaurant Website',
-    description:
-      'A premium restaurant experience featuring an elegant menu, modern branding, responsive layouts, and immersive food visuals.',
     tags: ['React', 'TypeScript', 'Tailwind CSS', 'GSAP', 'Capacitor'],
-    visual: 'napolitime',
     image: '/img/projects/napolitime.webp',
     concept: false,
     live: `${PAGES}/napolitime/`,
@@ -172,93 +134,30 @@ export const projects: Project[] = [
     accent: '#ff7a45',
   },
   {
+    id: 'devspace',
     n: '02',
     title: 'DEVSPACE',
-    category: 'SaaS Dashboard',
-    description:
-      'A modern dashboard concept with data visualization, interactive components, and a clean productivity-focused interface.',
     tags: ['Next.js', 'TypeScript', 'PostgreSQL', 'Charts'],
-    visual: 'devspace',
     concept: true,
     accent: '#5b8cff',
   },
   {
+    id: 'nexora',
     n: '03',
     title: 'NEXORA',
-    category: 'E-commerce Platform',
-    description:
-      'A contemporary online shopping experience featuring product discovery, smooth navigation, and responsive product pages.',
     tags: ['Next.js', 'Node.js', 'MongoDB', 'Stripe-ready'],
-    visual: 'nexora',
     concept: true,
     accent: '#a77bff',
   },
 ]
 
-export type ServiceIcon = 'web' | 'stack' | 'ui' | 'perf'
-export const services: { title: string; text: string; icon: ServiceIcon; points: string[] }[] = [
-  {
-    title: 'Website Development',
-    icon: 'web',
-    text: 'Fast, responsive marketing sites and landing pages with SEO and motion built in from day one.',
-    points: ['Responsive & SEO-ready', 'CMS-friendly content'],
-  },
-  {
-    title: 'Full-Stack Application Development',
-    icon: 'stack',
-    text: 'End-to-end web apps — from database schema and APIs to polished, production-ready interfaces.',
-    points: ['REST APIs & auth', 'Web, Android & iOS'],
-  },
-  {
-    title: 'UI/UX Implementation',
-    icon: 'ui',
-    text: 'Turning Figma designs into accessible, pixel-faithful components with refined micro-interactions.',
-    points: ['Design systems', 'Accessible by default'],
-  },
-  {
-    title: 'Performance Optimization',
-    icon: 'perf',
-    text: 'Auditing and tuning Core Web Vitals, bundle size and rendering so products feel instant.',
-    points: ['Core Web Vitals', 'Smooth 60 FPS motion'],
-  },
-]
+export type ServiceKey = 'web' | 'stack' | 'ui' | 'perf'
+export const services: ServiceKey[] = ['web', 'stack', 'ui', 'perf']
 
-/**
- * Journey timeline — real milestones only. Add jobs, education or achievements as you go.
- */
-export const journey: { date: string; title: string; org: string; text: string; link?: string }[] = [
-  {
-    date: 'Nov 2026',
-    title: 'NAPOLITIME — website & Android app',
-    org: 'Personal project',
-    text: 'Single-page restaurant experience with an interactive menu, order flow, GSAP scroll storytelling and a Capacitor Android build.',
-    link: `${PAGES}/napolitime/`,
-  },
-  {
-    date: 'Oct 2026',
-    title: 'DJILALI store landing',
-    org: 'Personal project',
-    text: 'An animated single-page product showcase built with React, Tailwind CSS and GSAP, deployed to GitHub Pages.',
-    link: `${PAGES}/djilali/`,
-  },
-  {
-    date: 'Oct 2026',
-    title: 'Speaking Pre-Test — mobile & web app',
-    org: 'Alfikr Almodi School',
-    text: 'Offline English speaking test for students on Android, iOS and the web, with a teacher dashboard and in-browser speech recognition for automatic correction.',
-    link: `${PAGES}/`,
-  },
+/** Journey timeline — real milestones only (text per language in the dictionaries). */
+export type JourneyKey = 'napolitime' | 'store' | 'pretest'
+export const journey: { key: JourneyKey; link?: string }[] = [
+  { key: 'napolitime', link: `${PAGES}/napolitime/` },
+  { key: 'store', link: `${PAGES}/djilali/` },
+  { key: 'pretest', link: `${PAGES}/` },
 ]
-
-export const workflow = [
-  { n: '01', title: 'Discover', text: 'Understand goals and requirements.' },
-  { n: '02', title: 'Design', text: 'Create intuitive interfaces and prototypes.' },
-  { n: '03', title: 'Develop', text: 'Build scalable, maintainable solutions.' },
-  { n: '04', title: 'Deliver', text: 'Test, optimize, and deploy.' },
-]
-
-export const contactCopy = {
-  eyebrow: 'Contact',
-  title: ['Have an Idea?', "Let's Build Something Great."],
-  text: "Have a project in mind or want to collaborate? Let's turn your vision into a digital experience.",
-}

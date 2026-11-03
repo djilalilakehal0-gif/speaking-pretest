@@ -2,7 +2,8 @@
 import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { AlertCircle, ArrowUpRight, CheckCircle2, Loader2, Mail, Phone, Send } from 'lucide-react'
-import { contact, contactCopy, site, socials } from '@/content/site'
+import { contact, socials } from '@/content/site'
+import { fill, type Dictionary } from '@/content/i18n'
 import { Magnetic } from '../ui/Magnetic'
 import { Reveal } from '../ui/Reveal'
 import { SocialIcon } from '../ui/SocialIcon'
@@ -14,17 +15,21 @@ type Status = { kind: 'idle' | 'sending' | 'sent' | 'mailto' | 'error'; message?
 const EMPTY: Values = { name: '', email: '', subject: '', message: '' }
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
-function validate(v: Values): Partial<Record<Field, string>> {
+type T = Dictionary['contact']
+
+function validate(v: Values, m: T['errors']): Partial<Record<Field, string>> {
   const e: Partial<Record<Field, string>> = {}
-  if (v.name.trim().length < 2) e.name = 'Please enter your name.'
-  if (!EMAIL_RE.test(v.email.trim())) e.email = 'Please enter a valid email address.'
-  if (v.subject.trim().length < 3) e.subject = 'Please add a short subject.'
-  if (v.message.trim().length < 20) e.message = 'Tell me a little more — at least 20 characters.'
-  if (v.message.length > 5000) e.message = 'Please keep the message under 5000 characters.'
+  if (v.name.trim().length < 2) e.name = m.name
+  if (!EMAIL_RE.test(v.email.trim())) e.email = m.email
+  if (v.subject.trim().length < 3) e.subject = m.subject
+  if (v.message.trim().length < 20) e.message = m.message
+  if (v.message.length > 5000) e.message = m.messageLong
   return e
 }
 
-export function Contact() {
+type Props = { t: T; site: Pick<Dictionary['site'], 'availability' | 'location'>; ui: Pick<Dictionary['ui'], 'newTab' | 'startProject'> }
+
+export function Contact({ t, site, ui }: Props) {
   const [values, setValues] = useState<Values>(EMPTY)
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({})
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({})
@@ -35,16 +40,16 @@ export function Contact() {
   const update = (f: Field, val: string) => {
     const next = { ...values, [f]: val }
     setValues(next)
-    if (touched[f]) setErrors(validate(next))
+    if (touched[f]) setErrors(validate(next, t.errors))
   }
   const blur = (f: Field) => {
     setTouched((t) => ({ ...t, [f]: true }))
-    setErrors(validate(values))
+    setErrors(validate(values, t.errors))
   }
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const errs = validate(values)
+    const errs = validate(values, t.errors)
     setErrors(errs)
     setTouched({ name: true, email: true, subject: true, message: true })
     const firstBad = (Object.keys(errs) as Field[])[0]
@@ -79,8 +84,8 @@ export function Contact() {
         setStatus({
           kind: 'error',
           message: contact.email
-            ? `Your message couldn't be sent right now. Please try again, or email ${contact.email} directly.`
-            : "Your message couldn't be sent right now. Please try again in a moment.",
+            ? fill(t.failEmail, { email: contact.email })
+            : t.fail,
         })
       }
       return
@@ -96,8 +101,8 @@ export function Contact() {
     setStatus({
       kind: 'error',
       message: contact.phone
-          ? `The contact form is not connected yet. Please call or message me at ${contact.phoneDisplay}.`
-          : 'The contact form is not connected yet. Please reach out through one of the profiles listed here.',
+          ? fill(t.notConnectedPhone, { phone: `\u2066${contact.phoneDisplay}\u2069` })
+          : t.notConnected,
     })
   }
 
@@ -122,15 +127,15 @@ export function Contact() {
       <div className="container-x">
         <div className="mx-auto max-w-4xl text-center">
           <Reveal>
-            <p className="eyebrow justify-center">{contactCopy.eyebrow}</p>
+            <p className="eyebrow justify-center">{t.eyebrow}</p>
           </Reveal>
           <Reveal delay={0.06}>
             <h2 id="contact-title" className="h-display mt-6 text-balance">
-              {contactCopy.title[0]} <span className="text-gradient animate-gradient">{contactCopy.title[1]}</span>
+              {t.titleLead} <span className="text-gradient animate-gradient">{t.titleHighlight}</span>
             </h2>
           </Reveal>
           <Reveal delay={0.12}>
-            <p className="mx-auto mt-7 max-w-xl text-pretty text-[1.05rem] leading-relaxed text-muted md:text-lg">{contactCopy.text}</p>
+            <p className="mx-auto mt-7 max-w-xl text-pretty text-[1.05rem] leading-relaxed text-muted md:text-lg">{t.text}</p>
           </Reveal>
           <Reveal delay={0.18} className="mt-10 flex justify-center">
             <Magnetic>
@@ -144,7 +149,7 @@ export function Contact() {
                 }}
                 className="btn btn-primary !min-h-14 !px-8 text-base"
               >
-                Start a Project <ArrowUpRight className="size-5" aria-hidden />
+                {ui.startProject} <ArrowUpRight className="size-5 rtl:-scale-x-100" aria-hidden />
               </a>
             </Magnetic>
           </Reveal>
@@ -153,9 +158,9 @@ export function Contact() {
         <div className="mt-20 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
           {/* direct channels */}
           <Reveal className="glass flex flex-col rounded-3xl p-7 sm:p-9 [&>*]:shrink-0">
-            <h3 className="text-2xl font-semibold tracking-tight">Prefer a direct line?</h3>
+            <h3 className="text-2xl font-semibold tracking-tight">{t.directTitle}</h3>
             <p className="mt-3 leading-relaxed text-muted">
-              I usually reply within a couple of working days. Share as much context as you like — goals, timeline, links or references.
+              {t.directText}
             </p>
             <ul className="mt-8 space-y-3">
               {contact.phone && (
@@ -165,10 +170,10 @@ export function Contact() {
                       <Phone className="size-[18px]" aria-hidden />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-xs text-dim">Phone</span>
-                      <span className="block truncate text-sm tabular-nums">{contact.phoneDisplay}</span>
+                      <span className="block text-xs text-dim">{t.phone}</span>
+                      <span dir="ltr" className="block truncate text-sm tabular-nums">{contact.phoneDisplay}</span>
                     </span>
-                    <ArrowUpRight className="size-4 text-dim transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
+                    <ArrowUpRight className="size-4 text-dim rtl:-scale-x-100 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
                   </a>
                 </li>
               )}
@@ -179,10 +184,10 @@ export function Contact() {
                       <Mail className="size-[18px]" aria-hidden />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-xs text-dim">Email</span>
+                      <span className="block text-xs text-dim">{t.email}</span>
                       <span className="block truncate text-sm">{contact.email}</span>
                     </span>
-                    <ArrowUpRight className="size-4 text-dim transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
+                    <ArrowUpRight className="size-4 text-dim rtl:-scale-x-100 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
                   </a>
                 </li>
               )}
@@ -199,23 +204,23 @@ export function Contact() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-xs text-dim">{s.label}</span>
-                      <span className="block truncate text-sm">{s.href.replace(/^https?:\/\/(www\.)?/, '')}</span>
+                      <span dir="ltr" className="block truncate text-sm">{s.href.replace(/^https?:\/\/(www\.)?/, '')}</span>
                     </span>
-                    <ArrowUpRight className="size-4 text-dim transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
-                    <span className="sr-only">(opens in a new tab)</span>
+                    <ArrowUpRight className="size-4 text-dim rtl:-scale-x-100 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
+                    <span className="sr-only">{ui.newTab}</span>
                   </a>
                 </li>
               ))}
             </ul>
             <dl className="mt-10 grid grid-cols-2 gap-4 border-t border-line pt-6 text-sm lg:mt-auto">
               <div>
-                <dt className="text-xs text-dim">Status</dt>
+                <dt className="text-xs text-dim">{t.status}</dt>
                 <dd className="mt-1 flex items-center gap-2 text-soft">
                   <span className="size-1.5 rounded-full bg-[#4ade80]" /> {site.availability}
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-dim">Location</dt>
+                <dt className="text-xs text-dim">{t.location}</dt>
                 <dd className="mt-1 text-soft">{site.location}</dd>
               </div>
             </dl>
@@ -225,29 +230,29 @@ export function Contact() {
           <Reveal delay={0.08} className="border-beam glass rounded-3xl p-7 sm:p-9">
             <form ref={form} noValidate onSubmit={onSubmit} aria-labelledby="form-title">
               <h3 id="form-title" className="text-2xl font-semibold tracking-tight">
-                Tell me about your project
+                {t.formTitle}
               </h3>
-              <p className="mt-2 text-sm text-muted">All fields are required.</p>
+              <p className="mt-2 text-sm text-muted">{t.required}</p>
 
               <div className="mt-8 grid gap-5 sm:grid-cols-2">
-                <FormField label="Name" id="c-name" error={touched.name ? errors.name : undefined}>
-                  <input type="text" autoComplete="name" placeholder="Your name" {...fieldProps('name')} />
+                <FormField label={t.name} id="c-name" error={touched.name ? errors.name : undefined}>
+                  <input type="text" autoComplete="name" placeholder={t.namePh} {...fieldProps('name')} />
                 </FormField>
-                <FormField label="Email" id="c-email" error={touched.email ? errors.email : undefined}>
-                  <input type="email" autoComplete="email" inputMode="email" placeholder="you@company.com" {...fieldProps('email')} />
+                <FormField label={t.emailLabel} id="c-email" error={touched.email ? errors.email : undefined}>
+                  <input type="email" autoComplete="email" inputMode="email" placeholder={t.emailPh} dir="ltr" {...fieldProps('email')} />
                 </FormField>
-                <FormField label="Subject" id="c-subject" error={touched.subject ? errors.subject : undefined} className="sm:col-span-2">
-                  <input type="text" placeholder="New website, web app, collaboration…" {...fieldProps('subject')} />
+                <FormField label={t.subject} id="c-subject" error={touched.subject ? errors.subject : undefined} className="sm:col-span-2">
+                  <input type="text" placeholder={t.subjectPh} {...fieldProps('subject')} />
                 </FormField>
-                <FormField label="Message" id="c-message" error={touched.message ? errors.message : undefined} className="sm:col-span-2">
-                  <textarea rows={6} placeholder="What are you building, and how can I help?" {...fieldProps('message')} className="field resize-y" />
+                <FormField label={t.message} id="c-message" error={touched.message ? errors.message : undefined} className="sm:col-span-2">
+                  <textarea rows={6} placeholder={t.messagePh} {...fieldProps('message')} className="field resize-y" />
                 </FormField>
               </div>
 
               {/* honeypot (hidden from people and assistive tech) */}
               <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
                 <label>
-                  Leave this empty <input ref={honeypot} type="text" name="company" tabIndex={-1} autoComplete="off" />
+                  {t.honeypot} <input ref={honeypot} type="text" name="company" tabIndex={-1} autoComplete="off" />
                 </label>
               </div>
 
@@ -255,27 +260,27 @@ export function Contact() {
                 <button type="submit" disabled={status.kind === 'sending'} className="btn btn-primary group w-full disabled:opacity-70 sm:w-auto">
                   {status.kind === 'sending' ? (
                     <>
-                      <Loader2 className="size-4 animate-spin" aria-hidden /> Sending…
+                      <Loader2 className="size-4 animate-spin" aria-hidden /> {t.sending}
                     </>
                   ) : (
                     <>
-                      Send Message <Send className="size-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
+                      {t.send} <Send className="size-4 rtl:-scale-x-100 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
                     </>
                   )}
                 </button>
-                <p className="text-xs text-dim">Your details are only used to reply to you.</p>
+                <p className="text-xs text-dim">{t.privacy}</p>
               </div>
 
               <div aria-live="polite" role="status" className="mt-6 empty:hidden">
                 <AnimatePresence mode="wait">
                   {status.kind === 'sent' && (
                     <Notice key="sent" tone="ok">
-                      Thank you — your message has been sent. I’ll get back to you soon.
+                      {t.sent}
                     </Notice>
                   )}
                   {status.kind === 'mailto' && (
                     <Notice key="mailto" tone="ok">
-                      Your email app should now be open with the message ready — just press send. If nothing opened, write to {contact.email}.
+                      {fill(t.mailto, { email: contact.email })}
                     </Notice>
                   )}
                   {status.kind === 'error' && (

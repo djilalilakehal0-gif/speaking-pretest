@@ -1,12 +1,17 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import Link from 'next/link'
 import { ArrowUpRight, Menu, X } from 'lucide-react'
-import { nav, site, socials } from '@/content/site'
+import { navIds, site, socials } from '@/content/site'
+import { locales, localeMeta, type Dictionary, type Locale } from '@/content/i18n'
 import { SocialIcon } from './ui/SocialIcon'
 import { Logo } from './ui/Logo'
 
-export function Nav() {
+type Props = { lang: Locale; t: Pick<Dictionary, 'nav' | 'ui'> }
+
+export function Nav({ lang, t }: Props) {
+  const nav = navIds.map((id) => ({ id, label: t.nav[id] }))
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState('')
   const [open, setOpen] = useState(false)
@@ -73,8 +78,8 @@ export function Nav() {
           scrolled || open ? 'border-line bg-bg/70 backdrop-blur-xl' : 'border-transparent bg-transparent'
         }`}
       />
-      <nav aria-label="Primary" className="container-x flex h-[var(--header-h)] items-center justify-between gap-6">
-        <a href="#top" className="group flex items-center gap-2.5 rounded-lg" aria-label={`${site.brand} — back to top`}>
+      <nav aria-label={t.ui.primaryNav} className="container-x flex h-[var(--header-h)] items-center justify-between gap-6">
+        <a href="#top" className="group flex items-center gap-2.5 rounded-lg" aria-label={`${site.brand} — ${t.ui.backHome}`}>
           <Logo className="size-8 transition-transform duration-500 group-hover:rotate-[20deg]" />
           <span className="text-[15px] font-semibold tracking-[0.18em]">{site.brand}</span>
         </a>
@@ -101,8 +106,9 @@ export function Nav() {
         </ul>
 
         <div className="flex items-center gap-2">
+          <LangSwitch lang={lang} label={t.ui.language} className="hidden sm:flex" />
           <a href="#contact" className="btn btn-primary hidden !min-h-10 !px-4 text-sm sm:inline-flex">
-            Start a Project <ArrowUpRight className="size-4" aria-hidden />
+            {t.ui.startProject} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden />
           </a>
           <button
             ref={menuBtn}
@@ -110,7 +116,7 @@ export function Nav() {
             className="grid size-11 place-items-center rounded-full border border-line-strong bg-white/[0.03] lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-menu"
-            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-label={open ? t.ui.closeMenu : t.ui.openMenu}
             onClick={() => setOpen((o) => !o)}
           >
             {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
@@ -125,7 +131,7 @@ export function Nav() {
             ref={panel}
             role="dialog"
             aria-modal="true"
-            aria-label="Site menu"
+            aria-label={t.ui.menu}
             className="fixed inset-x-0 bottom-0 top-[calc(var(--header-h)+env(safe-area-inset-top))] z-40 overflow-y-auto bg-bg/95 backdrop-blur-2xl lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -159,8 +165,9 @@ export function Nav() {
                 transition={{ delay: 0.4 }}
               >
                 <a href="#contact" onClick={() => setOpen(false)} className="btn btn-primary w-full">
-                  Start a Project <ArrowUpRight className="size-4" aria-hidden />
+                  {t.ui.startProject} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden />
                 </a>
+                <LangSwitch lang={lang} label={t.ui.language} className="flex w-full [&>a]:flex-1" />
                 <div className="flex gap-3">
                   {socials.map((s) => (
                     <a
@@ -168,7 +175,7 @@ export function Nav() {
                       href={s.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label={s.label}
+                      aria-label={`${s.label} ${t.ui.newTab}`}
                       className="grid size-12 place-items-center rounded-full border border-line-strong"
                     >
                       <SocialIcon k={s.key} />
@@ -181,5 +188,33 @@ export function Nav() {
         )}
       </AnimatePresence>
     </header>
+  )
+}
+
+/** EN / FR / ع segmented switch. Links point to the same page in another language. */
+function LangSwitch({ lang, label, className = '' }: { lang: Locale; label: string; className?: string }) {
+  return (
+    <div role="group" aria-label={label} className={`items-center gap-0.5 rounded-full border border-line-strong bg-white/[0.03] p-1 ${className}`}>
+      {locales.map((l) => {
+        const m = localeMeta[l]
+        const active = l === lang
+        return (
+          <Link
+            key={l}
+            href={m.path}
+            hrefLang={l}
+            lang={l}
+            aria-current={active ? 'page' : undefined}
+            aria-label={m.label}
+            title={m.label}
+            className={`grid h-8 min-w-9 place-items-center rounded-full px-2.5 text-xs font-medium transition-colors ${
+              active ? 'bg-white text-bg' : 'text-muted hover:bg-white/[0.08] hover:text-ink'
+            }`}
+          >
+            {m.short}
+          </Link>
+        )
+      })}
+    </div>
   )
 }

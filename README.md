@@ -151,5 +151,6 @@ const CODE_SECRET='alfikr-almodi-speaking-pretest';
 ## الموقع الشخصي (Portfolio)
 
 - الرابط: `https://djilalilakehal0-gif.github.io/speaking-pretest/portfolio/`
-- المجلد `portfolio/` (Next.js). كل النصوص والروابط والمشاريع في الملف `portfolio/src/content/site.ts`.
+- بثلاث لغات: الإنجليزية `/portfolio/`، والفرنسية `/portfolio/fr/`، والعربية `/portfolio/ar/` (من اليمين إلى اليسار).
+- النصوص في `portfolio/src/content/locales/` (ملف لكل لغة)، والروابط والمشاريع ورقم الهاتف في `portfolio/src/content/site.ts`.
 - لتفعيل نموذج التواصل: أضف المتغيّر `PORTFOLIO_CONTACT_ENDPOINT` في Settings → Secrets and variables → Actions → Variables (مثلاً رابط Formspree). التفاصيل في `portfolio/README.md`.

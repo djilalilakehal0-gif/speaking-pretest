@@ -1,40 +1,42 @@
 import { Database, Layout, Server, Wrench } from 'lucide-react'
-import { stack } from '@/content/site'
+import { stack, type StackKey } from '@/content/site'
+import type { Dictionary } from '@/content/i18n'
 import { BrandIcon, brandColor } from '../ui/BrandIcon'
 import { Reveal } from '../ui/Reveal'
 import { SectionHeading } from '../ui/SectionHeading'
 
-const CAT_ICON = { Frontend: Layout, Backend: Server, Databases: Database, Tools: Wrench } as Record<string, typeof Layout>
+const CAT_ICON: Record<StackKey, typeof Layout> = { frontend: Layout, backend: Server, databases: Database, tools: Wrench }
 const SPAN = ['lg:col-span-7', 'lg:col-span-5', 'lg:col-span-5', 'lg:col-span-7']
 
-export function Stack() {
+export function Stack({ t }: { t: Dictionary['stack'] }) {
   return (
     <section id="stack" aria-labelledby="stack-title" className="section">
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-1/3 -z-10 h-[60%] bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgb(79_124_255/0.08),transparent)]" />
       <div className="container-x">
         <SectionHeading
           id="stack-title"
-          eyebrow="Tech Stack"
+          eyebrow={t.eyebrow}
           title={
             <>
-              Tools I use to <span className="text-gradient animate-gradient">ship with confidence.</span>
+              {t.titleLead} <span className="text-gradient animate-gradient">{t.titleHighlight}</span>
             </>
           }
-          text="A focused, modern toolkit across the whole product — from interface to infrastructure."
+          text={t.text}
         />
 
         <div className="mt-14 grid gap-4 lg:grid-cols-12">
           {stack.map((cat, ci) => {
-            const Icon = CAT_ICON[cat.category] ?? Layout
+            const Icon = CAT_ICON[cat.key]
+            const label = t.categories[cat.key]
             return (
-              <Reveal key={cat.category} delay={0.06 * ci} className={SPAN[ci % SPAN.length]}>
+              <Reveal key={cat.key} delay={0.06 * ci} className={SPAN[ci % SPAN.length]}>
                 <div className="border-beam glass h-full rounded-3xl p-6 sm:p-7">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.2em] text-soft">
-                        <Icon className="size-4 text-blue" aria-hidden /> {cat.category}
+                        <Icon className="size-4 text-blue" aria-hidden /> {label.name}
                       </h3>
-                      <p className="mt-2.5 text-sm text-muted">{cat.blurb}</p>
+                      <p className="mt-2.5 text-sm text-muted">{label.blurb}</p>
                     </div>
                     <span className="font-mono text-xs text-dim">{String(cat.items.length).padStart(2, '0')}</span>
                   </div>
@@ -53,7 +55,7 @@ export function Stack() {
                           <span className="text-muted transition-colors duration-300 group-hover/t:text-[color:var(--c)]">
                             <BrandIcon icon={t.icon} className="size-[18px]" />
                           </span>
-                          {t.name}
+                          <span dir="ltr">{t.name}</span>
                         </span>
                       </li>
                     ))}

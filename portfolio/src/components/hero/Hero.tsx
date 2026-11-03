@@ -3,7 +3,8 @@ import dynamic from 'next/dynamic'
 import { useRef, type ReactNode } from 'react'
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from 'motion/react'
 import { ArrowDown, ArrowUpRight, MapPin } from 'lucide-react'
-import { hero, site } from '@/content/site'
+import { site } from '@/content/site'
+import type { Dictionary } from '@/content/i18n'
 import { asset } from '@/lib/asset'
 import { useFinePointer } from '@/lib/hooks'
 import { Magnetic } from '../ui/Magnetic'
@@ -23,7 +24,10 @@ const PARTICLES = Array.from({ length: 16 }, (_, i) => ({
   dur: 9 + (i % 5) * 2,
 }))
 
-export function Hero() {
+type Props = { t: Pick<Dictionary, 'hero' | 'site' | 'ui'> }
+
+export function Hero({ t }: Props) {
+  const hero = t.hero
   const reduce = useReducedMotion()
   const fine = useFinePointer()
   const mx = useSpring(useMotionValue(0), { stiffness: 60, damping: 18 })
@@ -36,7 +40,7 @@ export function Hero() {
     my.set(e.clientY / window.innerHeight - 0.5)
   }
 
-  const words = hero.headline.join(' ').split(' ')
+  const words = hero.headline.split(' ')
 
   return (
     <section
@@ -77,7 +81,7 @@ export function Hero() {
 
           <h1 id="hero-title" className="mt-7 text-balance text-[clamp(2.6rem,6.2vw,5.3rem)] font-semibold leading-[0.98] tracking-[-0.045em]">
             <span className="sr-only">
-              {hero.headline.join(' ')} {hero.highlight}
+              {hero.headline} {hero.highlight}
             </span>
             <span aria-hidden>
               {words.map((w, i) => (
@@ -89,7 +93,7 @@ export function Hero() {
               ))}
               <span className="inline-block overflow-hidden pb-[0.12em] align-top">
                 <span className="hero-word" style={{ animationDelay: `${0.08 + words.length * 0.06}s` }}>
-                  <span className="text-gradient inline-block animate-gradient pr-[0.06em]">{hero.highlight}</span>
+                  <span className="text-gradient inline-block animate-gradient pe-[0.06em]">{hero.highlight}</span>
                 </span>
               </span>
             </span>
@@ -106,15 +110,15 @@ export function Hero() {
             className="hero-fade mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
           >
             <Magnetic>
-              <a href={hero.primaryCta.href} className="btn btn-primary group w-full sm:w-auto">
-                {hero.primaryCta.label}
+              <a href="#work" className="btn btn-primary group w-full sm:w-auto">
+                {hero.primary}
                 <ArrowDown className="size-4 transition-transform duration-500 group-hover:translate-y-0.5" aria-hidden />
               </a>
             </Magnetic>
             <Magnetic>
-              <a href={hero.secondaryCta.href} className="btn btn-ghost group w-full sm:w-auto">
-                {hero.secondaryCta.label}
-                <ArrowUpRight className="size-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
+              <a href="#contact" className="btn btn-ghost group w-full sm:w-auto">
+                {hero.secondary}
+                <ArrowUpRight className="size-4 rtl:-scale-x-100 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
               </a>
             </Magnetic>
           </div>
@@ -123,13 +127,14 @@ export function Hero() {
             style={{ animationDelay: '0.7s' }}
             className="hero-fade mt-10 flex items-center gap-2 font-mono text-xs text-dim"
           >
-            <MapPin className="size-3.5" aria-hidden /> {site.location}
+            <MapPin className="size-3.5" aria-hidden /> {t.site.location}
           </p>
         </div>
 
         {/* visual composition */}
         <motion.div
           aria-hidden
+          dir="ltr"
           initial={reduce ? false : { opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.4, delay: 0.2, ease: EASE }}
@@ -150,11 +155,11 @@ export function Hero() {
                 className="size-12 rounded-xl object-cover"
                 fetchPriority="high"
               />
-              <div>
+              <div dir="auto">
                 <p className="text-sm font-semibold tracking-tight">{site.name}</p>
-                <p className="text-xs text-muted">{site.role}</p>
+                <p className="text-xs text-muted">{t.site.role}</p>
                 <p className="mt-1 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-[#4ade80]">
-                  <span className="size-1.5 rounded-full bg-[#4ade80]" /> Online
+                  <span className="size-1.5 rounded-full bg-[#4ade80]" /> {t.site.online}
                 </p>
               </div>
             </div>
@@ -212,8 +217,8 @@ export function Hero() {
         <span className="flex h-9 w-[22px] justify-center rounded-full border border-line-strong pt-2">
           <span className="block h-1.5 w-[3px] animate-scroll-dot rounded-full bg-current" />
         </span>
-        <span className="font-mono text-[10px] uppercase tracking-[0.22em]">Scroll</span>
-        <span className="sr-only">to the About section</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.22em]">{t.ui.scroll}</span>
+        <span className="sr-only">{t.ui.scrollTo}</span>
       </a>
     </section>
   )

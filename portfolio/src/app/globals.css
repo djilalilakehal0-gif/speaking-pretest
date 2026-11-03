@@ -286,6 +286,40 @@
   to { --beam-angle: 360deg; }
 }
 
+/* ── Arabic (RTL) ─────────────────────────────────────────────
+   Readex Pro covers Arabic and Latin, so the whole page shares one typeface
+   (code panels inside dir="ltr" keep Geist Mono).
+   Letter-spacing would break Arabic letter joining, so it is removed. */
+html[lang='ar'] {
+  --font-sans: 'Readex Pro Variable', var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Readex Pro Variable', var(--font-geist-mono), ui-monospace, monospace;
+}
+html[lang='ar'] [dir='ltr'] :is(.font-mono, pre, code) {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+html[lang='ar'] body * {
+  letter-spacing: 0 !important;
+}
+html[lang='ar'] h1,
+html[lang='ar'] h2,
+html[lang='ar'] .h-display,
+html[lang='ar'] .h-section {
+  line-height: 1.25 !important;
+}
+html[lang='ar'] .eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+}
+html[dir='rtl'] .eyebrow::before {
+  background: linear-gradient(270deg, var(--color-blue), transparent);
+}
+html[lang='ar'] p,
+html[lang='ar'] li,
+html[lang='ar'] dd,
+html[lang='ar'] dt {
+  line-height: 1.85;
+}
+
 /* Decorative loops stop while the tab is hidden */
 html.is-hidden * {
   animation-play-state: paused !important;
