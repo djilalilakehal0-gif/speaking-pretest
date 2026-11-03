@@ -75,8 +75,9 @@ const fr: Dictionary = {
     eyebrow: 'Projets sélectionnés',
     titleLead: 'Projets',
     titleHighlight: 'à la une.',
-    text: 'Une sélection de produits et de concepts, chacun pensé pour la performance, la clarté et le soin du détail.',
+    text: 'Une sélection de vrais produits que j’ai conçus et développés, chacun pensé pour la performance, la clarté et le soin du détail.',
     count: '{n} projets · {c} concepts',
+    countOnly: '{n} projets',
     concept: 'Concept',
     view: 'Voir le projet',
     discuss: 'Parler d’un projet similaire',
@@ -94,15 +95,15 @@ const fr: Dictionary = {
         description:
           'Une expérience de restaurant haut de gamme : un menu élégant, une identité moderne, des mises en page responsives et des visuels culinaires immersifs.',
       },
-      devspace: {
-        category: 'Tableau de bord SaaS',
+      pretest: {
+        category: 'Application éducative · Android, iOS et Web',
         description:
-          'Un concept de tableau de bord moderne avec visualisation de données, composants interactifs et une interface épurée centrée sur la productivité.',
+          'Un test d’expression orale en anglais utilisable hors ligne, avec un tableau de bord enseignant et une correction automatique grâce à la reconnaissance vocale dans le navigateur.',
       },
-      nexora: {
-        category: 'Plateforme e-commerce',
+      store: {
+        category: 'Page produit',
         description:
-          'Une expérience d’achat en ligne contemporaine : découverte des produits, navigation fluide et fiches produit responsives.',
+          'Une vitrine produit animée sur une seule page, avec des panneaux qui s’ouvrent, des animations GSAP fluides et une mise en page responsive jusqu’aux petits téléphones.',
       },
     },
   },
@@ -178,6 +179,7 @@ const fr: Dictionary = {
       'Je réponds généralement sous deux jours ouvrés. Partagez autant de contexte que vous le souhaitez : objectifs, délais, liens ou références.',
     phone: 'Téléphone',
     whatsapp: 'WhatsApp',
+    waFab: 'Discuter sur WhatsApp',
     sendWhatsapp: 'Envoyer via WhatsApp',
     privacyWhatsapp: 'Votre message s’ouvre dans WhatsApp, rien n’est enregistré sur ce site.',
     whatsappOpened: 'WhatsApp est ouvert avec votre message prêt : il ne reste qu’à l’envoyer.',

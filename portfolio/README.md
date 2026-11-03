@@ -44,7 +44,7 @@ All three files have the same keys, and TypeScript fails the build if one is mis
 - Social share image (1200×630): `public/img/og.jpg`.
 - Project screenshots: put a 1200×750 `name.webp` and a 720×450 `name-sm.webp` in `public/img/projects/`, then set `image: '/img/projects/name.webp'`. Projects without a screenshot show a designed UI preview.
 
-DEVSPACE and NEXORA are example **concepts**. They are labelled "Concept" on the site. Replace them with real work when you can.
+The three featured projects are real, live work: NAPOLITIME, Speaking Pre-Test and the DJILALI store, each with a screenshot of the live site. A project with `concept: true` gets a "Concept" label, and one without `image` shows a branded placeholder.
 
 ## Contact form
 
@@ -82,6 +82,14 @@ To use your own domain later (e.g. `djilali.com`): open the project, go to **Cus
 ### Other hosts
 
 Build with an empty `NEXT_PUBLIC_BASE_PATH`, set `NEXT_PUBLIC_SITE_URL` to the final address and serve `out/`. To serve from a sub-folder, set `NEXT_PUBLIC_BASE_PATH` (e.g. `/portfolio`).
+
+## Floating WhatsApp button
+
+A WhatsApp button (`src/components/WhatsAppButton.tsx`) appears in the bottom corner after the hero and hides while the contact section is on screen. It opens a chat with `contact.whatsapp` and a greeting in the page language. Set `whatsapp: ''` to remove it.
+
+## Analytics
+
+Visits are measured with **Cloudflare Web Analytics**, which is free, cookie-less and needs no consent banner. Enable it in Cloudflare: open project **djilali**, go to **Metrics → Web Analytics → Enable**. Cloudflare then adds its script to every deploy automatically, with no code change.
 
 ## Performance & accessibility notes
 

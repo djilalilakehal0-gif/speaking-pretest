@@ -73,8 +73,9 @@ const en = {
     eyebrow: 'Selected Work',
     titleLead: 'Featured',
     titleHighlight: 'projects.',
-    text: 'A selection of products and concepts — each one built around performance, clarity and craft.',
+    text: 'A selection of real products I designed and built — each one focused on performance, clarity and craft.',
     count: '{n} projects · {c} concepts',
+    countOnly: '{n} projects',
     concept: 'Concept',
     view: 'View Project',
     discuss: 'Discuss a similar project',
@@ -92,15 +93,15 @@ const en = {
         description:
           'A premium restaurant experience featuring an elegant menu, modern branding, responsive layouts, and immersive food visuals.',
       },
-      devspace: {
-        category: 'SaaS Dashboard',
+      pretest: {
+        category: 'Education App · Android, iOS & Web',
         description:
-          'A modern dashboard concept with data visualization, interactive components, and a clean productivity-focused interface.',
+          'An offline English speaking test for students, with a teacher dashboard and automatic correction through in-browser speech recognition.',
       },
-      nexora: {
-        category: 'E-commerce Platform',
+      store: {
+        category: 'Product Landing Page',
         description:
-          'A contemporary online shopping experience featuring product discovery, smooth navigation, and responsive product pages.',
+          'An animated single-page product showcase with expanding panels, smooth GSAP motion and a responsive layout down to small phones.',
       },
     },
   },
@@ -176,6 +177,7 @@ const en = {
       'I usually reply within a couple of working days. Share as much context as you like — goals, timeline, links or references.',
     phone: 'Phone',
     whatsapp: 'WhatsApp',
+    waFab: 'Chat on WhatsApp',
     sendWhatsapp: 'Send via WhatsApp',
     privacyWhatsapp: 'Your message opens in WhatsApp — nothing is stored on this site.',
     whatsappOpened: 'WhatsApp is open with your message ready — just press send.',
