@@ -177,6 +177,12 @@ const fr: Dictionary = {
     directText:
       'Je réponds généralement sous deux jours ouvrés. Partagez autant de contexte que vous le souhaitez : objectifs, délais, liens ou références.',
     phone: 'Téléphone',
+    whatsapp: 'WhatsApp',
+    sendWhatsapp: 'Envoyer via WhatsApp',
+    privacyWhatsapp: 'Votre message s’ouvre dans WhatsApp, rien n’est enregistré sur ce site.',
+    whatsappOpened: 'WhatsApp est ouvert avec votre message prêt : il ne reste qu’à l’envoyer.',
+    whatsappRetry: 'Rien ne s’est ouvert ? Ouvrir WhatsApp',
+    waIntro: 'Bonjour Djilali ! Je vous contacte depuis votre portfolio.',
     email: 'E-mail',
     status: 'Statut',
     location: 'Localisation',
