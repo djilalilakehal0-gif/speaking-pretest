@@ -87,6 +87,12 @@ Build with an empty `NEXT_PUBLIC_BASE_PATH`, set `NEXT_PUBLIC_SITE_URL` to the f
 
 A WhatsApp button (`src/components/WhatsAppButton.tsx`) appears in the bottom corner after the hero and hides while the contact section is on screen. It opens a chat with `contact.whatsapp` and a greeting in the page language. Set `whatsapp: ''` to remove it.
 
+## Google Search
+
+- `public/googledf2598c8ab6f449d.html` is the Google Search Console ownership file. Keep it, or Search Console loses verification.
+- `/sitemap.xml` (`src/app/sitemap.ts`) lists the three language versions with their hreflang alternates. `/robots.txt` (`src/app/robots.ts`) allows crawling and points to the sitemap.
+- In Search Console (property `https://djilali.pages.dev/`), go to **Sitemaps**, submit `sitemap.xml`, then use **URL inspection → Request indexing** for `/`, `/fr/` and `/ar/`.
+
 ## Analytics
 
 Visits are measured with **Cloudflare Web Analytics**, which is free, cookie-less and needs no consent banner. Enable it in Cloudflare: open project **djilali**, go to **Metrics → Web Analytics → Enable**. Cloudflare then adds its script to every deploy automatically, with no code change.
