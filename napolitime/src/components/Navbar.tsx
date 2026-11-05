@@ -1,15 +1,13 @@
 import { AnimatePresence, motion, useAnimationControls, useMotionValueEvent, useScroll } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { Logo } from './Logo'
-import { CartIcon, MenuMorph, PhoneIcon } from './icons/Icons'
-import { site } from '../config/site'
+import { LogoMark } from './Logo'
+import { CartIcon, MenuMorph } from './icons/Icons'
 import { totals, useCart } from '../lib/cart'
 import { euro } from '../lib/format'
 
 export const navLinks = [
-  { id: 'menu', label: 'Menu' },
-  { id: 'visit', label: 'Restaurant' },
-  { id: 'contact', label: 'Contact' },
+  { id: 'menu', label: 'La carte' },
+  { id: 'visit', label: 'Le restaurant' },
 ]
 
 function useActiveSection(ids: string[]) {
@@ -35,7 +33,7 @@ function CartButton() {
   return (
     <button
       type="button" onClick={() => setOpen(true)}
-      className="relative inline-flex h-12 w-12 items-center justify-center rounded-full border border-cream/15 text-cream transition-colors hover:border-gold hover:text-gold"
+      className="relative inline-flex h-12 w-12 items-center justify-center bg-ink-3 text-cream transition-colors hover:bg-white hover:text-ink"
       aria-label={`Ouvrir le panier, ${count} article${count > 1 ? 's' : ''}`}
     >
       <motion.span animate={controls} className="inline-flex"><CartIcon size={22} /></motion.span>
@@ -45,7 +43,7 @@ function CartButton() {
             key={count}
             initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
             transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-            className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-tomato px-1 text-[11px] font-bold text-white"
+            className="absolute -right-1.5 -top-1.5 flex h-6 min-w-6 items-center justify-center bg-tomato px-1 text-sm font-bold text-white"
           >
             {count}
           </motion.span>
@@ -77,25 +75,23 @@ export function Navbar() {
 
   return (
     <>
-      <a href="#main" className="sr-only z-[90] rounded-full bg-gold px-4 py-2 font-semibold text-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Aller au contenu</a>
+      <a href="#main" className="sr-only z-[90] bg-white px-4 py-2 text-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Aller au contenu</a>
       <motion.header
         animate={{ y: hidden ? '-110%' : '0%' }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color] duration-500 ${
-          scrolled || mobileOpen ? 'border-b border-cream/[0.06] bg-ink/80 backdrop-blur-xl' : 'border-b border-transparent'
-        }`}
+        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${scrolled || mobileOpen ? 'bg-ink' : 'bg-transparent'}`}
       >
         <nav className="container-x flex h-[4.5rem] items-center justify-between gap-4" aria-label="Navigation principale">
-          <a href="#top" aria-label="Accueil NAPOLITIME" onClick={() => setMobileOpen(false)}><Logo compact /></a>
+          <a href="#top" aria-label="Accueil NAPOLITIME" onClick={() => setMobileOpen(false)}><LogoMark size={52} /></a>
 
-          <ul className="hidden items-center gap-1 lg:flex">
+          <ul className="ml-auto hidden items-center gap-1 lg:flex">
             {navLinks.map((l) => (
               <li key={l.id} className="relative">
                 <a href={`#${l.id}`} aria-current={active === l.id ? 'true' : undefined}
-                  className={`relative block px-4 py-2 text-base font-semibold transition-colors ${active === l.id ? 'text-cream' : 'text-ash hover:text-cream'}`}>
+                  className={`relative block px-4 py-2 text-[length:var(--step-body)] transition-colors ${active === l.id ? 'text-cream' : 'text-cream/75 hover:text-cream'}`}>
                   {l.label}
                   {active === l.id && (
-                    <motion.span layoutId="nav-indicator" className="absolute inset-x-4 -bottom-0.5 h-[3px] rounded-full bg-tomato" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />
+                    <motion.span layoutId="nav-indicator" className="absolute inset-x-4 -bottom-0.5 h-[3px] bg-white" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />
                   )}
                 </a>
               </li>
@@ -103,11 +99,11 @@ export function Navbar() {
           </ul>
 
           <div className="flex items-center gap-2">
-            <a href={site.contact.phoneHref} className="hidden items-center gap-2 px-3 text-base font-semibold text-cream hover:text-gold md:inline-flex"><PhoneIcon size={18} /> {site.contact.phoneDisplay}</a>
+            
             <CartButton />
             <button
               type="button" onClick={() => setMobileOpen((o) => !o)}
-              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-cream/15 text-cream lg:hidden"
+              className="inline-flex h-12 w-12 items-center justify-center bg-ink-3 text-cream lg:hidden"
               aria-expanded={mobileOpen} aria-controls="mobile-nav" aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             >
               <MenuMorph open={mobileOpen} />
@@ -154,8 +150,8 @@ export function MobileCartBar() {
           initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           className="fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:hidden"
         >
-          <button type="button" onClick={() => setOpen(true)} className="btn btn-primary w-full justify-between !px-6 shadow-2xl">
-            <span>Voir le panier · {t.count}</span>
+          <button type="button" onClick={() => setOpen(true)} className="btn btn-primary w-full justify-between !px-6">
+            <span>Voir le panier ({t.count})</span>
             <span>{euro(t.subtotal)}</span>
           </button>
         </motion.div>

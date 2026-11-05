@@ -13,7 +13,7 @@ export function LogoMark({ size = 40, spin = false, className = '' }: { size?: n
       <img
         src={`${base}img/${size > 120 ? 'logo-512' : 'logo-160'}.webp`}
         alt="" width={size} height={size} decoding="async"
-        className="h-full w-full rounded-full object-contain drop-shadow-[0_6px_18px_rgba(229,9,20,.25)]"
+        className="h-full w-full rounded-full object-contain"
       />
       {spin && !reduced && (
         <motion.svg

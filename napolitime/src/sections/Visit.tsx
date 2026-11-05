@@ -1,151 +1,117 @@
-import { useEffect, useState, type FormEvent } from 'react'
 import { site } from '../config/site'
-import { categories } from '../data/menu'
-import { openStatus } from '../lib/hours'
 import { photo } from '../lib/img'
-import { subscribeNewsletter } from '../lib/order'
-import { Logo } from '../components/Logo'
-import { FacebookIcon, InstagramIcon, MailIcon, PhoneIcon, TiktokIcon } from '../components/icons/Icons'
+import { OpenSign } from './Hero'
+import { InstagramIcon, FacebookIcon, TiktokIcon } from '../components/icons/Icons'
 
 const socialIcon = { instagram: InstagramIcon, tiktok: TiktokIcon, facebook: FacebookIcon } as const
 
-/** The restaurant: storefront, address, phone and opening hours. */
+/** Short form of the week, built from the real hours: "Mardi, mercredi 18:00 – 23:00". */
+function weekLines() {
+  const order = [1, 2, 3, 4, 5, 6, 0]
+  const groups: { days: string[]; hours: string }[] = []
+  for (const d of order) {
+    const h = site.hours.find((x) => x.day === d)!
+    const hours = h.open ? `${h.open} – ${h.close}` : 'fermé'
+    const last = groups[groups.length - 1]
+    if (last && last.hours === hours) last.days.push(h.label.toLowerCase())
+    else groups.push({ days: [h.label.toLowerCase()], hours })
+  }
+  return groups.map((g) => {
+    const days = g.days.length > 2 ? `${g.days[0]} au ${g.days[g.days.length - 1]}` : g.days.join(' et ')
+    return `${days.charAt(0).toUpperCase()}${days.slice(1)} : ${g.hours}`
+  })
+}
+
+/**
+ * The restaurant — a full-width picture of the shop, then "Address in display rows":
+ * every row at the same display size, told apart by two flat tones.
+ */
+/** The address in site.ts is still an example until the owner fills it in. */
+const addressKnown = !site.contact.street.startsWith('Adresse')
+
 export function Visit() {
-  const [status, setStatus] = useState(() => openStatus())
-  useEffect(() => {
-    const t = setInterval(() => setStatus(openStatus()), 60_000)
-    return () => clearInterval(t)
-  }, [])
   const store = photo('storefront')
-
+  const row = 'flex min-h-[5.25rem] items-end px-[var(--margin)] pb-3 sm:min-h-[9.5rem] sm:pb-5'
+  const big = 'display text-[length:var(--step-head)] !leading-[0.9]'
   return (
-    <section id="visit" className="border-t border-white/[0.08] bg-ink py-20 sm:py-28" aria-labelledby="visit-title">
-      <div className="container-x grid items-start gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
-        <img
-          src={store.src} srcSet={store.srcSet} sizes="(min-width:1024px) 52vw, 92vw" loading="lazy"
-          alt="La devanture de NAPOLITIME le soir : enseigne lumineuse, porte ouverte et comptoir"
-          className="w-full rounded-2xl"
-        />
+    <section id="visit" className="mt-32 sm:mt-48" aria-labelledby="visit-title">
+      <div className="container-x">
+        <div className="overflow-hidden" data-reveal>
+          <img src={store.src} srcSet={store.srcSet} sizes="(min-width:1440px) 1376px, 100vw" loading="lazy" width={1151} height={1220}
+            alt="La devanture de NAPOLITIME le soir : enseigne lumineuse, porte ouverte et comptoir"
+            className="drift aspect-[4/5] w-full object-cover object-top sm:aspect-[21/9] sm:object-[50%_22%]" />
+        </div>
+      </div>
 
-        <div id="contact">
-          <h2 id="visit-title" className="display text-[clamp(3rem,7vw,5.5rem)]">Le restaurant</h2>
-          <p className="mt-5 text-xl">{site.contact.street}<br /><span className="text-ash">{site.contact.city}</span></p>
-
-          <a href={site.contact.phoneHref} className="mt-8 flex items-center gap-4 rounded-xl bg-tomato px-5 py-4 text-white transition-colors hover:bg-[#ff1a26]">
-            <PhoneIcon size={26} />
-            <span>
-              <span className="block text-sm text-white/80">Commander par téléphone</span>
-              <span className="display block text-4xl">{site.contact.phoneDisplay}</span>
-            </span>
-          </a>
-
-          <div className="mt-10">
-            <div className="flex items-baseline justify-between gap-4">
-              <h3 className="text-xl font-semibold">Horaires</h3>
-              <p className="flex items-center gap-2 text-sm text-ash" role="status">
-                <span className={`h-2 w-2 rounded-full ${status.open ? 'bg-[#3ddc84]' : 'bg-tomato'}`} aria-hidden />
-                {status.open ? 'Ouvert' : 'Fermé'}, {status.label.charAt(0).toLowerCase() + status.label.slice(1)}
-              </p>
-            </div>
-            <table className="mt-3 w-full text-base">
-              <caption className="sr-only">Horaires d'ouverture</caption>
-              <tbody>
-                {[1, 2, 3, 4, 5, 6, 0].map((d) => {
-                  const h = site.hours.find((x) => x.day === d)!
-                  const today = d === status.today
-                  return (
-                    <tr key={d} className={`border-b border-white/[0.07] ${today ? 'font-semibold text-white' : 'text-ash'}`} aria-current={today ? 'date' : undefined}>
-                      <th scope="row" className="py-2.5 text-left font-[inherit]">{h.label}{today && <span className="sr-only"> (aujourd'hui)</span>}</th>
-                      <td className="py-2.5 text-right tabular-nums">{h.open ? `${h.open} – ${h.close}` : 'Fermé'}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href={site.contact.mapUrl} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">Itinéraire</a>
-            <a href={`mailto:${site.contact.email}`} className="btn btn-ghost"><MailIcon size={18} /> Écrire</a>
-          </div>
+      <div id="contact" className="mx-auto mt-16 max-w-[1440px]">
+        <div className={`${row} bg-ink`}>
+          <h2 id="visit-title" className={big} data-reveal>Venir chez Napolitime</h2>
+        </div>
+        <a href={site.contact.phoneHref} className={`${row} bg-ink-2 transition-colors hover:bg-tomato`}>
+          <span className={big}>{site.contact.phoneDisplay}</span>
+        </a>
+        <a href={site.contact.mapUrl} target="_blank" rel="noopener noreferrer" className={`${row} bg-ink transition-colors hover:bg-ink-3`}>
+          <span className={big}>{addressKnown ? `${site.contact.street}, ${site.contact.city}` : 'Itinéraire'}</span>
+        </a>
+        <div className={`${row} flex-col !items-start justify-end gap-3 bg-ink-2 !pb-14 sm:flex-row sm:!items-end sm:justify-between sm:!pb-5`}>
+          <OpenSign big />
+          <ul className="text-[length:var(--step-body)] sm:text-right">
+            {weekLines().map((l) => <li key={l}>{l}</li>)}
+          </ul>
+        </div>
+        <div className={`${row} bg-tomato sm:bg-ink`}>
+          <p className={`${big} flex items-center gap-6`}>
+            Une faim ?
+            <a href={site.contact.phoneHref} aria-label={`Appeler NAPOLITIME au ${site.contact.phoneDisplay}`}
+              className="inline-flex h-[0.9em] w-[0.9em] items-center justify-center bg-white text-ink transition-transform hover:scale-110 active:scale-95">
+              <svg viewBox="0 0 24 24" className="h-1/2 w-1/2" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden><path d="M5 12h13M13 6l6 6-6 6" /></svg>
+            </a>
+          </p>
         </div>
       </div>
     </section>
   )
 }
 
+/** Footer — "Invitation over a cropped name", in the inverse colours. */
 export function Footer() {
-  const [email, setEmail] = useState('')
-  const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
-  const [msg, setMsg] = useState('')
-  const configured = !!site.integrations.newsletterEndpoint
-
-  const submit = async (e: FormEvent) => {
-    e.preventDefault()
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) { setState('error'); setMsg('Cette adresse e-mail est incomplète.'); return }
-    if (!configured) {
-      window.location.href = `mailto:${site.contact.email}?subject=${encodeURIComponent('Inscription aux offres')}&body=${encodeURIComponent(`Merci d'ajouter ${email.trim()} aux offres NAPOLITIME.`)}`
-      setState('idle'); setMsg('Votre messagerie s’est ouverte avec la demande : envoyez-la pour vous inscrire.')
-      return
-    }
-    setState('sending')
-    const r = await subscribeNewsletter(email)
-    if (r.ok) { setState('done'); setMsg('Inscription enregistrée. Vérifiez votre boîte mail.'); setEmail('') }
-    else { setState('error'); setMsg(r.error ?? 'L’inscription n’a pas abouti. Réessayez.') }
-  }
-
   return (
-    <footer className="border-t border-white/[0.08] bg-ink-2" aria-labelledby="footer-title">
-      <h2 id="footer-title" className="sr-only">Informations NAPOLITIME</h2>
-      <div className="container-x grid gap-12 py-14 md:grid-cols-[1.3fr_1fr_1fr]">
-        <div>
-          <Logo />
-          <p className="mt-4 max-w-xs text-ash">Qualité, goût et convivialité, de midi à tard le soir.</p>
-          <ul className="mt-6 flex gap-2">
-            {site.socials.map((s) => {
-              const Icon = socialIcon[s.id as keyof typeof socialIcon]
-              return (
-                <li key={s.id}>
-                  <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`${site.name} sur ${s.label} (nouvel onglet)`}
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white transition-colors hover:border-tomato hover:bg-tomato">
-                    <Icon size={20} />
-                  </a>
-                </li>
-              )
-            })}
-          </ul>
+    <footer className="relative mt-32 overflow-hidden bg-white text-ink sm:mt-48" aria-labelledby="footer-title">
+      <div className="container-x grid gap-10 pt-16 sm:pt-24 lg:grid-cols-12">
+        <div className="lg:col-span-7" data-reveal>
+          <h2 id="footer-title" className="display max-w-[12ch] text-[length:var(--step-head)] !leading-[0.9]">Ce soir, on vous attend</h2>
+          <a href={site.contact.phoneHref} className="btn mt-8 w-full bg-ink text-white hover:bg-tomato sm:w-auto">Appeler le {site.contact.phoneDisplay}</a>
         </div>
-
-        <nav aria-label="Le menu">
-          <h3 className="font-semibold">Le menu</h3>
-          <ul className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 text-ash md:grid-cols-1">
-            {categories.map((c) => <li key={c.id}><a href={`#cat-${c.id}`} className="hover:text-white">{c.label}</a></li>)}
-          </ul>
-        </nav>
-
-        <div>
-          <h3 className="font-semibold">Offres par e-mail</h3>
-          <p className="mt-1 text-sm text-ash">Nouveautés et promotions, un e-mail par mois au plus.</p>
-          <form onSubmit={submit} noValidate className="mt-4 flex flex-col gap-2">
-            <label htmlFor="nl-email" className="sr-only">Adresse e-mail</label>
-            <input id="nl-email" type="email" inputMode="email" autoComplete="email" maxLength={120} required
-              value={email} onChange={(e) => { setEmail(e.target.value); if (state === 'error') setState('idle') }}
-              placeholder="vous@exemple.fr" className="input" aria-invalid={state === 'error' || undefined} aria-describedby="nl-msg" />
-            <button type="submit" disabled={state === 'sending'} className="btn btn-primary">{state === 'sending' ? 'Inscription…' : "M'inscrire"}</button>
-          </form>
-          <p id="nl-msg" role="status" className={`mt-2 min-h-5 text-sm ${state === 'error' ? 'text-gold' : 'text-ash'}`}>{msg}</p>
-        </div>
+        <ul className="flex flex-wrap gap-x-6 gap-y-2 text-[length:var(--step-body)] lg:col-span-3 lg:col-start-10 lg:flex-col" data-reveal>
+          {site.socials.map((s) => {
+            const Icon = socialIcon[s.id as keyof typeof socialIcon]
+            return (
+              <li key={s.id}>
+                <a href={s.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 underline-offset-4 hover:underline">
+                  <Icon size={18} /> {s.label}
+                </a>
+              </li>
+            )
+          })}
+          <li><a href={`mailto:${site.contact.email}`} className="underline-offset-4 hover:underline">{site.contact.email}</a></li>
+        </ul>
       </div>
 
-      <div className="container-x flex flex-col justify-between gap-2 border-t border-white/[0.08] py-6 text-sm text-ash sm:flex-row">
-        <p>© {new Date().getFullYear()} {site.name}</p>
-        <p>Prix TTC. Photos non contractuelles.</p>
+      <div className="container-x mt-20 flex flex-col justify-between gap-1 text-[length:var(--step-small)] sm:flex-row">
+        <p>© {new Date().getFullYear()} {site.name}. Prix TTC, photos non contractuelles.</p>
+        <p>
+          Photo du burger : Unsplash. Vidéo : <a className="underline" href="https://commons.wikimedia.org/wiki/File:Adanada_%C5%9Ei%C5%9F_Kebap.webm">« Adanada Şiş Kebap »</a> par Basak,{' '}
+          <a className="underline" href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>, via Wikimedia Commons.
+        </p>
       </div>
       {site.isDemo && (
-        <p className="bg-white px-4 py-2 text-center text-sm font-semibold text-ink">
-          À compléter : l’adresse, l’e-mail, les réseaux sociaux et les horaires sont des exemples (src/config/site.ts).
+        <p className="container-x mt-1 max-w-[70ch] text-[length:var(--step-small)] font-medium text-tomato-deep">
+          À compléter avant le lancement : l’adresse, l’e-mail, les réseaux sociaux et les horaires sont des exemples.
         </p>
       )}
+      <p aria-hidden className="monument-foot display -mb-[0.06em] mt-4 translate-y-[22%] whitespace-nowrap px-[var(--margin)] text-[21.4vw] !leading-[0.8]">
+        Napolitime
+      </p>
     </footer>
   )
 }

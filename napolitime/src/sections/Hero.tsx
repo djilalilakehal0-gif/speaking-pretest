@@ -1,57 +1,66 @@
 import { useEffect, useState } from 'react'
-import { PhoneIcon } from '../components/icons/Icons'
-import { openStatus } from '../lib/hours'
+import { openStatus, type OpenStatus } from '../lib/hours'
 import { photo } from '../lib/img'
 import { site } from '../config/site'
 
 /**
- * The poster: the slogan set as huge sign lettering, and the burger in a red neon
- * light box — the backlit menu panels above the counter. The page's one orchestrated
- * moment is here (lines rise, the tube flickers on, the burger lights up), in CSS so
- * it paints before JavaScript and is skipped for reduced motion.
+ * Hero — "Name across the middle". The shop's lit fascia is the name on a black band, so the
+ * page sets NAPOLITIME across the whole width; the burger photograph stands in for its first O.
+ * Corners: the slogan and the one action (top left), the live open sign (bottom left, the
+ * page's live thing) and the phone (bottom right).
  */
 export function Hero() {
   const burger = photo('hero-burger')
-  const [status, setStatus] = useState<ReturnType<typeof openStatus> | null>(null)
-  useEffect(() => setStatus(openStatus()), [])
-
+  const store = photo('storefront')
   return (
-    <section id="top" className="relative isolate overflow-hidden pb-16 pt-[5.5rem] sm:pb-24 lg:pt-28" aria-labelledby="hero-title">
-      <div className="container-x relative">
-        <h1 id="hero-title" className="display hero-type relative z-0 text-[clamp(4.4rem,16vw,13rem)] text-cream lg:text-[min(13.6vw,12.5rem)]">
-          <span className="block">The taste <span className="lg:inline hidden">of</span></span>
-          <span className="block"><span className="lg:hidden">of </span>excellence</span>
-        </h1>
-
-        <div className="relative lg:grid lg:grid-cols-[1fr_minmax(0,32rem)] lg:gap-12">
-          <figure className="relative z-10 mx-auto mt-8 aspect-square w-[min(88vw,28rem)] lg:order-2 lg:-mt-[1.6vw] lg:w-full">
-            <div className="neon neon-on absolute inset-0 rounded-[1.25rem] bg-ink" aria-hidden />
-            <img
-              src={burger.src} srcSet={burger.srcSet} sizes="(min-width:1024px) 32rem, 88vw"
-              alt="Cheeseburger NAPOLITIME : pain brioché, steak et cheddar fondant"
-              fetchPriority="high" decoding="async"
-              className="hero-burger relative h-full w-full rounded-[1.25rem] object-cover [mask-image:radial-gradient(closest-side,#000_70%,transparent_100%)]"
-            />
-            <img src={`${import.meta.env.BASE_URL}img/logo-160.webp`} alt="" width={96} height={96} className="hero-badge absolute -bottom-6 -left-6 h-20 w-20 rounded-full sm:h-24 sm:w-24" aria-hidden />
-          </figure>
-
-        <div className="hero-copy relative z-10 mt-14 max-w-xl lg:order-1 lg:mt-10">
-          <p className="text-xl leading-relaxed text-cream/85">
-            Burgers, sandwichs, tacos et tex-mex préparés à la commande, sur place, à emporter ou en livraison.
+    <section id="top" className="relative flex flex-col pt-[4.75rem] lg:min-h-[100svh]" aria-labelledby="hero-title">
+      <div className="container-x load-2 pt-6">
+        <div className="max-w-[26rem]">
+          <p className="text-[length:var(--step-lead)] leading-snug">
+            The taste of excellence. Burgers, sandwichs, tacos et tex-mex, sur place, à emporter ou livrés.
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a href="#menu" className="btn btn-primary">Voir le menu</a>
-            <a href={site.contact.phoneHref} className="btn btn-ghost"><PhoneIcon size={18} /> Appeler le {site.contact.phoneDisplay}</a>
-          </div>
-          {status && (
-            <p className="mt-6 flex items-center gap-2.5 text-base text-ash" role="status">
-              <span className={`h-2.5 w-2.5 rounded-full ${status.open ? 'bg-[#3ddc84] shadow-[0_0_10px_#3ddc84]' : 'bg-tomato'}`} aria-hidden />
-              {status.open ? status.label : `Fermé pour le moment. ${status.label}.`}
-            </p>
-          )}
-        </div>
+          <a href="#menu" className="btn btn-primary mt-5 w-full sm:w-auto">Voir la carte</a>
         </div>
       </div>
+
+      <h1 id="hero-title" aria-label="NAPOLITIME" className="monument load-1 display my-10 flex items-baseline justify-center whitespace-nowrap px-[var(--margin)] text-[clamp(4.1rem,21.4vw,20rem)] !leading-[0.8] lg:my-auto">
+        <span aria-hidden>NAP</span>
+        <span aria-hidden className="relative mx-[0.03em] inline-block h-[0.7em] w-[0.62em] overflow-hidden bg-black">
+          <img src={burger.src} srcSet={burger.srcSet} sizes="20vw" alt="" fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full scale-[1.45] object-cover" />
+        </span>
+        <span aria-hidden>LITIME</span>
+      </h1>
+
+      <div className="container-x load-3 flex flex-col gap-4 pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <OpenSign />
+        <a href={site.contact.phoneHref} className="text-[length:var(--step-lead)] underline decoration-2 underline-offset-4 hover:text-tomato">
+          Appeler le {site.contact.phoneDisplay}
+        </a>
+      </div>
+
+      {/* Phone: the lower half shows the shop itself, cropped by the screen's edge. */}
+      <img src={store.src} srcSet={store.srcSet} sizes="100vw" alt="La devanture lumineuse de NAPOLITIME le soir" loading="lazy"
+        className="mt-4 aspect-[4/5] w-full object-cover object-top sm:hidden" />
     </section>
+  )
+}
+
+/** The window's LED "OPEN" sign, made live: lit while open, with the time it closes or opens. */
+export function OpenSign({ big = false }: { big?: boolean }) {
+  const [s, setS] = useState<OpenStatus | null>(null)
+  useEffect(() => {
+    setS(openStatus())
+    const t = setInterval(() => setS(openStatus()), 30_000)
+    return () => clearInterval(t)
+  }, [])
+  if (!s) return <p className="text-[length:var(--step-lead)] text-ash">Horaires plus bas</p>
+  return (
+    <p className={`flex items-center gap-3 ${big ? 'display text-[length:var(--step-head)]' : 'text-[length:var(--step-lead)]'}`} role="status">
+      <svg aria-hidden viewBox="0 0 64 26" className={`shrink-0 ${s.open ? 'sign-on' : 'opacity-35'} ${big ? 'h-[0.6em]' : 'h-[1.1em]'}`}>
+        <rect width="64" height="26" fill="#E50914" />
+        <text x="32" y="21" textAnchor="middle" fill="#fff" fontFamily="Bebas Neue, sans-serif" fontSize="22" letterSpacing="1">OPEN</text>
+      </svg>
+      <span>{s.open ? s.label : `Fermé. ${s.label}`}</span>
+    </p>
   )
 }

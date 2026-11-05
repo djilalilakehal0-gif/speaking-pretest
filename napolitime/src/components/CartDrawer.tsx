@@ -58,23 +58,23 @@ function Drawer({ onClose }: { onClose: () => void }) {
 
   return (
     <motion.div className="fixed inset-0 z-[70]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { delay: 0.2 } }}>
-      <button type="button" aria-label="Fermer le panier" tabIndex={-1} onClick={onClose} className="absolute inset-0 bg-ink/70 backdrop-blur-sm" />
+      <button type="button" aria-label="Fermer le panier" tabIndex={-1} onClick={onClose} className="absolute inset-0 bg-black/80" />
       <motion.aside
         ref={ref} role="dialog" aria-modal="true" aria-labelledby="cart-title"
         initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
         transition={{ duration: 0.6, ease }}
-        className="absolute inset-y-0 right-0 flex w-full max-w-[30rem] flex-col bg-ink-2 shadow-[-30px_0_80px_-20px_rgba(0,0,0,.8)]"
+        className="absolute inset-y-0 right-0 flex w-full max-w-[30rem] flex-col bg-ink-2"
       >
-        <header className="flex items-center justify-between border-b border-cream/[0.07] px-5 py-4 sm:px-7">
+        <header className="flex items-center justify-between bg-ink-3 px-5 py-4 sm:px-7">
           <div className="flex items-center gap-3">
             {step === 'details' && (
-              <button type="button" onClick={() => setStep('cart')} aria-label="Retour au panier" className="inline-flex h-10 w-10 rotate-180 items-center justify-center rounded-full border border-cream/15 hover:border-gold">
+              <button type="button" onClick={() => setStep('cart')} aria-label="Retour au panier" className="inline-flex h-10 w-10 rotate-180 items-center justify-center border border-cream/15 hover:border-gold">
                 <ArrowIcon />
               </button>
             )}
             <h2 id="cart-title" className="display text-3xl">{title}</h2>
           </div>
-          <button type="button" onClick={onClose} aria-label="Fermer le panier" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-cream/15 hover:border-gold hover:text-gold">
+          <button type="button" onClick={onClose} aria-label="Fermer le panier" className="inline-flex h-11 w-11 items-center justify-center border border-cream/15 hover:border-gold hover:text-gold">
             <CloseIcon />
           </button>
         </header>
@@ -104,7 +104,7 @@ function Drawer({ onClose }: { onClose: () => void }) {
         </div>
 
         {(step === 'cart' || step === 'details' || step === 'failed') && lines.length > 0 && (
-          <footer className="border-t border-cream/[0.07] bg-ink-2 px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 sm:px-7">
+          <footer className="bg-ink-3 px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 sm:px-7">
             {step === 'cart' && <FulfilmentToggle value={fulfilment} onChange={setFulfilment} />}
             <dl className="mt-4 space-y-1.5 text-sm">
               <Row label="Sous-total" value={euro(t.subtotal)} />
@@ -152,13 +152,13 @@ function FulfilmentToggle({ value, onChange }: { value: Fulfilment; onChange: (f
     { id: 'pickup' as const, label: 'À emporter', sub: `${site.ordering.estimatedPickupMinutes} min`, Icon: BagIcon },
   ]
   return (
-    <div role="radiogroup" aria-label="Livraison ou à emporter" className="grid grid-cols-2 gap-1 rounded-2xl bg-ink p-1">
+    <div role="radiogroup" aria-label="Livraison ou à emporter" className="grid grid-cols-2 gap-1 bg-ink p-1">
       {opts.map((o) => (
         <button
           key={o.id} type="button" role="radio" aria-checked={value === o.id} onClick={() => onChange(o.id)}
-          className={`relative flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition-colors ${value === o.id ? 'text-ink' : 'text-cream/60 hover:text-cream'}`}
+          className={`relative flex items-center justify-center gap-2 px-3 py-3 text-sm font-semibold transition-colors ${value === o.id ? 'text-ink' : 'text-cream/60 hover:text-cream'}`}
         >
-          {value === o.id && <motion.span layoutId="fulfil-pill" className="absolute inset-0 rounded-xl bg-cream" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />}
+          {value === o.id && <motion.span layoutId="fulfil-pill" className="absolute inset-0 bg-cream" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />}
           <span className="relative flex items-center gap-2"><o.Icon size={20} live={value === o.id} /> {o.label}<span className="text-xs font-normal opacity-60">{o.sub}</span></span>
         </button>
       ))}
@@ -189,17 +189,17 @@ function CartLines() {
               exit={{ opacity: 0, x: 60, height: 0, transition: { duration: 0.3 } }}
               className="overflow-hidden"
             >
-              <div className="flex gap-4 rounded-2xl bg-ink/60 p-3">
-                {item.image ? <img src={menuImage(item.image)} alt="" loading="lazy" className="h-20 w-20 shrink-0 rounded-xl bg-black object-contain p-1" /> : <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-black"><LogoMark size={44} /></span>}
+              <div className="flex gap-4 bg-ink/60 p-3">
+                {item.image ? <img src={menuImage(item.image)} alt="" loading="lazy" className="h-20 w-20 shrink-0 bg-black object-contain p-1" /> : <span className="flex h-20 w-20 shrink-0 items-center justify-center bg-black"><LogoMark size={44} /></span>}
                 <div className="flex min-w-0 flex-1 flex-col">
                   <div className="flex items-start justify-between gap-2">
                     <p className="font-semibold leading-tight">{item.name}{item.option && <span className="block text-xs font-normal text-cream/55">{item.option}</span>}</p>
-                    <button type="button" onClick={() => remove(l.id)} aria-label={`Retirer ${item.name}`} className="-mr-1 -mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-cream/40 hover:text-tomato">
+                    <button type="button" onClick={() => remove(l.id)} aria-label={`Retirer ${item.name}`} className="-mr-1 -mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center text-cream/40 hover:text-tomato">
                       <TrashIcon />
                     </button>
                   </div>
                   <div className="mt-auto flex items-center justify-between">
-                    <div className="flex items-center rounded-full border border-cream/12" role="group" aria-label={`Quantité : ${item.name}`}>
+                    <div className="flex items-center border border-cream/12" role="group" aria-label={`Quantité : ${item.name}`}>
                       <button type="button" onClick={() => setQty(l.id, l.qty - 1)} aria-label={`Un ${item.name} de moins`} className="flex h-10 w-10 items-center justify-center hover:text-gold"><MinusIcon size={16} /></button>
                       <motion.span key={l.qty} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-6 text-center text-sm font-bold tabular-nums">{l.qty}</motion.span>
                       <button type="button" onClick={() => setQty(l.id, l.qty + 1)} aria-label={`Un ${item.name} de plus`} className="flex h-10 w-10 items-center justify-center hover:text-gold"><PlusIcon size={16} /></button>
@@ -277,7 +277,7 @@ function Status({ title, text, tone, spinner, icon }: { title: string; text: str
     <div className="flex flex-col items-center py-14 text-center" role={tone === 'error' ? 'alert' : 'status'}>
       {spinner && <span className="h-12 w-12 animate-spin rounded-full border-2 border-cream/15 border-t-gold" aria-hidden />}
       {icon && <span className="text-gold">{icon}</span>}
-      {tone === 'error' && <span className="flex h-14 w-14 items-center justify-center rounded-full bg-tomato/15 text-2xl text-tomato" aria-hidden>!</span>}
+      {tone === 'error' && <span className="flex h-14 w-14 items-center justify-center bg-tomato/15 text-2xl text-tomato" aria-hidden>!</span>}
       <p className="display mt-6 text-3xl">{title}</p>
       <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/65">{text}</p>
       {tone === 'error' && <p className="mt-4 text-sm text-cream/65">Réessayez ci-dessous ou appelez-nous au <a className="text-gold underline" href={site.contact.phoneHref}>{site.contact.phoneDisplay}</a>.</p>}
@@ -294,15 +294,15 @@ function Handoff({ summary }: { summary: string }) {
   }
   return (
     <div>
-      <div className="rounded-2xl border border-gold/40 bg-gold/[0.07] p-4 text-sm leading-relaxed text-cream/85" role="note">
+      <div className=" border border-gold/40 bg-gold/[0.07] p-4 text-sm leading-relaxed text-cream/85" role="note">
         <strong className="text-gold">La commande en ligne n’est pas encore connectée.</strong> Votre commande n’est <em>pas</em> passée.
         Envoyez-la au restaurant ci-dessous : elle n’est confirmée que lorsque l’équipe vous répond ou vous rappelle.
       </div>
-      <pre className="mt-5 max-h-64 overflow-auto whitespace-pre-wrap rounded-2xl bg-ink p-4 font-sans text-xs leading-relaxed text-cream/75">{summary}</pre>
+      <pre className="mt-5 max-h-64 overflow-auto whitespace-pre-wrap bg-ink p-4 font-sans text-xs leading-relaxed text-cream/75">{summary}</pre>
       <div className="mt-5 grid gap-3">
         <a href={site.contact.phoneHref} className="btn btn-primary w-full"><PhoneIcon size={18} /> Appeler le {site.contact.phoneDisplay}</a>
         <a href={mailto} className="btn btn-ghost w-full"><MailIcon size={18} /> Envoyer par e-mail</a>
-        <button type="button" onClick={copy} className="btn btn-ghost w-full" aria-live="polite">{copied ? 'Copié ✓' : 'Copier la commande'}</button>
+        <button type="button" onClick={copy} className="btn btn-ghost w-full" aria-live="polite">{copied ? <>Copié <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12.5 10 17.5 19 7" /></svg></> : 'Copier la commande'}</button>
       </div>
     </div>
   )

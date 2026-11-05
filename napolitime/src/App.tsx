@@ -5,6 +5,7 @@ import { CartDrawer } from './components/CartDrawer'
 import { AddedToast } from './components/AddedToast'
 import { Hero } from './sections/Hero'
 import { Menu } from './sections/Menu'
+import { Favourites } from './sections/Favourites'
 import { Visit, Footer } from './sections/Visit'
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
         <Navbar />
         <main id="main">
           <Hero />
+          <Favourites />
           <Menu />
           <Visit />
         </main>
