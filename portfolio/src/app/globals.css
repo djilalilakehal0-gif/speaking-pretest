@@ -285,6 +285,23 @@
 }
 .desk-in { animation: desk-in 1.2s 0.25s var(--ease-out-expo) both; }
 
+/* Phones/tablets: the hero icon rows slide with the page scroll using a CSS scroll-driven
+   animation (runs off the main thread). Uses `translate` so it adds to Motion's `transform`.
+   Browsers without scroll timelines simply show the rows still. */
+@keyframes tech-slide {
+  from { translate: 0 0; }
+  to { translate: -30% 0; }
+}
+@supports (animation-timeline: view()) {
+  @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+    .tech-row {
+      animation: tech-slide linear both;
+      animation-timeline: view();
+    }
+    .tech-row[data-reverse] { animation-direction: reverse; }
+  }
+}
+
 @property --beam-angle {
   syntax: '<angle>';
   initial-value: 0deg;
