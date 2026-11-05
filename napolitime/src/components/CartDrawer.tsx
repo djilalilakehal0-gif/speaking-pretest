@@ -3,7 +3,8 @@ import { useEffect, useId, useState, type ReactNode } from 'react'
 import { site } from '../config/site'
 import { catalog, totals, useCart, type Fulfilment } from '../lib/cart'
 import { euro } from '../lib/format'
-import { photo } from '../lib/img'
+import { menuImage } from './ProductCard'
+import { LogoMark } from './Logo'
 import { orderSummaryText, sanitize, submitOrder, validate, type Customer, type Errors } from '../lib/order'
 import { useDialog } from '../lib/useDialog'
 import { ArrowIcon, BagIcon, CartIcon, CloseIcon, MailIcon, MinusIcon, PhoneIcon, PlusIcon, ScooterIcon, TrashIcon } from './icons/Icons'
@@ -53,11 +54,11 @@ function Drawer({ onClose }: { onClose: () => void }) {
     }
   }
 
-  const title = { cart: 'Your order', details: 'Checkout', sending: 'Sending…', confirmed: 'Order received', failed: 'Not sent', handoff: 'Send your order' }[step]
+  const title = { cart: 'Votre panier', details: 'Vos coordonnées', sending: 'Envoi…', confirmed: 'Commande reçue', failed: 'Non envoyée', handoff: 'Envoyer la commande' }[step]
 
   return (
     <motion.div className="fixed inset-0 z-[70]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { delay: 0.2 } }}>
-      <button type="button" aria-label="Close cart" tabIndex={-1} onClick={onClose} className="absolute inset-0 bg-ink/70 backdrop-blur-sm" />
+      <button type="button" aria-label="Fermer le panier" tabIndex={-1} onClick={onClose} className="absolute inset-0 bg-ink/70 backdrop-blur-sm" />
       <motion.aside
         ref={ref} role="dialog" aria-modal="true" aria-labelledby="cart-title"
         initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
@@ -67,13 +68,13 @@ function Drawer({ onClose }: { onClose: () => void }) {
         <header className="flex items-center justify-between border-b border-cream/[0.07] px-5 py-4 sm:px-7">
           <div className="flex items-center gap-3">
             {step === 'details' && (
-              <button type="button" onClick={() => setStep('cart')} aria-label="Back to cart" className="inline-flex h-10 w-10 rotate-180 items-center justify-center rounded-full border border-cream/15 hover:border-gold">
+              <button type="button" onClick={() => setStep('cart')} aria-label="Retour au panier" className="inline-flex h-10 w-10 rotate-180 items-center justify-center rounded-full border border-cream/15 hover:border-gold">
                 <ArrowIcon />
               </button>
             )}
             <h2 id="cart-title" className="display text-3xl">{title}</h2>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close cart" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-cream/15 hover:border-gold hover:text-gold">
+          <button type="button" onClick={onClose} aria-label="Fermer le panier" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-cream/15 hover:border-gold hover:text-gold">
             <CloseIcon />
           </button>
         </header>
@@ -88,15 +89,15 @@ function Drawer({ onClose }: { onClose: () => void }) {
             >
               {step === 'cart' && <CartLines />}
               {step === 'details' && <DetailsForm customer={customer} setCustomer={setCustomer} errors={errors} fulfilment={fulfilment} />}
-              {step === 'sending' && <Status title="Sending your order…" text="Please keep this window open." spinner />}
+              {step === 'sending' && <Status title="Envoi de votre commande…" text="Gardez cette fenêtre ouverte." spinner />}
               {step === 'confirmed' && (
                 <Status
-                  title="The restaurant received your order"
-                  text={`${result.message ?? 'We will call you if anything changes.'} Order number: ${result.orderId}.`}
+                  title="Le restaurant a reçu votre commande"
+                  text={`${result.message ?? 'Nous vous appelons en cas de changement.'} Numéro de commande : ${result.orderId}.`}
                   icon={<BagIcon size={48} draw />}
                 />
               )}
-              {step === 'failed' && <Status title="Your order was not sent" text={result.error ?? 'Something went wrong.'} tone="error" />}
+              {step === 'failed' && <Status title="Votre commande n'a pas été envoyée" text={result.error ?? 'Une erreur est survenue.'} tone="error" />}
               {step === 'handoff' && <Handoff summary={snapshot} />}
             </motion.div>
           </AnimatePresence>
@@ -106,9 +107,9 @@ function Drawer({ onClose }: { onClose: () => void }) {
           <footer className="border-t border-cream/[0.07] bg-ink-2 px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 sm:px-7">
             {step === 'cart' && <FulfilmentToggle value={fulfilment} onChange={setFulfilment} />}
             <dl className="mt-4 space-y-1.5 text-sm">
-              <Row label="Subtotal" value={euro(t.subtotal)} />
+              <Row label="Sous-total" value={euro(t.subtotal)} />
               {fulfilment === 'delivery' && (
-                <Row label="Delivery" value={t.deliveryFee ? euro(t.deliveryFee) : 'Free'} hint={t.deliveryFee ? `Free from ${euro(site.ordering.freeDeliveryFrom)}` : undefined} />
+                <Row label="Livraison" value={t.deliveryFee ? euro(t.deliveryFee) : 'Offerte'} hint={t.deliveryFee ? `Offerte dès ${euro(site.ordering.freeDeliveryFrom)}` : undefined} />
               )}
               <div className="flex items-baseline justify-between pt-2">
                 <dt className="font-semibold uppercase tracking-[0.14em] text-cream/70">Total</dt>
@@ -116,19 +117,19 @@ function Drawer({ onClose }: { onClose: () => void }) {
               </div>
             </dl>
             {t.belowMinimum && (
-              <p className="mt-2 text-xs text-gold" role="status">Minimum for delivery is {euro(site.ordering.minimumDeliveryOrder)}. Add a little more or choose pickup.</p>
+              <p className="mt-2 text-xs text-gold" role="status">Minimum de commande en livraison : {euro(site.ordering.minimumDeliveryOrder)}. Ajoutez un article ou choisissez « À emporter ».</p>
             )}
             {step === 'cart' && (
               <button type="button" disabled={t.belowMinimum} onClick={() => setStep('details')} className="btn btn-primary mt-4 w-full disabled:animate-none disabled:opacity-40">
-                Checkout <ArrowIcon />
+                Commander <ArrowIcon />
               </button>
             )}
             {(step === 'details' || step === 'failed') && (
               <button type="button" disabled={t.belowMinimum} onClick={placeOrder} className="btn btn-primary mt-4 w-full disabled:opacity-40">
-                {site.integrations.orderEndpoint ? `Place order · ${euro(t.total)}` : 'Continue'}
+                {site.integrations.orderEndpoint ? `Valider · ${euro(t.total)}` : 'Continuer'}
               </button>
             )}
-            <p className="mt-3 text-center text-xs text-cream/45">{site.ordering.paymentNote} No payment is taken on this website.</p>
+            <p className="mt-3 text-center text-xs text-cream/45">{site.ordering.paymentNote} Aucun paiement sur ce site.</p>
           </footer>
         )}
       </motion.aside>
@@ -147,11 +148,11 @@ function Row({ label, value, hint }: { label: string; value: string; hint?: stri
 
 function FulfilmentToggle({ value, onChange }: { value: Fulfilment; onChange: (f: Fulfilment) => void }) {
   const opts = [
-    { id: 'delivery' as const, label: 'Delivery', sub: `${site.ordering.estimatedDeliveryMinutes} min`, Icon: ScooterIcon },
-    { id: 'pickup' as const, label: 'Pickup', sub: `${site.ordering.estimatedPickupMinutes} min`, Icon: BagIcon },
+    { id: 'delivery' as const, label: 'Livraison', sub: `${site.ordering.estimatedDeliveryMinutes} min`, Icon: ScooterIcon },
+    { id: 'pickup' as const, label: 'À emporter', sub: `${site.ordering.estimatedPickupMinutes} min`, Icon: BagIcon },
   ]
   return (
-    <div role="radiogroup" aria-label="Delivery or pickup" className="grid grid-cols-2 gap-1 rounded-2xl bg-ink p-1">
+    <div role="radiogroup" aria-label="Livraison ou à emporter" className="grid grid-cols-2 gap-1 rounded-2xl bg-ink p-1">
       {opts.map((o) => (
         <button
           key={o.id} type="button" role="radio" aria-checked={value === o.id} onClick={() => onChange(o.id)}
@@ -171,9 +172,9 @@ function CartLines() {
     return (
       <div className="flex flex-col items-center py-16 text-center">
         <CartIcon size={56} draw className="text-cream/40" />
-        <p className="display mt-6 text-3xl">Your cart is empty</p>
-        <p className="mt-2 max-w-xs text-sm text-cream/55">Wood-fired pizza and smash burgers are one tap away.</p>
-        <a href="#menu" onClick={() => setOpen(false)} className="btn btn-ghost mt-8">Browse the menu</a>
+        <p className="display mt-6 text-3xl">Votre panier est vide</p>
+        <p className="mt-2 max-w-xs text-sm text-cream/55">Burgers, sandwichs et tacos sont à un geste.</p>
+        <a href="#menu" onClick={() => setOpen(false)} className="btn btn-ghost mt-8">Voir le menu</a>
       </div>
     )
   return (
@@ -181,8 +182,7 @@ function CartLines() {
       <AnimatePresence initial={false}>
         {lines.map((l) => {
           const item = catalog.get(l.id)!
-          const img = photo(item.image)
-          return (
+                    return (
             <motion.li
               key={l.id} layout
               initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
@@ -190,19 +190,19 @@ function CartLines() {
               className="overflow-hidden"
             >
               <div className="flex gap-4 rounded-2xl bg-ink/60 p-3">
-                <img src={img.src.replace('-1280', '-640')} alt="" loading="lazy" className="h-20 w-20 shrink-0 rounded-xl object-cover" />
+                {item.image ? <img src={menuImage(item.image)} alt="" loading="lazy" className="h-20 w-20 shrink-0 rounded-xl bg-black object-contain p-1" /> : <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-black"><LogoMark size={44} /></span>}
                 <div className="flex min-w-0 flex-1 flex-col">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="truncate font-semibold">{item.name}{item.kind === 'deal' && <span className="ml-2 rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold uppercase text-ink">Deal</span>}</p>
-                    <button type="button" onClick={() => remove(l.id)} aria-label={`Remove ${item.name}`} className="-mr-1 -mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-cream/40 hover:text-tomato">
+                    <p className="font-semibold leading-tight">{item.name}{item.option && <span className="block text-xs font-normal text-cream/55">{item.option}</span>}</p>
+                    <button type="button" onClick={() => remove(l.id)} aria-label={`Retirer ${item.name}`} className="-mr-1 -mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-cream/40 hover:text-tomato">
                       <TrashIcon />
                     </button>
                   </div>
                   <div className="mt-auto flex items-center justify-between">
-                    <div className="flex items-center rounded-full border border-cream/12" role="group" aria-label={`Quantity of ${item.name}`}>
-                      <button type="button" onClick={() => setQty(l.id, l.qty - 1)} aria-label={`One less ${item.name}`} className="flex h-10 w-10 items-center justify-center hover:text-gold"><MinusIcon size={16} /></button>
+                    <div className="flex items-center rounded-full border border-cream/12" role="group" aria-label={`Quantité : ${item.name}`}>
+                      <button type="button" onClick={() => setQty(l.id, l.qty - 1)} aria-label={`Un ${item.name} de moins`} className="flex h-10 w-10 items-center justify-center hover:text-gold"><MinusIcon size={16} /></button>
                       <motion.span key={l.qty} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-6 text-center text-sm font-bold tabular-nums">{l.qty}</motion.span>
-                      <button type="button" onClick={() => setQty(l.id, l.qty + 1)} aria-label={`One more ${item.name}`} className="flex h-10 w-10 items-center justify-center hover:text-gold"><PlusIcon size={16} /></button>
+                      <button type="button" onClick={() => setQty(l.id, l.qty + 1)} aria-label={`Un ${item.name} de plus`} className="flex h-10 w-10 items-center justify-center hover:text-gold"><PlusIcon size={16} /></button>
                     </div>
                     <p className="font-semibold tabular-nums text-gold">{euro(item.price * l.qty)}</p>
                   </div>
@@ -220,7 +220,7 @@ function Field({ id, label, error, children, optional }: { id: string; label: st
   return (
     <div>
       <label htmlFor={id} className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-cream/60">
-        {label}{optional && <span className="ml-1 normal-case tracking-normal text-cream/35">(optional)</span>}
+        {label}{optional && <span className="ml-1 normal-case tracking-normal text-cream/35">(facultatif)</span>}
       </label>
       {children}
       <AnimatePresence>
@@ -249,24 +249,24 @@ function DetailsForm({ customer, setCustomer, errors, fulfilment }: {
   return (
     <form className="space-y-4" noValidate onSubmit={(e) => e.preventDefault()} aria-describedby={`${uid}-privacy`}>
       <p className="text-sm text-cream/60">
-        {fulfilment === 'delivery' ? 'Where should we bring it?' : 'Who is picking up?'} We only use these details to prepare and deliver this order.
+        {fulfilment === 'delivery' ? 'Où devons-nous livrer ?' : 'Qui vient chercher la commande ?'} Ces informations servent uniquement à préparer cette commande.
       </p>
-      <Field id={`${uid}-name`} label="Full name" error={errors.name}><input {...bind('name')} autoComplete="name" maxLength={80} required /></Field>
+      <Field id={`${uid}-name`} label="Nom complet" error={errors.name}><input {...bind('name')} autoComplete="name" maxLength={80} required /></Field>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field id={`${uid}-phone`} label="Phone" error={errors.phone}><input {...bind('phone')} type="tel" inputMode="tel" autoComplete="tel" maxLength={30} required /></Field>
+        <Field id={`${uid}-phone`} label="Téléphone" error={errors.phone}><input {...bind('phone')} type="tel" inputMode="tel" autoComplete="tel" maxLength={30} required /></Field>
         <Field id={`${uid}-email`} label="E-mail" error={errors.email} optional><input {...bind('email')} type="email" inputMode="email" autoComplete="email" maxLength={120} /></Field>
       </div>
       {fulfilment === 'delivery' && (
         <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
-          <Field id={`${uid}-address`} label="Street & number" error={errors.address}><input {...bind('address')} autoComplete="street-address" maxLength={160} required /></Field>
-          <Field id={`${uid}-postcode`} label="Postcode" error={errors.postcode}><input {...bind('postcode')} autoComplete="postal-code" inputMode="numeric" maxLength={12} required /></Field>
+          <Field id={`${uid}-address`} label="Rue et numéro" error={errors.address}><input {...bind('address')} autoComplete="street-address" maxLength={160} required /></Field>
+          <Field id={`${uid}-postcode`} label="Code postal" error={errors.postcode}><input {...bind('postcode')} autoComplete="postal-code" inputMode="numeric" maxLength={12} required /></Field>
         </div>
       )}
-      <Field id={`${uid}-notes`} label="Notes for the kitchen or rider" error={errors.notes} optional>
-        <textarea {...bind('notes')} rows={3} maxLength={300} placeholder="Doorbell, allergies, extra basil…" />
+      <Field id={`${uid}-notes`} label="Remarques pour la cuisine ou le livreur" error={errors.notes} optional>
+        <textarea {...bind('notes')} rows={3} maxLength={300} placeholder="Interphone, allergies, sans oignons…" />
       </Field>
       <p id={`${uid}-privacy`} className="text-xs leading-relaxed text-cream/40">
-        Your details are not stored in this browser and are sent only to {site.name} over an encrypted connection.
+        Vos informations ne sont pas enregistrées dans ce navigateur et ne sont envoyées qu’à {site.name}, via une connexion chiffrée.
       </p>
     </form>
   )
@@ -280,7 +280,7 @@ function Status({ title, text, tone, spinner, icon }: { title: string; text: str
       {tone === 'error' && <span className="flex h-14 w-14 items-center justify-center rounded-full bg-tomato/15 text-2xl text-tomato" aria-hidden>!</span>}
       <p className="display mt-6 text-3xl">{title}</p>
       <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/65">{text}</p>
-      {tone === 'error' && <p className="mt-4 text-sm text-cream/65">You can try again below, or call us on <a className="text-gold underline" href={site.contact.phoneHref}>{site.contact.phoneDisplay}</a>.</p>}
+      {tone === 'error' && <p className="mt-4 text-sm text-cream/65">Réessayez ci-dessous ou appelez-nous au <a className="text-gold underline" href={site.contact.phoneHref}>{site.contact.phoneDisplay}</a>.</p>}
     </div>
   )
 }
@@ -288,21 +288,21 @@ function Status({ title, text, tone, spinner, icon }: { title: string; text: str
 /** Shown when no ordering backend is configured: hands the order to the restaurant, never fakes a confirmation. */
 function Handoff({ summary }: { summary: string }) {
   const [copied, setCopied] = useState(false)
-  const mailto = `mailto:${site.contact.email}?subject=${encodeURIComponent(`${site.name} order`)}&body=${encodeURIComponent(summary)}`
+  const mailto = `mailto:${site.contact.email}?subject=${encodeURIComponent(`Commande ${site.name}`)}&body=${encodeURIComponent(summary)}`
   const copy = async () => {
     try { await navigator.clipboard.writeText(summary); setCopied(true) } catch { setCopied(false) }
   }
   return (
     <div>
       <div className="rounded-2xl border border-gold/40 bg-gold/[0.07] p-4 text-sm leading-relaxed text-cream/85" role="note">
-        <strong className="text-gold">Online ordering isn’t connected yet.</strong> Your order has <em>not</em> been placed.
-        Send it to the restaurant below — it is confirmed only when the team replies or calls you back.
+        <strong className="text-gold">La commande en ligne n’est pas encore connectée.</strong> Votre commande n’est <em>pas</em> passée.
+        Envoyez-la au restaurant ci-dessous : elle n’est confirmée que lorsque l’équipe vous répond ou vous rappelle.
       </div>
       <pre className="mt-5 max-h-64 overflow-auto whitespace-pre-wrap rounded-2xl bg-ink p-4 font-sans text-xs leading-relaxed text-cream/75">{summary}</pre>
       <div className="mt-5 grid gap-3">
-        <a href={site.contact.phoneHref} className="btn btn-primary w-full"><PhoneIcon size={18} /> Call {site.contact.phoneDisplay}</a>
-        <a href={mailto} className="btn btn-ghost w-full"><MailIcon size={18} /> Send by e-mail</a>
-        <button type="button" onClick={copy} className="btn btn-ghost w-full" aria-live="polite">{copied ? 'Copied ✓' : 'Copy order text'}</button>
+        <a href={site.contact.phoneHref} className="btn btn-primary w-full"><PhoneIcon size={18} /> Appeler le {site.contact.phoneDisplay}</a>
+        <a href={mailto} className="btn btn-ghost w-full"><MailIcon size={18} /> Envoyer par e-mail</a>
+        <button type="button" onClick={copy} className="btn btn-ghost w-full" aria-live="polite">{copied ? 'Copié ✓' : 'Copier la commande'}</button>
       </div>
     </div>
   )

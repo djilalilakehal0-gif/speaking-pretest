@@ -31,7 +31,7 @@ export function Loader({ onDone }: { onDone: () => void }) {
       {show && (
         <motion.div
           key="loader"
-          role="status" aria-live="polite" aria-label="Loading NAPOLITIME"
+          role="status" aria-live="polite" aria-label="Chargement de NAPOLITIME"
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-ink"
           exit={reduced ? { opacity: 0 } : { clipPath: 'inset(0 0 100% 0)' }}
           initial={{ clipPath: 'inset(0 0 0% 0)' }}
@@ -44,7 +44,7 @@ export function Loader({ onDone }: { onDone: () => void }) {
             {letters.map((l, i) => (
               <motion.span
                 key={i}
-                className={i >= 6 ? 'text-gold' : 'text-cream'}
+                className={i >= 6 ? 'text-tomato' : 'text-cream'}
                 initial={{ y: '110%' }} animate={{ y: '0%' }}
                 transition={{ delay: 0.25 + i * 0.045, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               >
@@ -52,11 +52,11 @@ export function Loader({ onDone }: { onDone: () => void }) {
               </motion.span>
             ))}
           </div>
-          <motion.p className="italian mt-3 text-xl text-gold" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }}>
-            Taste the Moment.
+          <motion.p className="mt-3 text-xs font-bold uppercase tracking-[0.35em] text-cream/70" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }}>
+            The Taste of Excellence
           </motion.p>
           <div className="mt-8 h-px w-40 overflow-hidden bg-cream/10">
-            <motion.div className="h-full bg-gold" initial={{ x: '-100%' }} animate={{ x: '0%' }} transition={{ duration: 1.5, ease: [0.65, 0, 0.35, 1] }} />
+            <motion.div className="h-full bg-tomato" initial={{ x: '-100%' }} animate={{ x: '0%' }} transition={{ duration: 1.5, ease: [0.65, 0, 0.35, 1] }} />
           </div>
         </motion.div>
       )}

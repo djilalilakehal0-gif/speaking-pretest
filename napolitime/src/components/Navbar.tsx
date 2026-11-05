@@ -7,10 +7,8 @@ import { euro } from '../lib/format'
 
 export const navLinks = [
   { id: 'menu', label: 'Menu' },
-  { id: 'story', label: 'Our story' },
-  { id: 'offers', label: 'Deals' },
-  { id: 'reviews', label: 'Reviews' },
-  { id: 'visit', label: 'Visit' },
+  { id: 'visit', label: 'Restaurant' },
+  { id: 'contact', label: 'Contact' },
 ]
 
 function useActiveSection(ids: string[]) {
@@ -37,7 +35,7 @@ function CartButton() {
     <button
       type="button" onClick={() => setOpen(true)}
       className="relative inline-flex h-12 w-12 items-center justify-center rounded-full border border-cream/15 text-cream transition-colors hover:border-gold hover:text-gold"
-      aria-label={`Open cart, ${count} item${count === 1 ? '' : 's'}`}
+      aria-label={`Ouvrir le panier, ${count} article${count > 1 ? 's' : ''}`}
     >
       <motion.span animate={controls} className="inline-flex"><CartIcon size={22} /></motion.span>
       <AnimatePresence>
@@ -78,7 +76,7 @@ export function Navbar() {
 
   return (
     <>
-      <a href="#main" className="sr-only z-[90] rounded-full bg-gold px-4 py-2 font-semibold text-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to content</a>
+      <a href="#main" className="sr-only z-[90] rounded-full bg-gold px-4 py-2 font-semibold text-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Aller au contenu</a>
       <motion.header
         animate={{ y: hidden ? '-110%' : '0%' }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
@@ -86,8 +84,8 @@ export function Navbar() {
           scrolled || mobileOpen ? 'border-b border-cream/[0.06] bg-ink/80 backdrop-blur-xl' : 'border-b border-transparent'
         }`}
       >
-        <nav className="container-x flex h-[4.5rem] items-center justify-between gap-4" aria-label="Main">
-          <a href="#top" aria-label="NAPOLITIME home" onClick={() => setMobileOpen(false)}><Logo compact /></a>
+        <nav className="container-x flex h-[4.5rem] items-center justify-between gap-4" aria-label="Navigation principale">
+          <a href="#top" aria-label="Accueil NAPOLITIME" onClick={() => setMobileOpen(false)}><Logo compact /></a>
 
           <ul className="hidden items-center gap-1 lg:flex">
             {navLinks.map((l) => (
@@ -104,12 +102,12 @@ export function Navbar() {
           </ul>
 
           <div className="flex items-center gap-2">
-            <a href="#menu" className="btn btn-primary hidden !min-h-11 !px-5 !text-[0.75rem] sm:inline-flex">Order now</a>
+            <a href="#menu" className="btn btn-primary hidden !min-h-11 !px-5 !text-[0.75rem] sm:inline-flex">Commander</a>
             <CartButton />
             <button
               type="button" onClick={() => setMobileOpen((o) => !o)}
               className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-cream/15 text-cream lg:hidden"
-              aria-expanded={mobileOpen} aria-controls="mobile-nav" aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileOpen} aria-controls="mobile-nav" aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             >
               <MenuMorph open={mobileOpen} />
             </button>
@@ -128,7 +126,7 @@ export function Navbar() {
             className="fixed inset-0 z-40 flex flex-col bg-ink px-6 pb-10 pt-28 lg:hidden"
           >
             <motion.ul initial="hidden" animate="shown" variants={{ shown: { transition: { staggerChildren: 0.06, delayChildren: 0.2 } } }} className="flex flex-col gap-2">
-              {[{ id: 'top', label: 'Home' }, ...navLinks].map((l) => (
+              {[{ id: 'top', label: 'Accueil' }, ...navLinks].map((l) => (
                 <motion.li key={l.id} variants={{ hidden: { opacity: 0, x: 40 }, shown: { opacity: 1, x: 0 } }}>
                   <a href={`#${l.id}`} onClick={() => setMobileOpen(false)} className="display block py-2 text-5xl text-cream active:text-tomato">
                     {l.label}
@@ -136,7 +134,7 @@ export function Navbar() {
                 </motion.li>
               ))}
             </motion.ul>
-            <a href="#menu" onClick={() => setMobileOpen(false)} className="btn btn-primary mt-auto w-full">Order now</a>
+            <a href="#menu" onClick={() => setMobileOpen(false)} className="btn btn-primary mt-auto w-full">Commander</a>
           </motion.div>
         )}
       </AnimatePresence>
@@ -156,7 +154,7 @@ export function MobileCartBar() {
           className="fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:hidden"
         >
           <button type="button" onClick={() => setOpen(true)} className="btn btn-primary w-full justify-between !px-6 shadow-2xl">
-            <span>View order · {t.count}</span>
+            <span>Voir le panier · {t.count}</span>
             <span>{euro(t.subtotal)}</span>
           </button>
         </motion.div>

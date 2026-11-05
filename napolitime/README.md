@@ -1,4 +1,4 @@
-# NAPOLITIME — Taste the Moment.
+# NAPOLITIME — The Taste of Excellence
 
 Single-page restaurant website for a Neapolitan pizza & gourmet burger brand.
 React 19 · TypeScript · Vite · Tailwind CSS 4 · Framer Motion · GSAP (ScrollTrigger) · Lottie.
@@ -16,15 +16,17 @@ npm run build      # typecheck + production build into dist/
 
 | What | File |
 | --- | --- |
-| Name, address, phone, e-mail, socials, opening hours, delivery fees | `src/config/site.ts` |
-| Menu (products, prices in €, ingredients, allergens, tags) | `src/data/menu.ts` |
-| Meal deals, reviews, ingredient copy | `src/data/content.ts` |
-| Photos | `scripts/photos.json` → `node scripts/fetch-photos.mjs` (writes `public/img/*-640.webp` + `*-1280.webp`) |
+| Phone, address, e-mail, socials, opening hours, delivery fees | `src/config/site.ts` |
+| Menu: products, prices (€), options (flavours/drinks), Best Seller badge | `src/data/menu.ts` |
+| Product photos | `public/menu/<image>.webp` — drop a new file with the same name to replace a photo |
+| Logo | `assets/source/logo.png` → `python3 scripts/make-logo.py <source.png>` |
+| Hero photo | `public/img/hero-burger-*.webp`; storefront `public/img/storefront-*.webp` |
 
-**Demo content:** the address, phone, e-mail, social links, prices and reviews are placeholders.
-While `site.isDemo` is `true` a notice is shown in the footer. Replace the sample reviews with real ones before launch.
+**Product photos are temporary:** they are cropped from the restaurant's printed menu board, so they are small.
+Replace them with real high-resolution photos (square or 4:3, ≥ 1000 px) using the same file names.
+A product without `image` shows a branded "photo à venir" visual (Schweppes and Eau 50 cl for now).
 
-Food photography comes from Unsplash (Unsplash License, free for commercial use); sources and photographers are listed in `scripts/photos.json`.
+The address, e-mail, social links and opening hours are still examples; while `site.isDemo` is `true` a notice is shown in the footer.
 
 ## Ordering — what is real and what is not
 

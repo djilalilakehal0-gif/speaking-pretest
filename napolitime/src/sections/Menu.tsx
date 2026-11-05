@@ -1,96 +1,116 @@
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { categories, products, type Category, type Product } from '../data/menu'
 import { ProductCard } from '../components/ProductCard'
 import { ProductModal } from '../components/ProductModal'
 import { SectionHeading } from '../components/Reveal'
-import { BurgerIcon, HeartToggle, PizzaSliceIcon } from '../components/icons/Icons'
-import { useFavourites } from '../lib/favourites'
 
-type Filter = 'all' | Category | 'favourites'
+/** Highlights the category whose section is under the sticky bar. */
+function useActiveCategory(ids: string[]) {
+  const [active, setActive] = useState(ids[0])
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id.replace('cat-', ''))),
+      { rootMargin: '-35% 0px -60% 0px' },
+    )
+    ids.forEach((id) => { const el = document.getElementById(`cat-${id}`); if (el) obs.observe(el) })
+    return () => obs.disconnect()
+  }, [ids])
+  return active
+}
 
 export function Menu() {
-  const [filter, setFilter] = useState<Filter>('all')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<Product | null>(null)
-  const { favs } = useFavourites()
+  const ids = useMemo(() => categories.map((c) => c.id), [])
+  const active = useActiveCategory(ids)
+  const bar = useRef<HTMLDivElement>(null)
 
-  const list = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return products.filter((p) => {
-      if (filter === 'favourites' ? !favs.includes(p.id) : filter !== 'all' && p.category !== filter) return false
-      if (!q) return true
-      return [p.name, p.description, ...p.ingredients].some((s) => s.toLowerCase().includes(q))
-    })
-  }, [filter, query, favs])
+  // Keep the active tab visible inside the horizontally scrolling bar.
+  useEffect(() => {
+    const nav = bar.current
+    const el = nav?.querySelector<HTMLElement>(`[data-cat="${active}"]`)
+    if (nav && el && nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: el.offsetLeft - nav.clientWidth / 2 + el.clientWidth / 2, behavior: 'smooth' })
+  }, [active])
 
-  const counts = useMemo(() => Object.fromEntries(categories.map((c) => [c.id, c.id === 'all' ? products.length : products.filter((p) => p.category === c.id).length])), [])
+  const q = query.trim().toLowerCase()
+  const byCat = useMemo(() => {
+    const m = new Map<Category, Product[]>()
+    for (const c of categories) m.set(c.id, products.filter((p) => p.category === c.id && (!q || `${p.name} ${p.options?.join(' ') ?? ''}`.toLowerCase().includes(q))))
+    return m
+  }, [q])
+  const total = [...byCat.values()].reduce((s, l) => s + l.length, 0)
+
+  const jump = (id: string) => {
+    document.getElementById(`cat-${id}`)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })
+  }
 
   return (
-    <section id="menu" className="relative bg-ink py-24 sm:py-32" aria-labelledby="menu-heading">
+    <section id="menu" className="relative bg-ink pb-24 pt-24 sm:pb-32 sm:pt-32" aria-labelledby="menu-title">
       <div className="container-x">
-        <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
-          <div id="menu-heading"><SectionHeading eyebrow="Il menù" title="The menu." italic="Fresh from the oven & the grill" /></div>
-          <div className="flex items-center gap-4 text-cream/50" aria-hidden>
-            <PizzaSliceIcon size={44} draw live /><span className="display text-3xl text-cream/30">&</span><BurgerIcon size={44} draw live />
-          </div>
-        </div>
+        <div id="menu-title"><SectionHeading eyebrow="La carte · القائمة" title="Notre menu." intro="Burgers, sandwichs, tacos, tex-mex, desserts et boissons. Touchez un produit pour le détail, ajoutez-le au panier en un geste." /></div>
+      </div>
 
-        <div className="sticky top-[4.5rem] z-30 -mx-4 mt-12 bg-ink/85 px-4 py-3 backdrop-blur-xl sm:mx-0 sm:rounded-full sm:px-2">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <LayoutGroup id="menu-filters">
-              <div role="tablist" aria-label="Menu categories" className="no-scrollbar -mx-1 flex gap-1 overflow-x-auto px-1">
-                {[...categories, { id: 'favourites' as const, label: 'Favourites' }].map((c) => {
-                  const active = filter === c.id
-                  return (
-                    <button
-                      key={c.id} type="button" role="tab" aria-selected={active} aria-controls="menu-grid"
-                      onClick={() => setFilter(c.id)}
-                      className={`relative flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold uppercase tracking-[0.14em] transition-colors sm:px-5 ${active ? 'text-white' : 'text-cream/60 hover:text-cream'}`}
-                    >
-                      {active && <motion.span layoutId="menu-pill" className="absolute inset-0 rounded-full bg-tomato" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />}
-                      <span className="relative flex items-center gap-1.5">
-                        {c.id === 'favourites' && <HeartToggle active={favs.length > 0} size={14} />}
-                        {c.label}
-                        <span className={`text-[10px] ${active ? 'text-white/70' : 'text-cream/35'}`}>{c.id === 'favourites' ? favs.length : counts[c.id]}</span>
-                      </span>
-                    </button>
-                  )
-                })}
+      <div className="sticky top-[4.5rem] z-30 mt-12 border-y border-white/[0.06] bg-ink/90 backdrop-blur-xl">
+        <div className="container-x flex flex-col gap-3 py-3 lg:flex-row lg:items-center lg:justify-between">
+          <LayoutGroup id="cat-nav">
+            <nav ref={bar} aria-label="Catégories du menu" className="no-scrollbar relative -mx-1 flex gap-1 overflow-x-auto px-1">
+              {categories.map((c) => {
+                const on = active === c.id
+                const count = byCat.get(c.id)!.length
+                return (
+                  <button
+                    key={c.id} type="button" data-cat={c.id} onClick={() => jump(c.id)} aria-current={on ? 'true' : undefined} disabled={!count}
+                    className={`relative flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold uppercase tracking-[0.14em] transition-colors disabled:opacity-30 sm:px-5 ${on ? 'text-white' : 'text-cream/60 hover:text-cream'}`}
+                  >
+                    {on && <motion.span layoutId="cat-pill" className="absolute inset-0 rounded-full bg-tomato shadow-[0_8px_30px_-8px_rgba(229,9,20,.9)]" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />}
+                    <span className="relative">{c.label}</span>
+                    <span className={`relative text-[10px] ${on ? 'text-white/70' : 'text-cream/35'}`}>{count}</span>
+                  </button>
+                )
+              })}
+            </nav>
+          </LayoutGroup>
+          <label className="relative block lg:w-72">
+            <span className="sr-only">Rechercher dans le menu</span>
+            <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Rechercher : kebab, nuggets, oreo…" className="input !min-h-11 !rounded-full !py-2 pl-10 text-sm" />
+            <svg className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-cream/40" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" />
+            </svg>
+          </label>
+        </div>
+      </div>
+
+      <div className="container-x">
+        {categories.map((c, ci) => {
+          const list = byCat.get(c.id)!
+          if (!list.length) return null
+          return (
+            <section key={c.id} id={`cat-${c.id}`} aria-labelledby={`h-${c.id}`} className="scroll-mt-40 pt-16 sm:pt-20">
+              <div className="mb-8 flex items-end justify-between gap-4 border-b border-white/[0.07] pb-5">
+                <h3 id={`h-${c.id}`} className="display flex items-baseline gap-4 text-[clamp(2.4rem,6vw,4.2rem)] text-cream">
+                  <span className="text-tomato">{String(ci + 1).padStart(2, '0')}</span>{c.label}
+                </h3>
+                <span className="pb-2 text-xl font-semibold text-cream/45" lang="ar" dir="rtl">{c.labelAr}</span>
               </div>
-            </LayoutGroup>
-            <label className="relative block lg:w-72">
-              <span className="sr-only">Search the menu</span>
-              <input
-                type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search: burrata, spicy, cheddar…"
-                className="input !min-h-11 !rounded-full !py-2 pl-10 text-sm"
-              />
-              <svg className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-cream/40" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-                <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" />
-              </svg>
-            </label>
-          </div>
-        </div>
-
-        <motion.div id="menu-grid" role="tabpanel" layout className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3" aria-live="polite">
-          <AnimatePresence mode="popLayout">
-            {list.map((p, i) => <ProductCard key={p.id} product={p} onOpen={setSelected} priority={i < 3} />)}
-          </AnimatePresence>
-        </motion.div>
+              <div className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
+                {list.map((p, i) => <ProductCard key={p.id} product={p} onOpen={setSelected} eager={ci === 0 && i < 4} />)}
+              </div>
+            </section>
+          )
+        })}
 
         <AnimatePresence>
-          {list.length === 0 && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="card-surface mt-6 flex flex-col items-center rounded-[2rem] px-6 py-16 text-center">
-              <p className="display text-3xl">{filter === 'favourites' && !query ? 'No favourites yet' : 'Nothing matches'}</p>
-              <p className="mt-2 max-w-sm text-sm text-cream/55">
-                {filter === 'favourites' && !query ? 'Tap the heart on any dish to keep it here.' : `We couldn't find “${query}”. Try another ingredient.`}
-              </p>
-              <button type="button" onClick={() => { setQuery(''); setFilter('all') }} className="btn btn-ghost mt-6">Show full menu</button>
+          {total === 0 && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-16 flex flex-col items-center rounded-[2rem] border border-white/[0.07] bg-ink-2 px-6 py-16 text-center">
+              <p className="display text-3xl">Aucun résultat</p>
+              <p className="mt-2 max-w-sm text-sm text-cream/55">Rien ne correspond à « {query} ».</p>
+              <button type="button" onClick={() => setQuery('')} className="btn btn-ghost mt-6">Voir tout le menu</button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <p className="mt-10 text-center text-xs text-cream/40">Prices include VAT. Allergen information is on every dish — tap “Ingredients & allergens”.</p>
+        <p className="mt-14 text-center text-xs text-cream/40">Prix TTC en euros. Photos non contractuelles.</p>
       </div>
       <ProductModal product={selected} onClose={() => setSelected(null)} />
     </section>

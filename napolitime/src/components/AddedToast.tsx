@@ -15,7 +15,8 @@ export function AddedToast() {
     const t = setTimeout(() => setVisible(false), 2600)
     return () => clearTimeout(t)
   }, [pulse])
-  const name = lastAdded ? catalog.get(lastAdded)?.name : ''
+  const item = lastAdded ? catalog.get(lastAdded) : undefined
+  const name = item ? `${item.name}${item.option ? ` (${item.option})` : ''}` : ''
   return (
     <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-24 z-[65] flex justify-center px-4 sm:bottom-8">
       <AnimatePresence>
@@ -26,9 +27,9 @@ export function AddedToast() {
             transition={{ type: 'spring', stiffness: 380, damping: 28 }}
             className="pointer-events-auto flex items-center gap-3 rounded-full border border-cream/10 bg-ink-3/95 py-2 pl-2 pr-3 shadow-2xl backdrop-blur"
           >
-            {reduced ? <span className="ml-2 text-gold">✓</span> : <Lottie data={added} size={44} play={pulse} />}
-            <p className="text-sm"><span className="font-semibold">{name}</span> <span className="text-cream/60">added</span></p>
-            <button type="button" onClick={() => setOpen(true)} className="ml-2 rounded-full bg-cream px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-ink hover:bg-gold">View cart</button>
+            {reduced ? <span className="ml-2 text-tomato">✓</span> : <Lottie data={added} size={44} play={pulse} />}
+            <p className="text-sm"><span className="font-semibold">{name}</span> <span className="text-cream/60">ajouté</span></p>
+            <button type="button" onClick={() => setOpen(true)} className="ml-2 rounded-full bg-cream px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-ink hover:bg-tomato hover:text-white">Panier</button>
           </motion.div>
         )}
       </AnimatePresence>

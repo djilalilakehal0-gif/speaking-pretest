@@ -25,17 +25,17 @@ export function openStatus(date = new Date()): OpenStatus {
   // Late-night service that started yesterday and runs past midnight
   if (yesterday?.open && yesterday.close) {
     const o = toMin(yesterday.open), c = toMin(yesterday.close)
-    if (c < o && minute < c) return { open: true, label: `Open until ${yesterday.close}`, today: day }
+    if (c < o && minute < c) return { open: true, label: `Ouvert jusqu'à ${yesterday.close}`, today: day }
   }
   if (today?.open && today.close) {
     const o = toMin(today.open), c = toMin(today.close)
     const closesAfterMidnight = c < o
-    if (minute >= o && (closesAfterMidnight || minute < c)) return { open: true, label: `Open until ${today.close}`, today: day }
-    if (minute < o) return { open: false, label: `Opens today at ${today.open}`, today: day }
+    if (minute >= o && (closesAfterMidnight || minute < c)) return { open: true, label: `Ouvert jusqu'à ${today.close}`, today: day }
+    if (minute < o) return { open: false, label: `Ouvre aujourd'hui à ${today.open}`, today: day }
   }
   for (let i = 1; i <= 7; i++) {
     const next = site.hours.find((h) => h.day === (day + i) % 7)
-    if (next?.open) return { open: false, label: `Opens ${i === 1 ? 'tomorrow' : next.label} at ${next.open}`, today: day }
+    if (next?.open) return { open: false, label: `Ouvre ${i === 1 ? 'demain' : next.label.toLowerCase()} à ${next.open}`, today: day }
   }
-  return { open: false, label: 'Closed', today: day }
+  return { open: false, label: 'Fermé', today: day }
 }

@@ -24,14 +24,14 @@ export function sanitize(c: Customer): Customer {
 
 export function validate(c: Customer, fulfilment: Fulfilment): Errors {
   const e: Errors = {}
-  if (c.name.trim().length < 2) e.name = 'Please enter your name.'
+  if (c.name.trim().length < 2) e.name = 'Indiquez votre nom.'
   const digits = c.phone.replace(/[^\d]/g, '')
   if (!/^[+\d][\d\s().-]*$/.test(c.phone.trim()) || digits.length < 7 || digits.length > 15)
-    e.phone = 'Enter a valid phone number so we can reach you.'
-  if (c.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(c.email.trim())) e.email = 'This e-mail address looks incomplete.'
+    e.phone = 'Indiquez un numéro de téléphone valide.'
+  if (c.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(c.email.trim())) e.email = 'Cette adresse e-mail semble incomplète.'
   if (fulfilment === 'delivery') {
-    if (c.address.trim().length < 6) e.address = 'Enter street and house number for delivery.'
-    if (!/^[A-Za-z0-9 -]{3,10}$/.test(c.postcode.trim())) e.postcode = 'Enter a valid postcode.'
+    if (c.address.trim().length < 6) e.address = 'Indiquez la rue et le numéro pour la livraison.'
+    if (!/^[A-Za-z0-9 -]{3,10}$/.test(c.postcode.trim())) e.postcode = 'Indiquez un code postal valide.'
   }
   return e
 }
@@ -40,22 +40,22 @@ export function orderSummaryText(lines: Line[], fulfilment: Fulfilment, c: Custo
   const t = totals(lines, fulfilment)
   const rows = lines.map((l) => {
     const it = catalog.get(l.id)!
-    return `${l.qty} × ${it.name} — €${(it.price * l.qty).toFixed(2)}`
+    return `${l.qty} × ${it.name}${it.option ? ` (${it.option})` : ''} — ${(it.price * l.qty).toFixed(2).replace('.', ',')} €`
   })
   return [
-    `New ${fulfilment} order for ${site.name}`,
+    `Nouvelle commande ${fulfilment === 'delivery' ? 'en livraison' : 'à emporter'} — ${site.name}`,
     '',
     ...rows,
     '',
-    `Subtotal: €${t.subtotal.toFixed(2)}`,
-    fulfilment === 'delivery' ? `Delivery: €${t.deliveryFee.toFixed(2)}` : 'Pickup at the restaurant',
-    `Total: €${t.total.toFixed(2)}`,
+    `Sous-total : ${t.subtotal.toFixed(2).replace('.', ',')} €`,
+    fulfilment === 'delivery' ? `Livraison : ${t.deliveryFee.toFixed(2).replace('.', ',')} €` : 'À emporter au restaurant',
+    `Total : ${t.total.toFixed(2).replace('.', ',')} €`,
     '',
-    `Name: ${c.name}`,
-    `Phone: ${c.phone}`,
-    c.email && `E-mail: ${c.email}`,
-    fulfilment === 'delivery' && `Address: ${c.address}, ${c.postcode}`,
-    c.notes && `Notes: ${c.notes}`,
+    `Nom : ${c.name}`,
+    `Téléphone : ${c.phone}`,
+    c.email && `E-mail : ${c.email}`,
+    fulfilment === 'delivery' && `Adresse : ${c.address}, ${c.postcode}`,
+    c.notes && `Remarques : ${c.notes}`,
   ].filter(Boolean).join('\n')
 }
 
@@ -70,9 +70,9 @@ export type SubmitResult =
  */
 export async function submitOrder(lines: Line[], fulfilment: Fulfilment, customer: Customer): Promise<SubmitResult> {
   const endpoint = site.integrations.orderEndpoint
-  if (!endpoint) return { ok: false, error: 'Online ordering is not connected.' }
+  if (!endpoint) return { ok: false, error: 'La commande en ligne n’est pas connectée.' }
   if (!/^https:\/\//.test(endpoint) && !/^http:\/\/localhost/.test(endpoint))
-    return { ok: false, error: 'The ordering endpoint must use HTTPS.' }
+    return { ok: false, error: 'Le service de commande doit utiliser HTTPS.' }
 
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), 15000)
@@ -82,7 +82,7 @@ export async function submitOrder(lines: Line[], fulfilment: Fulfilment, custome
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
         fulfilment,
-        items: lines.map((l) => ({ id: l.id, qty: l.qty })),
+        items: lines.map((l) => { const [id, option] = l.id.split('::'); return { id, option, qty: l.qty } }),
         customer: sanitize(customer),
         clientTotal: totals(lines, fulfilment).total,
       }),
@@ -90,11 +90,11 @@ export async function submitOrder(lines: Line[], fulfilment: Fulfilment, custome
       credentials: 'omit',
     })
     const data = (await res.json().catch(() => ({}))) as { orderId?: unknown; message?: unknown; error?: unknown }
-    if (!res.ok) return { ok: false, error: typeof data.error === 'string' ? data.error : `The restaurant could not accept the order (error ${res.status}).` }
-    if (typeof data.orderId !== 'string' || !data.orderId) return { ok: false, error: 'The restaurant did not confirm the order. Please call us to check.' }
+    if (!res.ok) return { ok: false, error: typeof data.error === 'string' ? data.error : `Le restaurant n’a pas pu accepter la commande (erreur ${res.status}).` }
+    if (typeof data.orderId !== 'string' || !data.orderId) return { ok: false, error: 'Le restaurant n’a pas confirmé la commande. Appelez-nous pour vérifier.' }
     return { ok: true, orderId: data.orderId, message: typeof data.message === 'string' ? data.message : undefined }
   } catch (err) {
-    return { ok: false, error: (err as Error).name === 'AbortError' ? 'The request timed out. Check your connection and try again.' : 'Network error — your order was not sent. Please try again.' }
+    return { ok: false, error: (err as Error).name === 'AbortError' ? 'Délai dépassé. Vérifiez votre connexion et réessayez.' : 'Erreur réseau : votre commande n’a pas été envoyée. Réessayez.' }
   } finally {
     clearTimeout(timer)
   }
@@ -108,8 +108,8 @@ export async function subscribeNewsletter(email: string): Promise<{ ok: boolean;
       method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'omit',
       body: JSON.stringify({ email: email.trim().slice(0, 120) }),
     })
-    return res.ok ? { ok: true } : { ok: false, error: `Sign-up failed (error ${res.status}). Please try again.` }
+    return res.ok ? { ok: true } : { ok: false, error: `Inscription impossible (erreur ${res.status}). Réessayez.` }
   } catch {
-    return { ok: false, error: 'Network error. Please try again.' }
+    return { ok: false, error: 'Erreur réseau. Réessayez.' }
   }
 }

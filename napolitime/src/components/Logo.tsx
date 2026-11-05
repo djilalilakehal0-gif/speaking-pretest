@@ -13,15 +13,15 @@ export function LogoMark({ size = 40, spin = false, className = '' }: { size?: n
       <img
         src={`${base}img/${size > 120 ? 'logo-512' : 'logo-160'}.webp`}
         alt="" width={size} height={size} decoding="async"
-        className="h-full w-full rounded-full object-contain drop-shadow-[0_6px_18px_rgba(245,185,66,.25)]"
+        className="h-full w-full rounded-full object-contain drop-shadow-[0_6px_18px_rgba(229,9,20,.25)]"
       />
       {spin && !reduced && (
         <motion.svg
           viewBox="0 0 100 100" className="absolute -inset-[8%] h-[116%] w-[116%]"
           animate={{ rotate: 360 }} transition={{ duration: 2.4, ease: 'linear', repeat: Infinity }}
         >
-          <circle cx="50" cy="50" r="48" fill="none" stroke="#F5B942" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="70 232" />
-          <circle cx="50" cy="50" r="48" fill="none" stroke="#E63932" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="30 272" strokeDashoffset="-150" />
+          <circle cx="50" cy="50" r="48" fill="none" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="70 232" />
+          <circle cx="50" cy="50" r="48" fill="none" stroke="#E50914" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="30 272" strokeDashoffset="-150" />
         </motion.svg>
       )}
     </span>
@@ -35,7 +35,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
         <LogoMark size={compact ? 46 : 52} />
       </motion.span>
       <span className="display text-[1.55rem] leading-none tracking-[0.04em] text-cream">
-        NAPOLI<span className="text-gold">TIME</span>
+        NAPOLI<span className="text-tomato">TIME</span>
       </span>
     </span>
   )

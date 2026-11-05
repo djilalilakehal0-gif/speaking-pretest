@@ -13,7 +13,7 @@ export async function initNative() {
 
   const [{ App }, { StatusBar, Style }] = await Promise.all([import('@capacitor/app'), import('@capacitor/status-bar')])
   StatusBar.setStyle({ style: Style.Dark }).catch(() => {})
-  StatusBar.setBackgroundColor({ color: '#101010' }).catch(() => {})
+  StatusBar.setBackgroundColor({ color: '#080808' }).catch(() => {})
 
   App.addListener('backButton', () => {
     const overlayOpen = document.querySelector('[role="dialog"], #mobile-nav')
