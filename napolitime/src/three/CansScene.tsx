@@ -1,8 +1,9 @@
 /**
  * Interactive 3D cans (React Three Fiber). Loaded lazily by sections/Beverages.tsx, never on first paint.
- * - Each can is its own object: drag it horizontally to spin it (with inertia); it keeps idling on its own.
- * - The pair floats, leans toward the pointer and, driven by `progress` (scroll 0→1), opens out while the camera dollies in.
- * - Lighting is built from local light-formers, so nothing is downloaded besides the two GLB files.
+ * - Each can is its own object: drag it horizontally to spin it 360° (with inertia); it keeps idling on its own.
+ * - The group floats, leans toward the pointer and, driven by `progress` (scroll 0→1), opens out while the camera dollies in.
+ * - Wide screens: one row. Narrow screens (portrait phones): a 2 × 2 grid, so each can stays large enough.
+ * - Lighting is built from local light-formers, so nothing is downloaded besides the GLB files.
  */
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { ContactShadows, Environment, Float, Lightformer, useGLTF } from '@react-three/drei'
@@ -10,9 +11,28 @@ import { Suspense, useEffect, useMemo, useRef, type MutableRefObject } from 'rea
 import * as THREE from 'three'
 
 const base = import.meta.env.BASE_URL
-export const CAN_MODELS = { coca: `${base}models/coca-cola.glb`, pepsi: `${base}models/pepsi.glb` }
+export const CAN_MODELS = {
+  coca: `${base}models/coca-cola.glb`,
+  pepsi: `${base}models/pepsi.glb`,
+  fanta: `${base}models/fanta.glb`,
+  sprite: `${base}models/sprite.glb`,
+} as const
+export type CanId = keyof typeof CAN_MODELS
+
+const CAN_W = 0.068     // can diameter (m), from the GLB bounds
+const CAN_H = 0.1157    // can height (m)
+
+/** Slot of can `i` among `n`: x/y in metres, before the scroll-driven spread. */
+function slot(i: number, n: number, grid: boolean, spread: number) {
+  if (grid) {
+    const col = i % 2, row = Math.floor(i / 2), rows = Math.ceil(n / 2)
+    return { x: (col - 0.5) * spread, y: ((rows - 1) / 2 - row) * CAN_H * 1.18 }
+  }
+  return { x: (i - (n - 1) / 2) * spread, y: 0 }
+}
 
 type Props = {
+  cans: readonly CanId[]
   progress: MutableRefObject<number>
   reduced: boolean
   active: boolean
@@ -38,7 +58,8 @@ function tuneMaterials(root: THREE.Object3D) {
   })
 }
 
-function Can({ url, side, progress, reduced, idleSpeed }: { url: string; side: -1 | 1; progress: MutableRefObject<number>; reduced: boolean; idleSpeed: number }) {
+function Can({ url, index, count, grid, progress, reduced, idleSpeed }: { url: string; index: number; count: number; grid: boolean; progress: MutableRefObject<number>; reduced: boolean; idleSpeed: number }) {
+  const side = index < (count - 1) / 2 ? -1 : 1
   const { scene } = useGLTF(url, false, false)
   const model = useMemo(() => { const s = scene.clone(true); tuneMaterials(s); return s }, [scene])
   const group = useRef<THREE.Group>(null)
@@ -72,15 +93,18 @@ function Can({ url, side, progress, reduced, idleSpeed }: { url: string; side: -
     }
     if (group.current) {
       // scroll choreography: the cans start close and tilted, then open out and straighten
-      const spread = THREE.MathUtils.lerp(0.036, 0.058, THREE.MathUtils.smoothstep(p, 0.1, 0.55))
-      group.current.position.x = THREE.MathUtils.damp(group.current.position.x, side * spread, 6, delta)
-      const tilt = side * THREE.MathUtils.lerp(0.18, 0.05, THREE.MathUtils.smoothstep(p, 0.1, 0.6))
+      const spread = THREE.MathUtils.lerp(CAN_W * 1.06, CAN_W * 1.5, THREE.MathUtils.smoothstep(p, 0.1, 0.55))
+      const { x, y } = slot(index, count, grid, spread)
+      group.current.position.x = THREE.MathUtils.damp(group.current.position.x, x, 6, delta)
+      group.current.position.y = THREE.MathUtils.damp(group.current.position.y, y, 6, delta)
+      const lean = count === 1 ? 0 : (index - (count - 1) / 2) / ((count - 1) / 2)   // -1 … 1, outer cans lean most
+      const tilt = (grid ? 0.6 : 1) * lean * THREE.MathUtils.lerp(0.18, 0.05, THREE.MathUtils.smoothstep(p, 0.1, 0.6))
       group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, -tilt, 6, delta)
     }
   })
 
   return (
-    <group ref={group} position={[side * 0.036, 0, 0]}>
+    <group ref={group} position={[slot(index, count, grid, CAN_W * 1.06).x, slot(index, count, grid, CAN_W * 1.06).y, 0]}>
       <Float enabled={!reduced} speed={1.6} rotationIntensity={0.25} floatIntensity={0.6} floatingRange={[-0.004, 0.004]}>
         <group
           ref={spin}
@@ -101,15 +125,19 @@ function Can({ url, side, progress, reduced, idleSpeed }: { url: string; side: -
 }
 
 /** Camera dolly + pointer parallax for the whole pair. */
-function Rig({ progress, reduced, children }: { progress: MutableRefObject<number>; reduced: boolean; children: React.ReactNode }) {
+function Rig({ progress, reduced, count, grid, children }: { progress: MutableRefObject<number>; reduced: boolean; count: number; grid: boolean; children: React.ReactNode }) {
   const pair = useRef<THREE.Group>(null)
   const { camera, size } = useThree()
   useFrame((state, delta) => {
     const p = progress.current
     const aspect = size.width / size.height
-    // distance at which the can fills ~60 % of the height, or at which both cans still fit the width
+    // distance at which the cans fill ~60 % of the height, or at which every can still fits the width (fully spread)
     const halfTan = Math.tan(THREE.MathUtils.degToRad(15))
-    const fit = Math.max(0.1157 / 0.6 / (2 * halfTan), 0.215 / (2 * halfTan * aspect))
+    const cols = grid ? 2 : count
+    const rows = grid ? Math.ceil(count / 2) : 1
+    const width = (cols - 1) * CAN_W * 1.5 + CAN_W * 1.6
+    const height = rows * CAN_H * 1.18
+    const fit = Math.max(height / 0.6 / (2 * halfTan), width / (2 * halfTan * aspect))
     const z = THREE.MathUtils.lerp(fit * 1.18, fit * 0.98, THREE.MathUtils.smoothstep(p, 0, 0.6))
     camera.position.z = THREE.MathUtils.damp(camera.position.z, z, 4, delta)
     camera.position.y = THREE.MathUtils.damp(camera.position.y, THREE.MathUtils.lerp(0.03, 0.008, p), 4, delta)
@@ -127,7 +155,7 @@ function Ready({ onReady }: { onReady?: () => void }) {
   return null
 }
 
-export default function CansScene({ progress, reduced, active, onReady }: Props) {
+export default function CansScene({ cans, progress, reduced, active, onReady }: Props) {
   return (
     <Canvas
       frameloop={active ? 'always' : 'never'}
@@ -142,11 +170,7 @@ export default function CansScene({ progress, reduced, active, onReady }: Props)
       <directionalLight position={[-0.4, 0.6, 0.6]} intensity={1.6} color="#fff1dc" />
       <spotLight position={[0.5, 0.4, -0.3]} angle={0.5} penumbra={1} intensity={6} color="#C6A46C" />
       <Suspense fallback={null}>
-      <Rig progress={progress} reduced={reduced}>
-        <Can url={CAN_MODELS.coca} side={-1} progress={progress} reduced={reduced} idleSpeed={0.35} />
-        <Can url={CAN_MODELS.pepsi} side={1} progress={progress} reduced={reduced} idleSpeed={-0.3} />
-      </Rig>
-      <ContactShadows position={[0, -0.064, 0]} opacity={0.7} scale={0.35} blur={2.4} far={0.12} resolution={512} color="#000000" />
+      <Layout cans={cans} progress={progress} reduced={reduced} />
       {/* studio reflections, made locally (no HDR download) */}
       <Environment resolution={256} frames={1}>
         <color attach="background" args={['#0b0a0a']} />
@@ -161,5 +185,22 @@ export default function CansScene({ progress, reduced, active, onReady }: Props)
   )
 }
 
-useGLTF.preload(CAN_MODELS.coca, false, false)
-useGLTF.preload(CAN_MODELS.pepsi, false, false)
+/** Picks the row / grid arrangement from the canvas shape and places the cans. */
+function Layout({ cans, progress, reduced }: { cans: readonly CanId[]; progress: MutableRefObject<number>; reduced: boolean }) {
+  const { size } = useThree()
+  const grid = cans.length > 2 && size.width / size.height < 1.1
+  const rows = grid ? Math.ceil(cans.length / 2) : 1
+  return (
+    <>
+      <Rig progress={progress} reduced={reduced} count={cans.length} grid={grid}>
+        {cans.map((id, i) => (
+          // alternate the idle spin direction so neighbouring cans never turn in lockstep
+          <Can key={id} url={CAN_MODELS[id]} index={i} count={cans.length} grid={grid} progress={progress} reduced={reduced} idleSpeed={(i % 2 ? -0.3 : 0.35) * (1 - i * 0.04)} />
+        ))}
+      </Rig>
+      <ContactShadows position={[0, -0.064 - ((rows - 1) * CAN_H * 1.18) / 2, 0]} opacity={0.7} scale={0.35 + 0.1 * cans.length} blur={2.4} far={0.12} resolution={512} color="#000000" />
+    </>
+  )
+}
+
+for (const url of Object.values(CAN_MODELS)) useGLTF.preload(url, false, false)

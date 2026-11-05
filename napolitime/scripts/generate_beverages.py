@@ -1,9 +1,9 @@
 """
 NAPOLITIME — 3D beverage can generator (Blender / bpy).
 
-Builds two real 3D 33 cl cans from scratch — Coca-Cola (red) and Pepsi (blue) — and exports:
-  public/models/coca-cola.glb, public/models/pepsi.glb          (meshes + PBR materials + embedded textures)
-  public/models/previews/coca-cola-preview.png / pepsi-preview.png   (Cycles studio renders)
+Builds real 3D 33 cl cans from scratch — Coca-Cola, Pepsi, Fanta Orange and Sprite — and exports:
+  public/models/{coca-cola,pepsi,fanta,sprite}.glb                    (meshes + PBR materials + embedded textures)
+  public/models/previews/{name}-preview.png                           (Cycles studio renders)
   public/models/previews/*.webp                                       (same renders, light, for the website fallback)
 
 Geometry (metres, Blender Z-up; glTF export converts to Y-up):
@@ -13,11 +13,13 @@ Geometry (metres, Blender Z-up; glTF export converts to Y-up):
   * pull tab (with finger hole), rivet, embossed opening score
   * condensation: a few hundred flattened droplets merged into one mesh
 Labels are painted here with Pillow at 2048 px (fonts in scripts/assets/fonts, OFL licensed).
+The artwork is brand-inspired, drawn from scratch: no official logo files are used.
 
 Run (Blender 4.2+/5.x as a Python module, or inside Blender):
   python3 -m venv .venv && .venv/bin/pip install bpy pillow numpy
   .venv/bin/python scripts/generate_beverages.py            # models + previews
   .venv/bin/python scripts/generate_beverages.py --no-render  # models only (fast)
+  .venv/bin/python scripts/generate_beverages.py --only fanta,sprite   # only these cans (others untouched)
 or:  blender -b -P scripts/generate_beverages.py -- --no-render
 """
 import math
@@ -38,6 +40,7 @@ PREVIEWS = os.path.join(OUT, 'previews')
 TMP = os.path.join(ROOT, 'scripts', '.build')
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else sys.argv[1:]
 RENDER = '--no-render' not in ARGS
+ONLY = ARGS[ARGS.index('--only') + 1].split(',') if '--only' in ARGS else None
 
 # ---------------------------------------------------------------- can dimensions (33 cl standard can)
 R = 0.0330            # body radius
@@ -168,6 +171,195 @@ def pepsi_label(path):
         d.text((cx, h * 0.82), 'pepsi', font=word, fill=(255, 255, 255), anchor='mm')
     for cx in (0, w * 0.5, w):
         draw_text_centered(d, cx, h * 0.90, '33 cl', small, (220, 230, 255))
+    img.convert('RGB').filter(ImageFilter.GaussianBlur(0.5)).save(path, quality=92)
+
+
+def stroked_text(img, xy, text, fnt, fill, stroke, stroke_w, angle=0.0, shadow=None, shadow_offset=(0, 10)):
+    """Text with a thick outline (and optional soft shadow), drawn on its own layer so it can be rotated."""
+    pad = stroke_w * 3 + 40
+    probe = ImageDraw.Draw(Image.new('L', (1, 1)))
+    l, t, r, b = probe.textbbox((0, 0), text, font=fnt, stroke_width=stroke_w)
+    w, h = r - l + pad * 2, b - t + pad * 2
+    layer = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    origin = (pad - l, pad - t)
+    if shadow:
+        sh = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+        ImageDraw.Draw(sh).text((origin[0] + shadow_offset[0], origin[1] + shadow_offset[1]), text, font=fnt,
+                                fill=shadow, stroke_width=stroke_w, stroke_fill=shadow)
+        layer.alpha_composite(sh.filter(ImageFilter.GaussianBlur(6)))
+    d.text(origin, text, font=fnt, fill=fill, stroke_width=stroke_w, stroke_fill=stroke)
+    if angle:
+        layer = layer.rotate(angle, resample=Image.BICUBIC, expand=True)
+    img.alpha_composite(layer, (int(xy[0] - layer.width / 2), int(xy[1] - layer.height / 2)))
+
+
+def leaf(img, cx, cy, length, angle, dark=(18, 110, 40), light=(70, 175, 70)):
+    """Two-tone leaf with a central vein, drawn at 4x then downsampled."""
+    s = 4
+    L = int(length * s)
+    lay = Image.new('RGBA', (L, L // 2), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    top, bot = [], []
+    for i in range(61):
+        t = i / 60
+        x = t * L
+        w = math.sin(t * math.pi) ** 0.8 * L * 0.2
+        top.append((x, L / 4 - w))
+        bot.append((x, L / 4 + w))
+    d.polygon(top + bot[::-1], fill=dark)
+    d.polygon(top + [(L, L / 4), (0, L / 4)], fill=light)
+    d.line([(L * 0.04, L / 4), (L * 0.96, L / 4)], fill=(210, 240, 190), width=max(2, s * 2))
+    lay = lay.resize((L // s, L // (2 * s)), Image.LANCZOS).rotate(angle, resample=Image.BICUBIC, expand=True)
+    img.alpha_composite(lay, (int(cx - lay.width / 2), int(cy - lay.height / 2)))
+
+
+def citrus_slice(size, flesh, pith=(255, 248, 225), peel=(240, 120, 10), segments=10):
+    """Cross-section of a citrus fruit (orange / lime): peel, pith, juicy segments, at 4x then downsampled."""
+    s = size * 4
+    lay = Image.new('RGBA', (s, s), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    d.ellipse((0, 0, s - 1, s - 1), fill=peel)
+    m = s * 0.045
+    d.ellipse((m, m, s - m, s - m), fill=pith)
+    inner = s / 2 - s * 0.085
+    c = s / 2
+    gap = math.radians(3.2)
+    for k in range(segments):
+        a0 = 2 * math.pi * k / segments + gap
+        a1 = 2 * math.pi * (k + 1) / segments - gap
+        pts = [(c + s * 0.025 * math.cos((a0 + a1) / 2), c + s * 0.025 * math.sin((a0 + a1) / 2))]
+        for i in range(17):
+            a = a0 + (a1 - a0) * i / 16
+            pts.append((c + inner * math.cos(a), c + inner * math.sin(a)))
+        d.polygon(pts, fill=flesh)
+        hl = tuple(min(255, int(v * 1.12) + 18) for v in flesh)   # juicy highlight streak in each segment
+        mid = (a0 + a1) / 2
+        d.line([(c + inner * 0.35 * math.cos(mid), c + inner * 0.35 * math.sin(mid)),
+                (c + inner * 0.82 * math.cos(mid), c + inner * 0.82 * math.sin(mid))], fill=hl, width=int(s * 0.012))
+    return lay.resize((size, size), Image.LANCZOS)
+
+
+def splash(img, cx, cy, size, color, seed=3):
+    """Juice splash: a soft crown of teardrops thrown upwards from behind a fruit slice."""
+    rnd = random.Random(seed)
+    s = 3
+    W = int(size * 2 * s)
+    lay = Image.new('RGBA', (W, W), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    c = W / 2
+    for k in range(9):
+        a = math.radians(225 + 90 * k / 8 + rnd.uniform(-5, 5))
+        r1 = size * s * rnd.uniform(0.62, 0.92)
+        w = size * s * rnd.uniform(0.05, 0.08)
+        tip = (c + r1 * math.cos(a), c + r1 * math.sin(a))
+        base = size * s * 0.32
+        nx, ny = -math.sin(a), math.cos(a)
+        pts = []
+        for i in range(21):                                   # teardrop: wide near the fruit, thin to the drop
+            t = i / 20
+            rr = base + (r1 - base) * t
+            half = w * (1 - t) ** 1.4 + w * 0.12
+            pts.append((c + rr * math.cos(a) + nx * half, c + rr * math.sin(a) + ny * half))
+        for i in range(20, -1, -1):
+            t = i / 20
+            rr = base + (r1 - base) * t
+            half = w * (1 - t) ** 1.4 + w * 0.12
+            pts.append((c + rr * math.cos(a) - nx * half, c + rr * math.sin(a) - ny * half))
+        d.polygon(pts, fill=color)
+        dr = w * rnd.uniform(0.55, 0.85)
+        dx, dy = tip[0] + math.cos(a) * dr * 2.2, tip[1] + math.sin(a) * dr * 2.2
+        d.ellipse((dx - dr, dy - dr, dx + dr, dy + dr), fill=color)
+    lay = lay.filter(ImageFilter.GaussianBlur(s * 1.2)).resize((W // s, W // s), Image.LANCZOS)
+    img.alpha_composite(lay, (int(cx - lay.width / 2), int(cy - lay.height / 2)))
+
+
+def fanta_label(path):
+    w, h = TEX_W, TEX_H
+    img = vertical_gradient(w, h, (214, 62, 0), (240, 104, 0), (200, 52, 0)).convert('RGBA')
+    glow = Image.new('L', (w, h), 0)
+    gd = ImageDraw.Draw(glow)
+    for cx in (w * 0.25, w * 0.75):                      # bright sunburst behind each logo
+        for k in range(28):
+            r = 470 - k * 15
+            gd.ellipse((cx - r, h * 0.44 - r * 0.8, cx + r, h * 0.44 + r * 0.8), fill=int(5 + k * 3.4))
+    img.paste((255, 150, 20, 255), (0, 0), glow.filter(ImageFilter.GaussianBlur(30)))
+    word = font('lilita-one.ttf', 245)
+    tag = font('montserrat-800.ttf', 54)
+    small = font('montserrat-700.ttf', 30)
+    for cx in (w * 0.25, w * 0.75):
+        # white-ringed orange badge, the blue wordmark across it, a leaf on top
+        d = ImageDraw.Draw(img)
+        r = 290
+        d.ellipse((cx - r, h * 0.44 - r, cx + r, h * 0.44 + r), fill=(255, 255, 255))
+        r2 = r - 22
+        d.ellipse((cx - r2, h * 0.44 - r2, cx + r2, h * 0.44 + r2), fill=(242, 100, 0))
+        leaf(img, cx + 40, h * 0.17, 210, 14)
+        stroked_text(img, (cx, h * 0.45), 'fanta', word, (14, 46, 150), (255, 255, 255), 17, angle=4,
+                     shadow=(10, 22, 80, 170), shadow_offset=(6, 12))
+        d = ImageDraw.Draw(img)
+        pill_w, pill_h, py, px = 330, 92, h * 0.73, cx - 40
+        d.rounded_rectangle((px - pill_w / 2, py - pill_h / 2, px + pill_w / 2, py + pill_h / 2), radius=24,
+                            fill=(16, 44, 130), outline=(255, 255, 255), width=6)
+        draw_text_centered(d, px, py + 2, 'Orange', tag, (255, 255, 255))
+        sl = citrus_slice(280, (255, 150, 20), peel=(244, 118, 6))
+        splash(img, cx + 340, h * 0.86, 230, (255, 196, 70, 235), seed=int(cx))
+        img.alpha_composite(sl, (int(cx + 340 - 140), int(h * 0.84 - 140)))
+        leaf(img, cx + 450, h * 0.66, 140, 50)
+    d = ImageDraw.Draw(img)
+    for cx in (0, w * 0.5, w):
+        draw_text_centered(d, cx, h * 0.92, '33 cl', small, (255, 236, 210))
+    img.convert('RGB').filter(ImageFilter.GaussianBlur(0.5)).save(path, quality=92)
+
+
+def sprite_banner(width, height):
+    """Green banner with a white outline and spiky ends, like the Sprite label."""
+    s = 4
+    W, H = width * s, height * s
+    lay = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    tip = H * 0.18
+    pts = [(tip, H * 0.18), (W * 0.5, H * 0.04), (W - tip * 0.2, H * 0.10), (W - tip, H * 0.30), (W - tip * 0.4, H * 0.55),
+           (W - tip * 1.1, H * 0.74), (W * 0.5, H * 0.92), (tip * 0.6, H * 0.86), (tip * 1.2, H * 0.62), (0, H * 0.40)]
+    d.polygon(pts, fill=(255, 255, 255))
+    cx, cy = W / 2, H / 2
+    inner = [(cx + (x - cx) * 0.93, cy + (y - cy) * 0.86) for x, y in pts]
+    d.polygon(inner, fill=(10, 112, 46))
+    return lay.resize((width, height), Image.LANCZOS)
+
+
+def sprite_label(path):
+    w, h = TEX_W, TEX_H
+    img = vertical_gradient(w, h, (6, 96, 38), (20, 150, 64), (5, 84, 32)).convert('RGBA')
+    sheen = Image.new('L', (w, h), 0)
+    sd = ImageDraw.Draw(sheen)
+    for cx in (w * 0.25, w * 0.75):                      # diagonal light streaks
+        for k in range(5):
+            x = cx - 380 + k * 170
+            sd.polygon([(x, 0), (x + 60, 0), (x - 140, h), (x - 200, h)], fill=26)
+    img.paste((120, 220, 120, 255), (0, 0), sheen.filter(ImageFilter.GaussianBlur(18)))
+    word = font('kanit-800-italic.ttf', 205)
+    small = font('montserrat-700.ttf', 30)
+    for cx in (w * 0.25, w * 0.75):
+        d = ImageDraw.Draw(img)
+        # yellow-to-lime citrus sun peeking over the banner
+        sun = Image.new('RGBA', (360, 360), (0, 0, 0, 0))
+        sdraw = ImageDraw.Draw(sun)
+        for k in range(180):
+            t = k / 179
+            col = (int(250 - 60 * t), int(214 + 20 * t), int(30 + 40 * t), 255)
+            sdraw.ellipse((k, k, 359 - k, 359 - k), outline=col, width=2)
+        img.alpha_composite(sun.rotate(25), (int(cx + 10), int(h * 0.02)))
+        banner = sprite_banner(900, 330)
+        img.alpha_composite(banner, (int(cx - 450), int(h * 0.22)))
+        stroked_text(img, (cx, h * 0.41), 'Sprite', word, (255, 255, 255), (8, 70, 28), 6, angle=8,
+                     shadow=(0, 40, 14, 170), shadow_offset=(5, 9))
+        lime = citrus_slice(260, (190, 228, 60), pith=(240, 250, 210), peel=(70, 160, 40))
+        splash(img, cx + 210, h * 0.82, 220, (225, 250, 255, 210), seed=int(cx) + 5)
+        img.alpha_composite(lime, (int(cx + 210 - 130), int(h * 0.80 - 130)))
+    d = ImageDraw.Draw(img)
+    for cx in (0, w * 0.5, w):
+        draw_text_centered(d, cx, h * 0.92, '33 cl', small, (210, 245, 215))
     img.convert('RGB').filter(ImageFilter.GaussianBlur(0.5)).save(path, quality=92)
 
 
@@ -433,24 +625,32 @@ def main():
     os.makedirs(TMP, exist_ok=True)
     clean_scene()
 
-    coca_png, pepsi_png = os.path.join(TMP, 'coca-cola-label.jpg'), os.path.join(TMP, 'pepsi-label.jpg')
-    coca_label(coca_png)
-    pepsi_label(pepsi_png)
+    # key, Blender title, output file name, label painter, pull-tab tint
+    cans = [
+        ('coca', 'CocaCola', 'coca-cola', coca_label, (0.86, 0.84, 0.82)),
+        ('pepsi', 'Pepsi', 'pepsi', pepsi_label, (0.78, 0.80, 0.86)),
+        ('fanta', 'Fanta', 'fanta', fanta_label, (0.84, 0.80, 0.74)),
+        ('sprite', 'Sprite', 'sprite', sprite_label, (0.78, 0.84, 0.80)),
+    ]
+    if ONLY:                                     # e.g. --only fanta,sprite  (keeps the other GLBs untouched)
+        cans = [c for c in cans if c[2] in ONLY]
 
-    coca_col, coca_root = build_can('coca', 'CocaCola', coca_png, (0.86, 0.84, 0.82))
-    pepsi_col, pepsi_root = build_can('pepsi', 'Pepsi', pepsi_png, (0.78, 0.80, 0.86))
-
-    export_glb(coca_col, coca_root, os.path.join(OUT, 'coca-cola.glb'))
-    export_glb(pepsi_col, pepsi_root, os.path.join(OUT, 'pepsi.glb'))
-    print('exported', [os.path.getsize(os.path.join(OUT, f)) for f in ('coca-cola.glb', 'pepsi.glb')])
+    built = []
+    for key, title, name, painter, tab in cans:
+        png = os.path.join(TMP, f'{name}-label.jpg')
+        painter(png)
+        col, root = build_can(key, title, png, tab)
+        export_glb(col, root, os.path.join(OUT, f'{name}.glb'))
+        print('exported', name, os.path.getsize(os.path.join(OUT, f'{name}.glb')))
+        built.append((col, root, name))
 
     if RENDER:
         setup_studio()
-        for root in (coca_root, pepsi_root):
+        cols = [b[0] for b in built]
+        for col, root, name in built:
             root.rotation_euler = (0, 0, math.radians(-8))
-        for col, name in ((coca_col, 'coca-cola'), (pepsi_col, 'pepsi')):
             png = os.path.join(PREVIEWS, f'{name}-preview.png')
-            render_preview(col, [coca_col, pepsi_col], png)
+            render_preview(col, cols, png)
             Image.open(png).convert('RGB').save(png.replace('.png', '.webp'), quality=86)
             print('rendered', png)
 
