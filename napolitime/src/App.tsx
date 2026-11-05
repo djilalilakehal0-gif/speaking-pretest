@@ -12,6 +12,7 @@ import { Hero, Marquee } from './sections/Hero'
 import { Story } from './sections/Story'
 import { BurgerShowcase } from './sections/BurgerShowcase'
 import { Signature } from './sections/Signature'
+import { Beverages } from './sections/Beverages'
 import { Menu } from './sections/Menu'
 import { Experience } from './sections/Experience'
 import { FinalCta, Visit, Footer } from './sections/Visit'
@@ -40,6 +41,7 @@ export default function App() {
           <Story />
           <BurgerShowcase onOpen={setSelected} />
           <Signature onOpen={setSelected} />
+          <Beverages onOpen={setSelected} />
           <Menu onOpen={setSelected} />
           <Experience />
           <FinalCta />

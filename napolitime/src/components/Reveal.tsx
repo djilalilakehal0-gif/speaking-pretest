@@ -1,5 +1,5 @@
 import { motion, type Variants } from 'framer-motion'
-import { Fragment, useRef, type ReactNode, type ElementType } from 'react'
+import { Fragment, useRef, type ReactNode } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -10,7 +10,7 @@ export const ease = [0.16, 1, 0.3, 1] as const
 
 /** Splits text into words that rise from a mask, staggered. Screen readers get the plain text. */
 export function SplitReveal({ text, className = '', as: Tag = 'span', delay = 0, stagger = 0.07 }: {
-  text: string; className?: string; as?: ElementType; delay?: number; stagger?: number
+  text: string; className?: string; as?: 'span' | 'p' | 'div' | 'h2' | 'h3'; delay?: number; stagger?: number
 }) {
   const lines = text.split('\n')
   const container: Variants = { hidden: {}, shown: { transition: { staggerChildren: stagger, delayChildren: delay } } }
