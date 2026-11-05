@@ -12,6 +12,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
+          lenis: ["lenis"],
           react: ['react', 'react-dom'],
           motion: ['framer-motion'],
           gsap: ['gsap', 'gsap/ScrollTrigger'],

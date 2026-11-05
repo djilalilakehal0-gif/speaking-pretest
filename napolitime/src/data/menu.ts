@@ -99,3 +99,9 @@ export const products: Product[] = [
 ]
 
 export const productById = new Map(products.map((x) => [x.id, x]))
+
+/**
+ * Plats mis en avant dans la section « Signature » de la page d'accueil (ordre d'affichage).
+ * Ce sont des produits de la carte ci-dessus : leurs prix et photos viennent de `products`.
+ */
+export const signatureIds = ['kebab', 'le-best', 'tacos-3', 'triple-x', 'tex-box-xl', 'milkshake'] as const

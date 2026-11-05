@@ -1,7 +1,12 @@
 # NAPOLITIME — The Taste of Excellence
 
-Single-page restaurant website for a Neapolitan pizza & gourmet burger brand.
-React 19 · TypeScript · Vite · Tailwind CSS 4 · Framer Motion · GSAP (ScrollTrigger) · Lottie.
+Single-page restaurant website with an Italian luxury identity (burgundy, black, ivory, champagne gold;
+Cormorant Garamond + Inter). React 19 · TypeScript · Vite · Tailwind CSS 4 · Framer Motion · GSAP
+(ScrollTrigger, SplitText) · Lenis smooth scrolling · Lottie.
+
+Page order: loader → hero (cinematic photo slideshow) → marquee → *La nostra storia* → *Piatti signature*
+(pinned horizontal gallery) → *La carte* (full menu) → *L'esperienza* (dine in / take away / delivery) →
+*A tavola!* call to action → restaurant, hours & contact → footer.
 
 Published by the Pages workflow at `/napolitime/` (e.g. `https://<user>.github.io/speaking-pretest/napolitime/`).
 
@@ -18,6 +23,8 @@ npm run build      # typecheck + production build into dist/
 | --- | --- |
 | Phone, address, e-mail, socials, opening hours, delivery fees | `src/config/site.ts` |
 | Menu: products, prices (€), options (flavours/drinks), Best Seller badge | `src/data/menu.ts` |
+| Dishes shown in the "Signature" gallery | `signatureIds` in `src/data/menu.ts` |
+| Colours, fonts, buttons | `src/index.css` (`@theme` tokens) |
 | Product photos | `public/menu/<image>.webp` — drop a new file with the same name to replace a photo |
 | Logo | `assets/source/logo.png` → `python3 scripts/make-logo.py <source.png>` |
 | Hero photo | `public/img/hero-burger-*.webp`; storefront `public/img/storefront-*.webp` |
@@ -57,7 +64,8 @@ Customer details are kept in memory only; the browser stores just the cart (prod
 
 ## Motion & accessibility
 
-* Loader, hero parallax, pinned pizza → burger transition (GSAP ScrollTrigger); staggered reveals, filters, drawer, modal (Framer Motion); "added to cart" burst (Lottie, `src/lottie/added.json`, loaded lazily).
+* Lenis smooth scrolling on desktop browsers (`src/lib/smooth.ts`; off for reduced motion and in the Android app). Every overlay locks scrolling through `lockScroll()`.
+* Loader curtain; hero headline split into characters (GSAP SplitText), photo slideshow with masked wipes and Ken Burns, scroll parallax; masked image reveals and parallax (`ImageReveal`), scroll-lit manifesto, rotating seal, pinned horizontal "Signature" gallery, sticky "Experience" frame; staggered reveals, filters, drawer, modal (Framer Motion); magnetic buttons; "added to cart" burst (Lottie, loaded lazily).
 * Custom animated SVG icon set in `src/components/icons/Icons.tsx`: stroke draw-on, flame flicker, scooter wheels, clock hands, cart bounce, heart/plus→check/menu→close morphs.
 * `prefers-reduced-motion` is respected everywhere (Framer `MotionConfig`, GSAP `matchMedia`, CSS, canvas particles off).
 * Skip link, focus-trapped dialogs with Escape, labelled controls, live regions for cart updates and errors.
