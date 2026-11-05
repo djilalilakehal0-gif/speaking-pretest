@@ -1,121 +1,57 @@
-import { motion } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useGSAP } from '@gsap/react'
-import { Embers } from '../components/Embers'
-import { MagneticButton } from '../components/MagneticButton'
-import { ArrowIcon, PhoneIcon } from '../components/icons/Icons'
-import { LogoMark } from '../components/Logo'
+import { useEffect, useState } from 'react'
+import { PhoneIcon } from '../components/icons/Icons'
 import { openStatus } from '../lib/hours'
 import { photo } from '../lib/img'
 import { site } from '../config/site'
-import { categories } from '../data/menu'
 
-gsap.registerPlugin(ScrollTrigger, useGSAP)
-
-const ease = [0.16, 1, 0.3, 1] as const
-
-export function Hero({ ready }: { ready: boolean }) {
-  const root = useRef<HTMLElement>(null)
+/**
+ * The poster: the slogan set as huge sign lettering, and the burger in a red neon
+ * light box — the backlit menu panels above the counter. The page's one orchestrated
+ * moment is here (lines rise, the tube flickers on, the burger lights up), in CSS so
+ * it paints before JavaScript and is skipped for reduced motion.
+ */
+export function Hero() {
   const burger = photo('hero-burger')
   const [status, setStatus] = useState<ReturnType<typeof openStatus> | null>(null)
   useEffect(() => setStatus(openStatus()), [])
 
-  useGSAP(() => {
-    const mm = gsap.matchMedia()
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: 0.6 } })
-      tl.to('[data-px="food"]', { yPercent: -14, scale: 1.06, ease: 'none' }, 0)
-        .to('[data-px="copy"]', { yPercent: 25, opacity: 0.1, ease: 'none' }, 0)
-        .to('[data-px="glow"]', { scale: 1.3, opacity: 0.35, ease: 'none' }, 0)
-    })
-    return () => mm.revert()
-  }, { scope: root })
-
-  const show = ready ? 'shown' : 'hidden'
-  const item = { hidden: { opacity: 0, y: 24 }, shown: { opacity: 1, y: 0, transition: { duration: 0.9, ease } } }
-
   return (
-    <section ref={root} id="top" className="grain relative isolate flex min-h-[100svh] flex-col overflow-hidden pt-[4.5rem]" aria-labelledby="hero-title">
-      <div data-px="glow" aria-hidden className="absolute -right-[15%] top-[0%] -z-10 h-[85vmax] w-[85vmax] rounded-full bg-[radial-gradient(circle,rgba(229,9,20,.38)_0%,rgba(229,9,20,.10)_35%,transparent_65%)]" />
-      <div aria-hidden className="absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-[radial-gradient(ellipse_at_50%_100%,rgba(229,9,20,.18),transparent_60%)]" />
-      <Embers className="absolute inset-0 -z-[5] h-full w-full" />
+    <section id="top" className="relative isolate overflow-hidden pb-16 pt-[5.5rem] sm:pb-24 lg:pt-28" aria-labelledby="hero-title">
+      <div className="container-x relative">
+        <h1 id="hero-title" className="display hero-type relative z-0 text-[clamp(4.4rem,16vw,13rem)] text-cream lg:text-[min(13.6vw,12.5rem)]">
+          <span className="block">The taste <span className="lg:inline hidden">of</span></span>
+          <span className="block"><span className="lg:hidden">of </span>excellence</span>
+        </h1>
 
-      <div className="container-x relative grid flex-1 items-center gap-8 pb-16 pt-6 lg:grid-cols-[1fr_1.05fr] lg:gap-6 lg:pb-20">
-        <motion.div data-px="copy" initial="hidden" animate={show} variants={{ shown: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } } }} className="relative z-10">
-          <motion.div variants={item}><LogoMark size={110} className="sm:!h-[132px] sm:!w-[132px]" /></motion.div>
-          <motion.p variants={item} className="eyebrow mt-7 flex items-center gap-3">
-            <span className="h-px w-10 bg-tomato" /> Burger · Sandwich · Tacos · Tex-Mex
-          </motion.p>
-          <h1 id="hero-title" className="display mt-5 text-[clamp(3.3rem,10vw,8rem)] text-cream" aria-label="The Taste of Excellence">
-            {['THE TASTE', 'OF', 'EXCELLENCE'].map((w, i) => (
-              <span key={w} className={`block overflow-hidden pb-[0.04em] ${i === 1 ? 'text-[0.5em] tracking-[0.3em] text-cream/60' : ''} ${i === 2 ? 'text-tomato [text-shadow:0_0_60px_rgba(229,9,20,.45)]' : ''}`} aria-hidden>
-                <motion.span className="block will-change-transform" variants={{ hidden: { y: '105%' }, shown: { y: '0%', transition: { duration: 1.05, ease } } }}>{w}</motion.span>
-              </span>
-            ))}
-          </h1>
-          <motion.p variants={item} className="mt-6 max-w-md text-lg leading-relaxed text-cream/70">
-            Des burgers généreux, des sandwichs gourmands et des tacos, préparés à la commande.
-          </motion.p>
-          <motion.div variants={item} className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <MagneticButton href="#menu" className="btn btn-primary" ariaLabel="Voir le menu">Voir le menu <ArrowIcon /></MagneticButton>
-            <MagneticButton href={site.contact.phoneHref} className="btn btn-ghost"><PhoneIcon size={18} /> {site.contact.phoneDisplay}</MagneticButton>
-          </motion.div>
-          <motion.ul variants={item} className="mt-9 flex flex-wrap gap-2" aria-label="Catégories">
-            {categories.map((c) => (
-              <li key={c.id}><a href={`#cat-${c.id}`} className="block rounded-full border border-white/12 px-3.5 py-1.5 text-xs font-semibold text-cream/65 transition-colors hover:border-tomato hover:text-cream">{c.label}</a></li>
-            ))}
-          </motion.ul>
-        </motion.div>
-
-        <div className="relative mx-auto w-full max-w-[min(92vw,640px)] lg:max-w-none">
-          <motion.div
-            data-px="food"
-            initial={{ opacity: 0, scale: 0.85, y: 40 }} animate={ready ? { opacity: 1, scale: 1, y: 0 } : {}}
-            transition={{ duration: 1.5, ease }}
-            className="relative aspect-square"
-          >
-            <div className="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(229,9,20,.55),transparent_68%)] blur-3xl" aria-hidden />
-            <svg viewBox="0 0 100 100" className="spin-slow absolute inset-[3%] h-[94%] w-[94%]" aria-hidden>
-              <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(255,255,255,.14)" strokeWidth=".3" strokeDasharray="1 2.2" />
-              <circle cx="50" cy="50" r="44" fill="none" stroke="#E50914" strokeWidth=".5" strokeDasharray="40 236" strokeLinecap="round" />
-            </svg>
+        <div className="relative lg:grid lg:grid-cols-[1fr_minmax(0,32rem)] lg:gap-12">
+          <figure className="relative z-10 mx-auto mt-8 aspect-square w-[min(88vw,28rem)] lg:order-2 lg:-mt-[1.6vw] lg:w-full">
+            <div className="neon neon-on absolute inset-0 rounded-[1.25rem] bg-ink" aria-hidden />
             <img
-              src={burger.src} srcSet={burger.srcSet} sizes="(min-width:1024px) 50vw, 92vw"
-              alt="Cheeseburger : pain brioché, steak juteux et cheddar fondant"
+              src={burger.src} srcSet={burger.srcSet} sizes="(min-width:1024px) 32rem, 88vw"
+              alt="Cheeseburger NAPOLITIME : pain brioché, steak et cheddar fondant"
               fetchPriority="high" decoding="async"
-              className="relative h-full w-full object-cover [mask-image:radial-gradient(closest-side,#000_62%,transparent_100%)]"
+              className="hero-burger relative h-full w-full rounded-[1.25rem] object-cover [mask-image:radial-gradient(closest-side,#000_70%,transparent_100%)]"
             />
-          </motion.div>
+            <img src={`${import.meta.env.BASE_URL}img/logo-160.webp`} alt="" width={96} height={96} className="hero-badge absolute -bottom-6 -left-6 h-20 w-20 rounded-full sm:h-24 sm:w-24" aria-hidden />
+          </figure>
+
+        <div className="hero-copy relative z-10 mt-14 max-w-xl lg:order-1 lg:mt-10">
+          <p className="text-xl leading-relaxed text-cream/85">
+            Burgers, sandwichs, tacos et tex-mex préparés à la commande, sur place, à emporter ou en livraison.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a href="#menu" className="btn btn-primary">Voir le menu</a>
+            <a href={site.contact.phoneHref} className="btn btn-ghost"><PhoneIcon size={18} /> Appeler le {site.contact.phoneDisplay}</a>
+          </div>
           {status && (
-            <motion.div
-              initial={{ y: -20, opacity: 0 }} animate={ready ? { y: 0, opacity: 1 } : {}}
-              transition={{ delay: 1.1, duration: 0.6, ease }}
-              className="absolute right-2 top-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/70 px-3.5 py-2 text-xs font-bold text-cream backdrop-blur"
-            >
-              <span className={`h-2 w-2 rounded-full ${status.open ? 'animate-pulse bg-[#3ddc84]' : 'bg-tomato'}`} />
-              {status.open ? 'Ouvert maintenant' : status.label}
-            </motion.div>
+            <p className="mt-6 flex items-center gap-2.5 text-base text-ash" role="status">
+              <span className={`h-2.5 w-2.5 rounded-full ${status.open ? 'bg-[#3ddc84] shadow-[0_0_10px_#3ddc84]' : 'bg-tomato'}`} aria-hidden />
+              {status.open ? status.label : `Fermé pour le moment. ${status.label}.`}
+            </p>
           )}
         </div>
+        </div>
       </div>
-
-      <RedBand />
     </section>
-  )
-}
-
-/** Scrolling brand band between the hero and the menu. */
-function RedBand() {
-  const words = ['Burgers', 'Sandwichs', 'Tacos', 'Tex-Mex', 'Milkshakes', 'Qualité', 'Goût', 'Convivialité']
-  return (
-    <div className="relative z-10 mt-auto overflow-hidden bg-tomato py-3.5 text-white shadow-[0_0_60px_rgba(229,9,20,.5)]" aria-hidden>
-      <div className="marquee flex w-max gap-10 whitespace-nowrap">
-        {[...words, ...words, ...words, ...words].map((w, i) => (
-          <span key={i} className="display flex items-center gap-10 text-2xl">{w} <span className="text-black/50">✦</span></span>
-        ))}
-      </div>
-    </div>
   )
 }

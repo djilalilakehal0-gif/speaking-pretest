@@ -112,7 +112,7 @@ function Drawer({ onClose }: { onClose: () => void }) {
                 <Row label="Livraison" value={t.deliveryFee ? euro(t.deliveryFee) : 'Offerte'} hint={t.deliveryFee ? `Offerte dès ${euro(site.ordering.freeDeliveryFrom)}` : undefined} />
               )}
               <div className="flex items-baseline justify-between pt-2">
-                <dt className="font-semibold uppercase tracking-[0.14em] text-cream/70">Total</dt>
+                <dt className="text-lg font-semibold">Total</dt>
                 <dd className="display text-3xl text-gold">{euro(t.total)}</dd>
               </div>
             </dl>
@@ -121,7 +121,7 @@ function Drawer({ onClose }: { onClose: () => void }) {
             )}
             {step === 'cart' && (
               <button type="button" disabled={t.belowMinimum} onClick={() => setStep('details')} className="btn btn-primary mt-4 w-full disabled:animate-none disabled:opacity-40">
-                Commander <ArrowIcon />
+                Commander
               </button>
             )}
             {(step === 'details' || step === 'failed') && (
@@ -219,7 +219,7 @@ function CartLines() {
 function Field({ id, label, error, children, optional }: { id: string; label: string; error?: string; children: ReactNode; optional?: boolean }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-cream/60">
+      <label htmlFor={id} className="mb-1.5 block text-base font-semibold">
         {label}{optional && <span className="ml-1 normal-case tracking-normal text-cream/35">(facultatif)</span>}
       </label>
       {children}

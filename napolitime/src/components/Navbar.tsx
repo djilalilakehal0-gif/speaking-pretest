@@ -1,7 +1,8 @@
 import { AnimatePresence, motion, useAnimationControls, useMotionValueEvent, useScroll } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { Logo } from './Logo'
-import { CartIcon, MenuMorph } from './icons/Icons'
+import { CartIcon, MenuMorph, PhoneIcon } from './icons/Icons'
+import { site } from '../config/site'
 import { totals, useCart } from '../lib/cart'
 import { euro } from '../lib/format'
 
@@ -91,10 +92,10 @@ export function Navbar() {
             {navLinks.map((l) => (
               <li key={l.id} className="relative">
                 <a href={`#${l.id}`} aria-current={active === l.id ? 'true' : undefined}
-                  className={`relative block px-4 py-2 text-[0.8rem] font-semibold uppercase tracking-[0.16em] transition-colors ${active === l.id ? 'text-cream' : 'text-cream/60 hover:text-cream'}`}>
+                  className={`relative block px-4 py-2 text-base font-semibold transition-colors ${active === l.id ? 'text-cream' : 'text-ash hover:text-cream'}`}>
                   {l.label}
                   {active === l.id && (
-                    <motion.span layoutId="nav-indicator" className="absolute inset-x-4 -bottom-0.5 h-[2px] rounded-full bg-tomato" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />
+                    <motion.span layoutId="nav-indicator" className="absolute inset-x-4 -bottom-0.5 h-[3px] rounded-full bg-tomato" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />
                   )}
                 </a>
               </li>
@@ -102,7 +103,7 @@ export function Navbar() {
           </ul>
 
           <div className="flex items-center gap-2">
-            <a href="#menu" className="btn btn-primary hidden !min-h-11 !px-5 !text-[0.75rem] sm:inline-flex">Commander</a>
+            <a href={site.contact.phoneHref} className="hidden items-center gap-2 px-3 text-base font-semibold text-cream hover:text-gold md:inline-flex"><PhoneIcon size={18} /> {site.contact.phoneDisplay}</a>
             <CartButton />
             <button
               type="button" onClick={() => setMobileOpen((o) => !o)}
@@ -128,13 +129,13 @@ export function Navbar() {
             <motion.ul initial="hidden" animate="shown" variants={{ shown: { transition: { staggerChildren: 0.06, delayChildren: 0.2 } } }} className="flex flex-col gap-2">
               {[{ id: 'top', label: 'Accueil' }, ...navLinks].map((l) => (
                 <motion.li key={l.id} variants={{ hidden: { opacity: 0, x: 40 }, shown: { opacity: 1, x: 0 } }}>
-                  <a href={`#${l.id}`} onClick={() => setMobileOpen(false)} className="display block py-2 text-5xl text-cream active:text-tomato">
+                  <a href={`#${l.id}`} onClick={() => setMobileOpen(false)} className="display block py-2 text-6xl text-cream active:text-tomato">
                     {l.label}
                   </a>
                 </motion.li>
               ))}
             </motion.ul>
-            <a href="#menu" onClick={() => setMobileOpen(false)} className="btn btn-primary mt-auto w-full">Commander</a>
+            <a href="#menu" onClick={() => setMobileOpen(false)} className="btn btn-primary mt-auto w-full">Voir le menu</a>
           </motion.div>
         )}
       </AnimatePresence>

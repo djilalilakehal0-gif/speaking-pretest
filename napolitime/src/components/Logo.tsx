@@ -34,7 +34,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
       <motion.span whileHover={{ rotate: -8, scale: 1.06 }} transition={{ type: 'spring', stiffness: 260, damping: 14 }} className="inline-flex">
         <LogoMark size={compact ? 46 : 52} />
       </motion.span>
-      <span className="display text-[1.55rem] leading-none tracking-[0.04em] text-cream">
+      <span className="display text-[1.75rem] leading-none text-cream">
         NAPOLI<span className="text-tomato">TIME</span>
       </span>
     </span>
