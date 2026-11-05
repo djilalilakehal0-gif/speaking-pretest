@@ -1,24 +1,24 @@
 /**
  * Restaurant settings. Everything a restaurant owner normally changes lives here.
  *
- * DEMO CONTENT: the address, phone, e-mail and social handles below are placeholders.
- * `isDemo` keeps a visible "demo content" notice in the footer until real details are set.
+ * Le téléphone vient de la devanture du restaurant. L'adresse, l'e-mail, les réseaux sociaux et
+ * les horaires sont encore des exemples : `isDemo` affiche un avertissement en pied de page
+ * tant qu'ils ne sont pas remplacés.
  */
 export const site = {
   isDemo: true,
 
   name: 'NAPOLITIME',
-  tagline: 'Taste the Moment.',
+  tagline: 'The Taste of Excellence',
 
   contact: {
-    phoneDisplay: '+39 081 000 0000',
-    phoneHref: 'tel:+390810000000',
-    email: 'ciao@napolitime.example',
-    street: 'Via dei Tribunali 00',
-    city: '80138 Napoli, Italia',
+    phoneDisplay: '09 55 91 40 84',
+    phoneHref: 'tel:+33955914084',
+    email: 'contact@napolitime.example',
+    street: 'Adresse à compléter',
+    city: 'France',
     /** Opens a map search for the address; replace with your Google Maps place link. */
-    mapUrl: 'https://www.google.com/maps/search/?api=1&query=Via+dei+Tribunali+Napoli',
-    mapEmbed: 'https://www.openstreetmap.org/export/embed.html?bbox=14.2525%2C40.8495%2C14.2625%2C40.8545&layer=mapnik&marker=40.852%2C14.2575',
+    mapUrl: 'https://www.google.com/maps/search/?api=1&query=NAPOLITIME',
   },
 
   socials: [
@@ -29,15 +29,15 @@ export const site = {
 
   /** Opening hours, 0 = Sunday. Times are local restaurant time (24h). `null` = closed. */
   hours: [
-    { day: 0, label: 'Sunday', open: '12:00', close: '23:00' },
-    { day: 1, label: 'Monday', open: null, close: null },
-    { day: 2, label: 'Tuesday', open: '18:00', close: '23:00' },
-    { day: 3, label: 'Wednesday', open: '18:00', close: '23:00' },
-    { day: 4, label: 'Thursday', open: '18:00', close: '23:30' },
-    { day: 5, label: 'Friday', open: '12:00', close: '00:30' },
-    { day: 6, label: 'Saturday', open: '12:00', close: '00:30' },
+    { day: 0, label: 'Dimanche', open: '12:00', close: '23:00' },
+    { day: 1, label: 'Lundi', open: null, close: null },
+    { day: 2, label: 'Mardi', open: '18:00', close: '23:00' },
+    { day: 3, label: 'Mercredi', open: '18:00', close: '23:00' },
+    { day: 4, label: 'Jeudi', open: '18:00', close: '23:30' },
+    { day: 5, label: 'Vendredi', open: '12:00', close: '00:30' },
+    { day: 6, label: 'Samedi', open: '12:00', close: '00:30' },
   ] as { day: number; label: string; open: string | null; close: string | null }[],
-  timeZone: 'Europe/Rome',
+  timeZone: 'Europe/Paris',
 
   ordering: {
     deliveryFee: 2.5,
@@ -46,7 +46,7 @@ export const site = {
     estimatedDeliveryMinutes: '30–45',
     estimatedPickupMinutes: '15–20',
     /** Shown at checkout. No online payment is taken by this site. */
-    paymentNote: 'Pay by card or cash when you receive your order.',
+    paymentNote: 'Paiement par carte ou en espèces à la réception.',
   },
 
   /**

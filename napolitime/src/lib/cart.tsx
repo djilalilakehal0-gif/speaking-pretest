@@ -1,16 +1,29 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState, type ReactNode } from 'react'
 import { products } from '../data/menu'
-import { deals } from '../data/content'
 import { site } from '../config/site'
 import { cents } from './format'
 
-/** Anything that can go in the cart: a menu product or a meal deal. */
-export interface CatalogItem { id: string; name: string; price: number; image: string; kind: 'product' | 'deal' }
+/**
+ * A cart line id is the product id, or `productId::option` when the product has options
+ * (e.g. `milkshake::Oreo`), so each flavour is its own line.
+ */
+export interface CatalogItem { id: string; name: string; option?: string; price: number; image?: string }
 
-export const catalog = new Map<string, CatalogItem>([
-  ...products.map((p) => [p.id, { id: p.id, name: p.name, price: p.price, image: p.image, kind: 'product' }] as const),
-  ...deals.map((d) => [d.id, { id: d.id, name: d.name, price: d.price, image: d.image, kind: 'deal' }] as const),
-])
+const byId = new Map(products.map((p) => [p.id, p]))
+
+export const lineId = (productId: string, option?: string) => (option ? `${productId}::${option}` : productId)
+
+export const catalog = {
+  get(id: string): CatalogItem | undefined {
+    const [pid, option] = id.split('::')
+    const p = byId.get(pid)
+    if (!p) return undefined
+    if (option !== undefined && !p.options?.includes(option)) return undefined
+    if (option === undefined && p.options?.length) return undefined
+    return { id, name: p.name, option, price: p.price, image: p.image }
+  },
+  has(id: string) { return !!this.get(id) },
+}
 
 export type Fulfilment = 'delivery' | 'pickup'
 export interface Line { id: string; qty: number }

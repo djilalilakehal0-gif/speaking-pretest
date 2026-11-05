@@ -6,10 +6,7 @@ import { Navbar, MobileCartBar } from './components/Navbar'
 import { CartDrawer } from './components/CartDrawer'
 import { AddedToast } from './components/AddedToast'
 import { Hero } from './sections/Hero'
-import { Featured } from './sections/Featured'
 import { Menu } from './sections/Menu'
-import { Story, Quality } from './sections/Story'
-import { BestSellers, Offers, Reviews } from './sections/Promo'
 import { Visit, Footer } from './sections/Visit'
 
 export default function App() {
@@ -21,13 +18,7 @@ export default function App() {
         <Navbar />
         <main id="main">
           <Hero ready={ready} />
-          <Featured />
           <Menu />
-          <Story />
-          <Quality />
-          <BestSellers />
-          <Offers />
-          <Reviews />
           <Visit />
         </main>
         <Footer />

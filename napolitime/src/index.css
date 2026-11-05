@@ -4,14 +4,14 @@
 @import '@fontsource/instrument-serif/400-italic.css';
 
 @theme {
-  --color-ink: #101010;
-  --color-ink-2: #181716;
-  --color-ink-3: #232120;
-  --color-tomato: #e63932;
-  --color-tomato-deep: #b8231e;
-  --color-cream: #fff3df;
-  --color-cream-2: #f6e6c9;
-  --color-gold: #f5b942;
+  --color-ink: #080808;
+  --color-ink-2: #131313;
+  --color-ink-3: #1e1e1e;
+  --color-tomato: #e50914;
+  --color-tomato-deep: #b00710;
+  --color-cream: #ffffff;
+  --color-cream-2: #2a2a2a;
+  --color-gold: #ff3b44;
   --color-white: #ffffff;
 
   --font-display: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
@@ -60,23 +60,23 @@
     -webkit-tap-highlight-color: transparent;
   }
   .btn-primary { background: var(--color-tomato); color: var(--color-white); animation: glow 3.2s ease-in-out infinite; }
-  .btn-primary:hover { background: #f0463f; box-shadow: 0 0 0 6px rgb(230 57 50 / .18), 0 18px 50px -10px rgb(230 57 50 / .8); }
-  .btn-ghost { border: 1.5px solid rgb(255 243 223 / .35); color: var(--color-cream); }
-  .btn-ghost:hover { border-color: var(--color-gold); color: var(--color-gold); background: rgb(245 185 66 / .06); }
+  .btn-primary:hover { background: #ff1f2b; box-shadow: 0 0 0 6px rgb(229 9 20 / .18), 0 18px 50px -10px rgb(229 9 20 / .8); }
+  .btn-ghost { border: 1.5px solid rgb(255 255 255 / .35); color: var(--color-cream); }
+  .btn-ghost:hover { border-color: var(--color-gold); color: var(--color-gold); background: rgb(229 9 20 / .06); }
   .btn-dark { background: var(--color-ink); color: var(--color-cream); }
   .btn-dark:hover { background: var(--color-tomato); color: var(--color-white); }
 
-  .card-surface { background: linear-gradient(180deg, rgb(255 255 255 / .045), rgb(255 255 255 / .015)); border: 1px solid rgb(255 243 223 / .08); }
+  .card-surface { background: linear-gradient(180deg, rgb(255 255 255 / .045), rgb(255 255 255 / .015)); border: 1px solid rgb(255 255 255 / .08); }
   .grain::after {
     content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .06; mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   .input {
     width: 100%; min-height: 3rem; border-radius: 0.9rem; padding: 0.75rem 1rem;
-    background: rgb(255 255 255 / .04); border: 1px solid rgb(255 243 223 / .14); color: var(--color-cream);
+    background: rgb(255 255 255 / .04); border: 1px solid rgb(255 255 255 / .14); color: var(--color-cream);
     font-size: 1rem; transition: border-color .2s, background-color .2s;
   }
-  .input::placeholder { color: rgb(255 243 223 / .35); }
+  .input::placeholder { color: rgb(255 255 255 / .35); }
   .input:focus { outline: none; border-color: var(--color-gold); background: rgb(255 255 255 / .07); }
   .input[aria-invalid='true'] { border-color: var(--color-tomato); }
   .no-scrollbar { scrollbar-width: none; }
@@ -84,8 +84,8 @@
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgb(230 57 50 / .0), 0 10px 30px -12px rgb(230 57 50 / .6); }
-  50% { box-shadow: 0 0 0 7px rgb(230 57 50 / .12), 0 14px 46px -8px rgb(230 57 50 / .85); }
+  0%, 100% { box-shadow: 0 0 0 0 rgb(229 9 20 / .0), 0 10px 30px -12px rgb(229 9 20 / .6); }
+  50% { box-shadow: 0 0 0 7px rgb(229 9 20 / .12), 0 14px 46px -8px rgb(229 9 20 / .85); }
 }
 
 /* Steam wisps above the hero pizza */
@@ -96,6 +96,9 @@
   100% { transform: translate3d(var(--drift, 12px), -150px, 0) scaleX(1.6); opacity: 0; }
 }
 .steam-wisp { animation: steam var(--dur, 5s) var(--delay, 0s) cubic-bezier(.4, 0, .4, 1) infinite; transform-origin: bottom center; will-change: transform, opacity; }
+
+@keyframes kenburns { from { transform: scale(1.04); } to { transform: scale(1.14) translate3d(-1.5%, -1%, 0); } }
+.kenburns { animation: kenburns 18s ease-in-out infinite alternate; transform-origin: 50% 40%; }
 
 @keyframes spin-slow { to { transform: rotate(360deg); } }
 .spin-slow { animation: spin-slow 80s linear infinite; }
