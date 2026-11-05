@@ -164,7 +164,7 @@ export function StarIcon({ filled = true, ...p }: IconProps & { filled?: boolean
     <Svg {...p}>
       <P
         d="m12 2.8 2.8 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17l-5.7 3.1 1.2-6.3-4.6-4.4 6.3-.8Z"
-        stroke={GOLD} fill={filled ? GOLD : 'none'}
+        stroke="currentColor" fill={filled ? 'currentColor' : 'none'}
       />
     </Svg>
   )

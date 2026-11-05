@@ -251,7 +251,7 @@ export function Footer() {
           initial={{ y: '40%', opacity: 0 }} whileInView={{ y: '0%', opacity: 1 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
           className="select-none text-center leading-[0.8]"
         >
-          <Wordmark className="text-[clamp(3rem,12.5vw,12.5rem)] text-ivory/[0.07] [&_.text-gold]:text-gold/25" />
+          <Wordmark flag={false} className="text-[clamp(3rem,14vw,14rem)] text-ivory/[0.07] [&_.text-rosso]:text-rosso/25" />
         </motion.p>
       </div>
 

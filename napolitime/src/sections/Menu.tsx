@@ -72,7 +72,7 @@ export function Menu({ onOpen }: { onOpen: (p: Product) => void }) {
           </LayoutGroup>
           <label className="relative block lg:w-72">
             <span className="sr-only">Rechercher dans le menu</span>
-            <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Rechercher : kebab, nuggets, oreo…" className="input input-light !min-h-11 !rounded-full !py-2 pl-10 text-sm" />
+            <input id="menu-search" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Rechercher : kebab, nuggets, oreo…" className="input input-light !min-h-11 !rounded-full !py-2 pl-10 text-sm" />
             <svg className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-noir/40" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
               <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" />
             </svg>

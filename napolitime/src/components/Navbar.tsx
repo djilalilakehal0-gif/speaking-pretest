@@ -4,16 +4,35 @@ import { Logo } from './Logo'
 import { CartIcon, MenuMorph, PhoneIcon } from './icons/Icons'
 import { totals, useCart } from '../lib/cart'
 import { euro } from '../lib/format'
-import { lockScroll } from '../lib/smooth'
+import { lockScroll, scrollToId } from '../lib/smooth'
 import { site } from '../config/site'
 
 export const navLinks = [
-  { id: 'story', label: 'Histoire', it: 'Storia' },
-  { id: 'signature', label: 'Signature', it: 'Firma' },
-  { id: 'menu', label: 'La carte', it: 'Menù' },
+  { id: 'top', label: 'Accueil', it: 'Home' },
+  { id: 'menu', label: 'Menu', it: 'Menù' },
+  { id: 'story', label: 'Notre Histoire', it: 'La storia' },
   { id: 'experience', label: 'Expérience', it: 'Esperienza' },
-  { id: 'visit', label: 'Restaurant', it: 'Ristorante' },
+  { id: 'visit', label: 'Contact', it: 'Contatti' },
 ]
+
+/** Search icon: jumps to the menu and focuses its search field. */
+function SearchButton({ onDone }: { onDone?: () => void }) {
+  return (
+    <button
+      type="button" aria-label="Rechercher un plat"
+      onClick={() => {
+        onDone?.()
+        scrollToId('menu')
+        window.setTimeout(() => document.getElementById('menu-search')?.focus({ preventScroll: true }), 900)
+      }}
+      className="inline-flex h-11 w-11 items-center justify-center rounded-full text-ivory transition-colors hover:text-gold"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+        <circle cx="10.5" cy="10.5" r="6.5" /><path d="m20 20-4.6-4.6" />
+      </svg>
+    </button>
+  )
+}
 
 function useActiveSection(ids: string[]) {
   const [active, setActive] = useState<string | null>(null)
@@ -38,17 +57,17 @@ function CartButton() {
   return (
     <button
       type="button" onClick={() => setOpen(true)}
-      className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-ivory/20 text-ivory transition-colors hover:border-gold hover:text-gold"
+      className="relative inline-flex h-11 w-11 items-center justify-center rounded-full text-ivory transition-colors hover:text-gold"
       aria-label={`Ouvrir le panier, ${count} article${count > 1 ? 's' : ''}`}
     >
-      <motion.span animate={controls} className="inline-flex"><CartIcon size={20} /></motion.span>
+      <motion.span animate={controls} className="inline-flex"><CartIcon size={24} strokeWidth={1.6} /></motion.span>
       <AnimatePresence>
         {count > 0 && (
           <motion.span
             key={count}
             initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
             transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-            className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-noir"
+            className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-rosso px-1 text-[10px] font-bold text-ivory"
           >
             {count}
           </motion.span>
@@ -97,13 +116,13 @@ export function Navbar() {
             {navLinks.map((l) => (
               <li key={l.id} className="relative">
                 <a href={`#${l.id}`} aria-current={active === l.id ? 'true' : undefined}
-                  className={`group relative block px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] transition-colors xl:px-4 ${active === l.id ? 'text-gold' : 'text-ivory/70 hover:text-ivory'}`}>
+                  className={`group relative block px-3 py-2 text-[0.95rem] font-medium transition-colors xl:px-5 ${active === l.id ? 'text-ivory' : 'text-ivory/80 hover:text-ivory'}`}>
                   <span className="relative block overflow-hidden">
                     <span className="block transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)] group-hover:-translate-y-full">{l.label}</span>
-                    <span className="absolute inset-0 block translate-y-full font-serif text-[13px] normal-case italic tracking-normal text-gold transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)] group-hover:translate-y-0" aria-hidden>{l.it}</span>
+                    <span className="absolute inset-0 block translate-y-full font-serif text-[1.05rem] italic text-gold transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)] group-hover:translate-y-0" aria-hidden>{l.it}</span>
                   </span>
                   {active === l.id && (
-                    <motion.span layoutId="nav-indicator" className="absolute -bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rotate-45 bg-gold" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />
+                    <motion.span layoutId="nav-indicator" className="absolute inset-x-3 -bottom-1 h-[2px] rounded-full bg-rosso xl:inset-x-5" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />
                   )}
                 </a>
               </li>
@@ -111,7 +130,7 @@ export function Navbar() {
           </ul>
 
           <div className="flex items-center gap-2">
-            <a href="#menu" className="btn btn-gold hidden !min-h-11 !px-5 sm:inline-flex">Commander</a>
+            <SearchButton />
             <CartButton />
             <button
               type="button" onClick={() => setMobileOpen((o) => !o)}
@@ -135,7 +154,7 @@ export function Navbar() {
             className="grain fixed inset-0 z-40 flex flex-col overflow-y-auto bg-burgundy px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-28 lg:hidden"
           >
             <motion.ul initial="hidden" animate="shown" variants={{ shown: { transition: { staggerChildren: 0.07, delayChildren: 0.25 } } }} className="flex flex-col">
-              {[{ id: 'top', label: 'Accueil', it: 'Home' }, ...navLinks].map((l, i) => (
+              {navLinks.map((l, i) => (
                 <motion.li key={l.id} variants={{ hidden: { opacity: 0, y: 40 }, shown: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} className="border-b border-ivory/10">
                   <a href={`#${l.id}`} onClick={() => setMobileOpen(false)} className="flex items-baseline gap-4 py-3.5 text-ivory active:text-gold">
                     <span className="font-serif text-sm italic text-gold">{String(i + 1).padStart(2, '0')}</span>

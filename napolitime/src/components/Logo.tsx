@@ -30,23 +30,20 @@ export function LogoMark({ size = 40, spin = false, className = '' }: { size?: n
   )
 }
 
-/** Serif wordmark: "Napoli" upright, "time" in gold italic. */
-export function Wordmark({ className = '' }: { className?: string }) {
+/** Script-like serif wordmark: "Napoli" in ivory italic, "Time" in Italian red, Italian-flag underline. */
+export function Wordmark({ className = '', flag = true }: { className?: string; flag?: boolean }) {
   return (
-    <span className={`font-serif leading-none tracking-[0.02em] ${className}`}>
-      <span className="font-semibold uppercase tracking-[0.14em]">Napoli</span>
-      <span className="display-i ml-0.5 text-gold">time</span>
+    <span className={`relative inline-block font-serif font-semibold italic leading-none tracking-[-0.01em] ${className}`}>
+      <span>Napoli</span><span className="text-rosso">Time</span>
+      {flag && <span aria-hidden className="tricolore absolute -bottom-[0.18em] left-[18%] h-[0.09em] min-h-[2px] w-[64%] rounded-full" />}
     </span>
   )
 }
 
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
-    <span className="group inline-flex items-center gap-3">
-      <motion.span whileHover={{ rotate: -10, scale: 1.05 }} transition={{ type: 'spring', stiffness: 260, damping: 14 }} className="inline-flex">
-        <LogoMark size={compact ? 38 : 46} />
-      </motion.span>
-      <Wordmark className="text-[1.35rem] text-ivory sm:text-[1.5rem]" />
-    </span>
+    <motion.span whileHover={{ y: -1 }} className="inline-flex items-center">
+      <Wordmark className={`${compact ? 'text-[1.7rem] sm:text-[2rem]' : 'text-[2.2rem]'} text-ivory`} />
+    </motion.span>
   )
 }

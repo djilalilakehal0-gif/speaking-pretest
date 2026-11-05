@@ -20,6 +20,8 @@
   --color-burgundy-deep: #4a0a17;
   --color-gold: #c6a46c;
   --color-gold-light: #dcc293;
+  --color-rosso: #c8102e;
+  --color-verde: #1e8c45;
   --color-ok: #7fb069;
 
   --font-serif: 'Cormorant Garamond', 'Cormorant', Georgia, 'Times New Roman', serif;
@@ -63,6 +65,8 @@
   @media (min-width: 640px) { .container-x { padding-inline: 1.75rem; } }
   @media (min-width: 1024px) { .container-x { padding-inline: 3rem; } }
 
+  /* Italian flag accent */
+  .tricolore { background: linear-gradient(90deg, var(--color-verde) 0 33.33%, var(--color-ivory) 33.33% 66.66%, var(--color-rosso) 66.66% 100%); }
   .hairline { height: 1px; background: linear-gradient(90deg, transparent, var(--color-gold), transparent); opacity: .55; }
 
   /* Buttons: a colour sweep slides in from the left on hover */
@@ -96,6 +100,11 @@
   .btn-line-dark { border: 1px solid rgb(17 17 17 / .3); color: var(--color-noir); }
   .btn-line-dark::before { background: var(--color-burgundy); }
   .btn-line-dark:hover { color: var(--color-ivory); border-color: var(--color-burgundy); }
+
+  /* Italian red CTA with a thin ivory ring (hero) */
+  .btn-rosso { background: var(--color-rosso); color: var(--color-ivory); box-shadow: 0 0 0 1.5px rgb(247 242 233 / .75), 0 20px 50px -18px rgb(200 16 46 / .8); }
+  .btn-rosso::before { background: var(--color-ivory); }
+  .btn-rosso:hover { color: var(--color-rosso); }
 
   .btn:disabled { opacity: .4; }
   .btn:disabled::before { display: none; }
