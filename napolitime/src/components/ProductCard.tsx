@@ -6,6 +6,7 @@ import { useFavourites } from '../lib/favourites'
 import { euro } from '../lib/format'
 import { AddMorph, HeartToggle, StarIcon } from './icons/Icons'
 import { LogoMark } from './Logo'
+import { ease } from './Reveal'
 
 const base = import.meta.env.BASE_URL
 export const menuImage = (name: string) => `${base}menu/${name}.webp`
@@ -15,9 +16,9 @@ export function ProductImage({ product, className = '', eager = false }: { produ
   const [failed, setFailed] = useState(false)
   if (!product.image || failed)
     return (
-      <div className={`flex flex-col items-center justify-center gap-3 bg-[radial-gradient(circle_at_50%_40%,rgba(229,9,20,.28),transparent_65%)] ${className}`}>
-        <LogoMark size={64} />
-        <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-cream/45">Photo à venir</span>
+      <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
+        <LogoMark size={60} />
+        <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-gold/70">Photo à venir</span>
       </div>
     )
   return (
@@ -29,23 +30,20 @@ export function ProductImage({ product, className = '', eager = false }: { produ
   )
 }
 
-export function PriceBadge({ price, large = false }: { price: number; large?: boolean }) {
-  return (
-    <span className={`inline-flex items-center rounded-full bg-tomato font-bold tabular-nums text-white shadow-[0_8px_24px_-8px_rgba(229,9,20,.9)] ${large ? 'px-5 py-2 text-xl' : 'px-3.5 py-1.5 text-sm'}`}>
-      {euro(price)}
-    </span>
-  )
+/** Price set in the serif, like a printed Italian menu. */
+export function Price({ price, className = '' }: { price: number; className?: string }) {
+  return <span className={`font-serif font-semibold [font-variant-numeric:lining-nums_tabular-nums] ${className}`}>{euro(price)}</span>
 }
 
 export function BestSellerBadge() {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-ink shadow-lg">
-      <StarIcon size={12} /> Best seller
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-noir shadow-lg">
+      <StarIcon size={11} /> Best seller
     </span>
   )
 }
 
-export function AddButton({ product, onChoose, className = '' }: { product: Product; onChoose?: () => void; className?: string }) {
+export function AddButton({ product, onChoose, tone = 'light', className = '' }: { product: Product; onChoose?: () => void; tone?: 'light' | 'dark'; className?: string }) {
   const { add } = useCart()
   const [done, setDone] = useState(false)
   useEffect(() => {
@@ -54,6 +52,7 @@ export function AddButton({ product, onChoose, className = '' }: { product: Prod
     return () => clearTimeout(t)
   }, [done])
   const needsChoice = !!product.options?.length
+  const idle = tone === 'light' ? 'bg-burgundy text-ivory hover:bg-noir' : 'bg-gold text-noir hover:bg-ivory'
   return (
     <motion.button
       type="button"
@@ -62,48 +61,55 @@ export function AddButton({ product, onChoose, className = '' }: { product: Prod
         if (needsChoice) { onChoose?.(); return }
         add(product.id); setDone(true)
       }}
-      whileTap={{ scale: 0.9 }}
-      className={`inline-flex h-11 items-center gap-2 rounded-full pl-3 pr-4 text-xs font-bold uppercase tracking-[0.12em] transition-colors ${done ? 'bg-white text-ink' : 'bg-tomato text-white hover:bg-[#ff1f2b]'} ${className}`}
+      whileTap={{ scale: 0.92 }}
+      className={`inline-flex h-11 items-center gap-2 rounded-full pl-3.5 pr-4 text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors duration-300 ${done ? 'bg-ok text-noir' : idle} ${className}`}
       aria-label={needsChoice ? `Choisir pour ${product.name}` : `Ajouter ${product.name} au panier`}
     >
-      <AddMorph done={done} />
+      <AddMorph done={done} size={16} />
       <span aria-live="polite">{done ? 'Ajouté' : needsChoice ? 'Choisir' : 'Ajouter'}</span>
     </motion.button>
   )
 }
 
-export function ProductCard({ product, onOpen, eager = false }: { product: Product; onOpen: (p: Product) => void; eager?: boolean }) {
+export function FavButton({ product, className = '' }: { product: Product; className?: string }) {
   const { isFav, toggle } = useFavourites()
   const fav = isFav(product.id)
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className={`group relative flex flex-col overflow-hidden rounded-[1.5rem] border bg-gradient-to-b from-ink-3 to-ink-2 transition-[border-color,box-shadow,transform] duration-500 hover:-translate-y-1 hover:border-tomato/60 hover:shadow-[0_30px_70px_-30px_rgba(229,9,20,.55)] ${product.bestSeller ? 'border-tomato/70' : 'border-white/[0.07]'}`}
+    <button
+      type="button" onClick={(e) => { e.stopPropagation(); toggle(product.id) }}
+      className={`inline-flex h-10 w-10 items-center justify-center rounded-full bg-noir/60 text-ivory backdrop-blur transition-colors hover:bg-noir ${className}`}
+      aria-pressed={fav} aria-label={fav ? `Retirer ${product.name} des favoris` : `Ajouter ${product.name} aux favoris`}
     >
-      <button type="button" onClick={() => onOpen(product)} className="relative block aspect-[4/3] overflow-hidden bg-[radial-gradient(circle_at_50%_60%,#2a0a0c_0%,#0d0d0d_70%)] text-left" aria-label={`Voir le détail : ${product.name}`}>
-        <span className="pointer-events-none absolute inset-x-8 bottom-3 h-6 rounded-full bg-black/70 blur-xl" aria-hidden />
-        <ProductImage product={product} eager={eager} className="relative h-full w-full p-3 transition-transform duration-[900ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.08]" />
-        <span className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-tomato/0 to-transparent transition-colors duration-500 group-hover:from-tomato/20" aria-hidden />
-        {product.bestSeller && <span className="absolute left-3 top-3"><BestSellerBadge /></span>}
-      </button>
-      <button
-        type="button" onClick={() => toggle(product.id)}
-        className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/55 text-cream backdrop-blur transition-colors hover:bg-black"
-        aria-pressed={fav} aria-label={fav ? `Retirer ${product.name} des favoris` : `Ajouter ${product.name} aux favoris`}
-      >
-        <HeartToggle active={fav} />
-      </button>
+      <HeartToggle active={fav} size={18} />
+    </button>
+  )
+}
 
-      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="display text-[1.55rem] leading-[1] text-cream">{product.name}</h3>
-          <PriceBadge price={product.price} />
+/** Menu card on the ivory menu: dark photo plate, serif name, dotted leader to the price. */
+export function ProductCard({ product, onOpen, eager = false, index = 0 }: { product: Product; onOpen: (p: Product) => void; eager?: boolean; index?: number }) {
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.9, ease, delay: (index % 4) * 0.07 }}
+      className="group relative flex flex-col rounded-[1.25rem] bg-white p-2.5 shadow-[0_1px_0_rgba(17,17,17,.06),0_20px_50px_-35px_rgba(74,10,23,.45)] transition-[box-shadow,transform] duration-700 ease-[cubic-bezier(.16,1,.3,1)] hover:-translate-y-1.5 hover:shadow-[0_1px_0_rgba(17,17,17,.06),0_40px_80px_-40px_rgba(74,10,23,.6)]"
+    >
+      <button type="button" onClick={() => onOpen(product)} className="plate block aspect-[16/10] rounded-[0.9rem] text-left sm:aspect-[16/11]" aria-label={`Voir le détail : ${product.name}`}>
+        <ProductImage product={product} eager={eager} className="h-full w-full p-2 transition-transform duration-[1200ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.07]" />
+        <span className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-gold/0 via-gold/0 to-gold/0 transition-colors duration-700 group-hover:to-gold/10" aria-hidden />
+        {product.bestSeller && <span className="absolute left-3 top-3 z-[2]"><BestSellerBadge /></span>}
+      </button>
+      <FavButton product={product} className="absolute right-5 top-5 z-[2]" />
+
+      <div className="flex flex-1 flex-col px-2.5 pb-2 pt-4">
+        <div className="flex items-baseline gap-2">
+          <h4 className="display text-[1.7rem] leading-[1.05] text-noir">{product.name}</h4>
+          <span className="mb-1.5 min-w-4 flex-1 border-b border-dotted border-noir/25" aria-hidden />
+          <Price price={product.price} className="text-[1.35rem] text-burgundy" />
         </div>
-        {product.description && <p className="text-sm leading-relaxed text-cream/60">{product.description}</p>}
-        {product.options && <p className="text-xs text-cream/45">{product.options.join(' · ')}</p>}
-        <div className="mt-auto flex items-center justify-between gap-3 pt-1">
-          <button type="button" onClick={() => onOpen(product)} className="text-xs font-semibold uppercase tracking-[0.14em] text-cream/45 underline-offset-4 hover:text-cream hover:underline">
+        {product.description && <p className="mt-2 text-sm leading-relaxed text-noir/60">{product.description}</p>}
+        {product.options && <p className="mt-2 text-xs italic text-noir/50">{product.options.join(' · ')}</p>}
+        <div className="mt-auto flex items-center justify-between gap-3 pt-4">
+          <button type="button" onClick={() => onOpen(product)} className="link-u text-[11px] font-semibold uppercase tracking-[0.2em] text-noir/50 hover:text-noir">
             Détails
           </button>
           <AddButton product={product} onChoose={() => onOpen(product)} />

@@ -63,7 +63,7 @@ function C(props: SVGMotionProps<SVGCircleElement>) {
 }
 
 const GOLD = '#FFFFFF'
-const RED = '#E50914'
+const RED = '#C6A46C' // champagne gold accent
 
 export function PizzaSliceIcon(p: IconProps) {
   return (
@@ -164,7 +164,7 @@ export function StarIcon({ filled = true, ...p }: IconProps & { filled?: boolean
     <Svg {...p}>
       <P
         d="m12 2.8 2.8 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17l-5.7 3.1 1.2-6.3-4.6-4.4 6.3-.8Z"
-        stroke={GOLD} fill={filled ? GOLD : 'none'}
+        stroke="currentColor" fill={filled ? 'currentColor' : 'none'}
       />
     </Svg>
   )
@@ -296,7 +296,7 @@ export function HeartToggle({ active, size = 20 }: { active: boolean; size?: num
       <motion.path
         d="M12 20.3S3.5 15.4 3.5 9.2A4.6 4.6 0 0 1 12 6.7a4.6 4.6 0 0 1 8.5 2.5c0 6.2-8.5 11.1-8.5 11.1Z"
         stroke={active ? RED : 'currentColor'} strokeWidth={1.8} strokeLinejoin="round"
-        animate={{ fill: active ? RED : 'rgba(229,9,20,0)' }}
+        animate={{ fill: active ? RED : 'rgba(198,164,108,0)' }}
         transition={{ duration: 0.25 }}
       />
     </motion.svg>

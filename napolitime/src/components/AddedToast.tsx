@@ -25,11 +25,11 @@ export function AddedToast() {
             key={pulse}
             initial={{ y: 40, opacity: 0, scale: 0.9 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 20, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-            className="pointer-events-auto flex items-center gap-3 rounded-full border border-cream/10 bg-ink-3/95 py-2 pl-2 pr-3 shadow-2xl backdrop-blur"
+            className="pointer-events-auto flex items-center gap-3 rounded-full border border-ivory/10 bg-charcoal/95 py-2 pl-2 pr-3 shadow-2xl backdrop-blur"
           >
-            {reduced ? <span className="ml-2 text-tomato">✓</span> : <Lottie data={added} size={44} play={pulse} />}
-            <p className="text-sm"><span className="font-semibold">{name}</span> <span className="text-cream/60">ajouté</span></p>
-            <button type="button" onClick={() => setOpen(true)} className="ml-2 rounded-full bg-cream px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-ink hover:bg-tomato hover:text-white">Panier</button>
+            {reduced ? <span className="ml-2 text-[#e8a0ad]">✓</span> : <Lottie data={added} size={44} play={pulse} />}
+            <p className="text-sm"><span className="font-semibold">{name}</span> <span className="text-ivory/60">ajouté</span></p>
+            <button type="button" onClick={() => setOpen(true)} className="ml-2 rounded-full bg-gold px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-noir hover:bg-ivory hover:text-noir">Panier</button>
           </motion.div>
         )}
       </AnimatePresence>

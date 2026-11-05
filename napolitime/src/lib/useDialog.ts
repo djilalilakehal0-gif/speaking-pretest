@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { lockScroll } from './smooth'
 
 /** Focus trap + Escape-to-close + scroll lock + focus restore for modal surfaces. */
 export function useDialog<T extends HTMLElement>(open: boolean, onClose: () => void) {
@@ -9,8 +10,7 @@ export function useDialog<T extends HTMLElement>(open: boolean, onClose: () => v
   useEffect(() => {
     if (!open) return
     const previous = document.activeElement as HTMLElement | null
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    lockScroll(true)
     const focusables = () =>
       Array.from(ref.current?.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled]),textarea,select,[tabindex]:not([tabindex="-1"])') ?? [])
     const raf = requestAnimationFrame(() => (ref.current?.querySelector<HTMLElement>('[data-autofocus]') ?? focusables()[0])?.focus())
@@ -28,7 +28,7 @@ export function useDialog<T extends HTMLElement>(open: boolean, onClose: () => v
     return () => {
       cancelAnimationFrame(raf)
       document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prevOverflow
+      lockScroll(false)
       previous?.focus?.()
     }
   }, [open])
