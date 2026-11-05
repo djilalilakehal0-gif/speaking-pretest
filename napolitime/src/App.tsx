@@ -10,6 +10,7 @@ import { AddedToast } from './components/AddedToast'
 import { ProductModal } from './components/ProductModal'
 import { Hero, Marquee } from './sections/Hero'
 import { Story } from './sections/Story'
+import { BurgerShowcase } from './sections/BurgerShowcase'
 import { Signature } from './sections/Signature'
 import { Menu } from './sections/Menu'
 import { Experience } from './sections/Experience'
@@ -37,6 +38,7 @@ export default function App() {
           <Hero ready={ready} />
           <Marquee />
           <Story />
+          <BurgerShowcase onOpen={setSelected} />
           <Signature onOpen={setSelected} />
           <Menu onOpen={setSelected} />
           <Experience />

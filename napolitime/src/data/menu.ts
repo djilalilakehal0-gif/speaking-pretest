@@ -105,3 +105,18 @@ export const productById = new Map(products.map((x) => [x.id, x]))
  * Ce sont des produits de la carte ci-dessus : leurs prix et photos viennent de `products`.
  */
 export const signatureIds = ['kebab', 'le-best', 'tacos-3', 'triple-x', 'tex-box-xl', 'milkshake'] as const
+
+/**
+ * Section « Burger Gourmet » (grande présentation photo sur la page d'accueil).
+ * `productId` : l'id du burger de la carte que montre la photo (ex. 'big-burger').
+ *   - renseigné  → la section affiche son vrai prix et un bouton « Ajouter au panier » ;
+ *   - `null`     → elle affiche « à partir de » (le plus petit prix des burgers) et renvoie vers les burgers.
+ * Aucun produit n'est créé ici : le prix vient toujours de `products`.
+ */
+export const featuredBurger: { productId: string | null; title: string; description: string; highlights: string[] } = {
+  productId: null,
+  title: 'Burger Gourmet',
+  description:
+    'Pain brioché doré aux graines de sésame, steak grillé à la flamme, cheddar fondant, bacon croustillant, oignon rouge, tomate et salade fraîche, sauce maison.',
+  highlights: ['Steak grillé', 'Cheddar fondant', 'Bacon croustillant'],
+}

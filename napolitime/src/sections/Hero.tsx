@@ -9,12 +9,13 @@ import { MagneticButton } from '../components/MagneticButton'
 import { ArrowIcon, ChefHatIcon, LeafIcon, ScooterIcon, StarIcon } from '../components/icons/Icons'
 import { ease } from '../components/Reveal'
 import { photo } from '../lib/img'
+import { gourmetPhoto } from './BurgerShowcase'
 
 gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP)
 
 const slides = [
   { ...photo('hero-pizza'), alt: 'Pizza napolitaine à la mozzarella filante, tomates cerises et basilic, devant la trattoria NapoliTime', pos: '78% 50%' },
-  { ...photo('hero-burger'), alt: 'Burger au cheddar fondant sur pain brioché', pos: '55% 50%' },
+  { src: gourmetPhoto.src, srcSet: gourmetPhoto.srcSet, alt: 'Burger Gourmet au cheddar fondant et bacon croustillant', pos: '55% 45%' },
   { ...photo('storefront'), alt: 'La devanture illuminée du restaurant NAPOLITIME le soir', pos: '50% 40%' },
 ]
 const SLIDE_MS = 7000
