@@ -205,7 +205,7 @@ function LangSwitch({ lang, label, className = '' }: { lang: Locale; label: stri
             hrefLang={l}
             lang={l}
             aria-current={active ? 'page' : undefined}
-            aria-label={m.label}
+            aria-label={`${m.short} – ${m.label}`}
             title={m.label}
             className={`grid h-8 min-w-9 place-items-center rounded-full px-2.5 text-xs font-medium transition-colors ${
               active ? 'bg-white text-bg' : 'text-muted hover:bg-white/[0.08] hover:text-ink'
