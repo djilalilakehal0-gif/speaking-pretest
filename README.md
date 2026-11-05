@@ -145,3 +145,12 @@ const CODE_SECRET='alfikr-almodi-speaking-pretest';
   {"url": "https://script.google.com/macros/s/…/exec"}
   ```
 - ملف السكربت `Code.gs` **لا يُرفع إلى GitHub** لأن فيه مفتاح المعلّم.
+
+---
+
+## الموقع الشخصي (Portfolio)
+
+- الرابط: **`https://djilali.pages.dev`** (منشور على Cloudflare Pages ويتحدّث تلقائياً مع كل رفع إلى `main`). الرابط القديم `…/speaking-pretest/portfolio/` يحوّل إليه.
+- بثلاث لغات: الإنجليزية `/`، والفرنسية `/fr/`، والعربية `/ar/` (من اليمين إلى اليسار).
+- النصوص في `portfolio/src/content/locales/` (ملف لكل لغة)، والروابط والمشاريع ورقم الهاتف في `portfolio/src/content/site.ts`.
+- نموذج التواصل يرسل عبر واتساب. التفاصيل وطرق أخرى في `portfolio/README.md`.
