@@ -99,7 +99,7 @@ Visits are measured with **Cloudflare Web Analytics**, which is free, cookie-les
 
 ## Performance & accessibility notes
 
-- The hero sphere is a ~2 KB canvas (no WebGL library). It loads after the main content and pauses when it is off-screen or the tab is hidden. It uses fewer points on phones and low-power devices and draws a single still frame when reduced motion is requested.
+- The hero is a scroll-driven "developer's desk" (`src/components/hero/Hero.tsx`): a portrait, monitor, laptop, phone and terminal in CSS 3D perspective. On large screens the scene is sticky for about 1.8 viewport heights. Scrolling opens the laptop, scrolls the real NAPOLITIME pages inside the monitor and the phone (`public/img/projects/napo-*-full.webp`), prints the terminal lines and slides the two rows of tech icons. Nothing loops on its own, everything is transform/opacity, and with reduced motion the scene is shown finished and still.
 - The hero entrance is pure CSS, so text paints before JavaScript loads. Other reveals use IntersectionObserver through Motion and run once.
 - The custom cursor, magnetic buttons, 3D tilt and pointer parallax are enabled only for a mouse or trackpad without reduced motion. The cursor's animation loop sleeps when the cursor is idle.
 - Accessibility: skip link, landmarks, one `h1` and ordered headings, focus-visible rings, and a mobile menu with a focus trap that closes on Escape. Form errors are linked to their fields with `aria-describedby`, and form status is announced through `aria-live`.
