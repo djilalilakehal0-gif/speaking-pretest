@@ -91,6 +91,7 @@ export const products: Product[] = [
     { id: 'milkshake-speculoos', name: 'Milkshake Spéculoos', price: 5.73, image: 'milkshake-speculoos' },
     { id: 'coca', name: 'Coca-Cola', price: 1.75, image: 'coca', options: ['Coca-Cola', 'Coca Zéro', 'Coca Cherry'] },
     { id: 'fanta', name: 'Fanta', price: 1.75, image: 'fanta', options: ['Orange', 'Citron'] },
+    { id: 'sprite', name: 'Sprite', price: 1.75, image: 'sprite' },
     { id: 'pepsi', name: 'Pepsi / Ice Tea / Oasis', price: 1.75, image: 'pepsi', options: ['Pepsi', 'Ice Tea', 'Oasis Tropical'] },
     { id: 'schweppes', name: 'Schweppes', price: 1.75, options: ['Agrumes', 'Pomme'] },
     { id: 'perrier', name: 'Perrier', price: 1.75, image: 'perrier' },

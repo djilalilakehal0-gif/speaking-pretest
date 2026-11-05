@@ -52,8 +52,7 @@ The "Bevande" section (`src/sections/Beverages.tsx`) loads the 3D scene (`src/th
 only when the section comes near, pauses it off-screen, and shows the preview renders if WebGL is unavailable.
 Each can spins on its own when dragged (360°, with inertia). Wide screens show the cans in a row, portrait phones in a 2 × 2 grid.
 Prices and options come from the menu products with the same id (`coca`, `pepsi`, `fanta`, `sprite` in `src/data/menu.ts`);
-a can with no matching menu product is shown in 3D without an order card. Sprite is in that case today: add it to the
-menu with its real price to give it a card and the add-to-cart button. The labels are brand-inspired artwork drawn by the script.
+a can with no matching menu product is shown in 3D without an order card. The labels are brand-inspired artwork drawn by the script.
 
 ## Ordering — what is real and what is not
 
