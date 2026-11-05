@@ -10,13 +10,23 @@ import { ease, Reveal, SectionHeading } from '../components/Reveal'
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
 const CansScene = lazy(() => import('../three/CansScene'))
+type CanId = import('../three/CansScene').CanId
 const base = import.meta.env.BASE_URL
 
-/** The two cans are real menu products: names, prices and options come from src/data/menu.ts. */
+/**
+ * The 3D cans, in display order. `id` is both the 3D model key and the menu product id:
+ * names, prices and options come from src/data/menu.ts. A can whose id is not on the menu
+ * is still shown in 3D but gets no order card (no price is ever invented here).
+ */
 const drinks = [
   { id: 'coca', accent: '#E41E2B', preview: `${base}models/previews/coca-cola-preview.webp` },
   { id: 'pepsi', accent: '#1E5BD8', preview: `${base}models/previews/pepsi-preview.webp` },
-] as const
+  { id: 'fanta', accent: '#FF7A00', preview: `${base}models/previews/fanta-preview.webp` },
+  { id: 'sprite', accent: '#14A04A', preview: `${base}models/previews/sprite-preview.webp` },
+] as const satisfies readonly { id: CanId; accent: string; preview: string }[]
+const canIds = drinks.map((d) => d.id)
+/** Static class names so Tailwind can see them. */
+const CARD_COLS: Record<number, string> = { 0: '', 1: 'max-w-md', 2: '', 3: 'lg:grid-cols-3', 4: 'lg:grid-cols-4' }
 
 function webglAvailable() {
   try {
@@ -36,16 +46,16 @@ class SceneBoundary extends Component<{ fallback: ReactNode; children: ReactNode
 
 function StillCans({ dim = false }: { dim?: boolean }) {
   return (
-    <div className={`absolute inset-0 grid grid-cols-2 items-center gap-2 px-4 transition-opacity duration-700 sm:px-[12%] ${dim ? 'opacity-40' : ''}`}>
+    <div className={`absolute inset-0 grid grid-cols-2 items-center gap-2 px-4 transition-opacity duration-700 sm:grid-cols-4 sm:px-[6%] ${dim ? 'opacity-40' : ''}`}>
       {drinks.map((d) => (
-        <img key={d.id} src={d.preview} alt="" className="mx-auto h-[85%] w-auto max-w-full object-contain" loading="lazy" decoding="async" />
+        <img key={d.id} src={d.preview} alt="" width={1000} height={1250} className="mx-auto h-[42%] w-auto max-w-full object-contain sm:h-[80%]" loading="lazy" decoding="async" />
       ))}
     </div>
   )
 }
 
 /**
- * "Bevande": Coca-Cola and Pepsi as genuine 3D models (public/models/*.glb, made by scripts/generate_beverages.py).
+ * "Bevande": Coca-Cola, Pepsi, Fanta and Sprite as genuine 3D models (public/models/*.glb, made by scripts/generate_beverages.py).
  * The WebGL scene is fetched only when the section approaches the viewport and stops rendering when it leaves.
  */
 export function Beverages({ onOpen }: { onOpen: (p: Product) => void }) {
@@ -79,9 +89,12 @@ export function Beverages({ onOpen }: { onOpen: (p: Product) => void }) {
 
   return (
     <section ref={root} id="bevande" className="grain relative isolate overflow-hidden bg-noir py-24 sm:py-32" aria-labelledby="bev-title">
-      {/* red and blue light pools behind each can */}
-      <div aria-hidden className="pointer-events-none absolute left-[8%] top-[30%] -z-10 h-[50vmax] w-[50vmax] rounded-full bg-[radial-gradient(circle,rgba(228,30,43,.22),transparent_62%)]" />
-      <div aria-hidden className="pointer-events-none absolute right-[8%] top-[30%] -z-10 h-[50vmax] w-[50vmax] rounded-full bg-[radial-gradient(circle,rgba(30,91,216,.22),transparent_62%)]" />
+      {/* a coloured light pool behind each can, in the cans' order */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[22%] -z-10 flex justify-center">
+        {drinks.map((d) => (
+          <span key={d.id} className="-mx-[6vmax] h-[38vmax] w-[38vmax] shrink-0 rounded-full opacity-[.2]" style={{ background: `radial-gradient(circle, ${d.accent}, transparent 62%)` }} />
+        ))}
+      </div>
 
       <div className="container-x">
         <div id="bev-title"><SectionHeading align="center" eyebrow="Bevande fresche" title={'Bien _frais.'} intro="Faites tourner les canettes : glissez-les du doigt ou de la souris." /></div>
@@ -94,7 +107,7 @@ export function Beverages({ onOpen }: { onOpen: (p: Product) => void }) {
             {near && (
               <Suspense fallback={null}>
                 <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: loaded ? 1 : 0 }} transition={{ duration: 1.2, ease }}>
-                  <CansScene progress={progress} reduced={reduced} active={visible} onReady={() => setLoaded(true)} />
+                  <CansScene cans={canIds} progress={progress} reduced={reduced} active={visible} onReady={() => setLoaded(true)} />
                 </motion.div>
               </Suspense>
             )}
@@ -107,7 +120,7 @@ export function Beverages({ onOpen }: { onOpen: (p: Product) => void }) {
         )}
       </div>
 
-      <div className="container-x relative mt-6 grid max-w-5xl grid-cols-1 gap-4 min-[520px]:grid-cols-2 sm:gap-6">
+      <div className={`container-x relative mt-6 grid max-w-6xl grid-cols-1 gap-4 min-[520px]:grid-cols-2 sm:gap-6 ${CARD_COLS[Math.min(items.length, 4)]}`}>
         {items.map((d, i) => (
           <Reveal key={d.id} delay={i * 0.1}>
             <article className="group relative overflow-hidden rounded-[1.5rem] border border-ivory/10 bg-noir-2/80 p-6 backdrop-blur transition-colors duration-500 hover:border-gold/40 sm:p-7">
