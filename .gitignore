@@ -1,0 +1,5 @@
+
+# Signing keystore must never live in the repo
+KEYSTORE_BASE64.txt
+*.keystore
+*.jks
