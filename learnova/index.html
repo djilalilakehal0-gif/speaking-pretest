@@ -247,7 +247,7 @@ tr:last-child td{border-bottom:0}
    LEARNOVA — DARK PREMIUM EDITION · design tokens + dashboard
    Scoped to .lx so pages not yet migrated keep their current look.
    ===================================================================== */
-.lx{
+.lx,.lx-t{
   --lx-bg:#080B18; --lx-bg-2:#10162A; --lx-card:#151D35; --lx-card-2:#1B2442;
   --lx-blue:#2563FF; --lx-purple:#8B5CF6; --lx-cyan:#22D3EE; --lx-magenta:#D946EF;
   --lx-text:#F8FAFC; --lx-muted:#94A3B8; --lx-line:rgba(148,163,184,.14); --lx-line-2:rgba(148,163,184,.24);
@@ -263,17 +263,18 @@ tr:last-child td{border-bottom:0}
   --mark:var(--lx-cyan); --mark-ink:#04202A; --mark-soft:rgba(34,211,238,.14);
   --ok:var(--lx-ok); --ok-soft:rgba(52,211,153,.14); --warn:var(--lx-warn); --warn-soft:rgba(251,191,36,.13);
   --bad:var(--lx-bad); --bad-soft:rgba(248,113,113,.14); --info:#7DD3FC; --info-soft:rgba(125,211,252,.12);
-  color-scheme:dark; color:var(--lx-text); background:var(--lx-bg);
-  min-height:calc(100vh - 48px); display:grid; grid-template-columns:minmax(0,1fr); position:relative; isolation:isolate;
+  color-scheme:dark; color:var(--lx-text);
 }
+.lx{background:var(--lx-bg);min-height:calc(100vh - 48px);display:grid;grid-template-columns:minmax(0,1fr);position:relative;isolation:isolate}
 body.lx-body{background:#080B18}
 .lx::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:radial-gradient(60vw 50vh at 85% -10%,rgba(139,92,246,.16),transparent 60%),radial-gradient(50vw 45vh at 0% 100%,rgba(37,99,255,.13),transparent 60%),var(--lx-bg)}
-.lx h1,.lx h2,.lx h3,.lx h4{color:var(--lx-text)}
-.lx a{color:inherit}
-.lx :focus-visible{outline:2px solid var(--lx-cyan);outline-offset:2px;border-radius:10px}
-.lx .muted{color:var(--lx-muted)}
-.lx .lvl{background:var(--lx-grad);color:#fff;font-weight:600}
+.lx-t h1,.lx-t h2,.lx-t h3,.lx-t h4{color:var(--lx-text)}
+.lx-t a{color:inherit}
+.lx-t :focus-visible{outline:2px solid var(--lx-cyan);outline-offset:2px;border-radius:10px}
+.lx-t .muted{color:var(--lx-muted)}
+.lx-t .lvl{background:var(--lx-grad);color:#fff;font-weight:600}
+.lx-t .badge-dot{background:var(--lx-magenta);box-shadow:0 0 0 3px var(--lx-bg)}
 
 /* glass card */
 .lx-card{background:var(--lx-glass),var(--lx-card);border:1px solid var(--lx-line);border-radius:var(--lx-r);padding:20px;box-shadow:var(--lx-shadow);position:relative;min-width:0}
@@ -485,6 +486,77 @@ body.lx-body{background:#080B18}
   .lx-headline{font-size:42px!important}
 }
 
+/* ---------- legacy components inside the dark system (all migrated pages) ---------- */
+.lx-t .card{background:var(--lx-glass),var(--lx-card);border-color:var(--lx-line);border-radius:18px;box-shadow:var(--lx-shadow)}
+.lx-t button.card,.lx-t a.card{transition:transform .2s ease,border-color .2s}
+.lx-t button.card:hover,.lx-t a.card:hover{transform:translateY(-2px);border-color:rgba(139,92,246,.45)}
+.lx-t .card-hero{background:radial-gradient(120% 140% at 100% 0%,rgba(139,92,246,.45),transparent 55%),radial-gradient(90% 120% at 0% 100%,rgba(37,99,255,.4),transparent 60%),linear-gradient(135deg,#111A3A,#0D1330);border:1px solid rgba(139,92,246,.35);color:var(--lx-text);border-radius:22px;box-shadow:0 24px 50px -28px rgba(37,99,255,.6)}
+.lx-t .card-hero::after{border-color:rgba(255,255,255,.06)}
+.lx-t .btn{border-radius:13px;transition:transform .18s ease,box-shadow .25s ease,background-color .2s}
+.lx-t .btn-p,.lx-t .btn-m{background:var(--lx-grad);color:#fff;box-shadow:0 10px 26px -12px rgba(99,102,241,.8)}
+.lx-t .btn-p:hover,.lx-t .btn-m:hover{background:var(--lx-grad);transform:translateY(-1px)}
+.lx-t .btn-g{background:rgba(255,255,255,.05);border-color:var(--lx-line-2);color:var(--lx-text)}
+.lx-t .btn-g:hover{background:rgba(255,255,255,.09)}
+.lx-t .btn-t{color:#7DD3FC}
+.lx-t .btn-t:hover{background:rgba(125,211,252,.08)}
+.lx-t .btn-ok{background:rgba(52,211,153,.16);color:#6EE7B7}
+.lx-t .btn-bad{background:rgba(248,113,113,.16);color:#FCA5A5}
+.lx-t .icon-btn,.lx-t .back{background:rgba(255,255,255,.04);border-color:var(--lx-line);color:var(--lx-text);border-radius:13px}
+.lx-t .icon-btn:hover,.lx-t .back:hover{background:rgba(255,255,255,.08)}
+.lx-t .inp{background:rgba(255,255,255,.04);border-color:var(--lx-line-2);color:var(--lx-text);border-radius:12px}
+.lx-t .inp::placeholder{color:#64748B}
+.lx-t .inp:focus{border-color:rgba(34,211,238,.6);box-shadow:0 0 0 3px rgba(34,211,238,.15)}
+.lx-t select.inp option{background:#151D35;color:#F8FAFC}
+.lx-t .pill{background:rgba(255,255,255,.04);border-color:var(--lx-line-2);color:#CBD5E1}
+.lx-t .pill[aria-pressed="true"]{background:var(--lx-grad);border-color:transparent;color:#fff}
+.lx-t .seg button[aria-pressed="true"]{background:var(--lx-grad);color:#fff}
+.lx-t .chip-brand{color:#93B4FF;background:rgba(37,99,255,.18)}
+.lx-t .chip-info{color:#7DD3FC}
+.lx-t .opt{background:rgba(255,255,255,.03);border-color:var(--lx-line-2)}
+.lx-t .opt[aria-pressed="true"]{border-color:var(--lx-purple);background:rgba(139,92,246,.14)}
+.lx-t .opt[aria-pressed="true"] .radio{border-color:var(--lx-purple)}
+.lx-t .slot{background:rgba(255,255,255,.03);border-color:var(--lx-line-2)}
+.lx-t .slot[aria-pressed="true"]{background:var(--lx-grad);border-color:transparent;color:#fff}
+.lx-t .steps i.on{background:var(--lx-grad)}
+.lx-t .bar>i{background:linear-gradient(90deg,#22D3EE,#2563FF 45%,#8B5CF6)}
+[dir="rtl"] .lx-t .bar>i{background:linear-gradient(270deg,#22D3EE,#2563FF 45%,#8B5CF6)}
+.lx-t .cat,.lx-t .drop,.lx-t .bankbox,.lx-t .meta>div,.lx-t .q-passage{background:rgba(255,255,255,.03);border-color:var(--lx-line)}
+.lx-t .cat .ci{background:rgba(37,99,255,.18);color:#93B4FF}
+.lx-t .drop{border-color:var(--lx-line-2)}
+.lx-t .drop:hover{border-color:rgba(34,211,238,.5)}
+.lx-t .empty{border-color:var(--lx-line-2);border-radius:16px}
+.lx-t .li{border-color:var(--lx-line)}
+.lx-t .ladder div.done{background:rgba(37,99,255,.3);color:#BFDBFE}
+.lx-t .ladder div.cur{background:var(--lx-grad);color:#fff}
+.lx-t .tbl-wrap{background:var(--lx-glass),var(--lx-card);border-color:var(--lx-line);border-radius:18px}
+.lx-t th{background:rgba(255,255,255,.03);color:var(--lx-muted);border-color:var(--lx-line)}
+.lx-t td{border-color:var(--lx-line)}
+.lx-t tbody tr{transition:background-color .15s}
+.lx-t tbody tr:hover{background:rgba(255,255,255,.025)}
+.lx-t .stat{background:var(--lx-glass),var(--lx-card);border-color:var(--lx-line);border-radius:18px;box-shadow:var(--lx-shadow);position:relative;overflow:hidden}
+.lx-t .stat::after{content:"";position:absolute;inset-inline-end:-30px;top:-30px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.35),transparent 70%);pointer-events:none}
+.lx-t .stat b{background:var(--lx-grad-text);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lx-t .stat.alert{border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.07)}
+.lx-t .stat.alert b{background:none;color:var(--lx-warn)}
+.lx-t .hbar .bar{background:rgba(148,163,184,.14)}
+.lx-t .att-btns button{background:rgba(255,255,255,.04);border-color:var(--lx-line-2);color:var(--lx-text)}
+.lx-t .brand .wm span{background:var(--lx-grad-text);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lx-t .brand img{border-radius:10px}
+.lx-t .note{border:1px solid currentColor;border-color:color-mix(in srgb,currentColor 30%,transparent)}
+/* student legacy page frame */
+.lx-page{width:100%;max-width:920px;margin-inline:auto}
+.lx-page .screen{padding:0;gap:18px}
+.lx-page .s-head h1{font-size:24px!important;font-weight:800}
+.lx[data-anim] .lx-page{animation:lxIn .5s cubic-bezier(.2,.7,.2,1) both}
+@media (min-width:1024px){.lx-page .cat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* sheets / toast */
+#sheet-root.lx-t .sheet-bg{background:rgba(3,5,14,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#sheet-root.lx-t .sheet{background:linear-gradient(180deg,#141C36,#0E1428);border:1px solid var(--lx-line-2);box-shadow:0 30px 80px -20px rgba(0,0,0,.8);animation:lxSheet .32s cubic-bezier(.2,.7,.2,1) both}
+@keyframes lxSheet{from{opacity:0;transform:translateY(24px) scale(.98)}}
+body.lx-body .toast{background:#1B2442;color:#F8FAFC;border:1px solid rgba(148,163,184,.24);box-shadow:0 18px 40px -12px rgba(0,0,0,.7)}
+body.lx-body .demobar{background:#05070F;color:#E2E8F0;border-bottom:1px solid rgba(148,163,184,.12)}
+@media (prefers-reduced-motion:reduce){#sheet-root.lx-t .sheet{animation:none}}
+
 /* motion: entrance only on first visit, transform/opacity only */
 @keyframes lxIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes lxGrow{from{transform:scaleX(0)}}
@@ -498,7 +570,7 @@ body.lx-body{background:#080B18}
 .lx-float-3{animation:lxFloat 5s ease-in-out infinite;animation-delay:-2s;transform-box:fill-box;transform-origin:center}
 .lx-orb{position:absolute;border-radius:50%;pointer-events:none;will-change:transform;animation:lxDrift 12s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){
-  .lx *,.lx *::before,.lx *::after{animation:none!important;transition:none!important}
+  .lx-t *,.lx-t *::before,.lx-t *::after{animation:none!important;transition:none!important}
 }
 </style>
 
@@ -920,7 +992,7 @@ function render(){
   let body='';
   if(role==='student')body=renderStudent();else if(role==='trainer')body=renderTrainer();else body=renderAdmin();
   $('#app').innerHTML=demoBar()+body;
-  const dark=!!$('#app .lx');document.body.classList.toggle('lx-body',dark);U._lxPrev=dark;
+  const dark=!!$('#app .lx, #app .lx-t');document.body.classList.toggle('lx-body',dark);$('#sheet-root').classList.toggle('lx-t',dark);U._lxLast=dark?lxKey():'';
   afterRender();
 }
 function demoBar(){const r=S.ui.role;return `<div class="demobar"><div class="row"><span class="lbl">${t('demo')}</span><div class="seg" role="group">${['student','trainer','admin'].map(x=>`<button data-a="role" data-v="${x}" aria-pressed="${r===x}">${t(x)}</button>`).join('')}</div></div>
@@ -941,6 +1013,9 @@ function renderStudent(){
   const u=me();
   if(!u||U.screen==='auth'||U.screen==='forgot')return `<div class="phone">${U.screen==='verify'?scrVerify():scrAuth()}</div>`;
   if(U.screen==='home'||!U.screen)return scrDash();
+  const lxCur=['home','courses','learning','schedule'].includes(U.screen)?U.screen:(['course','enroll'].includes(U.screen)?'courses':(['player','lesson','pay'].includes(U.screen)?'learning':'more'));
+  const lxFn={courses:scrCourses,course:scrCourse,enroll:scrEnroll,pay:scrPay,learning:scrLearning,player:scrPlayer,lesson:scrLesson,schedule:scrSchedule,more:scrMore,progress:scrProgress,payments:scrPayments,certs:scrCerts,notifs:scrNotifs,trainers:scrTrainers,placement:scrPlacement,support:scrSupport,verify:scrVerify,profile:scrProfile}[U.screen];
+  if(lxFn)return lxShell(lxCur,`<div class="lx-page">${lxFn()}</div>`,U._lxLast!==lxKey());
   const map={home:scrHome,courses:scrCourses,course:scrCourse,enroll:scrEnroll,pay:scrPay,learning:scrLearning,player:scrPlayer,lesson:scrLesson,schedule:scrSchedule,more:scrMore,progress:scrProgress,payments:scrPayments,certs:scrCerts,notifs:scrNotifs,trainers:scrTrainers,placement:scrPlacement,support:scrSupport,verify:scrVerify,profile:scrProfile};
   const fn=map[U.screen]||scrHome;
   const tabs=[['home','home'],['courses','book'],['learning','cap'],['schedule','cal'],['more','menu']];
@@ -1044,7 +1119,7 @@ function lxArt(){return `<svg viewBox="0 0 320 260" role="presentation" aria-hid
  <g fill="#E0F2FE"><path d="M64 160l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" opacity=".8"/><path d="M262 150l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" opacity=".7"/><path d="M226 30l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" opacity=".6"/></g>
 </svg>`;}
 function scrDash(){
-  const u=me();const anim=!U._lxPrev;
+  const u=me();const anim=U._lxLast!==lxKey();
   const up=upcomingFor(u.id);const next=up[0];const nc=next&&course(next.cid);const ntr=next&&trainer(next.trainerId);
   const act=activeEnr(u.id);
   const pend=enrOf(u.id).filter(e=>['booking_pending','payment_pending','rejected'].includes(e.status));
@@ -1057,30 +1132,9 @@ function scrDash(){
   const ci=S.levels.indexOf(u.level);
   let i=0;const inn=()=>`lx-in" style="--i:${i++}`;
   const counter=(v,suf)=>v==null?'—':`<span data-count="${v}">${v}</span>${suf||''}`;
-  const tabs=[['home','home'],['courses','book'],['learning','cap'],['schedule','cal'],['more','menu']];
-  const navMain=[['home','home','tab'],['courses','book','tab'],['learning','cap','tab'],['schedule','cal','tab']];
-  const navAcc=[['progress','chart'],['certs','award'],['payments','card'],['notifs','bell'],['trainers','users'],['placement','target'],['profile','user']];
-  const labels={certs:t('certificates'),notifs:t('notifications')};
   const ring=overall==null?0:overall;
   if(anim){afterHooks.push(lxAnimate);}
 
-  const side=`<aside class="lx-side" aria-label="${t('menuMain')}">
-   <div class="lx-brand">${LOGO}<div class="wm">Learn<span>ova</span></div></div>
-   <div class="lx-nav-l">${t('menuMain')}</div>
-   <nav class="lx-nav">${navMain.map(([s,ic])=>`<button data-a="tab" data-v="${s}" aria-current="${s==='home'}">${I(ic)}<span>${t(s)}</span></button>`).join('')}</nav>
-   <div class="lx-nav-l">${t('menuAcc')}</div>
-   <nav class="lx-nav">${navAcc.map(([s,ic])=>`<button data-a="go" data-s="${s}">${I(ic)}<span>${labels[s]||t(s)}</span>${s==='notifs'&&n?`<span class="cnt">${n}</span>`:''}</button>`).join('')}</nav>
-   <div class="lx-help"><b>${t('needHelp')}</b><p>${t('contactSub')}</p><a class="lx-btn lx-btn-g lx-btn-s" href="${waLink(U.lang==='ar'?'مرحباً Learnova، لدي استفسار.':'Hello Learnova, I have a question.')}" target="_blank" rel="noopener">${I('chat','ico-s')} ${t('contactWa')}</a></div>
-  </aside>`;
-
-  const top=`<header class="lx-top">
-   <div class="lx-brand">${LOGO}<div class="wm">Learn<span>ova</span></div></div>
-   <form class="lx-search" data-f="dashSearch" role="search">${I('search','ico-s')}<input name="q" id="lx-q" type="search" placeholder="${t('search')}" aria-label="${t('search')}" autocomplete="off"></form>
-   <span class="lx-top-sp"></span>
-   <button class="lx-ibtn lx-lang" data-a="lang" aria-label="${t('language')}">${U.lang==='ar'?'EN':'ع'}</button>
-   <button class="lx-ibtn" data-a="go" data-s="notifs" aria-label="${t('notifications')}">${I('bell')}${n?`<span class="badge-dot">${n}</span>`:''}</button>
-   <button class="lx-me" data-a="go" data-s="profile" aria-label="${t('profile')}">${avatar({name:u.name,col:'#2563FF'})}<span class="nm"><b>${esc(u.name)}</b><small>${u.level?`${t('yourLevel')} · <span dir="ltr">${esc(u.level)}</span>`:t('noLevel')}</small></span></button>
-  </header>`;
 
   const hero=`<section class="lx-hero lx-span-2 ${inn()}" aria-label="${t('nextClass')}">
    <span class="lx-orb" style="width:180px;height:180px;inset-inline-end:8%;top:-60px;background:radial-gradient(circle,rgba(217,70,239,.35),transparent 65%)"></span>
@@ -1164,10 +1218,37 @@ function scrDash(){
    <button class="lx-btn" data-a="go" data-s="${u.level?'progress':'placement'}">${u.level?t('progress'):t('takeTest')} ${I('chev','ico-s')}</button>
   </section>`;
 
-  return `<div class="lx"${anim?' data-anim':''}>${side}<div class="lx-main"><main class="stack" style="gap:inherit">${top}
-   <div class="lx-grid">${hero}${prog}${alerts}${kpis}${cont}${upc}${explore}${ach}${goal}</div></main></div>
-   <nav class="tabbar" aria-label="Main">${tabs.map(([s,ic])=>`<button data-a="tab" data-v="${s}" aria-current="${s==='home'}">${I(ic)}<span>${t(s)}</span></button>`).join('')}</nav></div>`;
+  return lxShell('home',`<div class="lx-grid">${hero}${prog}${alerts}${kpis}${cont}${upc}${explore}${ach}${goal}</div>`,anim);
 }
+/* shared student chrome: sidebar · top bar · mobile tab bar */
+function lxShell(cur,inner,anim){
+  const u=me();const n=unread(u.id);
+  const tabs=[['home','home'],['courses','book'],['learning','cap'],['schedule','cal'],['more','menu']];
+  const navMain=[['home','home'],['courses','book'],['learning','cap'],['schedule','cal']];
+  const navAcc=[['progress','chart'],['certs','award'],['payments','card'],['notifs','bell'],['trainers','users'],['placement','target'],['profile','user']];
+  const labels={certs:t('certificates'),notifs:t('notifications')};
+  const accCur=s=>U.screen===s||(s==='trainers'&&U.screen==='trainer');
+  const side=`<aside class="lx-side" aria-label="${t('menuMain')}">
+   <div class="lx-brand">${LOGO}<div class="wm">Learn<span>ova</span></div></div>
+   <div class="lx-nav-l">${t('menuMain')}</div>
+   <nav class="lx-nav">${navMain.map(([s,ic])=>`<button data-a="tab" data-v="${s}" aria-current="${s===cur}">${I(ic)}<span>${t(s)}</span></button>`).join('')}</nav>
+   <div class="lx-nav-l">${t('menuAcc')}</div>
+   <nav class="lx-nav">${navAcc.map(([s,ic])=>`<button data-a="go" data-s="${s}" aria-current="${accCur(s)}">${I(ic)}<span>${labels[s]||t(s)}</span>${s==='notifs'&&n?`<span class="cnt">${n}</span>`:''}</button>`).join('')}</nav>
+   <div class="lx-help"><b>${t('needHelp')}</b><p>${t('contactSub')}</p><a class="lx-btn lx-btn-g lx-btn-s" href="${waLink(U.lang==='ar'?'مرحباً Learnova، لدي استفسار.':'Hello Learnova, I have a question.')}" target="_blank" rel="noopener">${I('chat','ico-s')} ${t('contactWa')}</a></div>
+  </aside>`;
+
+  const top=`<header class="lx-top">
+   <div class="lx-brand">${LOGO}<div class="wm">Learn<span>ova</span></div></div>
+   <form class="lx-search" data-f="dashSearch" role="search">${I('search','ico-s')}<input name="q" id="lx-q" type="search" placeholder="${t('search')}" aria-label="${t('search')}" autocomplete="off"></form>
+   <span class="lx-top-sp"></span>
+   <button class="lx-ibtn lx-lang" data-a="lang" aria-label="${t('language')}">${U.lang==='ar'?'EN':'ع'}</button>
+   <button class="lx-ibtn" data-a="go" data-s="notifs" aria-label="${t('notifications')}">${I('bell')}${n?`<span class="badge-dot">${n}</span>`:''}</button>
+   <button class="lx-me" data-a="go" data-s="profile" aria-label="${t('profile')}">${avatar({name:u.name,col:'#2563FF'})}<span class="nm"><b>${esc(u.name)}</b><small>${u.level?`${t('yourLevel')} · <span dir="ltr">${esc(u.level)}</span>`:t('noLevel')}</small></span></button>
+  </header>`;
+  return `<div class="lx lx-t"${anim?' data-anim':''}>${side}<div class="lx-main"><main class="stack" style="gap:inherit">${top}${inner}</main></div>
+   <nav class="tabbar" aria-label="Main">${tabs.map(([s,ic])=>`<button data-a="tab" data-v="${s}" aria-current="${s===cur}">${I(ic)}<span>${t(s)}</span></button>`).join('')}</nav></div>`;
+}
+const lxKey=()=>S.ui.role+':'+(S.ui.role==='student'?U.screen:S.ui.role==='trainer'?U.trTab:U.adTab);
 function lxAnimate(){
   const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   const arc=document.querySelector('.lx-ring .arc');
