@@ -10,7 +10,7 @@ const en = {
     title: 'Software Developer | Full-Stack Engineer',
     role: 'Full-Stack Developer',
     tagline: 'Clean code, creative engineering and interfaces that feel effortless.',
-    portraitAlt: 'Djilali, software developer, standing in his workspace holding a laptop',
+    portraitAlt: 'Djilali, software developer, in a black suit, seated at his desk in front of code screens',
     availability: 'Available for select projects',
     location: 'Remote · Worldwide',
     online: 'Online',

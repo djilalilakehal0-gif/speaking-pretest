@@ -26,7 +26,7 @@ export function About({ t }: { t: Pick<Dictionary, 'about' | 'site'> }) {
                 height={site.portrait.height}
                 loading="lazy"
                 decoding="async"
-                className="aspect-[4/5] w-full object-cover object-[50%_18%] transition-transform duration-[1.4s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]"
+                className="aspect-[4/5] w-full object-cover object-top transition-transform duration-[1.4s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]"
               />
             </picture>
             <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-bg via-bg/40 to-transparent" />

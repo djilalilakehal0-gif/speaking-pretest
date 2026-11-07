@@ -14,9 +14,9 @@ export function Portrait({ p, role, online }: { p: MotionValue<number>; role: st
           src={asset(site.portrait.srcSmall)}
           alt=""
           width={480}
-          height={720}
+          height={600}
           fetchPriority="high"
-          className="size-full object-cover object-[50%_14%]"
+          className="size-full object-cover object-top"
         />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-bg/80 to-transparent" />
         <div className="absolute bottom-[5%] right-[5%] flex max-w-[70%] items-center gap-[2cqw] rounded-[1.6cqw] border border-white/15 bg-bg/70 px-[2.4cqw] py-[1.6cqw] backdrop-blur-md">
