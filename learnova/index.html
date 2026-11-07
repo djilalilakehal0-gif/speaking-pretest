@@ -557,6 +557,22 @@ body.lx-body .toast{background:#1B2442;color:#F8FAFC;border:1px solid rgba(148,1
 body.lx-body .demobar{background:#05070F;color:#E2E8F0;border-bottom:1px solid rgba(148,163,184,.12)}
 @media (prefers-reduced-motion:reduce){#sheet-root.lx-t .sheet{animation:none}}
 
+.lx-auth{align-items:center;justify-items:center;padding:20px 16px 40px;gap:24px}
+.lx-auth-art{display:none}
+.lx-auth-card{width:100%;max-width:520px;padding:6px 4px;border-radius:26px}
+.lx-auth-card .screen{padding:22px 20px}
+.lx-auth-card .screen>.stack:first-child>img{max-width:150px;border-radius:18px;background:#fff;padding:6px;box-shadow:0 12px 30px -12px rgba(139,92,246,.7)}
+.lx-auth-card .note{background:rgba(34,211,238,.08);color:#A5F3FC}
+.lx-auth-card .note.bad{background:rgba(248,113,113,.1);color:#FCA5A5}
+@media (min-width:960px){
+  .lx-auth{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);padding:40px 48px;gap:48px;align-items:center;min-height:calc(100vh - 48px)}
+  .lx-auth-art{display:flex;flex-direction:column;gap:20px;justify-self:stretch;max-width:620px;margin-inline-start:auto}
+  .lx-auth-art .lx-headline{font-size:44px!important}
+  .lx-auth-ill{max-width:420px}
+  .lx-auth-ill svg{width:100%;height:auto;overflow:visible}
+  .lx-auth-card{justify-self:start}
+}
+
 /* motion: entrance only on first visit, transform/opacity only */
 @keyframes lxIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes lxGrow{from{transform:scaleX(0)}}
@@ -1011,7 +1027,7 @@ const sheetHead=title=>`<div class="sheet-h"><h2>${title}</h2><button class="ico
 /* ============ STUDENT ============ */
 function renderStudent(){
   const u=me();
-  if(!u||U.screen==='auth'||U.screen==='forgot')return `<div class="phone">${U.screen==='verify'?scrVerify():scrAuth()}</div>`;
+  if(!u||U.screen==='auth'||U.screen==='forgot')return lxAuth(U.screen==='verify'?scrVerify():scrAuth());
   if(U.screen==='home'||!U.screen)return scrDash();
   const lxCur=['home','courses','learning','schedule'].includes(U.screen)?U.screen:(['course','enroll'].includes(U.screen)?'courses':(['player','lesson','pay'].includes(U.screen)?'learning':'more'));
   const lxFn={courses:scrCourses,course:scrCourse,enroll:scrEnroll,pay:scrPay,learning:scrLearning,player:scrPlayer,lesson:scrLesson,schedule:scrSchedule,more:scrMore,progress:scrProgress,payments:scrPayments,certs:scrCerts,notifs:scrNotifs,trainers:scrTrainers,placement:scrPlacement,support:scrSupport,verify:scrVerify,profile:scrProfile}[U.screen];
@@ -1248,6 +1264,17 @@ function lxShell(cur,inner,anim){
   return `<div class="lx lx-t"${anim?' data-anim':''}>${side}<div class="lx-main"><main class="stack" style="gap:inherit">${top}${inner}</main></div>
    <nav class="tabbar" aria-label="Main">${tabs.map(([s,ic])=>`<button data-a="tab" data-v="${s}" aria-current="${s===cur}">${I(ic)}<span>${t(s)}</span></button>`).join('')}</nav></div>`;
 }
+/* logged-out screens (login · sign-up · verify) */
+function lxAuth(inner){const anim=U._lxLast!==lxKey();
+  return `<div class="lx lx-t lx-auth"${anim?' data-anim':''}>
+   <section class="lx-auth-art lx-in" style="--i:0" aria-hidden="true">
+    <div class="lx-brand">${LOGO}<div class="wm">Learn<span>ova</span></div></div>
+    <h2 class="lx-headline"><span class="lx-grad-t">${esc(t('tagline'))}</span></h2>
+    <div class="lx-auth-ill">${lxArt()}</div>
+    <div class="lx-hero-meta"><span class="lx-pill">${I('video','ico-s')} ${t('group')} · ${t('oneToOne')}</span><span class="lx-pill" dir="ltr">${I('chart','ico-s')} Pre-A1 → C1</span><span class="lx-pill">${I('award','ico-s')} ${t('certificate')}</span></div>
+   </section>
+   <div class="lx-auth-card lx-card lx-in" style="--i:1">${inner}</div>
+  </div>`;}
 const lxKey=()=>S.ui.role+':'+(S.ui.role==='student'?U.screen:S.ui.role==='trainer'?U.trTab:U.adTab);
 function lxAnimate(){
   const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
