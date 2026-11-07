@@ -1,0 +1,1892 @@
+{
+ "v": 1,
+ "ui": {
+  "lang": "ar",
+  "role": "student",
+  "sid": "s1",
+  "trainerId": "t1"
+ },
+ "settings": {
+  "bank": "National Commercial Bank",
+  "holder": "Learnova Academy",
+  "acc": "0012-4478-9921",
+  "iban": "LY83 0020 0100 0000 1244 7899 21",
+  "currency": "USD",
+  "wa": "218910000000"
+ },
+ "levels": [
+  "Pre-A1",
+  "A1",
+  "A2",
+  "B1",
+  "B2",
+  "C1",
+  "مبتدئ"
+ ],
+ "cats": [
+  {
+   "id": "general",
+   "ar": "الإنجليزية العامة",
+   "en": "General English"
+  },
+  {
+   "id": "conversation",
+   "ar": "المحادثة",
+   "en": "English Conversation"
+  },
+  {
+   "id": "esp",
+   "ar": "الإنجليزية لأغراض خاصة ESP",
+   "en": "ESP – Specific Purposes"
+  },
+  {
+   "id": "intl",
+   "ar": "البرامج الدولية",
+   "en": "International Programs"
+  },
+  {
+   "id": "intensive",
+   "ar": "الدورات المكثفة",
+   "en": "Intensive Courses"
+  },
+  {
+   "id": "quran",
+   "ar": "القرآن الكريم والقراءة العربية",
+   "en": "Quran & Arabic Reading"
+  }
+ ],
+ "trainers": [
+  {
+   "id": "t1",
+   "name": "Wafaa Elhaj",
+   "gender": "f",
+   "col": "#0B4677",
+   "bio": {
+    "ar": "مدربة معتمدة CELTA تركز على المحادثة الواقعية وبناء الثقة في التحدث.",
+    "en": "CELTA-certified trainer focused on real-life speaking and confidence."
+   },
+   "quals": "CELTA · BA English Literature",
+   "exp": 8,
+   "specs": "General English, Conversation, IELTS",
+   "levels": [
+    "A1",
+    "A2",
+    "B1",
+    "B2"
+   ],
+   "meet": "https://meet.google.com/lep-wafa-a01",
+   "active": true,
+   "slots": [
+    "2026-11-08T10:00:00.000Z",
+    "2026-11-08T16:00:00.000Z",
+    "2026-11-09T10:00:00.000Z",
+    "2026-11-09T19:00:00.000Z",
+    "2026-11-10T16:00:00.000Z",
+    "2026-11-10T19:00:00.000Z",
+    "2026-11-11T10:00:00.000Z",
+    "2026-11-11T16:00:00.000Z",
+    "2026-11-12T10:00:00.000Z",
+    "2026-11-12T19:00:00.000Z",
+    "2026-11-13T16:00:00.000Z",
+    "2026-11-13T19:00:00.000Z"
+   ]
+  },
+  {
+   "id": "t6",
+   "name": "Dina Bensriti",
+   "gender": "f",
+   "col": "#2F8F83",
+   "bio": {
+    "ar": "مدربة لغة إنجليزية تركز على المحادثة والقواعد بأسلوب تفاعلي وبسيط.",
+    "en": "English trainer focused on conversation and grammar through an interactive, easy-going approach."
+   },
+   "quals": "TEFL Certified · BA English",
+   "exp": 5,
+   "specs": "General English, Conversation",
+   "levels": [
+    "A1",
+    "A2",
+    "B1",
+    "B2"
+   ],
+   "meet": "https://meet.google.com/envo-dina-f06",
+   "active": true,
+   "slots": [
+    "2026-11-08T10:00:00.000Z",
+    "2026-11-08T18:00:00.000Z",
+    "2026-11-09T14:00:00.000Z",
+    "2026-11-09T18:00:00.000Z",
+    "2026-11-10T10:00:00.000Z",
+    "2026-11-10T14:00:00.000Z",
+    "2026-11-11T10:00:00.000Z",
+    "2026-11-11T18:00:00.000Z",
+    "2026-11-12T14:00:00.000Z",
+    "2026-11-12T18:00:00.000Z",
+    "2026-11-13T10:00:00.000Z",
+    "2026-11-13T14:00:00.000Z"
+   ]
+  },
+  {
+   "id": "t7",
+   "name": "Melita Ivić",
+   "gender": "f",
+   "col": "#8A4FA3",
+   "bio": {
+    "ar": "مدربة لغة إنجليزية بخبرة دولية، تركز على الطلاقة في المحادثة والتحضير لاختبار IELTS.",
+    "en": "English trainer with international experience, focused on speaking fluency and IELTS preparation."
+   },
+   "quals": "CELTA · MA English Language",
+   "exp": 6,
+   "specs": "General English, IELTS, Conversation",
+   "levels": [
+    "A2",
+    "B1",
+    "B2",
+    "C1"
+   ],
+   "meet": "https://meet.google.com/lrn-meli-g07",
+   "active": true,
+   "slots": [
+    "2026-11-08T13:00:00.000Z",
+    "2026-11-08T17:00:00.000Z",
+    "2026-11-09T09:00:00.000Z",
+    "2026-11-09T13:00:00.000Z",
+    "2026-11-10T09:00:00.000Z",
+    "2026-11-10T17:00:00.000Z",
+    "2026-11-11T13:00:00.000Z",
+    "2026-11-11T17:00:00.000Z",
+    "2026-11-12T09:00:00.000Z",
+    "2026-11-12T13:00:00.000Z",
+    "2026-11-13T09:00:00.000Z",
+    "2026-11-13T17:00:00.000Z"
+   ]
+  },
+  {
+   "id": "t8",
+   "name": "Amira Alshaari",
+   "gender": "f",
+   "col": "#C0476B",
+   "bio": {
+    "ar": "مدربة لغة إنجليزية تساعد الطلاب على بناء الثقة في التحدث وتقوية القواعد والمفردات.",
+    "en": "English trainer who helps learners build speaking confidence and strengthen grammar and vocabulary."
+   },
+   "quals": "TEFL Certified · BA English",
+   "exp": 4,
+   "specs": "General English, Conversation",
+   "levels": [
+    "A1",
+    "A2",
+    "B1",
+    "B2"
+   ],
+   "meet": "https://meet.google.com/lrn-amir-h08",
+   "active": true,
+   "slots": [
+    "2026-11-08T11:00:00.000Z",
+    "2026-11-08T15:00:00.000Z",
+    "2026-11-09T11:00:00.000Z",
+    "2026-11-09T20:00:00.000Z",
+    "2026-11-10T15:00:00.000Z",
+    "2026-11-10T20:00:00.000Z",
+    "2026-11-11T11:00:00.000Z",
+    "2026-11-11T15:00:00.000Z",
+    "2026-11-12T11:00:00.000Z",
+    "2026-11-12T20:00:00.000Z",
+    "2026-11-13T15:00:00.000Z",
+    "2026-11-13T20:00:00.000Z"
+   ]
+  },
+  {
+   "id": "t2",
+   "name": "Omar Haddad",
+   "gender": "m",
+   "col": "#2C659F",
+   "bio": {
+    "ar": "مدرب DELTA بخبرة في برامج Oxford Discover وPearson للمراهقين والبالغين.",
+    "en": "DELTA trainer experienced with Oxford Discover and Pearson programs for teens and adults."
+   },
+   "quals": "DELTA · MA Applied Linguistics",
+   "exp": 11,
+   "specs": "General English, Oxford Discover, Pearson",
+   "levels": [
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1"
+   ],
+   "meet": "https://meet.google.com/lep-omar-b02",
+   "active": true,
+   "slots": [
+    "2026-11-08T09:00:00.000Z",
+    "2026-11-08T20:00:00.000Z",
+    "2026-11-09T17:00:00.000Z",
+    "2026-11-09T20:00:00.000Z",
+    "2026-11-10T09:00:00.000Z",
+    "2026-11-10T17:00:00.000Z",
+    "2026-11-11T09:00:00.000Z",
+    "2026-11-11T20:00:00.000Z",
+    "2026-11-12T17:00:00.000Z",
+    "2026-11-12T20:00:00.000Z",
+    "2026-11-13T09:00:00.000Z",
+    "2026-11-13T17:00:00.000Z"
+   ]
+  },
+  {
+   "id": "t3",
+   "name": "Layla Mansour",
+   "gender": "f",
+   "col": "#8A4FA3",
+   "bio": {
+    "ar": "متخصصة في إنجليزية الأعمال والتحضير لـ IELTS، عملت مع شركات ومصارف.",
+    "en": "Business English and IELTS specialist who has trained bank and corporate teams."
+   },
+   "quals": "MA TESOL · IELTS Examiner training",
+   "exp": 9,
+   "specs": "Business English, IELTS, Presentations",
+   "levels": [
+    "B1",
+    "B2",
+    "C1"
+   ],
+   "meet": "https://meet.google.com/lep-layl-c03",
+   "active": true,
+   "slots": [
+    "2026-11-08T18:00:00.000Z",
+    "2026-11-09T11:00:00.000Z",
+    "2026-11-09T18:00:00.000Z",
+    "2026-11-10T11:00:00.000Z",
+    "2026-11-11T18:00:00.000Z",
+    "2026-11-12T11:00:00.000Z",
+    "2026-11-12T18:00:00.000Z",
+    "2026-11-13T11:00:00.000Z"
+   ]
+  },
+  {
+   "id": "t4",
+   "name": "Huda Salem",
+   "gender": "f",
+   "col": "#B7791F",
+   "bio": {
+    "ar": "مدربة Jolly Phonics وOxford Phonics World للأطفال بأسلوب ممتع ومنظم.",
+    "en": "Jolly Phonics and Oxford Phonics World trainer for young learners."
+   },
+   "quals": "Jolly Phonics Certified · BEd",
+   "exp": 6,
+   "specs": "Jolly Phonics, Oxford Phonics World, Kids",
+   "levels": [
+    "Pre-A1",
+    "A1"
+   ],
+   "meet": "https://meet.google.com/lep-huda-d04",
+   "active": true,
+   "slots": [
+    "2026-11-08T15:00:00.000Z",
+    "2026-11-08T17:00:00.000Z",
+    "2026-11-09T15:00:00.000Z",
+    "2026-11-10T17:00:00.000Z",
+    "2026-11-11T15:00:00.000Z",
+    "2026-11-11T17:00:00.000Z",
+    "2026-11-12T15:00:00.000Z",
+    "2026-11-13T17:00:00.000Z"
+   ]
+  },
+  {
+   "id": "t5",
+   "name": "Dr. Samir Nouri",
+   "gender": "m",
+   "col": "#B63A33",
+   "bio": {
+    "ar": "طبيب ومدرب إنجليزية طبية، يدرّس التواصل مع المرضى وكتابة التقارير.",
+    "en": "Physician and medical English trainer: patient communication and case reports."
+   },
+   "quals": "MBBS · CertTESOL",
+   "exp": 7,
+   "specs": "English for Medicine, Presentations",
+   "levels": [
+    "B1",
+    "B2",
+    "C1"
+   ],
+   "meet": "https://meet.google.com/lep-sami-e05",
+   "active": true,
+   "slots": [
+    "2026-11-08T19:00:00.000Z",
+    "2026-11-09T21:00:00.000Z",
+    "2026-11-10T19:00:00.000Z",
+    "2026-11-10T21:00:00.000Z",
+    "2026-11-11T19:00:00.000Z",
+    "2026-11-12T21:00:00.000Z",
+    "2026-11-13T19:00:00.000Z",
+    "2026-11-13T21:00:00.000Z"
+   ]
+  }
+ ],
+ "courses": [
+  {
+   "active": true,
+   "seats": 12,
+   "modes": [
+    "group"
+   ],
+   "trainers": [
+    "t1",
+    "t6"
+   ],
+   "materials": [
+    "Unit worksheets (PDF)",
+    "Audio tracks",
+    "Vocabulary lists"
+   ],
+   "outcomes": {
+    "ar": [
+     "التحدث عن الروتين والخطط",
+     "استخدام الماضي البسيط والمستمر",
+     "فهم نصوص قصيرة ورسائل",
+     "كتابة رسالة شخصية قصيرة"
+    ],
+    "en": [
+     "Talk about routines and plans",
+     "Use past simple and continuous",
+     "Understand short texts and messages",
+     "Write a short personal email"
+    ]
+   },
+   "price1": 0,
+   "id": "c1",
+   "title": "General English A2",
+   "cat": "general",
+   "level": "A2",
+   "sessions": 16,
+   "weeks": 8,
+   "price": 120,
+   "groupTrainer": "t1",
+   "start": "2026-10-17",
+   "sched": {
+    "ar": "الأحد والثلاثاء والخميس · مساءً",
+    "en": "Sun, Tue & Thu · evening"
+   },
+   "desc": {
+    "ar": "دورة متكاملة لتقوية القواعد والمفردات والتواصل اليومي في مستوى A2.",
+    "en": "A complete A2 course building grammar, vocabulary and everyday communication."
+   },
+   "lessons": [
+    "Daily routines",
+    "Places in town",
+    "Past experiences",
+    "Shopping & prices",
+    "Making plans",
+    "Travel & directions"
+   ]
+  },
+  {
+   "active": true,
+   "seats": 10,
+   "modes": [
+    "group",
+    "1to1"
+   ],
+   "trainers": [
+    "t2",
+    "t1",
+    "t7",
+    "t8"
+   ],
+   "materials": [
+    "Course book pages (licensed)",
+    "Worksheets",
+    "Audio"
+   ],
+   "outcomes": {
+    "ar": [
+     "التعبير عن الرأي والاتفاق والاختلاف",
+     "استخدام المضارع التام",
+     "كتابة مقال رأي قصير"
+    ],
+    "en": [
+     "Give opinions, agree and disagree",
+     "Use the present perfect",
+     "Write a short opinion essay"
+    ]
+   },
+   "price1": 320,
+   "id": "c2",
+   "title": "General English B1",
+   "cat": "general",
+   "level": "B1",
+   "sessions": 20,
+   "weeks": 10,
+   "price": 150,
+   "groupTrainer": "t2",
+   "start": "2026-11-16",
+   "sched": {
+    "ar": "الإثنين والأربعاء · 7 مساءً",
+    "en": "Mon & Wed · 7 pm"
+   },
+   "desc": {
+    "ar": "انتقل من التواصل الأساسي إلى التعبير بثقة عن الآراء والتجارب.",
+    "en": "Move from basic communication to confidently expressing opinions and experiences."
+   },
+   "lessons": [
+    "Life experiences",
+    "Work & study",
+    "Health & lifestyle",
+    "Media & news",
+    "Opinions",
+    "Future plans"
+   ]
+  },
+  {
+   "active": true,
+   "seats": 8,
+   "modes": [
+    "1to1",
+    "group"
+   ],
+   "trainers": [
+    "t1",
+    "t6",
+    "t2",
+    "t8"
+   ],
+   "materials": [
+    "Role-play cards",
+    "Useful phrases sheet"
+   ],
+   "outcomes": {
+    "ar": [
+     "بدء المحادثة والاستمرار فيها",
+     "طلب التوضيح بلباقة",
+     "تحسين الطلاقة والنطق"
+    ],
+    "en": [
+     "Start and keep a conversation going",
+     "Ask for clarification politely",
+     "Improve fluency and pronunciation"
+    ]
+   },
+   "price1": 240,
+   "id": "c3",
+   "title": "Everyday Conversation",
+   "cat": "conversation",
+   "level": "B1",
+   "sessions": 12,
+   "weeks": 6,
+   "price": 95,
+   "groupTrainer": "t2",
+   "start": "2026-11-12",
+   "sched": {
+    "ar": "السبت · 6 مساءً (للمجموعة)",
+    "en": "Sat · 6 pm (group)"
+   },
+   "desc": {
+    "ar": "محادثة عملية للمواقف اليومية: التعارف، المطاعم، السفر، والعمل.",
+    "en": "Practical speaking for daily situations: meeting people, restaurants, travel and work."
+   },
+   "lessons": [
+    "Small talk",
+    "At a restaurant",
+    "Travel situations",
+    "On the phone",
+    "Sharing opinions",
+    "Telling stories"
+   ]
+  },
+  {
+   "active": true,
+   "seats": 12,
+   "modes": [
+    "1to1"
+   ],
+   "trainers": [
+    "t3",
+    "t5"
+   ],
+   "materials": [
+    "Email templates",
+    "Meeting phrases",
+    "Case studies"
+   ],
+   "outcomes": {
+    "ar": [
+     "إدارة اجتماع باللغة الإنجليزية",
+     "كتابة بريد إلكتروني رسمي",
+     "تقديم عرض قصير"
+    ],
+    "en": [
+     "Run a meeting in English",
+     "Write formal emails",
+     "Deliver a short presentation"
+    ]
+   },
+   "price1": 380,
+   "id": "c4",
+   "title": "Business English",
+   "cat": "esp",
+   "level": "B2",
+   "sessions": 10,
+   "weeks": 5,
+   "price": 0,
+   "groupTrainer": null,
+   "start": "2026-11-09",
+   "sched": {
+    "ar": "حسب الموعد المحجوز",
+    "en": "At your booked time"
+   },
+   "desc": {
+    "ar": "اجتماعات، عروض تقديمية، رسائل بريد احترافية، وتفاوض.",
+    "en": "Meetings, presentations, professional emails and negotiation."
+   },
+   "lessons": [
+    "Introductions at work",
+    "Emails that get answers",
+    "Meetings",
+    "Presentations",
+    "Negotiation"
+   ]
+  },
+  {
+   "active": true,
+   "seats": 10,
+   "modes": [
+    "group"
+   ],
+   "trainers": [
+    "t5"
+   ],
+   "materials": [
+    "Case sheets",
+    "Medical vocabulary list"
+   ],
+   "outcomes": {
+    "ar": [
+     "أخذ التاريخ المرضي",
+     "شرح التشخيص للمريض",
+     "عرض حالة أمام الفريق"
+    ],
+    "en": [
+     "Take a patient history",
+     "Explain a diagnosis to a patient",
+     "Present a case to the team"
+    ]
+   },
+   "price1": 0,
+   "id": "c5",
+   "title": "English for Medicine",
+   "cat": "esp",
+   "level": "B2",
+   "sessions": 12,
+   "weeks": 6,
+   "price": 180,
+   "groupTrainer": "t5",
+   "start": "2026-11-19",
+   "sched": {
+    "ar": "الثلاثاء · 8 مساءً",
+    "en": "Tue · 8 pm"
+   },
+   "desc": {
+    "ar": "التواصل مع المرضى، أخذ التاريخ المرضي، وعرض الحالات.",
+    "en": "Patient communication, history taking and case presentations."
+   },
+   "lessons": [
+    "History taking",
+    "Examination language",
+    "Explaining a diagnosis",
+    "Case presentations"
+   ]
+  },
+  {
+   "active": true,
+   "seats": 8,
+   "modes": [
+    "group"
+   ],
+   "trainers": [
+    "t4"
+   ],
+   "materials": [
+    "Sound cards (licensed)",
+    "Action songs"
+   ],
+   "outcomes": {
+    "ar": [
+     "التعرف على 42 صوتاً",
+     "دمج الأصوات لقراءة كلمات",
+     "كتابة كلمات بسيطة"
+    ],
+    "en": [
+     "Recognise the 42 letter sounds",
+     "Blend sounds to read words",
+     "Spell simple words"
+    ]
+   },
+   "price1": 0,
+   "id": "c6",
+   "title": "Jolly Phonics – Kids",
+   "cat": "intl",
+   "level": "Pre-A1",
+   "sessions": 24,
+   "weeks": 12,
+   "price": 110,
+   "groupTrainer": "t4",
+   "start": "2026-10-24",
+   "sched": {
+    "ar": "الجمعة والسبت · 5 مساءً",
+    "en": "Fri & Sat · 5 pm"
+   },
+   "desc": {
+    "ar": "تعلم الأصوات والدمج والتهجئة للأطفال من 4 إلى 7 سنوات.",
+    "en": "Sounds, blending and spelling for children aged 4–7."
+   },
+   "lessons": [
+    "Sounds: s a t i p n",
+    "Blending",
+    "Segmenting",
+    "Tricky words",
+    "Reading & spelling"
+   ]
+  },
+  {
+   "active": true,
+   "seats": 10,
+   "modes": [
+    "group"
+   ],
+   "trainers": [
+    "t2"
+   ],
+   "materials": [
+    "Student book pages (licensed)",
+    "Workbook activities"
+   ],
+   "outcomes": {
+    "ar": [
+     "مفردات الموضوعات الأساسية",
+     "جمل بسيطة عن الذات والعالم",
+     "قراءة قصص قصيرة"
+    ],
+    "en": [
+     "Core topic vocabulary",
+     "Simple sentences about self and the world",
+     "Read short stories"
+    ]
+   },
+   "price1": 0,
+   "id": "c7",
+   "title": "Oxford Discover – Level 1",
+   "cat": "intl",
+   "level": "A1",
+   "sessions": 20,
+   "weeks": 10,
+   "price": 130,
+   "groupTrainer": "t2",
+   "start": "2026-11-14",
+   "sched": {
+    "ar": "الأحد والأربعاء · 5 مساءً",
+    "en": "Sun & Wed · 5 pm"
+   },
+   "desc": {
+    "ar": "برنامج قائم على الأسئلة الكبرى لتنمية التفكير واللغة لدى الأطفال.",
+    "en": "Inquiry-based program building language and thinking skills for young learners."
+   },
+   "lessons": [
+    "Where do we live?",
+    "How do we play?",
+    "What do animals need?",
+    "Why do we celebrate?"
+   ]
+  },
+  {
+   "active": true,
+   "seats": 6,
+   "modes": [
+    "1to1",
+    "group"
+   ],
+   "trainers": [
+    "t3",
+    "t2",
+    "t7"
+   ],
+   "materials": [
+    "Cue cards",
+    "Band descriptors summary"
+   ],
+   "outcomes": {
+    "ar": [
+     "إجابات منظمة للجزء الأول",
+     "التحدث لدقيقتين في الجزء الثاني",
+     "توسيع النقاش في الجزء الثالث"
+    ],
+    "en": [
+     "Structured Part 1 answers",
+     "Speak for two minutes in Part 2",
+     "Extend discussion in Part 3"
+    ]
+   },
+   "price1": 300,
+   "id": "c8",
+   "title": "IELTS Speaking Intensive",
+   "cat": "intensive",
+   "level": "B2",
+   "sessions": 8,
+   "weeks": 2,
+   "price": 140,
+   "groupTrainer": "t3",
+   "start": "2026-11-11",
+   "sched": {
+    "ar": "يومياً عدا الجمعة · 8 مساءً",
+    "en": "Daily except Fri · 8 pm"
+   },
+   "desc": {
+    "ar": "تدريب مكثف على أجزاء IELTS Speaking الثلاثة مع تقييم مفصل.",
+    "en": "Intensive practice on all three IELTS Speaking parts with detailed scoring."
+   },
+   "lessons": [
+    "Part 1 strategies",
+    "Part 2 cue cards",
+    "Part 3 discussion",
+    "Mock test"
+   ]
+  },
+  {
+   "active": true,
+   "seats": 8,
+   "modes": [
+    "group"
+   ],
+   "trainers": [
+    "t4"
+   ],
+   "materials": [
+    "Phonics cards (licensed)"
+   ],
+   "outcomes": {
+    "ar": [
+     "أصوات الحروف من A إلى Z",
+     "كلمات CVC بسيطة"
+    ],
+    "en": [
+     "Letter sounds A–Z",
+     "Simple CVC words"
+    ]
+   },
+   "price1": 0,
+   "id": "c9",
+   "title": "Oxford Phonics World – Level 1",
+   "cat": "intl",
+   "level": "Pre-A1",
+   "sessions": 16,
+   "weeks": 8,
+   "price": 100,
+   "groupTrainer": "t4",
+   "start": "2026-11-17",
+   "sched": {
+    "ar": "الإثنين والخميس · 4 مساءً",
+    "en": "Mon & Thu · 4 pm"
+   },
+   "desc": {
+    "ar": "الحروف وأصواتها بترتيب متدرج مع أنشطة وأغانٍ.",
+    "en": "Letters and their sounds in a graded sequence with activities and songs."
+   },
+   "lessons": [
+    "Letters A–F",
+    "Letters G–L",
+    "Letters M–R",
+    "Letters S–Z"
+   ]
+  },
+  {
+   "active": true,
+   "seats": 12,
+   "modes": [
+    "group"
+   ],
+   "trainers": [
+    "t2"
+   ],
+   "materials": [
+    "Licensed Pearson content"
+   ],
+   "outcomes": {
+    "ar": [
+     "تقديم النفس والآخرين",
+     "الأرقام والوقت والأسعار"
+    ],
+    "en": [
+     "Introduce yourself and others",
+     "Numbers, time and prices"
+    ]
+   },
+   "price1": 0,
+   "id": "c10",
+   "title": "Pearson English – Level A1",
+   "cat": "intl",
+   "level": "A1",
+   "sessions": 16,
+   "weeks": 8,
+   "price": 115,
+   "groupTrainer": "t2",
+   "start": "2026-08-29",
+   "sched": {
+    "ar": "الإثنين والأربعاء · 6 مساءً",
+    "en": "Mon & Wed · 6 pm"
+   },
+   "desc": {
+    "ar": "مستوى A1 وفق البرنامج المرخص من Pearson.",
+    "en": "A1 level following the licensed Pearson program."
+   },
+   "lessons": [
+    "Hello!",
+    "My family",
+    "My day",
+    "Food & drink"
+   ]
+  },
+  {
+   "id": "c11",
+   "active": true,
+   "title": "نور البيان",
+   "cat": "quran",
+   "level": "مبتدئ",
+   "modes": [
+    "group",
+    "1to1"
+   ],
+   "sessions": 24,
+   "weeks": 12,
+   "price": 90,
+   "price1": 200,
+   "seats": 10,
+   "groupTrainer": "t1",
+   "trainers": [
+    "t1"
+   ],
+   "start": "2026-11-13",
+   "sched": {
+    "ar": "السبت والثلاثاء · 4 مساءً",
+    "en": "Sat & Tue · 4 pm"
+   },
+   "desc": {
+    "ar": "منهج نور البيان لتعليم القراءة العربية الصحيحة من الحروف حتى تلاوة القرآن الكريم وترتيله، للصغار والكبار.",
+    "en": "The Nour Al-Bayan method: from Arabic letters to correct Quran reading and recitation (tarteel), for children and adults."
+   },
+   "outcomes": {
+    "ar": [
+     "التعرف على الحروف الهجائية ونطقها من مخارجها",
+     "قراءة الحركات والتنوين والسكون والشدة",
+     "التمييز بين المدود واللام الشمسية والقمرية",
+     "تلاوة قصار السور تلاوة صحيحة مرتلة"
+    ],
+    "en": [
+     "Recognise Arabic letters and pronounce them correctly",
+     "Read short vowels, tanween, sukoon and shadda",
+     "Distinguish madd and sun/moon letters",
+     "Recite short surahs with correct tarteel"
+    ]
+   },
+   "materials": [
+    "كتاب نور البيان (PDF)",
+    "تسجيلات صوتية للنطق",
+    "بطاقات الحروف"
+   ],
+   "lessons": [
+    "الحروف الهجائية المفردة",
+    "الحروف المركبة",
+    "الحركات: الفتحة والضمة والكسرة",
+    "التنوين",
+    "المدود",
+    "السكون",
+    "الشدة",
+    "اللام الشمسية والقمرية",
+    "تطبيقات على قصار السور"
+   ]
+  }
+ ],
+ "students": [
+  {
+   "id": "s1",
+   "name": "Ahmed Benali",
+   "phone": "0912345678",
+   "pw": "leap123",
+   "email": "ahmed@example.com",
+   "gender": "m",
+   "country": "Libya",
+   "dob": "1998-04-12",
+   "level": "A2",
+   "placement": {
+    "score": 6,
+    "total": 12,
+    "level": "A2",
+    "at": "2026-10-08T12:00:00.000Z",
+    "by": {
+     "grammar": [
+      2,
+      4
+     ],
+     "vocab": [
+      2,
+      3
+     ],
+     "reading": [
+      1,
+      3
+     ],
+     "listening": [
+      1,
+      2
+     ]
+    }
+   },
+   "active": true,
+   "joined": "2026-10-03T10:00:00.000Z"
+  },
+  {
+   "id": "s2",
+   "name": "Mariam Youssef",
+   "phone": "0923456789",
+   "pw": "leap123",
+   "gender": "f",
+   "country": "Libya",
+   "dob": "2001-09-03",
+   "level": "A2",
+   "active": true,
+   "joined": "2026-10-10T10:00:00.000Z"
+  },
+  {
+   "id": "s3",
+   "name": "Khaled Omar",
+   "phone": "0934567890",
+   "pw": "leap123",
+   "gender": "m",
+   "country": "Tunisia",
+   "dob": "1994-01-22",
+   "level": "B2",
+   "active": true,
+   "joined": "2026-10-13T10:00:00.000Z"
+  },
+  {
+   "id": "s4",
+   "name": "Rania Farouk",
+   "phone": "0945678901",
+   "pw": "leap123",
+   "gender": "f",
+   "country": "Egypt",
+   "dob": "1999-06-30",
+   "level": "B2",
+   "active": true,
+   "joined": "2026-11-04T10:00:00.000Z"
+  },
+  {
+   "id": "s5",
+   "name": "Adam Hassan",
+   "phone": "0956789012",
+   "pw": "leap123",
+   "gender": "m",
+   "country": "Libya",
+   "dob": "2019-02-11",
+   "level": "Pre-A1",
+   "active": true,
+   "joined": "2026-10-22T10:00:00.000Z"
+  },
+  {
+   "id": "s6",
+   "name": "Salma Idris",
+   "phone": "0967890123",
+   "pw": "leap123",
+   "gender": "f",
+   "country": "Sudan",
+   "dob": "2000-11-05",
+   "level": "A2",
+   "active": true,
+   "joined": "2026-10-18T10:00:00.000Z"
+  }
+ ],
+ "enrollments": [
+  {
+   "mode": "group",
+   "slot": null,
+   "done": [
+    0,
+    1
+   ],
+   "quiz": {
+    "0": 3,
+    "1": 2
+   },
+   "created": "2026-10-18T10:00:00.000Z",
+   "payment": {
+    "amount": 120,
+    "status": "approved",
+    "file": "receipt_ahmed.jpg",
+    "receipt": null,
+    "at": "2026-10-18T11:00:00.000Z"
+   },
+   "id": "e1",
+   "sid": "s1",
+   "cid": "c1",
+   "trainerId": "t1",
+   "status": "active"
+  },
+  {
+   "mode": "1to1",
+   "slot": null,
+   "done": [],
+   "quiz": {},
+   "created": "2026-11-06T14:00:00.000Z",
+   "payment": {
+    "amount": 240,
+    "status": "pending",
+    "file": "receipt_c3.jpg",
+    "receipt": "data:image/jpeg;base64,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",
+    "at": "2026-11-07T00:26:17.644Z"
+   },
+   "id": "e2",
+   "sid": "s1",
+   "cid": "c3",
+   "trainerId": "t1",
+   "status": "payment_pending"
+  },
+  {
+   "mode": "group",
+   "slot": null,
+   "done": [
+    0,
+    1,
+    2
+   ],
+   "quiz": {
+    "0": 3,
+    "1": 3,
+    "2": 2
+   },
+   "created": "2026-10-18T10:00:00.000Z",
+   "payment": {
+    "amount": 120,
+    "status": "approved",
+    "file": "r.jpg",
+    "at": "2026-10-19T11:00:00.000Z"
+   },
+   "id": "e3",
+   "sid": "s2",
+   "cid": "c1",
+   "trainerId": "t1",
+   "status": "active"
+  },
+  {
+   "mode": "group",
+   "slot": null,
+   "done": [
+    0
+   ],
+   "quiz": {},
+   "created": "2026-10-18T10:00:00.000Z",
+   "payment": {
+    "amount": 120,
+    "status": "approved",
+    "file": "r.jpg",
+    "at": "2026-10-19T12:00:00.000Z"
+   },
+   "id": "e4",
+   "sid": "s3",
+   "cid": "c1",
+   "trainerId": "t1",
+   "status": "active"
+  },
+  {
+   "mode": "1to1",
+   "slot": null,
+   "done": [
+    0
+   ],
+   "quiz": {},
+   "created": "2026-10-18T10:00:00.000Z",
+   "payment": {
+    "amount": 380,
+    "status": "approved",
+    "file": "r.jpg",
+    "at": "2026-11-01T12:00:00.000Z"
+   },
+   "id": "e5",
+   "sid": "s3",
+   "cid": "c4",
+   "trainerId": "t3",
+   "status": "active"
+  },
+  {
+   "mode": "group",
+   "slot": null,
+   "done": [],
+   "quiz": {},
+   "created": "2026-11-07T09:00:00.000Z",
+   "payment": {
+    "amount": 140,
+    "status": "pending",
+    "file": "receipt_rania.jpg",
+    "receipt": "data:image/jpeg;base64,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5Tb3O8oKRTt7neU29zvKCkXAGPcn8rlAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQdLUgx0UXqSsjAkziTOx/I8nf7/wuibzmVdld3pOHqEbXhzHYx/aXDmOfQD/AN82iDEC3ZnIeyzsaZI2Ya1pGHNBPUfJXzdeshswNrD4o3lg2t/zHNe9oHT32jkFm1AiYJjNj6y0NJ+wJP8A5lBh3WLEUkjI3iJrpZXF5IHMYwMkH5K708ljZTYJBG+aQNkLQD/wOccZ+4XdRBhm3b2JnhzS5rJD6RwS0g8sADPk81ctqYbGQXRKxzyHS/SNpwMNzjb8+yyyIMM23MJYxJMyIyPY2SRjRz/y3HqR8gdV9tPnlluO9adxBhBY04Ad9bxuAx8Bp/n8LIPiZI+Nzhkxu3N+xwR/sSrQYaJz4rEodadEySWQulIbnLcbW5I+CfC7Wmz2bDnvncW7WsHp7QMEtaT9+pXfRBg5Lcrp2SNl9SeMz4gwPpIDg0cufPA69V9YrNt7mM/cgtkka3e0tc4Za4noMewWXRBhhcuMha4zGQvieTlg+na9rdwwPgk/wu5Wmkcyz/m+s2M4ZKQOf0g+3I4K7q4cA5paehGCgw0eoTNZE82RIxzYnSuIaBGS4AjkOX8/Cs3Z5ZD6c+GNE7staDuDC0N/jmsrHG2KJsbBhrGho/AR7BIxzHc2uBBQYlt2xtG2zvY5sRfLtb/lFxOfbHnouH3p42lxsZjYX4cNu6QA8jg8iOo5YWXY0MY1jejRgKkGJbbtusyZlYwNfINjyPpaAdpxjPsD16FdnTrD5hIySQyOZgk5aRz+C3r4yu6iAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIg//2Q==",
+    "at": "2026-11-07T09:30:00.000Z"
+   },
+   "id": "e6",
+   "sid": "s4",
+   "cid": "c8",
+   "trainerId": "t3",
+   "status": "payment_pending"
+  },
+  {
+   "mode": "group",
+   "slot": null,
+   "done": [
+    0,
+    1
+   ],
+   "quiz": {},
+   "created": "2026-10-18T10:00:00.000Z",
+   "payment": {
+    "amount": 110,
+    "status": "approved",
+    "file": "r.jpg",
+    "at": "2026-10-24T12:00:00.000Z"
+   },
+   "id": "e7",
+   "sid": "s5",
+   "cid": "c6",
+   "trainerId": "t4",
+   "status": "active"
+  },
+  {
+   "mode": "group",
+   "slot": null,
+   "done": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "quiz": {
+    "0": 3,
+    "1": 3,
+    "2": 3,
+    "3": 2
+   },
+   "created": "2026-08-24T10:00:00.000Z",
+   "payment": {
+    "amount": 115,
+    "status": "approved",
+    "file": "r.jpg",
+    "at": "2026-08-25T12:00:00.000Z"
+   },
+   "id": "e8",
+   "sid": "s1",
+   "cid": "c10",
+   "trainerId": "t2",
+   "status": "completed"
+  },
+  {
+   "mode": "group",
+   "slot": null,
+   "done": [
+    0,
+    1
+   ],
+   "quiz": {},
+   "created": "2026-10-18T10:00:00.000Z",
+   "payment": {
+    "amount": 120,
+    "status": "approved",
+    "file": "r.jpg",
+    "at": "2026-10-20T12:00:00.000Z"
+   },
+   "id": "e9",
+   "sid": "s6",
+   "cid": "c1",
+   "trainerId": "t1",
+   "status": "active"
+  }
+ ],
+ "sessions": [
+  {
+   "id": "ss10",
+   "cid": "c1",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-10-29T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "done",
+   "att": {
+    "s1": "present",
+    "s2": "present",
+    "s3": "present",
+    "s6": "present"
+   }
+  },
+  {
+   "id": "ss11",
+   "cid": "c1",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-10-31T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "done",
+   "att": {
+    "s1": "late",
+    "s2": "present",
+    "s3": "present",
+    "s6": "present"
+   }
+  },
+  {
+   "id": "ss12",
+   "cid": "c1",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-02T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "done",
+   "att": {
+    "s1": "present",
+    "s2": "present",
+    "s3": "absent",
+    "s6": "present"
+   }
+  },
+  {
+   "id": "ss13",
+   "cid": "c1",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-05T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "done",
+   "att": {
+    "s1": "present",
+    "s2": "present",
+    "s3": "present",
+    "s6": "absent"
+   }
+  },
+  {
+   "id": "ss1n",
+   "cid": "c1",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-07T06:05:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "ss1u0",
+   "cid": "c1",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-09T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "ss1u1",
+   "cid": "c1",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-11T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "ss1u2",
+   "cid": "c1",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-14T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "ss1u3",
+   "cid": "c1",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-16T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc25",
+   "cid": "c2",
+   "trainerId": "t2",
+   "eid": null,
+   "at": "2026-11-15T16:00:00.000Z",
+   "link": "https://meet.google.com/lep-omar-b02",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc33",
+   "cid": "c3",
+   "trainerId": "t2",
+   "eid": null,
+   "at": "2026-11-11T17:00:00.000Z",
+   "link": "https://meet.google.com/lep-omar-b02",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc34",
+   "cid": "c3",
+   "trainerId": "t2",
+   "eid": null,
+   "at": "2026-11-14T17:00:00.000Z",
+   "link": "https://meet.google.com/lep-omar-b02",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc35",
+   "cid": "c3",
+   "trainerId": "t2",
+   "eid": null,
+   "at": "2026-11-16T17:00:00.000Z",
+   "link": "https://meet.google.com/lep-omar-b02",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc60",
+   "cid": "c6",
+   "trainerId": "t4",
+   "eid": null,
+   "at": "2026-11-02T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-huda-d04",
+   "status": "done",
+   "att": {
+    "s5": "present"
+   }
+  },
+  {
+   "id": "sc61",
+   "cid": "c6",
+   "trainerId": "t4",
+   "eid": null,
+   "at": "2026-11-05T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-huda-d04",
+   "status": "done",
+   "att": {
+    "s5": "present"
+   }
+  },
+  {
+   "id": "sc62",
+   "cid": "c6",
+   "trainerId": "t4",
+   "eid": null,
+   "at": "2026-11-09T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-huda-d04",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc63",
+   "cid": "c6",
+   "trainerId": "t4",
+   "eid": null,
+   "at": "2026-11-11T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-huda-d04",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc64",
+   "cid": "c6",
+   "trainerId": "t4",
+   "eid": null,
+   "at": "2026-11-14T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-huda-d04",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc65",
+   "cid": "c6",
+   "trainerId": "t4",
+   "eid": null,
+   "at": "2026-11-16T19:00:00.000Z",
+   "link": "https://meet.google.com/lep-huda-d04",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc74",
+   "cid": "c7",
+   "trainerId": "t2",
+   "eid": null,
+   "at": "2026-11-13T16:00:00.000Z",
+   "link": "https://meet.google.com/lep-omar-b02",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc75",
+   "cid": "c7",
+   "trainerId": "t2",
+   "eid": null,
+   "at": "2026-11-15T16:00:00.000Z",
+   "link": "https://meet.google.com/lep-omar-b02",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc83",
+   "cid": "c8",
+   "trainerId": "t3",
+   "eid": null,
+   "at": "2026-11-11T17:00:00.000Z",
+   "link": "https://meet.google.com/lep-layl-c03",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc84",
+   "cid": "c8",
+   "trainerId": "t3",
+   "eid": null,
+   "at": "2026-11-14T17:00:00.000Z",
+   "link": "https://meet.google.com/lep-layl-c03",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc85",
+   "cid": "c8",
+   "trainerId": "t3",
+   "eid": null,
+   "at": "2026-11-16T17:00:00.000Z",
+   "link": "https://meet.google.com/lep-layl-c03",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc114",
+   "cid": "c11",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-13T16:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc115",
+   "cid": "c11",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-15T16:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "se50",
+   "cid": "c4",
+   "trainerId": "t3",
+   "eid": "e5",
+   "at": "2026-11-03T11:00:00.000Z",
+   "link": "https://meet.google.com/lep-layl-c03",
+   "status": "done",
+   "att": {
+    "s3": "present"
+   }
+  },
+  {
+   "id": "se51",
+   "cid": "c4",
+   "trainerId": "t3",
+   "eid": "e5",
+   "at": "2026-11-10T11:00:00.000Z",
+   "link": "https://meet.google.com/lep-layl-c03",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "se52",
+   "cid": "c4",
+   "trainerId": "t3",
+   "eid": "e5",
+   "at": "2026-11-17T11:00:00.000Z",
+   "link": "https://meet.google.com/lep-layl-c03",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "se53",
+   "cid": "c4",
+   "trainerId": "t3",
+   "eid": "e5",
+   "at": "2026-11-24T11:00:00.000Z",
+   "link": "https://meet.google.com/lep-layl-c03",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc110",
+   "cid": "c11",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-03T16:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "done",
+   "att": {}
+  },
+  {
+   "id": "sc111",
+   "cid": "c11",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-09T16:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc112",
+   "cid": "c11",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-12T16:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc113",
+   "cid": "c11",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-16T16:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "sc114",
+   "cid": "c11",
+   "trainerId": "t1",
+   "eid": null,
+   "at": "2026-11-19T16:00:00.000Z",
+   "link": "https://meet.google.com/lep-wafa-a01",
+   "status": "scheduled",
+   "att": {}
+  },
+  {
+   "id": "se5t",
+   "cid": "c4",
+   "trainerId": "t3",
+   "eid": "e5",
+   "at": "2026-11-07T21:00:00.000Z",
+   "link": "https://meet.google.com/lep-layl-c03",
+   "status": "scheduled",
+   "att": {}
+  }
+ ],
+ "homework": [
+  {
+   "id": "h1",
+   "cid": "c1",
+   "title": "Write about your daily routine (80–100 words)",
+   "kind": "writing",
+   "due": "2026-11-10T23:59:00.000Z",
+   "subs": [
+    {
+     "sid": "s2",
+     "text": "I usually wake up at 6:30. I have breakfast with my family and then I take the bus to university…",
+     "file": null,
+     "at": "2026-11-06T20:00:00.000Z",
+     "fb": "Great use of frequency adverbs. Check word order in \"always I go\" → \"I always go\".",
+     "grade": "8/10"
+    },
+    {
+     "sid": "s6",
+     "text": "Every day I get up early and go to work by car…",
+     "file": null,
+     "at": "2026-11-07T08:00:00.000Z",
+     "fb": null,
+     "grade": null
+    }
+   ]
+  },
+  {
+   "id": "h2",
+   "cid": "c1",
+   "title": "Speaking: describe your last weekend (1–3 min)",
+   "kind": "speaking",
+   "due": "2026-11-12T23:59:00.000Z",
+   "subs": [
+    {
+     "sid": "s3",
+     "text": "",
+     "file": "weekend_khaled.m4a",
+     "at": "2026-11-06T22:00:00.000Z",
+     "fb": null,
+     "grade": null
+    }
+   ]
+  },
+  {
+   "id": "h3",
+   "cid": "c4",
+   "title": "Write a follow-up email after a client meeting",
+   "kind": "writing",
+   "due": "2026-11-09T23:59:00.000Z",
+   "subs": []
+  },
+  {
+   "id": "h4",
+   "cid": "c10",
+   "title": "Introduce your family (5 sentences)",
+   "kind": "writing",
+   "due": "2026-09-08T23:00:00.000Z",
+   "subs": [
+    {
+     "sid": "s1",
+     "text": "This is my family…",
+     "at": "2026-09-07T20:00:00.000Z",
+     "fb": "Very good! Clear sentences.",
+     "grade": "9/10"
+    }
+   ]
+  }
+ ],
+ "certs": [
+  {
+   "id": "EN-2026-0412",
+   "sid": "s1",
+   "cid": "c10",
+   "level": "A1",
+   "duration": "8 weeks",
+   "date": "2026-10-28T12:00:00.000Z"
+  }
+ ],
+ "qs": [
+  {
+   "id": "q1",
+   "skill": "grammar",
+   "q": "She ___ to work every day.",
+   "o": [
+    "go",
+    "goes",
+    "going",
+    "gone"
+   ],
+   "a": 1
+  },
+  {
+   "id": "q2",
+   "skill": "grammar",
+   "q": "I ___ TV when the phone rang.",
+   "o": [
+    "watched",
+    "was watching",
+    "am watching",
+    "have watched"
+   ],
+   "a": 1
+  },
+  {
+   "id": "q3",
+   "skill": "grammar",
+   "q": "If I ___ more time, I would travel more.",
+   "o": [
+    "have",
+    "had",
+    "will have",
+    "having"
+   ],
+   "a": 1
+  },
+  {
+   "id": "q4",
+   "skill": "grammar",
+   "q": "The report ___ by the manager yesterday.",
+   "o": [
+    "approved",
+    "was approved",
+    "has approve",
+    "is approving"
+   ],
+   "a": 1
+  },
+  {
+   "id": "q5",
+   "skill": "vocab",
+   "q": "The opposite of \"expensive\" is…",
+   "o": [
+    "cheap",
+    "rich",
+    "heavy",
+    "early"
+   ],
+   "a": 0
+  },
+  {
+   "id": "q6",
+   "skill": "vocab",
+   "q": "He always tells the truth. He is very ___.",
+   "o": [
+    "honest",
+    "lazy",
+    "noisy",
+    "careless"
+   ],
+   "a": 0
+  },
+  {
+   "id": "q7",
+   "skill": "vocab",
+   "q": "The meeting was ___ because the manager was ill.",
+   "o": [
+    "called off",
+    "called up",
+    "called in",
+    "called back"
+   ],
+   "a": 0
+  },
+  {
+   "id": "q8",
+   "skill": "reading",
+   "passage": "Lina works at a hospital in the city centre. She usually starts at 7 a.m., but on Fridays she starts two hours later. After work, she takes an evening English class because she wants to study nursing in Canada next year.",
+   "q": "What time does Lina start on Fridays?",
+   "o": [
+    "7 a.m.",
+    "8 a.m.",
+    "9 a.m.",
+    "5 p.m."
+   ],
+   "a": 2
+  },
+  {
+   "id": "q9",
+   "skill": "reading",
+   "passage": "Lina works at a hospital in the city centre. She usually starts at 7 a.m., but on Fridays she starts two hours later. After work, she takes an evening English class because she wants to study nursing in Canada next year.",
+   "q": "Why is Lina learning English?",
+   "o": [
+    "For her current job",
+    "To study abroad",
+    "To travel for fun",
+    "Her manager asked her"
+   ],
+   "a": 1
+  },
+  {
+   "id": "q10",
+   "skill": "reading",
+   "passage": "Lina works at a hospital in the city centre. She usually starts at 7 a.m., but on Fridays she starts two hours later. After work, she takes an evening English class because she wants to study nursing in Canada next year.",
+   "q": "In the text, \"improve\" would be closest to…",
+   "o": [
+    "make better",
+    "forget",
+    "finish",
+    "check"
+   ],
+   "a": 0
+  },
+  {
+   "id": "q11",
+   "skill": "listening",
+   "audio": "The train to Manchester leaves from platform four at half past ten.",
+   "q": "When does the train leave?",
+   "o": [
+    "10:15",
+    "10:30",
+    "4:30",
+    "10:40"
+   ],
+   "a": 1
+  },
+  {
+   "id": "q12",
+   "skill": "listening",
+   "audio": "I'd rather not go out tonight. I've got an early start tomorrow.",
+   "q": "Why doesn't the speaker want to go out?",
+   "o": [
+    "They feel ill",
+    "They have to get up early",
+    "They have no money",
+    "The weather is bad"
+   ],
+   "a": 1
+  }
+ ],
+ "mapping": {
+  "Pre-A1": 0,
+  "A1": 20,
+  "A2": 35,
+  "B1": 55,
+  "B2": 72,
+  "C1": 88
+ },
+ "notifs": [
+  {
+   "id": "n1",
+   "to": "s1",
+   "ar": "تذكير: حصة General English A2 تبدأ اليوم.",
+   "en": "Reminder: your General English A2 class is today.",
+   "at": "2026-11-07T03:26:17.646Z",
+   "read": false
+  },
+  {
+   "id": "n2",
+   "to": "s1",
+   "ar": "تم استلام إيصال الدفع لدورة Everyday Conversation وهو قيد المراجعة.",
+   "en": "Payment receipt for Everyday Conversation received, pending review.",
+   "at": "2026-11-07T00:26:17.646Z",
+   "read": false
+  },
+  {
+   "id": "n3",
+   "to": "s1",
+   "ar": "شهادتك في Pearson English – Level A1 متاحة الآن.",
+   "en": "Your Pearson English – Level A1 certificate is available.",
+   "at": "2026-10-28T12:00:00.000Z",
+   "read": true
+  },
+  {
+   "id": "n4",
+   "to": "admin",
+   "ar": "إيصال جديد من Rania Farouk (IELTS Speaking Intensive).",
+   "en": "New receipt from Rania Farouk (IELTS Speaking Intensive).",
+   "at": "2026-11-07T09:30:00.000Z",
+   "read": false
+  },
+  {
+   "id": "n5",
+   "to": "admin",
+   "ar": "إيصال جديد من Ahmed Benali (Everyday Conversation).",
+   "en": "New receipt from Ahmed Benali (Everyday Conversation).",
+   "at": "2026-11-07T00:26:17.646Z",
+   "read": false
+  },
+  {
+   "id": "n6",
+   "to": "t1",
+   "ar": "Mariam Youssef سلّمت واجب الروتين اليومي.",
+   "en": "Mariam Youssef submitted the daily routine homework.",
+   "at": "2026-11-06T20:00:00.000Z",
+   "read": true
+  },
+  {
+   "id": "n7",
+   "to": "t1",
+   "ar": "Salma Idris سلّمت واجباً جديداً.",
+   "en": "Salma Idris submitted new homework.",
+   "at": "2026-11-07T08:00:00.000Z",
+   "read": false
+  }
+ ],
+ "notes": {
+  "t1:s6": "Needs practice with past simple irregular verbs."
+ }
+}

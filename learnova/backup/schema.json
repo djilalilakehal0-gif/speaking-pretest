@@ -1,0 +1,233 @@
+{
+ "v": "number",
+ "ui": {
+  "lang": "string",
+  "role": "string",
+  "sid": "string",
+  "trainerId": "string"
+ },
+ "settings": {
+  "bank": "string",
+  "holder": "string",
+  "acc": "string",
+  "iban": "string",
+  "currency": "string",
+  "wa": "string"
+ },
+ "levels": [
+  "string"
+ ],
+ "cats": [
+  {
+   "id": "string",
+   "ar": "string",
+   "en": "string"
+  }
+ ],
+ "trainers": [
+  {
+   "id": "string",
+   "name": "string",
+   "gender": "string",
+   "col": "string",
+   "bio": {
+    "ar": "string",
+    "en": "string"
+   },
+   "quals": "string",
+   "exp": "number",
+   "specs": "string",
+   "levels": [
+    "string"
+   ],
+   "meet": "string",
+   "active": "boolean",
+   "slots": [
+    "string"
+   ]
+  }
+ ],
+ "courses": [
+  {
+   "active": "boolean",
+   "seats": "number",
+   "modes": [
+    "string"
+   ],
+   "trainers": [
+    "string"
+   ],
+   "materials": [
+    "string"
+   ],
+   "outcomes": {
+    "ar": [
+     "string"
+    ],
+    "en": [
+     "string"
+    ]
+   },
+   "price1": "number",
+   "id": "string",
+   "title": "string",
+   "cat": "string",
+   "level": "string",
+   "sessions": "number",
+   "weeks": "number",
+   "price": "number",
+   "groupTrainer": "string",
+   "start": "string",
+   "sched": {
+    "ar": "string",
+    "en": "string"
+   },
+   "desc": {
+    "ar": "string",
+    "en": "string"
+   },
+   "lessons": [
+    "string"
+   ]
+  }
+ ],
+ "students": [
+  {
+   "id": "string",
+   "name": "string",
+   "phone": "string",
+   "pw": "string",
+   "email": "string",
+   "gender": "string",
+   "country": "string",
+   "dob": "string",
+   "level": "string",
+   "placement": {
+    "score": "number",
+    "total": "number",
+    "level": "string",
+    "at": "string",
+    "by": {
+     "grammar": [
+      "number"
+     ],
+     "vocab": [
+      "number"
+     ],
+     "reading": [
+      "number"
+     ],
+     "listening": [
+      "number"
+     ]
+    }
+   },
+   "active": "boolean",
+   "joined": "string"
+  }
+ ],
+ "enrollments": [
+  {
+   "mode": "string",
+   "slot": "object",
+   "done": [
+    "number"
+   ],
+   "quiz": {
+    "0": "number",
+    "1": "number"
+   },
+   "created": "string",
+   "payment": {
+    "amount": "number",
+    "status": "string",
+    "file": "string",
+    "receipt": "object",
+    "at": "string"
+   },
+   "id": "string",
+   "sid": "string",
+   "cid": "string",
+   "trainerId": "string",
+   "status": "string"
+  }
+ ],
+ "sessions": [
+  {
+   "id": "string",
+   "cid": "string",
+   "trainerId": "string",
+   "eid": "object",
+   "at": "string",
+   "link": "string",
+   "status": "string",
+   "att": {
+    "s1": "string",
+    "s2": "string",
+    "s3": "string",
+    "s6": "string"
+   }
+  }
+ ],
+ "homework": [
+  {
+   "id": "string",
+   "cid": "string",
+   "title": "string",
+   "kind": "string",
+   "due": "string",
+   "subs": [
+    {
+     "sid": "string",
+     "text": "string",
+     "file": "object",
+     "at": "string",
+     "fb": "string",
+     "grade": "string"
+    }
+   ]
+  }
+ ],
+ "certs": [
+  {
+   "id": "string",
+   "sid": "string",
+   "cid": "string",
+   "level": "string",
+   "duration": "string",
+   "date": "string"
+  }
+ ],
+ "qs": [
+  {
+   "id": "string",
+   "skill": "string",
+   "q": "string",
+   "o": [
+    "string"
+   ],
+   "a": "number"
+  }
+ ],
+ "mapping": {
+  "Pre-A1": "number",
+  "A1": "number",
+  "A2": "number",
+  "B1": "number",
+  "B2": "number",
+  "C1": "number"
+ },
+ "notifs": [
+  {
+   "id": "string",
+   "to": "string",
+   "ar": "string",
+   "en": "string",
+   "at": "string",
+   "read": "boolean"
+  }
+ ],
+ "notes": {
+  "t1:s6": "string"
+ }
+}
