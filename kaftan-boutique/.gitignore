@@ -1,0 +1,7 @@
+node_modules
+dist
+.venv
+scripts/.build
+scripts/.build-log.txt
+*.blend1
+tsconfig.tsbuildinfo

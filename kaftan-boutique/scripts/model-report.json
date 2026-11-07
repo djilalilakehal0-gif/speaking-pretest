@@ -1,0 +1,168 @@
+[
+  {
+    "id": "01",
+    "slug": "chocolate-kaftan",
+    "triangles": {
+      "Body": 14512,
+      "Hair": 4324,
+      "Kaftan": 43624,
+      "Sandals": 2552
+    },
+    "triangles_total": 65012,
+    "bounds_min": [
+      -0.3868,
+      -0.3622,
+      0.0
+    ],
+    "bounds_max": [
+      0.3901,
+      0.378,
+      1.7463
+    ],
+    "height_m": 1.746,
+    "floor_contact": true,
+    "centred": true,
+    "materials": [
+      "brushed-gold",
+      "chocolate-kaftan-satin",
+      "hair",
+      "lashes",
+      "lips",
+      "skin"
+    ],
+    "glb_bytes": 1640176
+  },
+  {
+    "id": "02",
+    "slug": "dark-satin-kaftan",
+    "triangles": {
+      "Body": 14512,
+      "Hair": 4888,
+      "Kaftan": 39680,
+      "Sandals": 2552
+    },
+    "triangles_total": 61632,
+    "bounds_min": [
+      -0.4174,
+      -0.3909,
+      0.0
+    ],
+    "bounds_max": [
+      0.4209,
+      0.4079,
+      1.7463
+    ],
+    "height_m": 1.746,
+    "floor_contact": true,
+    "centred": true,
+    "materials": [
+      "brushed-gold",
+      "dark-satin-kaftan-belt",
+      "dark-satin-kaftan-satin",
+      "hair",
+      "lashes",
+      "lips",
+      "skin"
+    ],
+    "glb_bytes": 1445804
+  },
+  {
+    "id": "03",
+    "slug": "burgundy-kaftan",
+    "triangles": {
+      "Body": 14512,
+      "Hair": 4324,
+      "Kaftan": 43624,
+      "Sandals": 2552
+    },
+    "triangles_total": 65012,
+    "bounds_min": [
+      -0.3677,
+      -0.3443,
+      0.0
+    ],
+    "bounds_max": [
+      0.3708,
+      0.3593,
+      1.7463
+    ],
+    "height_m": 1.746,
+    "floor_contact": true,
+    "centred": true,
+    "materials": [
+      "brushed-gold",
+      "burgundy-kaftan-satin",
+      "hair",
+      "lashes",
+      "lips",
+      "skin"
+    ],
+    "glb_bytes": 1648368
+  },
+  {
+    "id": "04",
+    "slug": "satin-cape-drape-kaftan",
+    "triangles": {
+      "Body": 14512,
+      "Hair": 4888,
+      "Kaftan": 60076,
+      "Sandals": 2552
+    },
+    "triangles_total": 82028,
+    "bounds_min": [
+      -0.4755,
+      -0.3336,
+      0.0
+    ],
+    "bounds_max": [
+      0.4722,
+      0.4645,
+      1.7463
+    ],
+    "height_m": 1.746,
+    "floor_contact": true,
+    "centred": true,
+    "materials": [
+      "brushed-gold",
+      "hair",
+      "lashes",
+      "lips",
+      "satin-cape-drape-kaftan-satin",
+      "skin"
+    ],
+    "glb_bytes": 1906128
+  },
+  {
+    "id": "05",
+    "slug": "red-off-shoulder-kaftan",
+    "triangles": {
+      "Body": 14512,
+      "Hair": 4324,
+      "Kaftan": 48752,
+      "Sandals": 2552
+    },
+    "triangles_total": 70140,
+    "bounds_min": [
+      -0.3944,
+      -0.3694,
+      0.0
+    ],
+    "bounds_max": [
+      0.3978,
+      0.3854,
+      1.7463
+    ],
+    "height_m": 1.746,
+    "floor_contact": true,
+    "centred": true,
+    "materials": [
+      "brushed-gold",
+      "hair",
+      "lashes",
+      "lips",
+      "red-off-shoulder-kaftan-satin",
+      "skin"
+    ],
+    "glb_bytes": 1718388
+  }
+]
