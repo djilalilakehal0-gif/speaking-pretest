@@ -32,7 +32,14 @@ export const TERMINAL: { text: string; tone: 'command' | 'success' | 'live' }[] 
 
 export const TERMINAL_TONE = { command: 'text-[#dfe9ff]', success: 'text-[#8ef0c4]', live: 'text-[#5cd3ff]' } as const
 
+/** Full-page screenshots shown on the devices (Speaking Pre-Test), with each screen's aspect ratio. */
 export const SCREENS = {
-  monitor: { src: '/img/projects/napo-desk-full.webp', width: 900, height: 5200 },
-  phone: { src: '/img/projects/napo-mob-full.webp', width: 360, height: 4200 },
+  monitor: { src: '/img/projects/pretest-desk-full.webp', width: 900, height: 916, screen: 16 / 10 },
+  phone: { src: '/img/projects/pretest-mob-full.webp', width: 360, height: 1530, screen: 9 / 19.5 },
 } as const
+
+/** How far (in % of the image height) a screenshot can scroll before its bottom reaches the screen's bottom. */
+export function scrollRange(s: { width: number; height: number; screen: number }) {
+  const visible = s.width / s.screen
+  return `-${Math.max(0, (1 - visible / s.height) * 100).toFixed(1)}%`
+}
