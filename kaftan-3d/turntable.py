@@ -65,11 +65,12 @@ scene.camera = cam
 
 scene.render.engine = 'CYCLES'
 scene.cycles.device = 'CPU'
-scene.cycles.samples = int(os.environ.get("SAMPLES", 24))
+scene.cycles.samples = int(os.environ.get("SAMPLES", 16))
 scene.cycles.use_denoising = True
 scene.cycles.max_bounces = 4
+scene.render.use_persistent_data = True
 scene.render.resolution_x, scene.render.resolution_y = 720, 1080
-scene.render.fps = 30
+scene.render.fps = 60
 scene.frame_start, scene.frame_end = 1, frames
 scene.view_settings.view_transform = 'AgX'
 scene.render.image_settings.file_format = 'PNG'
