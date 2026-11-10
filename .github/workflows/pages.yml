@@ -83,7 +83,7 @@ jobs:
         # A single static file (room and garment images load from images.higgs.ai; the five model photos ship beside it), served at /speaking-pretest/virtualfit/.
         run: |
           mkdir -p _site/virtualfit
-          cp virtualfit/index.html virtualfit/model-*.webp _site/virtualfit/
+          cp virtualfit/index.html virtualfit/*.webp _site/virtualfit/
 
       - name: Redirect the old portfolio address to djilali.pages.dev
         # The portfolio now lives on Cloudflare Pages (https://djilali.pages.dev, built from portfolio/).

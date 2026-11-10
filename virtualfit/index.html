@@ -193,8 +193,16 @@ const ITEMS=[
   {n:"Linen Shirt",   p:95,  g:[98.2,3.33],  m:49.86, c:[["White","#f7f6f1"],["Sand","#d9ccb4"],["Sky","#bcd0e2"],["Olive","#717556"]]},
   {n:"Grey Hoodie",   p:110, g:[1.14,93.3],  m:74.77, c:[["Heather","#a9a9a8"],["Bone","#e6e1d6"],["Forest","#33463a"],["Black","#1f1f21"]]},
   {n:"Ringer Tee",    p:55,  g:[49.7,95.3],  m:99.35, c:[["White / Black","#f4f2ee"],["Cream / Navy","#efe6d3"],["Grey / Red","#c9c7c2"],["White / Green","#e9efe8"]]},
+  /* the owner's own photos; img = cut-out shown on the card and the buy-card thumbnail */
+  {n:"Puma Polo",     p:65,  img:"garment-5.webp", c:[["Black","#161618"]]},
+  {n:"Nike Polo",     p:60,  img:"garment-6.webp", c:[["Black","#161618"]]},
+  {n:"Adidas Polo",   p:60,  img:"garment-7.webp", c:[["Black","#161618"]]},
+  {n:"Gucci Shirt & Blazer", p:450, img:"garment-8.webp", c:[["Black","#161618"]]},
 ];
-const N=10, HALF=5;
+const L=ITEMS.length;
+/* enough cards for a full arc, as a whole number of laps so the loop stays seamless */
+const N=L*Math.ceil(10/L), HALF=N/2;
+const garmStyle=it=>it.img?`background:url("${it.img}") center/contain no-repeat`:`background-position:${it.g[0]}% ${it.g[1]}%`;
 const $=id=>document.getElementById(id);
 const mod=(a,n)=>((a%n)+n)%n;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -222,10 +230,10 @@ function xAt(a){
 /* ---------- cards ---------- */
 const cards=[];
 for(let i=0;i<N;i++){
-  const it=ITEMS[i%5];
+  const it=ITEMS[i%L];
   const el=document.createElement('div');
   el.className='card glass';
-  el.innerHTML=`<div class="g" style="background-position:${it.g[0]}% ${it.g[1]}%"></div><div class="nm">${it.n}</div><div class="pr">$${it.p}</div><div class="sheen"></div>`;
+  el.innerHTML=`<div class="g" style='${garmStyle(it)}'></div><div class="nm">${it.n}</div><div class="pr">$${it.p}</div><div class="sheen"></div>`;
   el.dataset.i=i;
   const sheen=el.querySelector('.sheen');
   el.addEventListener('pointerenter',e=>{
@@ -270,7 +278,7 @@ function setColors(it){
 function updateBuy(k){
   const it=ITEMS[k];
   roll(bName,it.n); roll(bPrice,'$'+it.p);
-  thumbG.style.backgroundPosition=`${it.g[0]}% ${it.g[1]}%`;
+  thumbG.style.cssText=garmStyle(it);
   if(!reduced)thumbG.animate([{transform:'translateY(70%) scale(.8)'},{transform:'none'}],{duration:650,easing:EASE});
   setColors(it);
 }
@@ -321,7 +329,7 @@ tabBtns.forEach(b=>b.addEventListener('click',()=>{
   if(b.classList.contains('on'))return;
   tabBtns.forEach(t=>t.classList.toggle('on',t===b));
   placePill(true);
-  target+=5;
+  target+=L;
 }));
 
 /* ---------- input ---------- */
@@ -436,7 +444,7 @@ function frame(now){
   }
 
   if(!dragging&&Math.abs(target-pos)<.02){
-    const k=mod(Math.round(target),5);
+    const k=mod(Math.round(target),L);
     if(k!==shown)tryOn(k);
   }
 
