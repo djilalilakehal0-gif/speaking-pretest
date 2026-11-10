@@ -30,9 +30,6 @@ const en = {
     scroll: 'Scroll',
     scrollTo: 'to the About section',
     cursorView: 'View',
-    all: 'All',
-    filter: 'Filter projects by technology',
-    counter: 'projects',
   },
   nav: { about: 'About', stack: 'Stack', work: 'Work', services: 'Services', journey: 'Journey', contact: 'Contact' },
   hero: {
@@ -53,12 +50,6 @@ const en = {
       { title: 'Creative Thinking', text: 'Turning ambitious ideas into intuitive digital experiences.' },
       { title: 'Performance First', text: 'Building fast, accessible, and reliable applications.' },
     ],
-    stats: {
-      projects: 'Projects shipped',
-      tech: 'Technologies in my stack',
-      platforms: 'Platforms — Web, Android, iOS',
-      years: 'Years of experience',
-    },
   },
   stack: {
     eyebrow: 'Tech Stack',
@@ -70,42 +61,6 @@ const en = {
       backend: { name: 'Backend', blurb: 'APIs and services built to be predictable and scalable.' },
       databases: { name: 'Databases', blurb: 'Relational and document data, modelled with care.' },
       tools: { name: 'Tools', blurb: 'A workflow that keeps shipping smooth.' },
-    },
-  },
-  work: {
-    eyebrow: 'Selected Work',
-    titleLead: 'Featured',
-    titleHighlight: 'projects.',
-    text: 'A selection of real products I designed and built — each one focused on performance, clarity and craft.',
-    count: '{n} projects · {c} concepts',
-    countOnly: '{n} projects',
-    concept: 'Concept',
-    view: 'View Project',
-    discuss: 'Discuss a similar project',
-    source: 'Source code',
-    soon: 'Case study coming soon',
-    technologies: 'Technologies',
-    srLive: '— open live project (new tab)',
-    srDiscuss: '— discuss a similar project',
-    srSource: 'for {title} (new tab)',
-    screenshotAlt: '{title} — screenshot of the live website',
-    previewAlt: '{title} — interface concept preview',
-    items: {
-      napolitime: {
-        category: 'Restaurant Website',
-        description:
-          'A premium restaurant experience featuring an elegant menu, modern branding, responsive layouts, and immersive food visuals.',
-      },
-      pretest: {
-        category: 'Education App · Android, iOS & Web',
-        description:
-          'An offline English speaking test for students, with a teacher dashboard and automatic correction through in-browser speech recognition.',
-      },
-      store: {
-        category: 'Product Landing Page',
-        description:
-          'An animated single-page product showcase with expanding panels, smooth GSAP motion and a responsive layout down to small phones.',
-      },
     },
   },
   services: {
@@ -142,40 +97,6 @@ const en = {
         points: ['Core Web Vitals', 'Smooth 60 FPS motion'],
       },
     },
-  },
-  journey: {
-    eyebrow: 'Experience & Workflow',
-    titleLead: 'The journey',
-    titleHighlight: 'so far.',
-    text: 'Recent milestones and shipped work — plus the process every project goes through.',
-    seeLive: 'See it live',
-    howIWork: 'How I work',
-    items: {
-      napolitime: {
-        date: 'Nov 2026',
-        org: 'Personal project',
-        title: 'NAPOLITIME — website & Android app',
-        text: 'Single-page restaurant experience with an interactive menu, order flow, GSAP scroll storytelling and a Capacitor Android build.',
-      },
-      store: {
-        date: 'Oct 2026',
-        org: 'Personal project',
-        title: 'DJILALI store landing',
-        text: 'An animated single-page product showcase built with React, Tailwind CSS and GSAP, deployed to GitHub Pages.',
-      },
-      pretest: {
-        date: 'Oct 2026',
-        org: 'Alfikr Almodi School',
-        title: 'Speaking Pre-Test — mobile & web app',
-        text: 'Offline English speaking test for students on Android, iOS and the web, with a teacher dashboard and in-browser speech recognition for automatic correction.',
-      },
-    },
-    workflow: [
-      { title: 'Discover', text: 'Understand goals and requirements.' },
-      { title: 'Design', text: 'Create intuitive interfaces and prototypes.' },
-      { title: 'Develop', text: 'Build scalable, maintainable solutions.' },
-      { title: 'Deliver', text: 'Test, optimize, and deploy.' },
-    ],
   },
   contact: {
     eyebrow: 'Contact',

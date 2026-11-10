@@ -1,6 +1,5 @@
 import { Field } from '@/components/axon/Field'
-import { Work } from '@/components/axon/Work'
-import { contact, projects, services, site, socials, stack } from '@/content/site'
+import { contact, services, site, socials, stack } from '@/content/site'
 import { getDictionary, localeMeta, locales, type Locale } from '@/content/i18n'
 import { asset } from '@/lib/asset'
 
@@ -40,12 +39,7 @@ export function HomePage({ lang }: { lang: Locale }) {
               </a>
             ))}
           </nav>
-          <div className="counter blend" aria-label={`${projects.length} ${t.ui.counter}`}>
-            {String(projects.length).padStart(2, '0')}
-          </div>
         </div>
-
-        <Work t={t.work} ui={t.ui} />
 
         <div className="side">
           <section className="intro" aria-labelledby="s-about">

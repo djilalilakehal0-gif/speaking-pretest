@@ -12,7 +12,6 @@
   --accent: #aa88ff;
   --text: #dddddd;
   --muted: #8a8a8a;
-  --chip: #1c1c1c;
   --line: #2a2a2a;
   --mono: var(--font-geist-mono), 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
@@ -65,7 +64,6 @@ canvas#bg {
 }
 .ui a,
 .ui button,
-.ui .list,
 .ui .side {
   pointer-events: auto;
 }
@@ -81,14 +79,10 @@ canvas#bg {
   pointer-events: none;
   --shade: rgb(0 0 0 / 0.72);
   --clear: rgb(0 0 0 / 0);
-  background:
-    linear-gradient(to left, var(--shade), var(--shade) 480px, var(--clear) 640px),
-    linear-gradient(to right, var(--shade), var(--shade) 360px, var(--clear) 470px);
+  background: linear-gradient(to left, var(--shade), var(--shade) 480px, var(--clear) 640px);
 }
 [dir='rtl'] .ui::before {
-  background:
-    linear-gradient(to right, var(--shade), var(--shade) 480px, var(--clear) 640px),
-    linear-gradient(to left, var(--shade), var(--shade) 360px, var(--clear) 470px);
+  background: linear-gradient(to right, var(--shade), var(--shade) 480px, var(--clear) 640px);
 }
 .muted {
   color: var(--muted);
@@ -96,7 +90,14 @@ canvas#bg {
 .arr::before {
   content: '->';
 }
-/* In Arabic the browser mirrors '->' on its own, so it already points the reading direction. */
+/* The arrow is laid out literally (no bidi mirroring) and points the reading direction. */
+.arr {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+[dir='rtl'] .arr::before {
+  content: '<-';
+}
 
 /* ------------------------------------------------------------ brand */
 .brand {
@@ -126,7 +127,7 @@ canvas#bg {
   margin-top: 4px;
 }
 
-/* ------------------------------------------------------------ counter + languages */
+/* ------------------------------------------------------------ languages */
 .top-right {
   position: absolute;
   top: 24px;
@@ -149,128 +150,6 @@ canvas#bg {
 .langs a[aria-current='page'] {
   color: #fff;
 }
-.counter {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid var(--line);
-  background: #0a0a0a;
-  color: #fff;
-  font-size: 14px;
-  display: grid;
-  place-items: center;
-}
-
-/* ------------------------------------------------------------ chips */
-.tags {
-  position: absolute;
-  top: 120px;
-  inset-inline-start: 24px;
-  width: 320px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.chip {
-  background: var(--chip);
-  padding: 5px 9px;
-  font: inherit;
-  font-size: 11px;
-  letter-spacing: inherit;
-  text-transform: inherit;
-  color: #cfcfcf;
-  border: 0;
-  border-radius: 0;
-  cursor: pointer;
-  transition: background 200ms, color 200ms;
-}
-.chip:hover {
-  background: #2a2a2a;
-}
-.chip.active {
-  background: #e6e6e6;
-  color: #000;
-}
-
-/* ------------------------------------------------------------ project cards */
-.list {
-  position: absolute;
-  top: 250px;
-  inset-inline-start: 24px;
-  bottom: 0;
-  width: 320px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-.list::-webkit-scrollbar {
-  display: none;
-}
-.list {
-  text-shadow: 0 0 2px #000, 0 0 6px #000, 0 0 14px #000;
-}
-.card {
-  padding: 18px 0;
-  border-top: 1px solid var(--line);
-}
-.card-link {
-  display: block;
-  color: inherit;
-  text-decoration: none;
-}
-.thumb {
-  height: 160px;
-  border-radius: 2px;
-  background: #0a0a0a;
-  overflow: hidden;
-}
-.thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
-  display: block;
-  opacity: 0.85;
-  transition: opacity 400ms, transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.card-link:hover .thumb img,
-.card-link:focus-visible .thumb img {
-  opacity: 1;
-  transform: scale(1.04);
-}
-.meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 10px;
-  font-size: 12px;
-}
-.meta span:first-child {
-  color: #fff;
-  flex: none;
-}
-.meta span:last-child {
-  color: var(--muted);
-  text-align: end;
-}
-.card-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--muted);
-}
-.card-actions a {
-  color: var(--muted);
-  text-decoration: underline;
-  transition: color 300ms;
-}
-.card-actions a:hover {
-  color: #fff;
-}
-
 /* ------------------------------------------------------------ side column */
 .side {
   position: absolute;
@@ -384,8 +263,6 @@ canvas#bg {
   }
   .brand,
   .top-right,
-  .tags,
-  .list,
   .side {
     position: static;
     width: auto;
@@ -412,30 +289,14 @@ canvas#bg {
   .intro {
     order: 2;
   }
-  .tags {
-    order: 3;
-  }
-  .list {
-    order: 4;
-    overflow: visible;
-  }
   .about {
-    order: 5;
+    order: 3;
   }
   .intro + .about {
     margin-top: 0;
-  }
-  .thumb {
-    height: auto;
-    aspect-ratio: 16 / 10;
   }
   .side p {
     text-align: start;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .thumb img {
-    transition: none;
-  }
-}

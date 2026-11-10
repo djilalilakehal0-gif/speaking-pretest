@@ -1,14 +1,11 @@
 /**
  * ─────────────────────────────────────────────────────────────────────────────
  *  SHARED PORTFOLIO DATA (same in every language): links, contact, photos,
- *  tech stack, projects, numbers.
+ *  tech stack, services.
  *  All visible TEXT lives in src/content/locales/{en,fr,ar}.ts.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 import type { BrandIconKey } from '@/lib/brand-icons'
-
-const REPO = 'https://github.com/djilalilakehal0-gif/speaking-pretest'
-const PAGES = 'https://djilalilakehal0-gif.github.io/speaking-pretest'
 
 export const site = {
   brand: 'DJILALI',
@@ -100,76 +97,6 @@ export const stack: { key: StackKey; items: TechItem[] }[] = [
   },
 ]
 
-/**
- * Statistics in the About section. Every value must be true for you.
- * `value: null` hides a stat (e.g. add your years of experience when you want it shown).
- */
-export type StatKey = 'projects' | 'tech' | 'platforms' | 'years'
-export const stats: { key: StatKey; value: number | null; suffix?: string }[] = [
-  { key: 'projects', value: 3, suffix: '+' },
-  { key: 'tech', value: stack.reduce((n, c) => n + c.items.length, 0) },
-  { key: 'platforms', value: 3 },
-  { key: 'years', value: null, suffix: '+' },
-]
-
-export type ProjectId = 'napolitime' | 'pretest' | 'store'
-export type Project = {
-  id: ProjectId
-  n: string
-  title: string
-  tags: string[]
-  /** Screenshot in /public (optional). Without it a designed preview is rendered. */
-  image?: string
-  /** true = demonstration concept, labelled as such until replaced with real work. */
-  concept: boolean
-  live?: string
-  source?: string
-  accent: string
-}
-export const projects: Project[] = [
-  {
-    id: 'napolitime',
-    n: '01',
-    title: 'NAPOLITIME',
-    tags: ['React', 'TypeScript', 'Tailwind CSS', 'GSAP', 'Capacitor'],
-    image: '/img/projects/napolitime.webp',
-    concept: false,
-    live: `${PAGES}/napolitime/`,
-    source: `${REPO}/tree/main/napolitime`,
-    accent: '#ff7a45',
-  },
-  {
-    id: 'pretest',
-    n: '02',
-    title: 'SPEAKING PRE-TEST',
-    tags: ['JavaScript', 'Capacitor', 'Transformers.js', 'Google Apps Script'],
-    image: '/img/projects/pretest.webp',
-    concept: false,
-    live: `${PAGES}/`,
-    source: REPO,
-    accent: '#f5c451',
-  },
-  {
-    id: 'store',
-    n: '03',
-    title: 'DJILALI STORE',
-    tags: ['React', 'Vite', 'Tailwind CSS', 'GSAP'],
-    image: '/img/projects/store.webp',
-    concept: false,
-    live: `${PAGES}/djilali/`,
-    source: `${REPO}/tree/main/djilali`,
-    accent: '#9fcf8f',
-  },
-]
-
 export type ServiceKey = 'consult' | 'web' | 'stack' | 'ui' | 'perf'
 /** The first service is shown as a wide featured card. */
 export const services: ServiceKey[] = ['consult', 'web', 'stack', 'ui', 'perf']
-
-/** Journey timeline — real milestones only (text per language in the dictionaries). */
-export type JourneyKey = 'napolitime' | 'store' | 'pretest'
-export const journey: { key: JourneyKey; link?: string }[] = [
-  { key: 'napolitime', link: `${PAGES}/napolitime/` },
-  { key: 'store', link: `${PAGES}/djilali/` },
-  { key: 'pretest', link: `${PAGES}/` },
-]
