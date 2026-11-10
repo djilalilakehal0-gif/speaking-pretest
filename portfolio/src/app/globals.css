@@ -56,7 +56,7 @@ canvas#bg {
 }
 
 /* Full-screen photo layer under the (transparent) particle canvas: the particles add their light
-   on top of it, and the 3D panel drawn in the canvas stays exactly as it is. */
+   on top of it. */
 .photo-bg {
   position: fixed;
   inset: 0;

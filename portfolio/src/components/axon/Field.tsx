@@ -34,6 +34,5 @@ export function Field() {
         /* no network or no WebGL: the page stays on a plain black background */
       })
   }, [])
-  // data-portrait: the 3D photo panel drawn under the brand (public/models)
-  return <canvas id="bg" aria-hidden="true" data-portrait={asset('/models/djilali-portrait.glb')} />
+  return <canvas id="bg" aria-hidden="true" />
 }
