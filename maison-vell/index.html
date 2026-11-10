@@ -31,7 +31,24 @@ header{position:relative;z-index:5;background:#fff;padding:calc(20*var(--u)) cal
 main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u));min-height:0}
 .stage{position:relative;overflow:hidden;min-width:0;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:none;
   background:linear-gradient(transparent 60%,rgba(255,255,255,.72) 100%),linear-gradient(90deg,#f1f5fa 0%,#e7eff6 38%,#eef4f9 62%,#f6f9fc 100%)}
-.line{position:absolute;inset:0}
+.line{position:absolute;inset:0;z-index:1}
+/* motion graphic that plays each time a look settles at the front */
+.mg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.mg-word{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-family:Michroma,sans-serif;text-transform:uppercase;white-space:nowrap;
+  font-size:calc(150*var(--u));letter-spacing:.06em;color:rgba(255,255,255,.35);-webkit-text-stroke:1.5px rgba(22,25,31,.34);transition:opacity .35s}
+.mg-word span{display:inline-block;opacity:0;transform:translateY(45%);filter:blur(10px)}
+.mg-line{position:absolute;left:6%;right:6%;top:calc(44% + 85*var(--u));height:1px;background:linear-gradient(90deg,transparent,rgba(22,25,31,.35) 20%,rgba(22,25,31,.35) 80%,transparent);transform:scaleX(0);transform-origin:0 50%}
+.mg-ring{position:absolute;left:74.4%;top:89%;width:calc(300*var(--u));height:calc(46*var(--u));margin:calc(-23*var(--u)) 0 0 calc(-150*var(--u));border:1px solid rgba(22,25,31,.4);border-radius:50%;opacity:0;transform:scale(.2)}
+.mg.go .mg-word span{animation:mgRise .95s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--i)*45ms + 80ms)}
+.mg.go .mg-line{animation:mgDraw 1.1s cubic-bezier(.6,0,.2,1) forwards}
+.mg.go .mg.go .mg-ring{animation:mgRing 1.6s cubic-bezier(.2,.7,.3,1) forwards}
+.mg.go .mg-ring.r2{animation-delay:.28s}
+.mg.out .mg-word,.mg.out .mg-line{opacity:0!important;transition:opacity .3s}
+@keyframes mgRise{to{opacity:1;transform:none;filter:none}}
+@keyframes mgDraw{0%{transform:scaleX(0);opacity:1}60%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:.35}}
+@keyframes mgFade{to{opacity:1}}
+@keyframes mgRing{0%{opacity:0;transform:scale(.2)}25%{opacity:.9}100%{opacity:0;transform:scale(1.5)}}
+@media (prefers-reduced-motion:reduce){.mg.go .mg-word span{animation:mgFade .4s forwards;transform:none;filter:none}.mg.go .mg-ring{animation:none}}
 .m{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,filter;cursor:none}
 .m svg{display:block;position:relative;width:100%;height:100%}
 .m:before{content:"";position:absolute;left:8%;right:8%;bottom:-1.6%;height:3.6%;border-radius:50%;background:radial-gradient(closest-side,rgba(70,85,105,.24),transparent)}
@@ -84,6 +101,8 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   .stage{cursor:auto}.m{cursor:auto}.ring{display:none}
   .intro{left:16px;top:18px;width:calc(100% - 32px)}
   .intro h2{font-size:17px}
+  .mg-word{top:38%;-webkit-text-stroke-width:1.2px}.mg-line{top:calc(38% + 40px)}
+  .mg-ring{width:200px;height:30px;margin:-15px 0 0 -100px}
   .intro p{display:none}
   .credit{margin-top:12px;font-size:11px}
   .credit b{font-size:40px;margin-top:2px}
@@ -120,6 +139,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   </header>
   <main>
     <section class="stage" id="stage" aria-label="Runway looks. Drag, scroll or use the arrow keys to change look." tabindex="0">
+      <div class="mg" id="mg" aria-hidden="true"><div class="mg-line"></div><div class="mg-word" id="mgWord"></div><div class="mg-ring"></div><div class="mg-ring r2"></div></div>
       <div class="line" id="line"></div>
       <div class="intro">
         <h2 class="wide">Spring Summer 2027</h2>
@@ -209,12 +229,28 @@ function paint(){
 }
 const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
 
+// one word per look for the motion graphic, in LOOKS order
+const TITLES=['Noir','Bordeaux','Pinstripe','Burgundy','Oxford','Shearling','Blanc','Ivory'];
+const mg=$('mg'),mgWord=$('mgWord');
+let ready=false,shown=-1;
+function motion(){
+  if(!ready)return;
+  const r=Math.round(p),settled=!down&&Math.abs(target-p)<.03&&Math.abs(p-r)<.03;
+  if(settled&&wrap(r,N)!==shown){
+    shown=wrap(r,N);
+    const len=TITLES[shown].length;mgWord.style.fontSize=Math.min(H*.24,W*.9/(len*1.18)).toFixed(1)+'px';
+    mgWord.innerHTML=[...TITLES[shown]].map((c,i)=>`<span style="--i:${i}">${c}</span>`).join('');
+    mg.classList.remove('go','out');void mg.offsetWidth;mg.classList.add('go');
+  }else if(!settled&&shown!==-1&&Math.abs(p-r)>.08){shown=-1;mg.classList.add('out')}
+}
+
 function frame(now){
   const dt=Math.min(50,now-last)||16;last=now;
   const was=p;
   if(calm)p=target;else p+=(target-p)*(1-Math.exp(-dt*.0072));
   if(Math.abs(target-p)<.0004)p=target;
   if(p!==was||dirty){dirty=false;paint()}
+  motion();
   cx+=(mx-cx)*.32;cy+=(my-cy)*.32;
   ring.style.transform=`translate3d(${cx.toFixed(1)}px,${cy.toFixed(1)}px,0)`;
 }
@@ -269,7 +305,7 @@ music.addEventListener('pause',()=>{snd.classList.remove('on');snd.setAttribute(
 
 function loop(t){frame(t);requestAnimationFrame(loop)}
 Promise.all([MODELS,PIECES].map(u=>{const i=new Image;i.src=u;return i.decode().catch(()=>{})})).then(()=>document.fonts.ready).then(()=>{
-  size();paint();$('wait').classList.add('gone');
+  size();paint();$('wait').classList.add('gone');ready=true;
 });
 size();requestAnimationFrame(loop);
 </script>
