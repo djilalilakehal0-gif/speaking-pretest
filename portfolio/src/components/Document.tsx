@@ -40,7 +40,7 @@ export function buildMetadata(lang: Locale): Metadata {
 }
 
 export const viewportConfig = {
-  themeColor: '#04060d',
+  themeColor: '#000000',
   colorScheme: 'dark' as const,
   width: 'device-width',
   initialScale: 1,

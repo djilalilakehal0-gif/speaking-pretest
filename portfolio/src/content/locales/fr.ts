@@ -12,7 +12,7 @@ const fr: Dictionary = {
     title: 'Développeur logiciel | Ingénieur Full-Stack',
     role: 'Développeur Full-Stack',
     tagline: 'Un code propre, une ingénierie créative et des interfaces d’une grande fluidité.',
-    portraitAlt: 'Djilali, développeur logiciel, en costume noir, assis à son bureau devant des écrans de code',
+    portraitAlt: 'Djilali, développeur logiciel, en costume noir et casquette « Developer », assis à son bureau devant des écrans de code',
     availability: 'Disponible pour des projets choisis',
     location: 'À distance · Partout dans le monde',
     online: 'En ligne',
@@ -52,12 +52,6 @@ const fr: Dictionary = {
       { title: 'Pensée créative', text: 'Transformer des idées ambitieuses en expériences numériques intuitives.' },
       { title: 'Performance avant tout', text: 'Des applications rapides, accessibles et fiables.' },
     ],
-    stats: {
-      projects: 'Projets livrés',
-      tech: 'Technologies maîtrisées',
-      platforms: 'Plateformes — Web, Android, iOS',
-      years: 'Années d’expérience',
-    },
   },
   stack: {
     eyebrow: 'Stack technique',
@@ -69,42 +63,6 @@ const fr: Dictionary = {
       backend: { name: 'Backend', blurb: 'Des API et des services prévisibles et évolutifs.' },
       databases: { name: 'Bases de données', blurb: 'Des données relationnelles et documentaires, modélisées avec soin.' },
       tools: { name: 'Outils', blurb: 'Un workflow qui rend chaque livraison fluide.' },
-    },
-  },
-  work: {
-    eyebrow: 'Projets sélectionnés',
-    titleLead: 'Projets',
-    titleHighlight: 'à la une.',
-    text: 'Une sélection de vrais produits que j’ai conçus et développés, chacun pensé pour la performance, la clarté et le soin du détail.',
-    count: '{n} projets · {c} concepts',
-    countOnly: '{n} projets',
-    concept: 'Concept',
-    view: 'Voir le projet',
-    discuss: 'Parler d’un projet similaire',
-    source: 'Code source',
-    soon: 'Étude de cas bientôt disponible',
-    technologies: 'Technologies',
-    srLive: '— ouvrir le projet en ligne (nouvel onglet)',
-    srDiscuss: '— parler d’un projet similaire',
-    srSource: 'de {title} (nouvel onglet)',
-    screenshotAlt: '{title} — capture d’écran du site en ligne',
-    previewAlt: '{title} — aperçu de l’interface (concept)',
-    items: {
-      napolitime: {
-        category: 'Site de restaurant',
-        description:
-          'Une expérience de restaurant haut de gamme : un menu élégant, une identité moderne, des mises en page responsives et des visuels culinaires immersifs.',
-      },
-      pretest: {
-        category: 'Application éducative · Android, iOS et Web',
-        description:
-          'Un test d’expression orale en anglais utilisable hors ligne, avec un tableau de bord enseignant et une correction automatique grâce à la reconnaissance vocale dans le navigateur.',
-      },
-      store: {
-        category: 'Page produit',
-        description:
-          'Une vitrine produit animée sur une seule page, avec des panneaux qui s’ouvrent, des animations GSAP fluides et une mise en page responsive jusqu’aux petits téléphones.',
-      },
     },
   },
   services: {
@@ -141,40 +99,6 @@ const fr: Dictionary = {
         points: ['Core Web Vitals', 'Animations fluides à 60 FPS'],
       },
     },
-  },
-  journey: {
-    eyebrow: 'Expérience et méthode',
-    titleLead: 'Le parcours',
-    titleHighlight: 'jusqu’ici.',
-    text: 'Étapes récentes et projets livrés, ainsi que la méthode suivie pour chaque projet.',
-    seeLive: 'Voir en ligne',
-    howIWork: 'Ma méthode',
-    items: {
-      napolitime: {
-        date: 'nov. 2026',
-        org: 'Projet personnel',
-        title: 'NAPOLITIME — site web et application Android',
-        text: 'Une expérience de restaurant sur une seule page avec menu interactif, parcours de commande, narration au défilement avec GSAP et une version Android avec Capacitor.',
-      },
-      store: {
-        date: 'oct. 2026',
-        org: 'Projet personnel',
-        title: 'Page boutique DJILALI',
-        text: 'Une vitrine produit animée sur une seule page, réalisée avec React, Tailwind CSS et GSAP, déployée sur GitHub Pages.',
-      },
-      pretest: {
-        date: 'oct. 2026',
-        org: 'École Alfikr Almodi',
-        title: 'Speaking Pre-Test — application mobile et web',
-        text: 'Un test d’expression orale en anglais, utilisable hors ligne sur Android, iOS et le web, avec un tableau de bord enseignant et une reconnaissance vocale dans le navigateur pour la correction automatique.',
-      },
-    },
-    workflow: [
-      { title: 'Découvrir', text: 'Comprendre les objectifs et les besoins.' },
-      { title: 'Concevoir', text: 'Créer des interfaces intuitives et des prototypes.' },
-      { title: 'Développer', text: 'Construire des solutions évolutives et maintenables.' },
-      { title: 'Livrer', text: 'Tester, optimiser et déployer.' },
-    ],
   },
   contact: {
     eyebrow: 'Contact',
