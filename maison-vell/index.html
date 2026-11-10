@@ -7,7 +7,7 @@
 <meta name="description" content="A runway lookbook where six looks stand in a line into the distance and every drag brings the next one to the front.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Michroma&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;800&family=Michroma&display=swap" rel="stylesheet">
 <style>
 :root{--u:min(calc(100vw/1600),calc(100vh/900));--ink:#16191f;--mid:#737b86;--dim:#a4adb8;--line:#e6ebf0;--ice:#e9f0f7}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -20,7 +20,7 @@ ul{list-style:none}
 .page{height:100svh;min-height:520px;display:grid;grid-template-rows:auto 1fr;background:#fff}
 header{position:relative;z-index:5;background:#fff;padding:calc(20*var(--u)) calc(46*var(--u)) calc(15*var(--u))}
 .r1{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
-.brand{font-size:calc(15.5*var(--u));letter-spacing:.2em}
+.brand{font-family:Inter,system-ui,sans-serif;font-weight:800;text-transform:uppercase;font-size:calc(21*var(--u));letter-spacing:.14em;white-space:nowrap}
 .tabs{display:flex;gap:calc(48*var(--u));font-size:calc(14.5*var(--u));letter-spacing:.14em;color:var(--dim)}
 .tabs a{transition:color .25s}
 .tabs a:hover,.tabs .on{color:var(--ink)}
@@ -77,7 +77,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   header{padding:14px 16px 12px}
   .r1{grid-template-columns:1fr auto}
   .tabs,.r2,.acct>a:not(:last-child){display:none}
-  .brand{font-size:14px}
+  .brand{font-size:16px;letter-spacing:.1em}
   main{grid-template-columns:1fr;grid-template-rows:1fr 190px}
   .stage{cursor:auto}.m{cursor:auto}.ring{display:none}
   .intro{left:16px;top:18px;width:calc(100% - 32px)}
@@ -88,13 +88,19 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   .card{width:160px;height:100%;padding:12px}
   .fav{left:10px;top:10px}
 }
+@media (max-width:380px){
+  .brand{font-size:14px;letter-spacing:.06em}
+  .acct{gap:12px}
+  .snd span{display:none}
+  .intro h2{font-size:14px}
+}
 </style>
 </head>
 <body>
 <div class="page">
   <header>
     <div class="r1">
-      <a class="brand wide" href="#" aria-label="Maison Vell">Maison Vell</a>
+      <a class="brand" href="#">Lakehal Djilali</a>
       <nav class="tabs wide" aria-label="Sections"><a class="on" href="#" aria-current="page">Runway</a><a href="#">The Maison</a><a href="#">Lookbook</a><a href="#">Shop</a></nav>
       <div class="acct wide">
         <a href="#">Login</a>
