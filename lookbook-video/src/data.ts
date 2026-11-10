@@ -12,8 +12,8 @@ export const BEAT_LEN = 0.4876;
 // Pixel size of each cutout in public/looks/<n>.webp
 export const DIMS = beatsData.dims as [number, number][];
 
-export const INK = "#1c3a9e";
-export const MID = "#4a5d8c";
+export const INK = "#111111";
+export const MID = "#4d4d4d";
 
 // Timeline in beats: intro, eight looks of two bars each, then the finale.
 export const INTRO_BEATS = 16;

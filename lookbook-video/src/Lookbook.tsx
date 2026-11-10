@@ -60,7 +60,7 @@ const Background: React.FC<{ pulse: number }> = ({ pulse }) => (
   >
     <AbsoluteFill
       style={{
-        background: `radial-gradient(60% 18% at 50% 88%, rgba(28,58,158,${0.07 + 0.05 * pulse}), transparent 70%)`,
+        background: `radial-gradient(60% 18% at 50% 88%, rgba(17,17,17,${0.07 + 0.05 * pulse}), transparent 70%)`,
       }}
     />
   </AbsoluteFill>
@@ -78,7 +78,7 @@ const BeatBars: React.FC<{ beat: number; pulse: number }> = ({ beat, pulse }) =>
           style={{
             width: 64,
             height: 6,
-            background: on ? INK : "rgba(28,58,158,.18)",
+            background: on ? INK : "rgba(17,17,17,.18)",
             transform: `scaleY(${now ? 1 + 1.6 * pulse : 1})`,
           }}
         />
@@ -113,7 +113,7 @@ const Intro: React.FC<{ t: number; beat: number; pulse: number }> = ({ t, beat, 
           lineHeight: 1,
           letterSpacing: "0.04em",
           color: "rgba(255,255,255,.4)",
-          WebkitTextStroke: `2.5px rgba(28,58,158,${0.28 * ramp(t, b(2), 0.6)})`,
+          WebkitTextStroke: `2.5px rgba(17,17,17,${0.28 * ramp(t, b(2), 0.6)})`,
           transform: `scale(${1 + 0.025 * pulse * (beat >= 2 ? 1 : 0)})`,
         }}
       >
@@ -215,16 +215,17 @@ const Look: React.FC<{ k: number; t: number; beat: number; pulse: number }> = ({
   const lt = t - start;
   const look = LOOKS[k];
   const [w, h] = DIMS[k];
-  const H = 1420;
+  const H = 1100;
   const W = (H * w) / h;
   const dir = k % 2 ? -1 : 1;
 
   const enter = spring({ frame: lt * FPS, fps: FPS, config: { damping: 18, stiffness: 120, mass: 0.9 } });
   const exit = ramp(lt, BEAT_LEN * 7.4, BEAT_LEN * 0.6, Easing.in(Easing.cubic));
   const bump = 1 + 0.018 * pulse;
-  const x = 560 - W / 2 + (1 - enter) * 140 * dir - exit * 220 * dir;
+  const x = 640 - W / 2 + (1 - enter) * 140 * dir - exit * 220 * dir;
   const word = look.word.toUpperCase();
-  const wordSize = Math.min(230, 1640 / (word.length * 1.18));
+  // kept short enough to end above the piece names
+  const wordSize = Math.min(230, 1300 / (word.length * 1.18));
 
   const pieceIdx = beat >= 5 ? 1 : 0;
   const pieceIn = ramp(lt, BEAT_LEN * (pieceIdx ? 5 : 2), 0.45);
@@ -249,7 +250,7 @@ const Look: React.FC<{ k: number; t: number; beat: number; pulse: number }> = ({
           lineHeight: 1,
           letterSpacing: "0.04em",
           color: "rgba(255,255,255,.45)",
-          WebkitTextStroke: "2.5px rgba(28,58,158,.32)",
+          WebkitTextStroke: "2.5px rgba(17,17,17,.32)",
           opacity: 1 - exit,
         }}
       >
@@ -279,8 +280,8 @@ const Look: React.FC<{ k: number; t: number; beat: number; pulse: number }> = ({
             key={at}
             style={{
               position: "absolute",
-              left: 560 - 260,
-              top: 1690 - 40,
+              left: 640 - 260,
+              top: 1515 - 40,
               width: 520,
               height: 80,
               borderRadius: "50%",
@@ -294,8 +295,8 @@ const Look: React.FC<{ k: number; t: number; beat: number; pulse: number }> = ({
       <div
         style={{
           position: "absolute",
-          left: 560 - W * 0.42,
-          top: 1680,
+          left: 640 - W * 0.42,
+          top: 1500,
           width: W * 0.84,
           height: 44,
           borderRadius: "50%",
@@ -310,7 +311,7 @@ const Look: React.FC<{ k: number; t: number; beat: number; pulse: number }> = ({
         style={{
           position: "absolute",
           left: x,
-          top: 1700 - H,
+          top: 1520 - H,
           width: W,
           height: H,
           transformOrigin: "50% 100%",
@@ -320,10 +321,6 @@ const Look: React.FC<{ k: number; t: number; beat: number; pulse: number }> = ({
         }}
       />
 
-      {/* white veil so the text below stays legible over the legs */}
-      <AbsoluteFill
-        style={{ background: "linear-gradient(180deg, transparent 82%, rgba(255,255,255,.8) 93%)" }}
-      />
 
       {/* LOOK 15 … with the number rolling in */}
       <div
