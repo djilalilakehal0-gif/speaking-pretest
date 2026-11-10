@@ -22,6 +22,10 @@ export function HomePage({ lang }: { lang: Locale }) {
   return (
     <>
       <Field />
+      {/* the official photo, full screen and see-through, behind the content */}
+      <div className="photo-bg" aria-hidden="true">
+        <img src={asset('/img/bg.webp')} alt="" width={1199} height={1312} decoding="async" fetchPriority="high" />
+      </div>
       <main id="main" tabIndex={-1} className="ui">
         <header className="brand blend">
           <Mark />

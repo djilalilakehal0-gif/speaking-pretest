@@ -74,7 +74,9 @@
   const pressure = doubleTarget(SIM, SIM, THREE.HalfFloatType, THREE.NearestFilter);
   const divergenceT = target(SIM, SIM, THREE.HalfFloatType, THREE.NearestFilter);
   const curlT = target(SIM, SIM, THREE.HalfFloatType, THREE.NearestFilter);
-  let mask = target(Math.max(1, window.innerWidth), Math.max(1, window.innerHeight), THREE.HalfFloatType, THREE.LinearFilter);
+  // density mask at half the screen resolution: it is only sampled as a soft, linearly filtered map
+  const maskSize = () => [Math.max(1, Math.round(window.innerWidth / 2)), Math.max(1, Math.round(window.innerHeight / 2))];
+  let mask = target(...maskSize(), THREE.HalfFloatType, THREE.LinearFilter);
 
   const splatMat = shader(`
     varying vec2 vUv;
@@ -465,7 +467,45 @@
   const localFromCam = new THREE.Matrix4();
   let last = performance.now(), elapsed = 0;
 
+  /* ---- 60 fps pacing + adaptive quality ----
+     The loop renders on a fixed 60 fps grid (on 75-165 Hz screens the extra refreshes are skipped), and if a device
+     cannot hold ~60 fps the cost is lowered step by step: pixel ratio 1, then 1/2 and 1/4 of the points. */
+  const FRAME_MS = 1000 / 60;
+  let lastTick = 0, nextTick = 0;
+  let sampleTime = 0, sampleFrames = 0, level = 0, ticks = 0, lowSamples = 0;
+  const stats = (window.__fieldStats = { fps: 0, level: 0 });
+  function lowerQuality() {
+    if (level === 0 && renderer.getPixelRatio() > 1) {
+      renderer.setPixelRatio(1);
+      pointsMat.uniforms.DPR.value = 1;
+    } else if (level <= 1) {
+      geom.setDrawRange(0, COUNT / 2);
+      level = 1;
+    } else {
+      geom.setDrawRange(0, COUNT / 4);
+    }
+    level++;
+    stats.level = level;
+  }
+
   function frame(now) {
+    requestAnimationFrame(frame);
+    if (now < nextTick - 2) return;                              // not yet time (2 ms vsync tolerance)
+    nextTick = Math.max(nextTick + FRAME_MS, now - FRAME_MS);     // fixed 60 Hz grid; resyncs after a pause
+    const since = now - lastTick;
+    lastTick = now;
+    ticks++;
+    // measure only after a 2 s warm-up (shader compiling, image decoding) and ignore pauses (hidden tab)
+    if (ticks > 120 && since < 250) {
+      sampleTime += since; sampleFrames++;
+      if (sampleFrames === 90) {
+        stats.fps = Math.round(1000 / (sampleTime / sampleFrames));
+        lowSamples = stats.fps < 52 ? lowSamples + 1 : 0;
+        if (lowSamples >= 2 && level < 3) { lowerQuality(); lowSamples = 0; }
+        sampleTime = 0; sampleFrames = 0;
+      }
+    }
+
     const dt = Math.min((now - last) / 1000, 0.1);
     last = now;
     elapsed += dt;
@@ -505,7 +545,6 @@
     pointsMat.uniforms.time.value = elapsed;
     renderer.setRenderTarget(null);
     renderer.render(scene, camera);
-    requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 
@@ -516,6 +555,6 @@
     camera.aspect = W / H;
     camera.updateProjectionMatrix();
     fitGroup();
-    mask.setSize(Math.max(1, W), Math.max(1, H));
+    mask.setSize(...maskSize());
   });
 })();

@@ -55,6 +55,24 @@ canvas#bg {
   display: block;
 }
 
+/* Full-screen photo layer: above the particle canvas, below the text. 'screen' blending keeps the
+   particles fully bright while the photo shows through the black areas as a faint background. */
+.photo-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.32;
+  mix-blend-mode: screen;
+}
+.photo-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 30% 10%; /* keeps the cap and face in view on wide and tall screens */
+  display: block;
+}
+
 .ui {
   position: fixed;
   inset: 0;
