@@ -38,6 +38,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .tabs{position:fixed;left:50%;top:4.2vh;transform:translateX(-50%);z-index:30;display:flex;gap:2px;padding:5px;border-radius:999px}
 .tabs button{position:relative;z-index:1;height:38px;padding:0 22px;font-weight:500;font-size:14px;color:rgba(30,30,32,.72);border-radius:999px;white-space:nowrap;transition:color .4s var(--ease)}
 .tabs button.on{color:#111}
+.tabs button.soon{opacity:.45;cursor:default}
 .tabs .pill{position:absolute;left:0;top:5px;height:38px;width:0;border-radius:999px;background:rgba(255,255,255,.92);box-shadow:0 4px 14px -6px rgba(0,0,0,.3);transition:transform .6s var(--ease),width .6s var(--ease);z-index:0}
 
 /* rail */
@@ -59,11 +60,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 /* model */
 .model{position:fixed;left:50%;bottom:0;height:var(--MH);aspect-ratio:2296/2404;max-width:100vw;transform:translateX(-50%);z-index:50;pointer-events:none}
-.model .fig{position:absolute;inset:0;background:center bottom/100% 100% no-repeat}
+.model .fig{position:absolute;inset:0;background:center bottom/contain no-repeat}
 #mCur{opacity:0}
 #mNext{clip-path:inset(0 0 100% 0);transform-origin:50% 100%}
 .model .grid{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 5px,rgba(255,255,255,.22) 5px 6px);mix-blend-mode:screen;clip-path:inset(0 0 100% 0);
-  -webkit-mask:center bottom/100% 100% no-repeat;mask:center bottom/100% 100% no-repeat}
+  -webkit-mask:center bottom/contain no-repeat;mask:center bottom/contain no-repeat}
+/* full-body looks: the whole figure stands above the buy card */
+.model.full{aspect-ratio:2/5;bottom:calc(4.6vh + 104px);height:calc(100vh - 4.2vh - 64px - 4.6vh - 116px)}
 .model .scan{position:absolute;left:-14%;width:128%;top:0;height:2px;margin-top:-1px;opacity:0;background:linear-gradient(90deg,transparent,#fff 18%,#fff 82%,transparent);box-shadow:0 0 18px 4px rgba(255,255,255,.75),0 0 60px 10px rgba(190,225,255,.45);transform:scaleX(.2)}
 .model .scan::after{content:"";position:absolute;left:10%;right:10%;bottom:100%;height:calc(var(--MH)*.12);background:linear-gradient(to top,rgba(220,238,255,.32),transparent)}
 
@@ -124,6 +127,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   .rail svg{width:17px;height:17px}
   .arrow{display:none}
   .model{bottom:calc(4.6vh + 95px)}
+  .model.full{bottom:calc(4.6vh + 218px);height:calc(100vh - 4.2vh - 52px - 4.6vh - 226px)}
   .buy{flex-wrap:wrap;gap:12px 16px;padding:12px}
   .info{flex:1 1 calc(100% - 80px)}
   .sizegrp{flex:1 1 auto}
@@ -140,10 +144,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <nav class="tabs glass" id="tabs">
   <div class="pill" id="pill"></div>
   <button class="on">Tops</button>
-  <button>Bottoms</button>
-  <button>Outerwear</button>
-  <button>Shoes</button>
-  <button>Accessories</button>
+  <button class="soon" title="Coming soon">Bottoms</button>
+  <button>Looks</button>
+  <button class="soon" title="Coming soon">Shoes</button>
+  <button class="soon" title="Coming soon">Accessories</button>
 </nav>
 
 <aside class="rail glass">
@@ -187,7 +191,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 <script>
 (()=>{
-const ITEMS=[
+const TOPS=[
   {n:"Basic T-shirt", p:45,  g:[1.14,3.06],  m:.37,   c:[["White","#f4f2ee"],["Ash","#c9c7c2"],["Charcoal","#3b3c3f"],["Navy","#27324d"]]},
   {n:"Basic Sweater", p:105, g:[49.7,1.39],  m:25.0,  c:[["White","#f6f4ef"],["Oat","#ddd3c2"],["Sage","#b9c2ae"],["Black","#1f1f21"]]},
   {n:"Linen Shirt",   p:95,  g:[98.2,3.33],  m:49.86, c:[["White","#f7f6f1"],["Sand","#d9ccb4"],["Sky","#bcd0e2"],["Olive","#717556"]]},
@@ -199,9 +203,15 @@ const ITEMS=[
   {n:"Adidas Polo",   p:60,  img:"garment-7.webp", c:[["Black","#161618"]]},
   {n:"Gucci Shirt & Blazer", p:450, img:"garment-8.webp", c:[["Black","#161618"]]},
 ];
-const L=ITEMS.length;
-/* enough cards for a full arc, as a whole number of laps so the loop stays seamless */
-const N=L*Math.ceil(10/L), HALF=N/2;
+TOPS.forEach((it,k)=>{it.fig=`model-${k}.webp`});
+/* complete outfits, full-body photos; the photo itself is the card image */
+const LOOKS=[
+  {n:"Navy Suit",     p:320, img:"look-0.webp", fig:"look-0.webp", c:[["Navy","#1b2133"]]},
+  {n:"Burgundy Suit", p:340, img:"look-1.webp", fig:"look-1.webp", c:[["Burgundy","#5e1a2a"]]},
+];
+const CATS={Tops:{items:TOPS,full:false}, Looks:{items:LOOKS,full:true}};
+[...TOPS,...LOOKS].forEach(it=>{const im=new Image(); im.src=it.fig;});
+let ITEMS=TOPS, L=0, N=0, HALF=0;
 const garmStyle=it=>it.img?`background:url("${it.img}") center/contain no-repeat`:`background-position:${it.g[0]}% ${it.g[1]}%`;
 const $=id=>document.getElementById(id);
 const mod=(a,n)=>((a%n)+n)%n;
@@ -228,7 +238,12 @@ function xAt(a){
 }
 
 /* ---------- cards ---------- */
-const cards=[];
+let cards=[];
+function buildArc(){
+  L=ITEMS.length;
+  /* enough cards for a full arc, as a whole number of laps so the loop stays seamless */
+  N=L*Math.ceil(10/L); HALF=N/2;
+  arc.textContent=''; cards=[];
 for(let i=0;i<N;i++){
   const it=ITEMS[i%L];
   const el=document.createElement('div');
@@ -243,6 +258,8 @@ for(let i=0;i<N;i++){
   arc.appendChild(el);
   cards.push({el,seed:i*1.7+.3});
 }
+}
+buildArc();
 
 /* ---------- state ---------- */
 let pos=0, target=0, intro=reduced?1:0, shown=-1;
@@ -289,16 +306,14 @@ $('sizes').addEventListener('click',e=>{
 
 /* ---------- try-on scan ---------- */
 let anims=[];
-/* one cut-out photo per outfit: model-0.webp … model-4.webp */
-const FIGS=ITEMS.map((_,k)=>`url("model-${k}.webp")`);
-FIGS.forEach((_,k)=>{const im=new Image(); im.src=`model-${k}.webp`;});
+const figURL=k=>`url("${ITEMS[k].fig}")`;
 function tryOn(k){
   shown=k;
   updateBuy(k);
   anims.forEach(a=>a.cancel()); anims=[];
-  mNext.style.backgroundImage=FIGS[k];
-  grid.style.webkitMaskImage=grid.style.maskImage=FIGS[k];
-  if(reduced){mCur.style.backgroundImage=FIGS[k]; mCur.style.opacity=1; return;}
+  mNext.style.backgroundImage=figURL(k);
+  grid.style.webkitMaskImage=grid.style.maskImage=figURL(k);
+  if(reduced){mCur.style.backgroundImage=figURL(k); mCur.style.opacity=1; return;}
   const ez='cubic-bezier(.65,0,.35,1)';
   const clip=mNext.animate([{clipPath:'inset(0 0 100% 0)'},{clipPath:'inset(0 0 0% 0)'}],{duration:950,easing:ez,fill:'forwards'});
   const g=grid.animate([{clipPath:'inset(0 0 100% 0)'},{clipPath:'inset(0 0 0 0)',offset:.5},{clipPath:'inset(100% 0 0 0)'}],{duration:1092,easing:ez,fill:'forwards'});
@@ -311,7 +326,7 @@ function tryOn(k){
   const st=mNext.animate([{transform:'scale(1.012)'},{transform:'scale(1)'}],{duration:1250,easing:'ease-out'});
   anims=[clip,g,s,st];
   clip.onfinish=()=>{
-    mCur.style.backgroundImage=FIGS[k]; mCur.style.opacity=1;
+    mCur.style.backgroundImage=figURL(k); mCur.style.opacity=1;
     anims.forEach(a=>a.cancel()); anims=[];
   };
 }
@@ -326,10 +341,16 @@ function placePill(anim=true){
   if(!anim){pill.offsetWidth; pill.style.transition='';}
 }
 tabBtns.forEach(b=>b.addEventListener('click',()=>{
-  if(b.classList.contains('on'))return;
+  const cat=CATS[b.textContent.trim()];
+  if(b.classList.contains('on')||!cat)return;
   tabBtns.forEach(t=>t.classList.toggle('on',t===b));
   placePill(true);
-  target+=L;
+  /* new arc spreads out from the centre again; the scan reveals the first piece */
+  anims.forEach(a=>a.cancel()); anims=[];
+  ITEMS=cat.items; buildArc();
+  pos=target=0; intro=reduced?1:0; shown=-1;
+  mCur.style.opacity=0;
+  model.classList.toggle('full',cat.full);
 }));
 
 /* ---------- input ---------- */
