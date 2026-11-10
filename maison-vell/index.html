@@ -62,6 +62,13 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 .add:before,.add:after{content:"";position:absolute;left:50%;top:50%;width:calc(15*var(--u));height:1.5px;margin:-.75px 0 0 calc(-7.5*var(--u));background:var(--ink)}
 .add:after{transform:rotate(90deg)}
 .add:hover{transform:rotate(90deg)}
+.snd{display:flex;align-items:center;gap:calc(8*var(--u));font-size:calc(9.5*var(--u));letter-spacing:.12em;text-transform:uppercase}
+.snd i{display:flex;align-items:flex-end;gap:2px;height:calc(12*var(--u))}
+.snd i b{display:block;width:2px;height:30%;background:currentColor;transition:height .3s}
+.snd.on i b{animation:eq .9s ease-in-out infinite alternate}
+.snd.on i b:nth-child(2){animation-delay:-.3s}.snd.on i b:nth-child(3){animation-delay:-.6s}.snd.on i b:nth-child(4){animation-delay:-.15s}
+@keyframes eq{from{height:20%}to{height:100%}}
+@media (prefers-reduced-motion:reduce){.snd.on i b{animation:none;height:70%}}
 .wait{position:fixed;inset:0;z-index:9;background:#f1f5fa;transition:opacity .5s;pointer-events:none}
 .wait.gone{opacity:0}
 button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
@@ -94,6 +101,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
         <a href="#" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></a>
         <a href="#" aria-label="Saved"><svg viewBox="0 0 24 24"><path d="M12 20S3.5 15 3.5 9A4.6 4.6 0 0 1 12 6.6 4.6 4.6 0 0 1 20.500 9C20.500 15 12 20 12 20Z"/></svg></a>
         <a href="#" aria-label="Bag"><svg viewBox="0 0 24 24"><path d="M5 8h14l1 13H4Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg></a>
+        <button class="snd wide" id="snd" aria-pressed="false" aria-label="Play music"><i aria-hidden="true"><b></b><b></b><b></b><b></b></i><span>Sound</span></button>
         <a href="#">Cart (<span id="cart">0</span>)</a>
       </div>
     </div>
@@ -228,6 +236,14 @@ addEventListener('keydown',e=>{
   if(['ArrowRight','ArrowDown'].includes(e.key)){e.preventDefault();target=Math.round(target)+1}
   if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();target=Math.round(target)-1}
 });
+
+// music: browsers only allow sound after a tap, so it starts from the Sound button and loops
+const snd=$('snd'),music=new Audio('music.mp3');music.loop=true;music.preload='none';music.volume=.7;
+snd.addEventListener('click',()=>{
+  if(music.paused)music.play().catch(()=>{});else music.pause();
+});
+music.addEventListener('play',()=>{snd.classList.add('on');snd.setAttribute('aria-pressed','true');snd.setAttribute('aria-label','Pause music')});
+music.addEventListener('pause',()=>{snd.classList.remove('on');snd.setAttribute('aria-pressed','false');snd.setAttribute('aria-label','Play music')});
 
 function loop(t){frame(t);requestAnimationFrame(loop)}
 Promise.all([MODELS,PIECES].map(u=>{const i=new Image;i.src=u;return i.decode().catch(()=>{})})).then(()=>document.fonts.ready).then(()=>{
