@@ -237,9 +237,19 @@ addEventListener('keydown',e=>{
   if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();target=Math.round(target)-1}
 });
 
-// music: browsers only allow sound after a tap, so it starts from the Sound button and loops
-const snd=$('snd'),music=new Audio('music.mp3');music.loop=true;music.preload='none';music.volume=.7;
+// music: try to start on load; browsers that block sound until a gesture start it on the first
+// tap, swipe or key instead. Once the Sound button has been used, only the button controls it.
+const snd=$('snd'),music=new Audio('music.mp3');music.loop=true;music.preload='auto';music.volume=.7;
+let touched=false;
+const GESTURES=['pointerdown','touchend','keydown','click'];
+function autoStart(e){
+  if(touched||(e&&e.target.closest&&e.target.closest('#snd')))return;
+  music.play().then(()=>GESTURES.forEach(g=>removeEventListener(g,autoStart,true))).catch(()=>{});
+}
+GESTURES.forEach(g=>addEventListener(g,autoStart,true));
+autoStart();
 snd.addEventListener('click',()=>{
+  touched=true;GESTURES.forEach(g=>removeEventListener(g,autoStart,true));
   if(music.paused)music.play().catch(()=>{});else music.pause();
 });
 music.addEventListener('play',()=>{snd.classList.add('on');snd.setAttribute('aria-pressed','true');snd.setAttribute('aria-label','Pause music')});
