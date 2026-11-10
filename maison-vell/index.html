@@ -7,7 +7,7 @@
 <meta name="description" content="A runway lookbook where six looks stand in a line into the distance and every drag brings the next one to the front.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;800&family=Michroma&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;800&family=Michroma&family=Pinyon+Script&display=swap" rel="stylesheet">
 <style>
 :root{--u:min(calc(100vw/1600),calc(100vh/900));--ink:#16191f;--mid:#737b86;--dim:#a4adb8;--line:#e6ebf0;--ice:#e9f0f7}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -38,8 +38,8 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 .intro{position:absolute;z-index:150;left:calc(46*var(--u));top:calc(36*var(--u));width:calc(390*var(--u));pointer-events:none}
 .intro h2{font-weight:400;font-size:calc(22*var(--u));line-height:1.2;letter-spacing:.16em;white-space:nowrap}
 .intro p{margin-top:calc(16*var(--u));font-size:calc(14*var(--u));line-height:1.62;letter-spacing:.012em;color:var(--mid)}
-.credit{margin-top:calc(26*var(--u));font-size:calc(13*var(--u));letter-spacing:.2em;color:var(--ink)}
-.credit b{display:block;margin-top:calc(8*var(--u));font-family:Inter,system-ui,sans-serif;font-weight:800;font-size:calc(34*var(--u));line-height:1.05;letter-spacing:.08em;white-space:nowrap}
+.credit{margin-top:calc(26*var(--u));font-size:calc(13*var(--u));letter-spacing:.2em;color:var(--ink);text-shadow:0 0 10px rgba(255,255,255,.95),0 0 22px rgba(255,255,255,.8)}
+.credit b{display:block;margin-top:calc(4*var(--u));font-family:'Pinyon Script',cursive;font-weight:400;text-transform:none;font-size:calc(58*var(--u));line-height:1.15;letter-spacing:0;white-space:nowrap}
 .tag{position:absolute;z-index:2;left:calc(46*var(--u));bottom:calc(44*var(--u))}
 .look{display:flex;font-size:calc(29*var(--u));line-height:calc(38*var(--u));letter-spacing:.14em;gap:.5em;pointer-events:none}
 .win{height:calc(38*var(--u));overflow:hidden}
@@ -86,7 +86,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   .intro h2{font-size:17px}
   .intro p{display:none}
   .credit{margin-top:12px;font-size:11px}
-  .credit b{font-size:24px;margin-top:4px}
+  .credit b{font-size:40px;margin-top:2px}
   .tag{left:16px;bottom:18px}
   .look{font-size:22px;line-height:30px}.win,.roll b{height:30px}
   .card{width:160px;height:100%;padding:12px}
@@ -97,7 +97,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   .acct{gap:12px}
   .snd span{display:none}
   .intro h2{font-size:14px}
-  .credit b{font-size:20px}
+  .credit b{font-size:34px}
 }
 </style>
 </head>
