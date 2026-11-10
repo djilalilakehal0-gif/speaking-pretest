@@ -13,13 +13,13 @@
   const canvas = document.getElementById('bg');
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
   } catch (e) {
     return; // no WebGL: the page stays a plain black background
   }
   renderer.setPixelRatio(DPR);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0x000000, 1);
+  renderer.setClearColor(0x000000, 0); // transparent: the background photo layer sits underneath
   renderer.autoClear = true;
 
   // half-float for the fluid, float for positions (fall back to half-float if float targets are unsupported)
@@ -461,6 +461,94 @@
   points.frustumCulled = false;
   group.add(points);
 
+
+  /* ---------------------------------------------------------------- 3D photo panel
+     Reads the GLB named in <canvas data-portrait="..."> (models/djilali-portrait.glb) and draws it
+     in the free area under the brand, tilting toward the cursor. Hidden on phones. */
+  const panel = { scene: new THREE.Scene(), camera: new THREE.PerspectiveCamera(30, 1, 0.1, 20), group: null, rx: 0, ry: 0 };
+  panel.camera.position.set(0, 0, 2.6);
+  panel.scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const panelLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  panelLight.position.set(1, 2, 3);
+  panel.scene.add(panelLight);
+
+  // Minimal GLB reader for this panel: triangle primitives with POSITION / NORMAL / TEXCOORD_0,
+  // an embedded image for the base-colour texture, unlit or plain PBR materials.
+  async function loadPanel(url) {
+    const buf = await (await fetch(url)).arrayBuffer();
+    const dv = new DataView(buf);
+    if (dv.getUint32(0, true) !== 0x46546c67) throw new Error('not a GLB');
+    const jsonLen = dv.getUint32(12, true);
+    const json = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 20, jsonLen)));
+    const bin = 20 + jsonLen + 8;
+    const SIZES = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4 };
+    const TYPES = { 5126: Float32Array, 5125: Uint32Array, 5123: Uint16Array, 5121: Uint8Array };
+    const attr = (i) => {
+      const a = json.accessors[i], v = json.bufferViews[a.bufferView], T = TYPES[a.componentType], n = SIZES[a.type];
+      const off = bin + (v.byteOffset || 0) + (a.byteOffset || 0);
+      return new THREE.BufferAttribute(new T(buf.slice(off, off + a.count * n * T.BYTES_PER_ELEMENT)), n);
+    };
+    const textures = await Promise.all((json.textures || []).map(async (t) => {
+      const im = json.images[t.source], v = json.bufferViews[im.bufferView];
+      const blob = new Blob([new Uint8Array(buf, bin + (v.byteOffset || 0), v.byteLength)], { type: im.mimeType });
+      const img = new Image();
+      img.src = URL.createObjectURL(blob);
+      await img.decode();
+      const tex = new THREE.Texture(img);
+      tex.flipY = false;                                   // glTF UVs start at the image's top-left
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      tex.needsUpdate = true;
+      return tex;
+    }));
+    const materials = (json.materials || []).map((m) => {
+      const pbr = m.pbrMetallicRoughness || {};
+      const map = pbr.baseColorTexture ? textures[pbr.baseColorTexture.index] : null;
+      const color = new THREE.Color().fromArray(pbr.baseColorFactor || [1, 1, 1]);
+      return m.extensions && m.extensions.KHR_materials_unlit
+        ? new THREE.MeshBasicMaterial({ map, color })
+        : new THREE.MeshStandardMaterial({ map, color, roughness: pbr.roughnessFactor ?? 1, metalness: pbr.metallicFactor ?? 1 });
+    });
+    const root = new THREE.Group();
+    json.meshes.forEach((mesh) => mesh.primitives.forEach((p) => {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', attr(p.attributes.POSITION));
+      if (p.attributes.NORMAL !== undefined) g.setAttribute('normal', attr(p.attributes.NORMAL));
+      if (p.attributes.TEXCOORD_0 !== undefined) g.setAttribute('uv', attr(p.attributes.TEXCOORD_0));
+      if (p.indices !== undefined) g.setIndex(attr(p.indices));
+      root.add(new THREE.Mesh(g, materials[p.material] || new THREE.MeshStandardMaterial()));
+    }));
+    return root;
+  }
+  if (canvas.dataset.portrait) {
+    loadPanel(canvas.dataset.portrait).then((g) => { panel.group = g; panel.scene.add(g); }).catch(() => {});
+  }
+
+  // Free area under the brand (left; right in Arabic). null = no room (phones, very short windows).
+  function panelBox() {
+    const W = window.innerWidth, H = window.innerHeight;
+    if (W <= 760) return null;
+    const w = 320, h = Math.min(400, H - 160);
+    if (h < 220) return null;
+    const rtl = document.documentElement.dir === 'rtl';
+    return { x: rtl ? W - 24 - w : 24, y: H - 120 - h, w, h };   // y counts from the bottom (WebGL)
+  }
+
+  function drawPanel(mx, my, t) {
+    const box = panel.group && panelBox();
+    if (!box) return;
+    panel.ry += (mx * 0.45 + Math.sin(t * 0.6) * 0.05 - panel.ry) * 0.08;
+    panel.rx += (my * 0.25 - panel.rx) * 0.08;
+    panel.group.rotation.set(panel.rx, panel.ry, 0);
+    panel.camera.aspect = box.w / box.h;
+    panel.camera.updateProjectionMatrix();
+    renderer.autoClear = false;
+    renderer.setViewport(box.x, box.y, box.w, box.h);
+    renderer.clearDepth();
+    renderer.render(panel.scene, panel.camera);
+    renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+    renderer.autoClear = true;
+  }
+
   /* ---------------------------------------------------------------- frame */
   const camTarget = new THREE.Vector3();
   const projView = new THREE.Matrix4();
@@ -545,6 +633,7 @@
     pointsMat.uniforms.time.value = elapsed;
     renderer.setRenderTarget(null);
     renderer.render(scene, camera);
+    drawPanel(mx, my, elapsed);
   }
   requestAnimationFrame(frame);
 
