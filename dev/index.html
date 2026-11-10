@@ -202,7 +202,7 @@ footer a:hover { color: var(--ink); }
   .svc--feat { grid-column: auto; padding: 26px; }
   .scrollcue { display: none; }
   .marquee { display: block; }
-  #scene.ready { opacity: .55; }
+  #scene.ready { opacity: .75; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -578,103 +578,149 @@ setTimeout(reveal, 2200);
 </script>
 <script type="module">
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const BEE_GLB = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261017_132918_e8364d8f-7df2-4788-a725-dec28ec19af8.glb';
+const WING_TEX = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261017_132814_3a56ac14-47d8-4e49-a163-94234dea5639.png';
 
 const canvas = document.getElementById('scene');
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const lerp = (a, b, t) => a + (b - a) * t;
+const lerpAngle = (a, b, t) => { const d = ((b - a + 540) % 360) - 180; return a + d * t; };
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const D2R = Math.PI / 180;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
+renderer.toneMappingExposure = 1.15;
 
 const scene = new THREE.Scene();
 scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
 const camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, .1, 100);
 camera.position.set(0, 0, 10);
 
-scene.add(new THREE.HemisphereLight(0xdcd6ff, 0x1a1033, 1.0));
-const keyL = new THREE.DirectionalLight(0xffffff, 2.2); keyL.position.set(3, 5, 6); scene.add(keyL);
-const rimL = new THREE.DirectionalLight(0x22d3ee, 2.0); rimL.position.set(-5, -2, -4); scene.add(rimL);
+scene.add(new THREE.HemisphereLight(0xf2eeff, 0x5b45b8, 1.3));
+const keyL = new THREE.DirectionalLight(0xfff1d6, 2.6); keyL.position.set(3, 5, 6); scene.add(keyL);
+const rimL = new THREE.DirectionalLight(0x8fe9ff, 2.2); rimL.position.set(-5, 2, -4); scene.add(rimL);
 
-/* ── The object: iridescent crystal + glowing code-core + orbiting bits ── */
-const flight = new THREE.Group();   // position / scale / yaw
-const body = new THREE.Group();     // tilt
-flight.add(body); scene.add(flight);
+/* ── Hierarchy: flight (position, scale, yaw) > beeRoot (roll, pitch) > model + wings.
+      beeRoot frame: +X = head, +Y = up, +Z = the bee's right side. ── */
+const flight = new THREE.Group();
+const beeRoot = new THREE.Group();
+flight.add(beeRoot); scene.add(flight);
 
-const crystal = new THREE.Mesh(
-  new THREE.IcosahedronGeometry(1, 0),
-  new THREE.MeshPhysicalMaterial({
-    color: 0x2a1d66, metalness: .25, roughness: .12, clearcoat: 1, clearcoatRoughness: .1,
-    iridescence: 1, iridescenceIOR: 1.6, iridescenceThicknessRange: [200, 900],
-    flatShading: true, transparent: true, opacity: .5, depthWrite: false, envMapIntensity: 1.4, side: THREE.DoubleSide,
-  })
-);
-body.add(crystal);
-const edges = new THREE.LineSegments(
-  new THREE.EdgesGeometry(crystal.geometry),
-  new THREE.LineBasicMaterial({ color: 0x9d86ff, transparent: true, opacity: .9, blending: THREE.AdditiveBlending })
-);
-edges.scale.setScalar(1.002);
-body.add(edges);
-
-const coreMat = new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0x7c5cff, emissiveIntensity: 2.2, roughness: .4, metalness: .2 });
-const core = new THREE.Mesh(new THREE.TorusKnotGeometry(.36, .1, 180, 20, 2, 3), coreMat);
-body.add(core);
-const coreLight = new THREE.PointLight(0x7c5cff, 6, 6); body.add(coreLight);
-
-/* soft glow sprite */
+/* soft coloured glow behind the bee (follows the section accent) */
 const gc = document.createElement('canvas'); gc.width = gc.height = 256;
 const g = gc.getContext('2d'); const grd = g.createRadialGradient(128, 128, 0, 128, 128, 128);
-grd.addColorStop(0, 'rgba(255,255,255,.55)'); grd.addColorStop(.35, 'rgba(255,255,255,.14)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
+grd.addColorStop(0, 'rgba(255,255,255,.45)'); grd.addColorStop(.35, 'rgba(255,255,255,.12)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
 g.fillStyle = grd; g.fillRect(0, 0, 256, 256);
 const glowMat = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(gc), color: 0x7c5cff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
-const glow = new THREE.Sprite(glowMat); glow.scale.setScalar(4.2); flight.add(glow);
+const glow = new THREE.Sprite(glowMat); glow.scale.setScalar(2.6); glow.position.z = -.6; flight.add(glow);
 
-/* orbit rings with little "bits" */
-const rings = [];
-const bitGeo = new THREE.BoxGeometry(.07, .07, .07);
-[[1.55, .9, .3, 0x22d3ee, 16], [1.9, -.5, 1.1, 0x9d86ff, 22]].forEach(([r, tx, tz, col, n], ri) => {
-  const ring = new THREE.Group(); ring.rotation.set(tx, 0, tz);
-  const line = new THREE.Mesh(new THREE.TorusGeometry(r, .005, 6, 160), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .45, blending: THREE.AdditiveBlending }));
-  line.rotation.x = Math.PI / 2; ring.add(line);
-  const spin = new THREE.Group(); ring.add(spin);
-  const bitMat = new THREE.MeshStandardMaterial({ color: 0x0b0b16, emissive: col, emissiveIntensity: 1.6 });
-  for (let i = 0; i < n; i++) {
-    const a = i / n * Math.PI * 2, m = new THREE.Mesh(bitGeo, bitMat);
-    m.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); m.rotation.set(a, a * 2, 0);
-    if (i % 3 === 0) m.scale.setScalar(1.6);
-    spin.add(m);
+/* ── Wings: veined wing photo on black → alpha from luminance ── */
+const wingCanvas = document.createElement('canvas');
+wingCanvas.width = 1024; wingCanvas.height = 576;
+const wingTex = new THREE.CanvasTexture(wingCanvas);
+wingTex.colorSpace = THREE.SRGBColorSpace;
+const wingImg = new Image();
+wingImg.crossOrigin = 'anonymous';
+wingImg.onload = () => {
+  const ctx = wingCanvas.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(wingImg, 0, 0, 1024, 576);
+  const img = ctx.getImageData(0, 0, 1024, 576), d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i], gg = d[i + 1], b = d[i + 2];
+    const l = (r * .3 + gg * .59 + b * .11) / 255;
+    d[i + 3] = clamp((l - .035) * 4.2, 0, 1) * 255;
+    d[i] = Math.min(255, r * 1.5 + 30); d[i + 1] = Math.min(255, gg * 1.5 + 30); d[i + 2] = Math.min(255, b * 1.5 + 40);
   }
-  body.add(ring); rings.push({ ring, spin, speed: ri ? -.25 : .4 });
-});
+  ctx.putImageData(img, 0, 0);
+  wingTex.needsUpdate = true;
+};
+wingImg.src = WING_TEX;
+
+const wingMat = opacity => new THREE.MeshBasicMaterial({ map: wingTex, transparent: true, opacity, side: THREE.DoubleSide, depthWrite: false, color: 0xffffff, blending: THREE.NormalBlending });
+function wingGeo(span) {
+  const geo = new THREE.PlaneGeometry(span, span * 9 / 16);
+  geo.translate(span / 2 - span * .03, 0, 0); // hinge at the root
+  geo.rotateX(-Math.PI / 2);                  // flat
+  geo.rotateY(-Math.PI / 2);                  // span along +Z
+  return geo;
+}
+const WINGS = [{ span: .72, sweep: -.42, phase: 0, lift: .02 }, { span: .52, sweep: -.95, phase: -.5, lift: -.01 }];
+const COPIES = [[0, .95], [.55, .28], [-.55, .28]]; // two faint copies fake motion blur
+const flaps = [];
+function buildSide(anchor, mirror) {
+  const side = new THREE.Group();
+  side.position.copy(anchor);
+  if (mirror) side.scale.z = -1;
+  for (const w of WINGS) {
+    const sweep = new THREE.Group(); sweep.rotation.y = w.sweep; sweep.position.y = w.lift;
+    const geo = wingGeo(w.span);
+    for (const [off, op] of COPIES) {
+      const flap = new THREE.Group(), mesh = new THREE.Mesh(geo, wingMat(op));
+      mesh.frustumCulled = false; flap.add(mesh);
+      flap.userData.phase = w.phase + off;
+      sweep.add(flap); flaps.push(flap);
+    }
+    side.add(sweep);
+  }
+  beeRoot.add(side);
+}
+
+/* ── Bee model (body only; head along +Z in the file) ── */
+let loaded = false;
+new GLTFLoader().load(BEE_GLB, gltf => {
+  const model = gltf.scene;
+  model.traverse(o => {
+    if (o.isMesh) {
+      o.frustumCulled = false;
+      (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (m) m.envMapIntensity = .7; });
+    }
+  });
+  const holder = new THREE.Group(); holder.add(model);
+  model.rotation.set(0, Math.PI / 2, 0); // head +Z → +X
+  const box = new THREE.Box3().setFromObject(holder);
+  const size = box.getSize(new THREE.Vector3());
+  model.scale.multiplyScalar(1 / Math.max(size.x, size.y, size.z));
+  box.setFromObject(holder);
+  model.position.sub(box.getCenter(new THREE.Vector3()));
+  box.setFromObject(holder);
+  beeRoot.add(holder);
+  const anchor = new THREE.Vector3(box.min.x + (box.max.x - box.min.x) * .66, box.max.y * .86, (box.max.z - box.min.z) * .05);
+  buildSide(anchor, false);
+  buildSide(anchor, true);
+  loaded = true;
+  canvas.classList.add('ready');
+}, undefined, err => console.error(err));
 
 /* starfield */
 const N = 900, pos = new Float32Array(N * 3);
 for (let i = 0; i < N; i++) { pos[i * 3] = (Math.random() - .5) * 26; pos[i * 3 + 1] = (Math.random() - .5) * 30; pos[i * 3 + 2] = -Math.random() * 14 - 1; }
 const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xb8b4ff, size: .035, transparent: true, opacity: .7, sizeAttenuation: true, depthWrite: false }));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xb8b4ff, size: .035, transparent: true, opacity: .7, depthWrite: false }));
 scene.add(stars);
 
-/* ── Scroll path: one keyframe per section ── */
+/* ── Scroll path: one keyframe per section.
+      x/y in viewport units (-1..1), s = size, yaw in degrees (0 = facing right, 180 = facing left, 90 = facing camera). ── */
 const ACCENTS = [0x7c5cff, 0x22d3ee, 0x34d399, 0xf59e0b, 0xec4899].map(c => new THREE.Color(c));
 const K_DESK = [
-  { x: .52, y: .02, s: 1.0 },   // hero: right of the headline
-  { x: -.5, y: -.02, s: .85 },  // about: left, text on the right
-  { x: .8, y: .56, s: .4 },     // stack: top-right corner
-  { x: .74, y: .5, s: .46 },    // services: top-right, beside the title
-  { x: .6, y: -.74, s: .38 },   // contact: under the form
+  { x: .5,  y: -.04, s: 1.0,  yaw: 150, pitch: 6,  roll: -4 }, // hero: right of the headline, looking at it
+  { x: -.64, y: -.04, s: .8,  yaw: 35,  pitch: 8,  roll: 6 },  // about: left, looking at the text
+  { x: .8,  y: .52,  s: .5,   yaw: 160, pitch: 4,  roll: -6 }, // stack: top-right corner
+  { x: .76, y: .48,  s: .55,  yaw: 120, pitch: 10, roll: 4 },  // services: beside the title
+  { x: .64, y: -.8,  s: .42,  yaw: 160, pitch: -4, roll: 0 },  // contact: under the form
 ];
 const K_MOB = [
-  { x: .18, y: .5, s: .62 },
-  { x: -.1, y: .52, s: .55 },
-  { x: .5, y: .62, s: .38 },
-  { x: -.5, y: .62, s: .38 },
-  { x: .45, y: .62, s: .4 },
+  { x: .25, y: .52, s: .62, yaw: 150, pitch: 6,  roll: -4 },
+  { x: -.2, y: .55, s: .55, yaw: 40,  pitch: 8,  roll: 6 },
+  { x: .45, y: .62, s: .42, yaw: 160, pitch: 4,  roll: -6 },
+  { x: -.45,y: .62, s: .42, yaw: 30,  pitch: 10, roll: 4 },
+  { x: .4,  y: .62, s: .45, yaw: 145, pitch: -4, roll: 0 },
 ];
 const sections = [...document.querySelectorAll('main > section')];
 let spans = [];
@@ -693,12 +739,21 @@ function progress() {
 }
 function targetAt() {
   const K = innerWidth < 760 ? K_MOB : K_DESK;
-  const flip = document.documentElement.dir === 'rtl' ? -1 : 1;
-  const p = clamp(progress(), 0, K.length - 1);
+  const rtl = document.documentElement.dir === 'rtl';
+  let p = progress(); if (!isFinite(p)) p = 0;
+  p = clamp(p, 0, K.length - 1);
   const i = Math.min(K.length - 2, Math.floor(p)), f = p - i;
-  const t = ease(clamp((f - .1) / .8, 0, 1)), arc = Math.sin(t * Math.PI);
+  const t = ease(clamp((f - .12) / .76, 0, 1)), arc = Math.sin(t * Math.PI); // hold at each section, fly in between
   const a = K[i], b = K[i + 1];
-  return { x: lerp(a.x, b.x, t) * flip, y: lerp(a.y, b.y, t) - arc * .18, s: lerp(a.s, b.s, t) * (1 - arc * .15), i, t, moving: arc };
+  const yaw = lerpAngle(a.yaw, b.yaw, t);
+  return {
+    x: lerp(a.x, b.x, t) * (rtl ? -1 : 1),
+    y: lerp(a.y, b.y, t) - arc * .22,              // dives mid-flight, then glides back up
+    s: lerp(a.s, b.s, t) * (1 + arc * .12),
+    yaw: rtl ? 180 - yaw : yaw,                    // mirrored layout → mirrored heading
+    pitch: lerp(a.pitch, b.pitch, t), roll: lerp(a.roll, b.roll, t) * (rtl ? -1 : 1),
+    i, t, moving: arc,
+  };
 }
 
 function resize() {
@@ -718,7 +773,6 @@ addEventListener('pointermove', e => { mouse.x = e.clientX / innerWidth * 2 - 1;
 const cur = targetAt();
 const color = ACCENTS[0].clone(), tmp = new THREE.Color();
 const clock = new THREE.Clock();
-let spinY = 0;
 
 function tick() {
   requestAnimationFrame(tick);
@@ -726,37 +780,42 @@ function tick() {
   const tg = targetAt();
   const px = cur.x, py = cur.y, k = 1 - Math.exp(-dt * 3.2);
   cur.x = lerp(cur.x, tg.x, k); cur.y = lerp(cur.y, tg.y, k); cur.s = lerp(cur.s, tg.s, k);
-  const vx = (cur.x - px) / dt || 0, vy = (cur.y - py) / dt || 0;
+  cur.pitch = lerp(cur.pitch, tg.pitch, k); cur.roll = lerp(cur.roll, tg.roll, k);
+  cur.yaw = lerpAngle(cur.yaw, tg.yaw, 1 - Math.exp(-dt * 2.6));
+  const vx = dt > 0 ? (cur.x - px) / dt : 0, vy = dt > 0 ? (cur.y - py) / dt : 0;
   const km = 1 - Math.exp(-dt * 2);
   mouse.sx = lerp(mouse.sx, mouse.x, km); mouse.sy = lerp(mouse.sy, mouse.y, km);
 
-  const halfH = Math.tan(camera.fov * Math.PI / 360) * camera.position.z, halfW = halfH * camera.aspect;
-  const bob = reduced ? 0 : Math.sin(t * 1.4) * .05 + Math.sin(t * 2.3) * .02;
-  flight.position.set(cur.x * halfW + mouse.sx * .15, cur.y * halfH + bob * halfH + mouse.sy * .1, Math.sin(t * .7) * .2);
-  const scale = halfH * 2 * .2 * cur.s * Math.min(1, camera.aspect / .9 + .25);
-  flight.scale.setScalar(scale);
-
-  spinY += dt * (reduced ? .05 : .3 + tg.moving * 2.4);
-  body.rotation.set(
-    clamp(-vy * .6, -.5, .5) + mouse.sy * .35 + Math.sin(t * .5) * .15,
-    spinY + mouse.sx * .5,
-    clamp(-vx * .4, -.5, .5)
+  const halfH = Math.tan(camera.fov * D2R / 2) * camera.position.z, halfW = halfH * camera.aspect;
+  const hover = reduced ? 0 : Math.sin(t * 2.1) * .045 + Math.sin(t * 3.7) * .015;
+  flight.position.set(
+    cur.x * halfW + Math.sin(t * 1.3) * .04 + mouse.sx * .12,
+    cur.y * halfH + hover * halfH * .5 + mouse.sy * .08,
+    Math.sin(t * .9) * .15
   );
-  core.rotation.x = t * .8; core.rotation.y = t * 1.1;
-  core.scale.setScalar(1 + Math.sin(t * 2.2) * .06);
-  rings.forEach(r => { r.spin.rotation.y = t * r.speed * (1 + tg.moving * 3); });
+  flight.scale.setScalar(halfH * 2 * .3 * cur.s);
+  flight.rotation.set(0, -(cur.yaw + mouse.sx * 12) * D2R, 0);
+
+  // nose down when diving, bank into turns
+  const pitch = cur.pitch + clamp(vy * 22, -28, 28) + Math.sin(t * 2.1 + 1) * 3 + mouse.sy * 6;
+  const roll = cur.roll + clamp(vx * 18, -30, 30) + Math.sin(t * 1.7) * 4;
+  beeRoot.rotation.set(roll * D2R, 0, pitch * D2R, 'YZX');
+
+  const freq = Math.PI * 2 * (reduced ? 6 : 17 + tg.moving * 5);
+  for (const f of flaps) {
+    const a = Math.sin(t * freq + f.userData.phase);
+    f.rotation.x = -.25 + a * .95;
+    f.rotation.y = a * .18;
+  }
   stars.position.y = (scrollY / innerHeight) * .6; stars.rotation.y = t * .01;
 
-  // accent colour follows the section
   tmp.copy(ACCENTS[tg.i]).lerp(ACCENTS[Math.min(tg.i + 1, ACCENTS.length - 1)], tg.t);
   color.lerp(tmp, 1 - Math.exp(-dt * 3));
-  coreMat.emissive.copy(color); coreLight.color.copy(color); glowMat.color.copy(color);
-  edges.material.color.copy(color).lerp(new THREE.Color(0xffffff), .35);
+  glowMat.color.copy(color);
 
-  renderer.render(scene, camera);
+  if (loaded) renderer.render(scene, camera);
 }
 tick();
-canvas.classList.add('ready');
 document.getElementById('loader').classList.add('done');
 document.body.classList.add('loaded');
 </script>
