@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Djilali — Développeur logiciel | Ingénieur Full-Stack</title>
+<meta name="description" content="Djilali — Développeur logiciel et ingénieur Full-Stack : applications web performantes et conseil numérique pour entreprises et administrations.">
+<meta name="theme-color" content="#06060c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06060c; --ink: #eef0ff; --muted: #9aa0c3; --line: rgba(255,255,255,.09);
+  --card: rgba(16,16,30,.55); --acc: #7c5cff; --acc2: #22d3ee; --ok: #34d399;
+  --pad: clamp(18px, 4vw, 64px);
+  --sans: "Space Grotesk", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+[dir="rtl"] { --sans: "Readex Pro", system-ui, sans-serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans); color: var(--ink); overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  background:
+    radial-gradient(1200px 700px at 85% -10%, rgba(124,92,255,.18), transparent 60%),
+    radial-gradient(900px 600px at -10% 60%, rgba(34,211,238,.10), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+body::before { /* fine grid */
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 64px 64px; opacity: .35;
+  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+}
+a { color: inherit; text-decoration: none; }
+button, input, textarea { font: inherit; color: inherit; }
+[dir="rtl"] * { letter-spacing: 0 !important; }
+.mono { font-family: var(--mono); }
+::selection { background: var(--acc); color: #fff; }
+
+/* 3D canvas sits BEHIND the content so it never hides text */
+#scene { position: fixed; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 1.4s ease; }
+#scene.ready { opacity: 1; }
+main, footer { position: relative; z-index: 2; }
+
+/* LOADER */
+.loader { position: fixed; inset: 0; z-index: 60; background: var(--bg); display: grid; place-items: center; transition: opacity .7s ease, visibility .7s; }
+.loader.done { opacity: 0; visibility: hidden; }
+.loader span { font-family: var(--mono); font-size: 15px; color: var(--muted); }
+.loader span::after { content: "_"; animation: blink 1s steps(1) infinite; color: var(--acc2); }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* NAV */
+.nav { position: fixed; z-index: 40; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 28px; padding: 16px var(--pad); transition: background .4s, border-color .4s, backdrop-filter .4s; border-bottom: 1px solid transparent; }
+.nav.scrolled { background: rgba(6,6,12,.6); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-color: var(--line); }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .08em; font-size: 17px; direction: ltr; }
+.logo i { font-style: normal; font-family: var(--mono); font-size: 13px; padding: 5px 8px; border-radius: 8px; background: linear-gradient(135deg, var(--acc), var(--acc2)); color: #fff; letter-spacing: 0; }
+.nav__links { display: flex; gap: clamp(18px, 3vw, 40px); font-size: 15px; color: var(--muted); margin-inline-start: auto; }
+.nav__links a { position: relative; transition: color .3s; }
+.nav__links a:hover, .nav__links a.active { color: var(--ink); }
+.nav__links a::after { content: ""; position: absolute; inset-inline: 0; bottom: -4px; height: 1.5px; background: linear-gradient(90deg, var(--acc), var(--acc2)); transform: scaleX(0); transition: transform .35s ease; }
+.nav__links a:hover::after, .nav__links a.active::after { transform: scaleX(1); }
+.langs { display: flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; }
+.langs button { background: none; border: 0; cursor: pointer; padding: 5px 10px; border-radius: 999px; color: var(--muted); transition: background .3s, color .3s; }
+.langs button[aria-pressed="true"] { background: rgba(255,255,255,.1); color: var(--ink); }
+.langs button[data-lang="ar"] { font-family: "Readex Pro", sans-serif; }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 999px; font-weight: 600; font-size: 15px; border: 1px solid var(--line); background: rgba(255,255,255,.04); cursor: pointer; transition: transform .3s cubic-bezier(.2,.8,.2,1), background .3s, border-color .3s, box-shadow .3s; }
+.btn:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.25); }
+.btn--primary { background: linear-gradient(135deg, var(--acc), #5b3bd1 60%, var(--acc2)); border-color: transparent; color: #fff; box-shadow: 0 10px 30px -10px rgba(124,92,255,.7); }
+.btn--primary:hover { box-shadow: 0 16px 40px -10px rgba(124,92,255,.9); }
+.btn svg { width: 16px; height: 16px; transition: transform .3s; }
+.btn:hover svg { transform: translateX(3px); }
+[dir="rtl"] .btn svg { transform: scaleX(-1); }
+[dir="rtl"] .btn:hover svg { transform: scaleX(-1) translateX(3px); }
+.nav .btn { padding: 9px 16px; font-size: 14px; }
+
+/* SECTIONS */
+section { position: relative; min-height: 100vh; padding: clamp(110px, 16vh, 160px) var(--pad) clamp(70px, 10vh, 110px); }
+.wrap { max-width: 1240px; margin: 0 auto; }
+.eyebrow { display: flex; align-items: center; gap: 14px; font-family: var(--mono); font-size: 13px; color: var(--acc2); text-transform: uppercase; letter-spacing: .14em; }
+.eyebrow b { font-weight: 500; color: var(--muted); }
+.eyebrow::after { content: ""; width: 60px; height: 1px; background: linear-gradient(90deg, var(--acc2), transparent); }
+[dir="rtl"] .eyebrow::after { background: linear-gradient(-90deg, var(--acc2), transparent); }
+h2.title { margin-top: 18px; font-size: clamp(34px, 4.6vw, 68px); line-height: 1.05; letter-spacing: -.03em; font-weight: 700; }
+[dir="rtl"] h2.title { line-height: 1.3; }
+.grad { background: linear-gradient(100deg, var(--acc) 0%, #b79cff 40%, var(--acc2) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lead { margin-top: 20px; font-size: clamp(15.5px, 1.25vw, 19px); line-height: 1.65; color: var(--muted); max-width: 560px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transition: border-color .4s, transform .5s cubic-bezier(.2,.8,.2,1); }
+.card:hover { border-color: rgba(255,255,255,.2); transform: translateY(-4px); }
+
+.reveal { opacity: 0; transform: translateY(36px); transition: opacity .9s ease, transform 1s cubic-bezier(.2,.8,.15,1); }
+.in .reveal, .reveal.in { opacity: 1; transform: none; }
+.in .d1 { transition-delay: .08s; } .in .d2 { transition-delay: .18s; } .in .d3 { transition-delay: .28s; } .in .d4 { transition-delay: .38s; }
+
+/* HERO */
+.hero { display: flex; align-items: center; }
+.hero .wrap { width: 100%; }
+.hero__copy { max-width: 690px; }
+.badge { display: inline-flex; align-items: center; gap: 10px; padding: 7px 14px 7px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13.5px; color: var(--muted); background: rgba(255,255,255,.03); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(52,211,153,.6); animation: pulse 2s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 9px rgba(52,211,153,0); } 100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); } }
+.hero h1 { margin-top: 26px; font-size: clamp(42px, 6.6vw, 104px); line-height: .98; letter-spacing: -.045em; font-weight: 700; }
+[dir="rtl"] .hero h1 { line-height: 1.25; font-size: clamp(38px, 5.6vw, 88px); }
+.hero h1 .line { display: block; overflow: hidden; padding-bottom: .08em; }
+.hero h1 .line > span { display: inline-block; transform: translateY(110%); }
+.loaded .hero h1 .line > span { animation: rise 1.1s cubic-bezier(.2,.8,.15,1) forwards; }
+.hero h1 .line:nth-child(2) > span { animation-delay: .12s; }
+@keyframes rise { to { transform: none; } }
+.hero__fade { opacity: 0; }
+.loaded .hero__fade { animation: fade .9s ease forwards; animation-delay: var(--d, .5s); }
+@keyframes fade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.hero__ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+.hero__meta { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 44px; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.hero__meta span::before { content: "// "; color: var(--acc); }
+.scrollcue { position: absolute; bottom: 28px; inset-inline-start: var(--pad); display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.scrollcue i { width: 22px; height: 34px; border: 1.5px solid var(--muted); border-radius: 12px; position: relative; }
+.scrollcue i::after { content: ""; position: absolute; left: 50%; top: 7px; width: 3px; height: 7px; margin-left: -1.5px; border-radius: 2px; background: var(--acc2); animation: wheel 1.8s infinite; }
+@keyframes wheel { 0% { transform: translateY(0); opacity: 1; } 80% { transform: translateY(11px); opacity: 0; } 100% { opacity: 0; } }
+.marquee { position: absolute; left: 0; right: 0; bottom: 0; overflow: hidden; border-top: 1px solid var(--line); padding: 14px 0; mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent); display: none; }
+.marquee div { display: flex; gap: 46px; width: max-content; animation: marq 40s linear infinite; font-family: var(--mono); font-size: 13px; color: var(--muted); direction: ltr; }
+@keyframes marq { to { transform: translateX(-50%); } }
+
+/* ABOUT */
+.about .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; min-height: calc(100vh - 260px); }
+.about__copy { grid-column: 2; }
+.pillars { display: grid; gap: 14px; margin-top: 36px; }
+.pillar { display: flex; gap: 16px; padding: 18px 20px; }
+.pillar b { font-family: var(--mono); color: var(--acc2); font-size: 13px; padding-top: 3px; }
+.pillar h3 { font-size: 17px; font-weight: 600; }
+.pillar p { margin-top: 4px; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
+
+/* STACK */
+.stack__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 48px; }
+.cat { padding: 26px; }
+.cat header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.cat h3 { font-size: 20px; font-weight: 600; }
+.cat header span { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.cat p { margin-top: 6px; color: var(--muted); font-size: 14.5px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; direction: ltr; }
+[dir="rtl"] .chips { justify-content: flex-end; }
+.chip { font-family: var(--mono); font-size: 13px; padding: 7px 12px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,.03); transition: border-color .3s, color .3s, background .3s; }
+.chip:hover { border-color: var(--acc2); color: #fff; background: rgba(34,211,238,.08); }
+
+/* SERVICES */
+.svc__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 48px; }
+.svc { padding: 26px; display: flex; flex-direction: column; }
+.svc--feat { grid-column: span 4; display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; padding: 34px; background: linear-gradient(135deg, rgba(124,92,255,.18), rgba(34,211,238,.06) 70%), var(--card); }
+.svc .tag { align-self: flex-start; font-family: var(--mono); font-size: 12px; color: var(--acc2); border: 1px solid rgba(34,211,238,.35); border-radius: 999px; padding: 4px 10px; }
+.svc--feat .tag { justify-self: start; }
+.svc .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: rgba(124,92,255,.15); color: #b79cff; font-family: var(--mono); font-size: 14px; }
+.svc h3 { margin-top: 18px; font-size: 19px; font-weight: 600; line-height: 1.3; }
+.svc--feat h3 { font-size: clamp(22px, 2.2vw, 30px); margin-top: 14px; }
+.svc p { margin-top: 10px; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+.svc ul { list-style: none; margin-top: 18px; display: grid; gap: 8px; font-size: 14px; }
+.svc li { display: flex; gap: 10px; }
+.svc li::before { content: "→"; color: var(--acc2); font-family: var(--mono); }
+[dir="rtl"] .svc li::before { content: "←"; }
+.svc--feat ul { margin-top: 0; align-content: center; }
+.svc--feat .btn { margin-top: 24px; align-self: flex-start; }
+
+/* CONTACT */
+.contact .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px, 5vw, 70px); }
+.clist { display: grid; gap: 10px; margin-top: 34px; }
+.citem { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px; }
+.citem small { display: block; font-family: var(--mono); font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+.citem strong { font-weight: 500; font-size: 16px; }
+.citem .num { direction: ltr; unicode-bidi: isolate; }
+.citem svg { width: 18px; height: 18px; color: var(--muted); transition: color .3s, transform .3s; }
+a.citem:hover svg { color: var(--acc2); transform: translateX(3px); }
+[dir="rtl"] .citem svg { transform: scaleX(-1); }
+form.card { padding: clamp(22px, 3vw, 34px); align-self: start; }
+form.card:hover { transform: none; }
+form h3 { font-size: 22px; font-weight: 600; }
+.field { margin-top: 18px; display: grid; gap: 8px; }
+.field label { font-size: 13px; color: var(--muted); }
+.field input, .field textarea { width: 100%; background: rgba(0,0,0,.25); border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px; font-size: 15px; outline: none; transition: border-color .3s, box-shadow .3s; resize: vertical; }
+.field input:focus, .field textarea:focus { border-color: var(--acc); box-shadow: 0 0 0 4px rgba(124,92,255,.18); }
+form .btn { margin-top: 22px; width: 100%; justify-content: center; }
+.fnote { margin-top: 14px; font-size: 12.5px; color: var(--muted); }
+.fnote.err { color: #fb7185; }
+
+footer { border-top: 1px solid var(--line); padding: 28px var(--pad); display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; align-items: center; font-size: 13.5px; color: var(--muted); }
+footer a:hover { color: var(--ink); }
+
+/* RESPONSIVE */
+@media (max-width: 980px) {
+  .about .wrap, .contact .wrap { grid-template-columns: 1fr; }
+  .about__copy { grid-column: 1; }
+  .about .wrap { min-height: 0; padding-top: 30vh; }
+  .svc__grid { grid-template-columns: 1fr 1fr; }
+  .svc--feat { grid-column: span 2; grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .nav { gap: 12px; }
+  .nav__links, .nav .btn { display: none; }
+  .langs { margin-inline-start: auto; }
+  .hero { align-items: flex-end; padding-bottom: 120px; }
+  .hero h1 { margin-top: 20px; }
+  .stack__grid, .svc__grid { grid-template-columns: 1fr; }
+  .svc--feat { grid-column: auto; padding: 26px; }
+  .scrollcue { display: none; }
+  .marquee { display: block; }
+  #scene.ready { opacity: .55; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader"><span>npm run djilali</span></div>
+
+<nav class="nav" id="nav">
+  <a class="logo" href="#top" aria-label="DJILALI"><i>&lt;/&gt;</i>DJILALI</a>
+  <div class="nav__links">
+    <a href="#about" data-i18n="nav.about"></a>
+    <a href="#stack" data-i18n="nav.stack"></a>
+    <a href="#services" data-i18n="nav.services"></a>
+    <a href="#contact" data-i18n="nav.contact"></a>
+  </div>
+  <div class="langs" role="group" aria-label="Language">
+    <button data-lang="fr">FR</button><button data-lang="en">EN</button><button data-lang="ar">ع</button>
+  </div>
+  <a class="btn btn--primary" href="#contact"><span data-i18n="cta"></span></a>
+</nav>
+
+<canvas id="scene"></canvas>
+
+<main>
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div class="hero__copy">
+        <div class="badge hero__fade" style="--d:.2s"><span class="dot"></span><span data-i18n="hero.badge"></span></div>
+        <h1><span class="line"><span data-i18n="hero.h1a"></span></span><span class="line"><span class="grad" data-i18n="hero.h1b"></span></span></h1>
+        <p class="lead hero__fade" style="--d:.55s" data-i18n="hero.text"></p>
+        <div class="hero__ctas hero__fade" style="--d:.75s">
+          <a class="btn btn--primary" href="#services"><span data-i18n="hero.primary"></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+          <a class="btn" href="#contact" data-i18n="hero.secondary"></a>
+        </div>
+        <div class="hero__meta hero__fade" style="--d:.95s"><span data-i18n="hero.role"></span><span data-i18n="hero.loc"></span></div>
+      </div>
+    </div>
+    <div class="scrollcue"><i></i><span data-i18n="scroll"></span></div>
+    <div class="marquee" aria-hidden="true"><div id="marq"></div></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="wrap">
+      <div class="about__copy">
+        <div class="eyebrow reveal"><b>01</b><span data-i18n="about.eyebrow"></span></div>
+        <h2 class="title reveal d1"><span data-i18n="about.t1"></span> <span class="grad" data-i18n="about.t2"></span></h2>
+        <p class="lead reveal d2" data-i18n="about.text"></p>
+        <div class="pillars" id="pillars"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section class="stack" id="stack">
+    <div class="wrap">
+      <div class="eyebrow reveal"><b>02</b><span data-i18n="stack.eyebrow"></span></div>
+      <h2 class="title reveal d1"><span data-i18n="stack.t1"></span><br><span class="grad" data-i18n="stack.t2"></span></h2>
+      <p class="lead reveal d2" data-i18n="stack.text"></p>
+      <div class="stack__grid" id="stackGrid"></div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="services" id="services">
+    <div class="wrap">
+      <div class="eyebrow reveal"><b>03</b><span data-i18n="services.eyebrow"></span></div>
+      <h2 class="title reveal d1"><span data-i18n="services.t1"></span> <span class="grad" data-i18n="services.t2"></span></h2>
+      <p class="lead reveal d2" data-i18n="services.text"></p>
+      <div class="svc__grid" id="svcGrid"></div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow reveal"><b>04</b><span data-i18n="contact.eyebrow"></span></div>
+        <h2 class="title reveal d1"><span data-i18n="contact.t1"></span><br><span class="grad" data-i18n="contact.t2"></span></h2>
+        <p class="lead reveal d2" data-i18n="contact.text"></p>
+        <div class="clist">
+          <a class="card citem reveal d2" href="tel:+33755244752"><div><small data-i18n="contact.phone"></small><strong class="num">+33 7 55 24 47 52</strong></div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+          <a class="card citem reveal d3" id="waLink" href="https://wa.me/33755244752" target="_blank" rel="noopener"><div><small data-i18n="contact.whatsapp"></small><strong data-i18n="contact.waCta"></strong></div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+          <a class="card citem reveal d3" href="https://github.com/djilalilakehal0-gif" target="_blank" rel="noopener"><div><small>GitHub</small><strong class="num">@djilalilakehal0-gif</strong></div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+          <div class="card citem reveal d4"><div><small data-i18n="contact.status"></small><strong><span class="dot" style="display:inline-block;margin-inline-end:8px"></span><span data-i18n="hero.badge"></span></strong></div></div>
+        </div>
+      </div>
+      <form class="card reveal d2" id="form" novalidate>
+        <h3 data-i18n="contact.formTitle"></h3>
+        <div class="field"><label for="f-name" data-i18n="contact.name"></label><input id="f-name" name="name" autocomplete="name" data-i18n-ph="contact.namePh"></div>
+        <div class="field"><label for="f-subject" data-i18n="contact.subject"></label><input id="f-subject" name="subject" data-i18n-ph="contact.subjectPh"></div>
+        <div class="field"><label for="f-msg" data-i18n="contact.message"></label><textarea id="f-msg" name="message" rows="5" data-i18n-ph="contact.messagePh"></textarea></div>
+        <button class="btn btn--primary" type="submit"><span data-i18n="contact.send"></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+        <p class="fnote" id="fnote" data-i18n="contact.privacy"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>© <span id="year"></span> DJILALI · <span data-i18n="footer"></span></span>
+  <a href="#top" data-i18n="top"></a>
+</footer>
+
+<script>
+/* ───────────────────────── CONTENT (FR · EN · AR) ───────────────────────── */
+const STACK = {
+  frontend: ['React', 'Next.js', 'TypeScript', 'JavaScript', 'HTML5', 'CSS3', 'Tailwind CSS'],
+  backend: ['Node.js', 'Express', 'Python', 'REST APIs'],
+  databases: ['PostgreSQL', 'MongoDB', 'Supabase'],
+  tools: ['Git', 'GitHub', 'Docker', 'Figma', 'VS Code'],
+};
+const SVC_ICONS = { consult: '◎', web: '</>', stack: '{ }', ui: '◇', perf: '⚡' };
+
+const I18N = {
+  fr: {
+    meta: { title: 'Djilali — Développeur logiciel | Ingénieur Full-Stack', desc: 'Djilali — Développeur logiciel et ingénieur Full-Stack : applications web performantes et conseil numérique pour entreprises et administrations.' },
+    nav: { about: 'À propos', stack: 'Stack', services: 'Services', contact: 'Contact' },
+    cta: 'Démarrer un projet', scroll: 'Défiler', top: 'Retour en haut ↑', footer: 'Conçu et développé avec soin.',
+    hero: {
+      badge: 'Disponible pour des projets choisis',
+      h1a: 'Je crée des expériences', h1b: 'numériques extraordinaires.',
+      text: 'Développeur logiciel et ingénieur Full-Stack, je conçois des produits numériques performants, des applications web modernes et des expériences immersives, grâce à un code propre et une ingénierie créative.',
+      primary: 'Découvrir mes services', secondary: 'Discutons-en',
+      role: 'Développeur Full-Stack', loc: 'À distance · Partout dans le monde',
+    },
+    about: {
+      eyebrow: 'À propos', t1: 'Transformer les idées en', t2: 'réalité.',
+      text: 'Je suis un développeur passionné par la transformation de problèmes complexes en solutions numériques élégantes, évolutives et simples à utiliser. J’allie précision technique, design réfléchi et pratiques d’ingénierie modernes pour créer des produits qui ont du sens.',
+      pillars: [
+        ['Code propre', 'Un logiciel maintenable, évolutif et bien structuré.'],
+        ['Pensée créative', 'Transformer des idées ambitieuses en expériences numériques intuitives.'],
+        ['Performance avant tout', 'Des applications rapides, accessibles et fiables.'],
+      ],
+    },
+    stack: {
+      eyebrow: 'Stack technique', t1: 'Les outils qui me permettent de', t2: 'livrer en toute confiance.',
+      text: 'Une boîte à outils moderne et ciblée, de l’interface jusqu’à l’infrastructure.',
+      cats: {
+        frontend: ['Frontend', 'Des interfaces rapides, accessibles et précises au pixel près.'],
+        backend: ['Backend', 'Des API et des services prévisibles et évolutifs.'],
+        databases: ['Bases de données', 'Des données relationnelles et documentaires, modélisées avec soin.'],
+        tools: ['Outils', 'Un workflow qui rend chaque livraison fluide.'],
+      },
+    },
+    services: {
+      eyebrow: 'Services', t1: 'Ce que je peux créer', t2: 'pour vous.',
+      text: 'De la bonne idée au produit complet : conseil, conception et développement avec la même exigence du détail.',
+      featured: 'Pour les organisations', consultCta: 'Parlons des besoins de votre structure',
+      items: {
+        consult: ['Conseil numérique pour entreprises et administrations', 'J’accompagne les entreprises et les administrations pour comprendre leurs besoins, trouver les bonnes solutions numériques et proposer des idées concrètes adaptées à leurs objectifs, leur budget et leurs équipes.', ['Analyse des besoins et audit numérique', 'Solutions proposées sur mesure', 'Feuille de route claire pour la transformation numérique', 'Accompagnement de l’idée au lancement']],
+        web: ['Développement de sites web', 'Des sites vitrines et landing pages rapides et responsives, avec SEO et animations intégrés dès le départ.', ['Responsive et optimisé SEO', 'Contenu facile à gérer']],
+        stack: ['Applications Full-Stack', 'Des applications web complètes, du schéma de base de données et des API jusqu’à des interfaces soignées, prêtes pour la production.', ['API REST et authentification', 'Web, Android et iOS']],
+        ui: ['Intégration UI/UX', 'Transformer des maquettes Figma en composants accessibles et fidèles au pixel, avec des micro-interactions soignées.', ['Design systems', 'Accessible par défaut']],
+        perf: ['Optimisation des performances', 'Audit et optimisation des Core Web Vitals, du poids des bundles et du rendu pour des produits instantanés.', ['Core Web Vitals', 'Animations fluides à 60 FPS']],
+      },
+    },
+    contact: {
+      eyebrow: 'Contact', t1: 'Une idée ?', t2: 'Construisons quelque chose de grand.',
+      text: 'Vous avez un projet en tête ou souhaitez collaborer ? Transformons votre vision en expérience numérique.',
+      phone: 'Téléphone', whatsapp: 'WhatsApp', waCta: 'Discuter sur WhatsApp', status: 'Statut',
+      formTitle: 'Parlez-moi de votre projet', name: 'Nom', namePh: 'Votre nom', subject: 'Objet',
+      subjectPh: 'Nouveau site, application web, collaboration…', message: 'Message',
+      messagePh: 'Que construisez-vous, et comment puis-je vous aider ?', send: 'Envoyer via WhatsApp',
+      privacy: 'Votre message s’ouvre dans WhatsApp, rien n’est enregistré sur ce site.',
+      err: 'Merci de remplir les trois champs.', ok: 'WhatsApp est ouvert avec votre message prêt : il ne reste qu’à l’envoyer.',
+      waIntro: 'Bonjour Djilali ! Je vous contacte depuis votre site.',
+    },
+  },
+  en: {
+    meta: { title: 'Djilali — Software Developer | Full-Stack Engineer', desc: 'Djilali — Software developer and full-stack engineer: high-performance web applications and digital consulting for companies and public administrations.' },
+    nav: { about: 'About', stack: 'Stack', services: 'Services', contact: 'Contact' },
+    cta: 'Start a project', scroll: 'Scroll', top: 'Back to top ↑', footer: 'Designed and built with care.',
+    hero: {
+      badge: 'Available for select projects',
+      h1a: 'Building digital experiences', h1b: 'that feel extraordinary.',
+      text: 'Software developer and full-stack engineer — I design and develop high-performance digital products, modern web applications and immersive user experiences through clean code and creative engineering.',
+      primary: 'Explore my services', secondary: 'Let’s talk',
+      role: 'Full-Stack Developer', loc: 'Remote · Worldwide',
+    },
+    about: {
+      eyebrow: 'About', t1: 'Engineering ideas into', t2: 'reality.',
+      text: 'I’m a software developer passionate about transforming complex problems into elegant, scalable and user-friendly digital solutions. I combine technical precision, thoughtful design and modern engineering practices to build meaningful products.',
+      pillars: [
+        ['Clean Code', 'Maintainable, scalable and well-structured software.'],
+        ['Creative Thinking', 'Turning ambitious ideas into intuitive digital experiences.'],
+        ['Performance First', 'Building fast, accessible and reliable applications.'],
+      ],
+    },
+    stack: {
+      eyebrow: 'Tech Stack', t1: 'Tools I use to', t2: 'ship with confidence.',
+      text: 'A focused, modern toolkit across the whole product — from interface to infrastructure.',
+      cats: {
+        frontend: ['Frontend', 'Interfaces that are fast, accessible and pixel-precise.'],
+        backend: ['Backend', 'APIs and services built to be predictable and scalable.'],
+        databases: ['Databases', 'Relational and document data, modelled with care.'],
+        tools: ['Tools', 'A workflow that keeps shipping smooth.'],
+      },
+    },
+    services: {
+      eyebrow: 'Services', t1: 'What I can build', t2: 'for you.',
+      text: 'From the right idea to a complete product — advice, design and engineering with the same attention to detail.',
+      featured: 'For organizations', consultCta: 'Discuss your organization’s needs',
+      items: {
+        consult: ['Digital Consulting for Companies & Public Administrations', 'I help companies and administrations understand their needs, find the right digital solutions and propose practical ideas tailored to their goals, budget and teams.', ['Needs analysis & digital audit', 'Tailored solution proposals', 'Clear digital transformation roadmap', 'Support from idea to launch']],
+        web: ['Website Development', 'Fast, responsive marketing sites and landing pages with SEO and motion built in from day one.', ['Responsive & SEO-ready', 'Easy-to-manage content']],
+        stack: ['Full-Stack Applications', 'End-to-end web apps — from database schema and APIs to polished, production-ready interfaces.', ['REST APIs & auth', 'Web, Android & iOS']],
+        ui: ['UI/UX Implementation', 'Turning Figma designs into accessible, pixel-faithful components with refined micro-interactions.', ['Design systems', 'Accessible by default']],
+        perf: ['Performance Optimization', 'Auditing and tuning Core Web Vitals, bundle size and rendering so products feel instant.', ['Core Web Vitals', 'Smooth 60 FPS motion']],
+      },
+    },
+    contact: {
+      eyebrow: 'Contact', t1: 'Have an idea?', t2: 'Let’s build something great.',
+      text: 'Have a project in mind or want to collaborate? Let’s turn your vision into a digital experience.',
+      phone: 'Phone', whatsapp: 'WhatsApp', waCta: 'Chat on WhatsApp', status: 'Status',
+      formTitle: 'Tell me about your project', name: 'Name', namePh: 'Your name', subject: 'Subject',
+      subjectPh: 'New website, web app, collaboration…', message: 'Message',
+      messagePh: 'What are you building, and how can I help?', send: 'Send via WhatsApp',
+      privacy: 'Your message opens in WhatsApp — nothing is stored on this site.',
+      err: 'Please fill in all three fields.', ok: 'WhatsApp is open with your message ready — just hit send.',
+      waIntro: 'Hello Djilali! I’m reaching out from your website.',
+    },
+  },
+  ar: {
+    meta: { title: 'جيلالي — مطوّر برمجيات | مهندس Full-Stack', desc: 'جيلالي — مطوّر برمجيات ومهندس Full-Stack: تطبيقات ويب عالية الأداء واستشارات رقمية للشركات والإدارات.' },
+    nav: { about: 'من أنا', stack: 'التقنيات', services: 'الخدمات', contact: 'تواصل' },
+    cta: 'ابدأ مشروعاً', scroll: 'مرّر', top: 'العودة للأعلى ↑', footer: 'صُمّم وطُوّر بعناية.',
+    hero: {
+      badge: 'متاح لمشاريع مختارة',
+      h1a: 'أبني تجارب رقمية', h1b: 'تبدو استثنائية.',
+      text: 'مطوّر برمجيات ومهندس Full-Stack، أصمّم وأطوّر منتجات رقمية عالية الأداء، وتطبيقات ويب حديثة، وتجارب مستخدم غامرة، بكود نظيف وهندسة مبدعة.',
+      primary: 'استكشف خدماتي', secondary: 'لنتحدّث',
+      role: 'مطوّر Full-Stack', loc: 'عن بُعد · في كل أنحاء العالم',
+    },
+    about: {
+      eyebrow: 'من أنا', t1: 'أحوّل الأفكار إلى', t2: 'واقع.',
+      text: 'أنا مطوّر برمجيات شغوف بتحويل المشكلات المعقّدة إلى حلول رقمية أنيقة وقابلة للتوسّع وسهلة الاستخدام. أجمع بين الدقة التقنية والتصميم المدروس وأحدث ممارسات الهندسة لبناء منتجات ذات قيمة حقيقية.',
+      pillars: [
+        ['كود نظيف', 'برمجيات سهلة الصيانة، قابلة للتوسّع، ومنظّمة بإتقان.'],
+        ['تفكير إبداعي', 'تحويل الأفكار الطموحة إلى تجارب رقمية بديهية.'],
+        ['الأداء أولاً', 'تطبيقات سريعة، وسهلة الوصول، وموثوقة.'],
+      ],
+    },
+    stack: {
+      eyebrow: 'التقنيات', t1: 'أدوات أعتمد عليها', t2: 'لإنجاز بثقة.',
+      text: 'مجموعة أدوات حديثة ومركّزة تغطي المنتج كاملاً، من الواجهة إلى البنية التحتية.',
+      cats: {
+        frontend: ['الواجهة الأمامية', 'واجهات سريعة، سهلة الوصول، ودقيقة في كل تفصيل.'],
+        backend: ['الواجهة الخلفية', 'واجهات برمجية وخدمات موثوقة وقابلة للتوسّع.'],
+        databases: ['قواعد البيانات', 'بيانات علائقية ووثائقية مصمّمة بعناية.'],
+        tools: ['الأدوات', 'سير عمل يجعل كل تسليم سلساً.'],
+      },
+    },
+    services: {
+      eyebrow: 'الخدمات', t1: 'ما يمكنني بناؤه', t2: 'من أجلك.',
+      text: 'من الفكرة المناسبة إلى منتج متكامل: استشارة وتصميم وتطوير بنفس الاهتمام بالتفاصيل.',
+      featured: 'للمؤسسات', consultCta: 'لنتحدّث عن احتياجات مؤسستك',
+      items: {
+        consult: ['استشارات رقمية للشركات والإدارات', 'أساعد الشركات والإدارات على فهم احتياجاتها، وإيجاد الحلول الرقمية المناسبة، وطرح أفكار عملية تناسب أهدافها وميزانيتها وفرق عملها.', ['تحليل الاحتياجات والتدقيق الرقمي', 'اقتراح حلول مصمّمة حسب الحاجة', 'خطة واضحة للتحوّل الرقمي', 'مرافقة من الفكرة حتى الإطلاق']],
+        web: ['تطوير المواقع', 'مواقع تعريفية وصفحات هبوط سريعة ومتجاوبة، مع تحسين محركات البحث والحركة منذ اليوم الأول.', ['متجاوب ومهيّأ لمحركات البحث', 'محتوى سهل التعديل']],
+        stack: ['تطوير تطبيقات Full‑Stack', 'تطبيقات ويب متكاملة، من تصميم قاعدة البيانات والواجهات البرمجية إلى واجهات مصقولة جاهزة للإطلاق.', ['واجهات REST وتسجيل الدخول', 'الويب، أندرويد و iOS']],
+        ui: ['تنفيذ واجهات UI/UX', 'تحويل تصاميم Figma إلى مكوّنات سهلة الوصول ومطابقة للتصميم، مع تفاعلات دقيقة ومتقنة.', ['أنظمة التصميم', 'سهولة الوصول افتراضياً']],
+        perf: ['تحسين الأداء', 'تدقيق وتحسين مؤشرات Core Web Vitals وحجم الحزم وسرعة العرض لتبدو المنتجات فورية.', ['Core Web Vitals', 'حركة سلسة بـ 60 إطاراً في الثانية']],
+      },
+    },
+    contact: {
+      eyebrow: 'تواصل', t1: 'لديك فكرة؟', t2: 'لنبنِ شيئاً رائعاً معاً.',
+      text: 'لديك مشروع في ذهنك أو تريد التعاون؟ لنحوّل رؤيتك إلى تجربة رقمية.',
+      phone: 'الهاتف', whatsapp: 'واتساب', waCta: 'تحدّث معي على واتساب', status: 'الحالة',
+      formTitle: 'حدّثني عن مشروعك', name: 'الاسم', namePh: 'اسمك', subject: 'الموضوع',
+      subjectPh: 'موقع جديد، تطبيق ويب، تعاون…', message: 'الرسالة',
+      messagePh: 'ماذا تبني، وكيف يمكنني مساعدتك؟', send: 'إرسال عبر واتساب',
+      privacy: 'تُفتح رسالتك في واتساب، ولا يُحفظ شيء على هذا الموقع.',
+      err: 'يرجى ملء الحقول الثلاثة.', ok: 'تم فتح واتساب ورسالتك جاهزة، ما عليك إلا الإرسال.',
+      waIntro: 'مرحباً جيلالي! أتواصل معك من موقعك.',
+    },
+  },
+};
+
+const get = (o, path) => path.split('.').reduce((a, k) => (a == null ? a : a[k]), o);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const ARROW = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
+let LANG = 'fr';
+
+function render(lang) {
+  const T = I18N[lang];
+  LANG = lang;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.title = T.meta.title;
+  document.querySelector('meta[name=description]').content = T.meta.desc;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = get(T, el.dataset.i18n) ?? ''; });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = get(T, el.dataset.i18nPh) ?? ''; });
+  document.querySelectorAll('.langs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+
+  document.getElementById('pillars').innerHTML = T.about.pillars.map((p, i) =>
+    `<div class="card pillar reveal d${i + 2}"><b>0${i + 1}</b><div><h3>${esc(p[0])}</h3><p>${esc(p[1])}</p></div></div>`).join('');
+
+  document.getElementById('stackGrid').innerHTML = Object.keys(STACK).map((k, i) =>
+    `<article class="card cat reveal d${i + 1}"><header><h3>${esc(T.stack.cats[k][0])}</h3><span>${String(STACK[k].length).padStart(2, '0')}</span></header>
+     <p>${esc(T.stack.cats[k][1])}</p><div class="chips">${STACK[k].map(n => `<span class="chip">${esc(n)}</span>`).join('')}</div></article>`).join('');
+
+  const S = T.services;
+  document.getElementById('svcGrid').innerHTML = Object.keys(S.items).map((k, i) => {
+    const [title, text, points] = S.items[k];
+    const list = `<ul>${points.map(p => `<li>${esc(p)}</li>`).join('')}</ul>`;
+    if (k === 'consult') return `<article class="card svc svc--feat reveal d1"><div style="display:flex;flex-direction:column">
+        <span class="tag">${esc(S.featured)}</span><h3>${esc(title)}</h3><p>${esc(text)}</p>
+        <a class="btn btn--primary" href="#contact">${esc(S.consultCta)}${ARROW}</a></div>${list}</article>`;
+    return `<article class="card svc reveal d${i}"><span class="ico">${esc(SVC_ICONS[k])}</span><h3>${esc(title)}</h3><p>${esc(text)}</p>${list}</article>`;
+  }).join('');
+
+  document.getElementById('waLink').href = 'https://wa.me/33755244752?text=' + encodeURIComponent(T.contact.waIntro);
+  document.querySelectorAll('main > section.in').forEach(s => s.querySelectorAll('.reveal').forEach(r => r.classList.add('in')));
+  try { localStorage.setItem('dj-lang', lang); } catch (e) {}
+  window.dispatchEvent(new Event('langchange'));
+}
+
+/* initial language: ?lang= → saved choice → French */
+(() => {
+  let lang = new URLSearchParams(location.search).get('lang');
+  if (!I18N[lang]) { try { lang = localStorage.getItem('dj-lang'); } catch (e) { lang = null; } }
+  render(I18N[lang] ? lang : 'fr');
+})();
+document.querySelectorAll('.langs button').forEach(b => b.addEventListener('click', () => render(b.dataset.lang)));
+
+/* marquee + year */
+const all = Object.values(STACK).flat();
+document.getElementById('marq').innerHTML = [...all, ...all].map(n => `<span>${n}</span>`).join('');
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* reveal on scroll + active nav link + nav background */
+const sections = [...document.querySelectorAll('main > section')];
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('in'); e.target.querySelectorAll('.reveal').forEach(r => r.classList.add('in')); }
+}), { threshold: .15 });
+sections.forEach(s => io.observe(s));
+const nav = document.getElementById('nav');
+const navLinks = [...document.querySelectorAll('.nav__links a')];
+function onScroll() {
+  nav.classList.toggle('scrolled', scrollY > 30);
+  const y = innerHeight * .4;
+  const cur = sections.find(s => { const r = s.getBoundingClientRect(); return r.top <= y && r.bottom > y; });
+  navLinks.forEach(a => a.classList.toggle('active', !!cur && a.getAttribute('href') === '#' + cur.id));
+}
+addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+
+/* contact form → WhatsApp (no data stored) */
+document.getElementById('form').addEventListener('submit', e => {
+  e.preventDefault();
+  const T = I18N[LANG].contact, f = e.target, note = document.getElementById('fnote');
+  const name = f.name.value.trim(), subject = f.subject.value.trim(), msg = f.message.value.trim();
+  if (!name || !subject || !msg) { note.textContent = T.err; note.classList.add('err'); return; }
+  const text = `${T.waIntro}\n\n${T.name}: ${name}\n${T.subject}: ${subject}\n\n${msg}`;
+  window.open('https://wa.me/33755244752?text=' + encodeURIComponent(text), '_blank', 'noopener');
+  note.textContent = T.ok; note.classList.remove('err');
+});
+
+/* loader fallback */
+const reveal = () => { document.getElementById('loader').classList.add('done'); document.body.classList.add('loaded'); };
+setTimeout(reveal, 2200);
+</script>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const canvas = document.getElementById('scene');
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+const camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, .1, 100);
+camera.position.set(0, 0, 10);
+
+scene.add(new THREE.HemisphereLight(0xdcd6ff, 0x1a1033, 1.0));
+const keyL = new THREE.DirectionalLight(0xffffff, 2.2); keyL.position.set(3, 5, 6); scene.add(keyL);
+const rimL = new THREE.DirectionalLight(0x22d3ee, 2.0); rimL.position.set(-5, -2, -4); scene.add(rimL);
+
+/* ── The object: iridescent crystal + glowing code-core + orbiting bits ── */
+const flight = new THREE.Group();   // position / scale / yaw
+const body = new THREE.Group();     // tilt
+flight.add(body); scene.add(flight);
+
+const crystal = new THREE.Mesh(
+  new THREE.IcosahedronGeometry(1, 0),
+  new THREE.MeshPhysicalMaterial({
+    color: 0x2a1d66, metalness: .25, roughness: .12, clearcoat: 1, clearcoatRoughness: .1,
+    iridescence: 1, iridescenceIOR: 1.6, iridescenceThicknessRange: [200, 900],
+    flatShading: true, transparent: true, opacity: .5, depthWrite: false, envMapIntensity: 1.4, side: THREE.DoubleSide,
+  })
+);
+body.add(crystal);
+const edges = new THREE.LineSegments(
+  new THREE.EdgesGeometry(crystal.geometry),
+  new THREE.LineBasicMaterial({ color: 0x9d86ff, transparent: true, opacity: .9, blending: THREE.AdditiveBlending })
+);
+edges.scale.setScalar(1.002);
+body.add(edges);
+
+const coreMat = new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0x7c5cff, emissiveIntensity: 2.2, roughness: .4, metalness: .2 });
+const core = new THREE.Mesh(new THREE.TorusKnotGeometry(.36, .1, 180, 20, 2, 3), coreMat);
+body.add(core);
+const coreLight = new THREE.PointLight(0x7c5cff, 6, 6); body.add(coreLight);
+
+/* soft glow sprite */
+const gc = document.createElement('canvas'); gc.width = gc.height = 256;
+const g = gc.getContext('2d'); const grd = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+grd.addColorStop(0, 'rgba(255,255,255,.55)'); grd.addColorStop(.35, 'rgba(255,255,255,.14)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
+g.fillStyle = grd; g.fillRect(0, 0, 256, 256);
+const glowMat = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(gc), color: 0x7c5cff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+const glow = new THREE.Sprite(glowMat); glow.scale.setScalar(4.2); flight.add(glow);
+
+/* orbit rings with little "bits" */
+const rings = [];
+const bitGeo = new THREE.BoxGeometry(.07, .07, .07);
+[[1.55, .9, .3, 0x22d3ee, 16], [1.9, -.5, 1.1, 0x9d86ff, 22]].forEach(([r, tx, tz, col, n], ri) => {
+  const ring = new THREE.Group(); ring.rotation.set(tx, 0, tz);
+  const line = new THREE.Mesh(new THREE.TorusGeometry(r, .005, 6, 160), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .45, blending: THREE.AdditiveBlending }));
+  line.rotation.x = Math.PI / 2; ring.add(line);
+  const spin = new THREE.Group(); ring.add(spin);
+  const bitMat = new THREE.MeshStandardMaterial({ color: 0x0b0b16, emissive: col, emissiveIntensity: 1.6 });
+  for (let i = 0; i < n; i++) {
+    const a = i / n * Math.PI * 2, m = new THREE.Mesh(bitGeo, bitMat);
+    m.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); m.rotation.set(a, a * 2, 0);
+    if (i % 3 === 0) m.scale.setScalar(1.6);
+    spin.add(m);
+  }
+  body.add(ring); rings.push({ ring, spin, speed: ri ? -.25 : .4 });
+});
+
+/* starfield */
+const N = 900, pos = new Float32Array(N * 3);
+for (let i = 0; i < N; i++) { pos[i * 3] = (Math.random() - .5) * 26; pos[i * 3 + 1] = (Math.random() - .5) * 30; pos[i * 3 + 2] = -Math.random() * 14 - 1; }
+const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xb8b4ff, size: .035, transparent: true, opacity: .7, sizeAttenuation: true, depthWrite: false }));
+scene.add(stars);
+
+/* ── Scroll path: one keyframe per section ── */
+const ACCENTS = [0x7c5cff, 0x22d3ee, 0x34d399, 0xf59e0b, 0xec4899].map(c => new THREE.Color(c));
+const K_DESK = [
+  { x: .52, y: .02, s: 1.0 },   // hero: right of the headline
+  { x: -.5, y: -.02, s: .85 },  // about: left, text on the right
+  { x: .8, y: .56, s: .4 },     // stack: top-right corner
+  { x: .74, y: .5, s: .46 },    // services: top-right, beside the title
+  { x: .6, y: -.74, s: .38 },   // contact: under the form
+];
+const K_MOB = [
+  { x: .18, y: .5, s: .62 },
+  { x: -.1, y: .52, s: .55 },
+  { x: .5, y: .62, s: .38 },
+  { x: -.5, y: .62, s: .38 },
+  { x: .45, y: .62, s: .4 },
+];
+const sections = [...document.querySelectorAll('main > section')];
+let spans = [];
+function measure() {
+  spans = sections.map(s => { const top = s.offsetTop; return { start: top, end: top + Math.max(0, s.offsetHeight - innerHeight) }; });
+}
+function progress() {
+  const y = scrollY;
+  if (y <= spans[0].end) return 0;
+  for (let i = 0; i < spans.length - 1; i++) {
+    if (y <= spans[i].end) return i;
+    const a = spans[i].end, b = spans[i + 1].start;
+    if (y < b) return i + (y - a) / Math.max(1, b - a);
+  }
+  return spans.length - 1;
+}
+function targetAt() {
+  const K = innerWidth < 760 ? K_MOB : K_DESK;
+  const flip = document.documentElement.dir === 'rtl' ? -1 : 1;
+  const p = clamp(progress(), 0, K.length - 1);
+  const i = Math.min(K.length - 2, Math.floor(p)), f = p - i;
+  const t = ease(clamp((f - .1) / .8, 0, 1)), arc = Math.sin(t * Math.PI);
+  const a = K[i], b = K[i + 1];
+  return { x: lerp(a.x, b.x, t) * flip, y: lerp(a.y, b.y, t) - arc * .18, s: lerp(a.s, b.s, t) * (1 - arc * .15), i, t, moving: arc };
+}
+
+function resize() {
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  measure();
+}
+addEventListener('resize', resize);
+addEventListener('langchange', () => requestAnimationFrame(measure));
+addEventListener('load', measure);
+document.fonts && document.fonts.ready.then(measure);
+resize();
+
+const mouse = { x: 0, y: 0, sx: 0, sy: 0 };
+addEventListener('pointermove', e => { mouse.x = e.clientX / innerWidth * 2 - 1; mouse.y = -(e.clientY / innerHeight * 2 - 1); }, { passive: true });
+
+const cur = targetAt();
+const color = ACCENTS[0].clone(), tmp = new THREE.Color();
+const clock = new THREE.Clock();
+let spinY = 0;
+
+function tick() {
+  requestAnimationFrame(tick);
+  const dt = Math.min(clock.getDelta(), .05), t = clock.elapsedTime;
+  const tg = targetAt();
+  const px = cur.x, py = cur.y, k = 1 - Math.exp(-dt * 3.2);
+  cur.x = lerp(cur.x, tg.x, k); cur.y = lerp(cur.y, tg.y, k); cur.s = lerp(cur.s, tg.s, k);
+  const vx = (cur.x - px) / dt || 0, vy = (cur.y - py) / dt || 0;
+  const km = 1 - Math.exp(-dt * 2);
+  mouse.sx = lerp(mouse.sx, mouse.x, km); mouse.sy = lerp(mouse.sy, mouse.y, km);
+
+  const halfH = Math.tan(camera.fov * Math.PI / 360) * camera.position.z, halfW = halfH * camera.aspect;
+  const bob = reduced ? 0 : Math.sin(t * 1.4) * .05 + Math.sin(t * 2.3) * .02;
+  flight.position.set(cur.x * halfW + mouse.sx * .15, cur.y * halfH + bob * halfH + mouse.sy * .1, Math.sin(t * .7) * .2);
+  const scale = halfH * 2 * .2 * cur.s * Math.min(1, camera.aspect / .9 + .25);
+  flight.scale.setScalar(scale);
+
+  spinY += dt * (reduced ? .05 : .3 + tg.moving * 2.4);
+  body.rotation.set(
+    clamp(-vy * .6, -.5, .5) + mouse.sy * .35 + Math.sin(t * .5) * .15,
+    spinY + mouse.sx * .5,
+    clamp(-vx * .4, -.5, .5)
+  );
+  core.rotation.x = t * .8; core.rotation.y = t * 1.1;
+  core.scale.setScalar(1 + Math.sin(t * 2.2) * .06);
+  rings.forEach(r => { r.spin.rotation.y = t * r.speed * (1 + tg.moving * 3); });
+  stars.position.y = (scrollY / innerHeight) * .6; stars.rotation.y = t * .01;
+
+  // accent colour follows the section
+  tmp.copy(ACCENTS[tg.i]).lerp(ACCENTS[Math.min(tg.i + 1, ACCENTS.length - 1)], tg.t);
+  color.lerp(tmp, 1 - Math.exp(-dt * 3));
+  coreMat.emissive.copy(color); coreLight.color.copy(color); glowMat.color.copy(color);
+  edges.material.color.copy(color).lerp(new THREE.Color(0xffffff), .35);
+
+  renderer.render(scene, camera);
+}
+tick();
+canvas.classList.add('ready');
+document.getElementById('loader').classList.add('done');
+document.body.classList.add('loaded');
+</script>
+</body>
+</html>

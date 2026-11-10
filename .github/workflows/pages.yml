@@ -67,6 +67,18 @@ jobs:
           mkdir -p _site/axon
           cp axon/index.html _site/axon/
 
+      - name: Add the Melli 3D bee landing page
+        # A single static file (three.js loads from the jsDelivr CDN), served at /speaking-pretest/melli/.
+        run: |
+          mkdir -p _site/melli
+          cp melli/index.html _site/melli/
+
+      - name: Add the DJILALI developer site (3D, FR/EN/AR)
+        # A single static file (three.js loads from the jsDelivr CDN), served at /speaking-pretest/dev/.
+        run: |
+          mkdir -p _site/dev
+          cp dev/index.html _site/dev/
+
       - name: Redirect the old portfolio address to djilali.pages.dev
         # The portfolio now lives on Cloudflare Pages (https://djilali.pages.dev, built from portfolio/).
         # Old links (/portfolio/, /portfolio/fr/, /portfolio/ar/) forward there, keeping the language and #section.
