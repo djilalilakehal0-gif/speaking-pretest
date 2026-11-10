@@ -144,9 +144,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <nav class="tabs glass" id="tabs">
   <div class="pill" id="pill"></div>
   <button class="on">Tops</button>
-  <button class="soon" title="Coming soon">Bottoms</button>
+  <button>Bottoms</button>
   <button>Looks</button>
-  <button class="soon" title="Coming soon">Shoes</button>
+  <button>Shoes</button>
   <button class="soon" title="Coming soon">Accessories</button>
 </nav>
 
@@ -208,9 +208,29 @@ TOPS.forEach((it,k)=>{it.fig=`model-${k}.webp`});
 const LOOKS=[
   {n:"Navy Suit",     p:320, img:"look-0.webp", fig:"look-0.webp", c:[["Navy","#1b2133"]]},
   {n:"Burgundy Suit", p:340, img:"look-1.webp", fig:"look-1.webp", c:[["Burgundy","#5e1a2a"]]},
+  {n:"Grey Lacoste Look", p:150, img:"look-2.webp", fig:"look-2.webp", c:[["Grey","#a9abae"]]},
+  {n:"White Lacoste Look", p:150, img:"look-3.webp", fig:"look-3.webp", c:[["White","#f4f2ee"]]},
+  {n:"Navy Lacoste Look", p:150, img:"look-4.webp", fig:"look-4.webp", c:[["Navy","#1f2747"]]},
 ];
-const CATS={Tops:{items:TOPS,full:false}, Looks:{items:LOOKS,full:true}};
+/* Bottoms and Shoes share one full-body photo set: full-{bottom}{shoe}.webp holds every
+   combination, so picking trousers keeps the shoes you chose and the other way round */
+const BOTTOMS=[
+  {n:"Navy Suit Trousers", p:120, img:"bottom-0.webp", c:[["Navy","#1b2133"]]},
+  {n:"Beige Chinos",       p:70,  img:"bottom-1.webp", c:[["Beige","#cdb894"]]},
+  {n:"Indigo Jeans",       p:85,  img:"bottom-2.webp", c:[["Indigo","#25304a"]]},
+];
+const SHOES=[
+  {n:"White Sneakers",     p:110, img:"shoe-0.webp", c:[["White","#f4f2ee"]]},
+  {n:"Suede Loafers",      p:150, img:"shoe-1.webp", c:[["Brown","#7a4a2c"]]},
+  {n:"Black Oxfords",      p:180, img:"shoe-2.webp", c:[["Black","#161618"]]},
+];
+const outfit={b:0,s:0};
+BOTTOMS.forEach((it,k)=>{it.part='b';it.k=k});
+SHOES.forEach((it,k)=>{it.part='s';it.k=k});
+const CATS={Tops:{items:TOPS,full:false}, Bottoms:{items:BOTTOMS,full:true,band:[.45,.91]}, Looks:{items:LOOKS,full:true}, Shoes:{items:SHOES,full:true,band:[.89,1]}};
+let CAT=CATS.Tops;
 [...TOPS,...LOOKS].forEach(it=>{const im=new Image(); im.src=it.fig;});
+for(let b=0;b<3;b++)for(let s=0;s<3;s++){const im=new Image(); im.src=`full-${b}${s}.webp`;}
 let ITEMS=TOPS, L=0, N=0, HALF=0;
 const garmStyle=it=>it.img?`background:url("${it.img}") center/contain no-repeat`:`background-position:${it.g[0]}% ${it.g[1]}%`;
 const $=id=>document.getElementById(id);
@@ -306,25 +326,40 @@ $('sizes').addEventListener('click',e=>{
 
 /* ---------- try-on scan ---------- */
 let anims=[];
-const figURL=k=>`url("${ITEMS[k].fig}")`;
+function figOf(it){
+  if(!it.part)return it.fig;
+  const b=it.part==='b'?it.k:outfit.b, s=it.part==='s'?it.k:outfit.s;
+  return `full-${b}${s}.webp`;
+}
+const figURL=k=>`url("${figOf(ITEMS[k])}")`;
 function tryOn(k){
   shown=k;
   updateBuy(k);
   anims.forEach(a=>a.cancel()); anims=[];
+  const it=ITEMS[k];
+  if(it.part)outfit[it.part]=it.k;
+  /* trousers or shoes: when the figure is already on screen, scan only that band */
+  const [a,b]=(CAT.band&&mCur.style.opacity==='1')?CAT.band:[0,1];
+  const A=(a*100).toFixed(1)+'%', Bm=((1-b)*100).toFixed(1)+'%';
   mNext.style.backgroundImage=figURL(k);
   grid.style.webkitMaskImage=grid.style.maskImage=figURL(k);
   if(reduced){mCur.style.backgroundImage=figURL(k); mCur.style.opacity=1; return;}
   const ez='cubic-bezier(.65,0,.35,1)';
-  const clip=mNext.animate([{clipPath:'inset(0 0 100% 0)'},{clipPath:'inset(0 0 0% 0)'}],{duration:950,easing:ez,fill:'forwards'});
-  const g=grid.animate([{clipPath:'inset(0 0 100% 0)'},{clipPath:'inset(0 0 0 0)',offset:.5},{clipPath:'inset(100% 0 0 0)'}],{duration:1092,easing:ez,fill:'forwards'});
+  const full=`inset(${A} 0 ${Bm} 0)`, none=`inset(${A} 0 ${(100-a*100).toFixed(1)}% 0)`, gone=`inset(${(b*100).toFixed(1)}% 0 ${Bm} 0)`;
+  const at=f=>((a+(b-a)*f)*100).toFixed(2)+'%';
+  const clip=mNext.animate([{clipPath:none},{clipPath:full}],{duration:950,easing:ez,fill:'forwards'});
+  const g=grid.animate([{clipPath:none},{clipPath:full,offset:.5},{clipPath:gone}],{duration:1092,easing:ez,fill:'forwards'});
   const s=scan.animate([
-    {top:'0%',transform:'scaleX(.2)',opacity:0},
-    {top:'6%',transform:'scaleX(1)',opacity:1,offset:.08},
-    {top:'94%',transform:'scaleX(1)',opacity:1,offset:.92},
-    {top:'100%',transform:'scaleX(.2)',opacity:0}
+    {top:at(0),transform:'scaleX(.2)',opacity:0},
+    {top:at(.06),transform:'scaleX(1)',opacity:1,offset:.08},
+    {top:at(.94),transform:'scaleX(1)',opacity:1,offset:.92},
+    {top:at(1),transform:'scaleX(.2)',opacity:0}
   ],{duration:950,easing:ez,fill:'forwards'});
   const st=mNext.animate([{transform:'scale(1.012)'},{transform:'scale(1)'}],{duration:1250,easing:'ease-out'});
   anims=[clip,g,s,st];
+  /* full-figure swap: wipe the old figure away just ahead of the new one, so a
+     different silhouette never shows the previous outfit behind it */
+  if(a===0&&b===1)anims.push(mCur.animate([{clipPath:'inset(0 0 0 0)'},{clipPath:'inset(100% 0 0 0)'}],{duration:950,easing:ez,fill:'forwards'}));
   clip.onfinish=()=>{
     mCur.style.backgroundImage=figURL(k); mCur.style.opacity=1;
     anims.forEach(a=>a.cancel()); anims=[];
@@ -347,9 +382,12 @@ tabBtns.forEach(b=>b.addEventListener('click',()=>{
   placePill(true);
   /* new arc spreads out from the centre again; the scan reveals the first piece */
   anims.forEach(a=>a.cancel()); anims=[];
-  ITEMS=cat.items; buildArc();
-  pos=target=0; intro=reduced?1:0; shown=-1;
-  mCur.style.opacity=0;
+  /* Bottoms <-> Shoes keep the figure on screen; anything else reveals from nothing */
+  if(!(cat.band&&CAT.band))mCur.style.opacity=0;
+  CAT=cat; ITEMS=cat.items; buildArc();
+  /* open the arc on the piece already worn */
+  pos=target=cat===CATS.Bottoms?outfit.b:cat===CATS.Shoes?outfit.s:0;
+  intro=reduced?1:0; shown=-1;
   model.classList.toggle('full',cat.full);
 }));
 
