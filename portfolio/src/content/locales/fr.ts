@@ -12,7 +12,7 @@ const fr: Dictionary = {
     title: 'Développeur logiciel | Ingénieur Full-Stack',
     role: 'Développeur Full-Stack',
     tagline: 'Un code propre, une ingénierie créative et des interfaces d’une grande fluidité.',
-    portraitAlt: 'Djilali, développeur logiciel, en costume noir, assis à son bureau devant des écrans de code',
+    portraitAlt: 'Djilali, développeur logiciel, en costume noir et casquette « Developer », assis à son bureau devant des écrans de code',
     availability: 'Disponible pour des projets choisis',
     location: 'À distance · Partout dans le monde',
     online: 'En ligne',
@@ -32,6 +32,9 @@ const fr: Dictionary = {
     scroll: 'Défiler',
     scrollTo: 'vers la section À propos',
     cursorView: 'Voir',
+    all: 'Tous',
+    filter: 'Filtrer les projets par technologie',
+    counter: 'projets',
   },
   nav: { about: 'À propos', stack: 'Stack', work: 'Projets', services: 'Services', journey: 'Parcours', contact: 'Contact' },
   hero: {

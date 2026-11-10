@@ -22,7 +22,7 @@ export const site = {
     fallback: '/img/portrait.jpg',
     avatar: '/img/avatar.webp',
     width: 800,
-    height: 1000,
+    height: 875,
   },
 }
 

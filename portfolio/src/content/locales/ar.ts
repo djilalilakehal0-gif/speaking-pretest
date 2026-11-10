@@ -12,7 +12,7 @@ const ar: Dictionary = {
     title: 'مطوّر برمجيات | مهندس Full-Stack',
     role: 'مطوّر Full-Stack',
     tagline: 'كود نظيف، وهندسة مبدعة، وواجهات سلسة في الاستخدام.',
-    portraitAlt: 'جيلالي، مطوّر برمجيات، ببدلة سوداء، جالس إلى مكتبه أمام شاشات الكود',
+    portraitAlt: 'جيلالي، مطوّر برمجيات، ببدلة سوداء وقبعة «Developer»، جالس إلى مكتبه أمام شاشات الكود',
     availability: 'متاح لمشاريع مختارة',
     location: 'عن بُعد · في كل أنحاء العالم',
     online: 'متصل',
@@ -32,6 +32,9 @@ const ar: Dictionary = {
     scroll: 'مرّر',
     scrollTo: 'إلى قسم «من أنا»',
     cursorView: 'عرض',
+    all: 'الكل',
+    filter: 'تصفية المشاريع حسب التقنية',
+    counter: 'مشاريع',
   },
   nav: { about: 'من أنا', stack: 'التقنيات', work: 'أعمالي', services: 'الخدمات', journey: 'المسيرة', contact: 'تواصل' },
   hero: {
