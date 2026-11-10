@@ -61,6 +61,12 @@ jobs:
           mkdir -p _site/napolitime
           cp -r napolitime/dist/. _site/napolitime/
 
+      - name: Add the AXON motion research page
+        # A single static file (three.js loads from the jsDelivr CDN), served at /speaking-pretest/axon/.
+        run: |
+          mkdir -p _site/axon
+          cp axon/index.html _site/axon/
+
       - name: Redirect the old portfolio address to djilali.pages.dev
         # The portfolio now lives on Cloudflare Pages (https://djilali.pages.dev, built from portfolio/).
         # Old links (/portfolio/, /portfolio/fr/, /portfolio/ar/) forward there, keeping the language and #section.
