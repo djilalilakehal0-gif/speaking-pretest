@@ -384,7 +384,8 @@ const Finale: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
   const toCard = ramp(t, beatTime(CONTACT_BEAT), BEAT_LEN * 2, Easing.inOut(Easing.cubic));
   const order = [3, 5, 1, 7, 0, 6, 2, 4]; // stagger so neighbours differ in colour
   const H = 820;
-  const card = (n: number) => ramp(t, beatTime(CONTACT_BEAT + n), 0.6);
+  // the card starts a beat after the line-up begins to move away, so they never overlap
+  const card = (n: number) => ramp(t, beatTime(CONTACT_BEAT + 2 + n), 0.6);
 
   return (
     <AbsoluteFill>
@@ -468,7 +469,7 @@ const Finale: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
             fontFamily: SCRIPT,
             fontSize: 170,
             lineHeight: 1.05,
-            clipPath: `inset(-20% ${(1 - ramp(t, beatTime(CONTACT_BEAT + 1), BEAT_LEN * 2)) * 100}% -20% 0)`,
+            clipPath: `inset(-20% ${(1 - ramp(t, beatTime(CONTACT_BEAT + 3), BEAT_LEN * 2)) * 100}% -20% 0)`,
           }}
         >
           Lakehal Djilali
