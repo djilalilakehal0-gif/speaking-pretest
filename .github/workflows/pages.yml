@@ -79,6 +79,12 @@ jobs:
           mkdir -p _site/dev
           cp dev/index.html _site/dev/
 
+      - name: Add the VirtualFit spatial try-on page
+        # A single static file (images load from images.higgs.ai), served at /speaking-pretest/virtualfit/.
+        run: |
+          mkdir -p _site/virtualfit
+          cp virtualfit/index.html _site/virtualfit/
+
       - name: Redirect the old portfolio address to djilali.pages.dev
         # The portfolio now lives on Cloudflare Pages (https://djilali.pages.dev, built from portfolio/).
         # Old links (/portfolio/, /portfolio/fr/, /portfolio/ar/) forward there, keeping the language and #section.
