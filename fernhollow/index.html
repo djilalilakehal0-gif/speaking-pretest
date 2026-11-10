@@ -356,7 +356,7 @@ class Valley{
     this.mouse=new THREE.Vector2(9,9);this.mouseT=new THREE.Vector2(9,9);this.tilt=new THREE.Vector2();
     this.loadedSent=false;
 
-    this.buildPath();this.buildTerrain();this.buildSky();this.buildFlowers();this.buildRays();this.buildDust();this.buildButterflies();this.buildPost();this.bind();
+    this.buildPath();this.buildTerrain();this.buildSky();this.buildFlowers();this.buildRays();this.buildDust();this.buildButterflies();this.buildBirds();this.buildPost();this.bind();
     this.clock=new THREE.Clock();
     r.setAnimationLoop(()=>this.tick());
   }
@@ -504,6 +504,59 @@ class Valley{
     }
   }
 
+  /* small flocks of moonlit birds crossing the sky over the valley */
+  buildBirds(){
+    const R=rng(808);this.flocks=[];
+    const wing=new THREE.BufferGeometry();
+    wing.setAttribute('position',new THREE.Float32BufferAttribute([0,0,.32, 0,0,-.18, 1.05,0,-.12, 0,0,.32, 1.05,0,-.12, .55,0,.12],3));
+    const body=new THREE.BufferGeometry();
+    body.setAttribute('position',new THREE.Float32BufferAttribute([-.07,0,.55, .07,0,.55, 0,0,-.6, 0,.05,.5, 0,-.03,-.6, 0,0,.55],3));
+    const mat=new THREE.MeshBasicMaterial({color:new THREE.Color(.42,.48,.62),side:THREE.DoubleSide,transparent:true,opacity:.92});
+    const sizes=this.small?[8]:[9,6];
+    sizes.forEach((n,fi)=>{
+      const f={s:0,speed:4.2+R()*1.6,h:6,lat:0,ph:R()*10,birds:[]};
+      for(let i=0;i<n;i++){
+        const g=new THREE.Group(),flap=new THREE.Group();
+        const r=new THREE.Mesh(wing,mat),l=new THREE.Mesh(wing,mat);l.scale.x=-1;
+        flap.add(r,l,new THREE.Mesh(body,mat));g.add(flap);g.scale.setScalar(1.3+R()*.5);
+        const k=Math.ceil(i/2),side=i===0?0:(i%2?1:-1);
+        this.scene.add(g);
+        f.birds.push({g,r,l,off:new THREE.Vector3(side*k*1.7+(R()-.5)*.8,(R()-.5)*.9,-k*1.5+(R()-.5)*.8),f:7+R()*3,ph:R()*10,prev:new THREE.Vector3(),wob:R()*10});
+      }
+      this.resetFlock(f,fi===0?30:75);
+      this.flocks.push(f);
+    });
+  }
+  resetFlock(f,ahead){
+    f.s=this.dist+ahead;f.lat=(Math.random()-.5)*16;f.h=4.5+Math.random()*4;f.speed=4+Math.random()*2;
+    for(const b of f.birds)b.prev.set(0,0,0);
+  }
+  updateBirds(dt,t){
+    const L=this.pathLen,wrap=d=>(((d%L)+L)%L)/L,fwd=new THREE.Vector3(),right=new THREE.Vector3(),up=new THREE.Vector3(0,1,0),tgt=new THREE.Vector3();
+    for(const f of this.flocks){
+      f.s+=f.speed*dt;
+      if(f.s-this.dist>170)this.resetFlock(f,-25-Math.random()*20);
+      const u=wrap(f.s),lead=this.curve.getPointAt(u),tan=this.curve.getTangentAt(u);
+      const lat=f.lat+Math.sin(t*.13+f.ph)*7;
+      lead.x+=-tan.z*lat;lead.z+=tan.x*lat;lead.y+=f.h+Math.sin(t*.3+f.ph)*1.5;
+      fwd.set(tan.x,0,tan.z).normalize();right.crossVectors(fwd,up).normalize();
+      for(const b of f.birds){
+        tgt.copy(lead).addScaledVector(right,b.off.x).addScaledVector(fwd,b.off.z);
+        tgt.y+=b.off.y+Math.sin(t*.9+b.wob)*.35;
+        tgt.addScaledVector(right,Math.sin(t*.7+b.wob)*.4);
+        if(b.prev.lengthSq()===0){b.g.position.copy(tgt);b.prev.copy(tgt).sub(fwd)}
+        else b.g.position.lerp(tgt,Math.min(1,dt*2.5));
+        const dir=b.g.position.clone().sub(b.prev);
+        if(dir.lengthSq()>1e-6)b.g.lookAt(b.g.position.clone().add(dir));
+        b.prev.lerp(b.g.position,Math.min(1,dt*3));
+        // steady wingbeats with occasional glides
+        const glide=Math.max(0,Math.sin(t*.5+b.ph)-.6)/.4;
+        const a=Math.sin(t*b.f+b.ph)*(.75*(1-glide)+.08)+.1;
+        b.r.rotation.z=a;b.l.rotation.z=-a;
+      }
+    }
+  }
+
   buildPost(){
     const r=this.renderer;
     this.composer=new EffectComposer(r);
@@ -571,7 +624,7 @@ class Valley{
     u.uTime.value=t;u.uDisperse.value=this.disperse;u.uBloom.value=.25+.75*smooth(.05,.8,intro);
     this.sky.position.copy(pos);this.stars.position.copy(pos);this.starMat.uniforms.uTime.value=t;
     this.dustMat.uniforms.uCam.value.copy(pos);
-    this.updateButterflies(dt,t);
+    this.updateButterflies(dt,t);this.updateBirds(dt,t);
     for(const ray of this.rays){ray.rotation.y=Math.atan2(pos.x-ray.position.x,pos.z-ray.position.z);ray.material.uniforms.uFade.value=1-this.disperse*.6}
     this.final.uniforms.uTime.value=t;this.final.uniforms.uSpeed.value=this.speed;
     this.bloom.strength=.75+this.disperse*.15;
