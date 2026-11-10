@@ -288,6 +288,25 @@ gl_PointSize=d<.2?0.:clamp((.05+aR.w*.07)*uPx/d,0.,12.);
 vA=(.35+.65*sin(uTime*(1.+aR.w*2.)+aR.x*40.)*.5+.3)*smoothstep(35.,8.,d);}`;
 const dustFrag=`varying float vA;void main(){float r=length(gl_PointCoord-.5);if(r>.5)discard;gl_FragColor=vec4(vec3(1.,.86,.6)*1.6*vA*smoothstep(.5,0.,r),1.);}`;
 
+
+const wingVert=`varying vec2 vUv;varying float vD;void main(){vUv=uv;vec4 mv=modelViewMatrix*vec4(position,1.);vD=-mv.z;gl_Position=projectionMatrix*mv;}`;
+const wingFrag=`uniform vec3 uA,uB,uFog;uniform float uTime,uSeed;varying vec2 vUv;varying float vD;
+float lobe(vec2 p,vec2 c,vec2 r){vec2 q=(p-c)/r;return 1.-length(q);}
+void main(){
+  vec2 p=vUv;
+  float fore=lobe(p,vec2(.5,.36),vec2(.5,.36));
+  float hind=lobe(p,vec2(.36,.74),vec2(.36,.26));
+  float sh=max(fore,hind);
+  float a=smoothstep(0.,.06,sh);
+  if(a<.02)discard;
+  float edge=1.-smoothstep(.0,.22,sh);
+  float vein=smoothstep(.04,0.,abs(fract(atan(p.y-.5,p.x+.05)*4.5/3.1416+.5)-.5))*.35;
+  float spot=smoothstep(.09,.04,length(p-vec2(.7,.3)))+smoothstep(.06,.03,length(p-vec2(.45,.75)));
+  vec3 col=mix(uA,uB,p.x)*(.55+vein)+uB*edge*1.6+vec3(1.,.95,.85)*spot*1.4;
+  col*=.85+.15*sin(uTime*2.+uSeed*9.);
+  float fog=1.-exp(-pow(vD*.0105,1.55));
+  gl_FragColor=vec4(mix(col,uFog,fog),a*(.9-fog*.5)*smoothstep(.4,1.5,vD));
+}`;
 const finalShader={
   uniforms:{tDiffuse:{value:null},uTime:{value:0},uSpeed:{value:0},uRes:{value:new THREE.Vector2(1,1)},uJitter:{value:1}},
   vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
@@ -337,7 +356,7 @@ class Valley{
     this.mouse=new THREE.Vector2(9,9);this.mouseT=new THREE.Vector2(9,9);this.tilt=new THREE.Vector2();
     this.loadedSent=false;
 
-    this.buildPath();this.buildTerrain();this.buildSky();this.buildFlowers();this.buildRays();this.buildDust();this.buildPost();this.bind();
+    this.buildPath();this.buildTerrain();this.buildSky();this.buildFlowers();this.buildRays();this.buildDust();this.buildButterflies();this.buildPost();this.bind();
     this.clock=new THREE.Clock();
     r.setAnimationLoop(()=>this.tick());
   }
@@ -444,6 +463,47 @@ class Valley{
     const pts=new THREE.Points(g,this.dustMat);pts.frustumCulled=false;this.scene.add(pts);
   }
 
+  /* glowing butterflies that flutter along the valley ahead of the camera */
+  buildButterflies(){
+    const R=rng(321),N=this.small?6:10;this.butterflies=[];
+    const wingGeo=new THREE.PlaneGeometry(1,1);wingGeo.rotateX(-Math.PI/2);wingGeo.translate(.5,0,0);
+    const bodyGeo=new THREE.SphereGeometry(.5,8,6);
+    const pairs=[[[.15,.55,.9],[.6,.95,1.]],[[.9,.45,.15],[1.,.85,.4]],[[.5,.25,.9],[.95,.7,1.]],[[.2,.8,.55],[.8,1.,.75]],[[.95,.35,.5],[1.,.8,.85]]];
+    for(let i=0;i<N;i++){
+      const [ca,cb]=pairs[i%pairs.length];
+      const mat=new THREE.ShaderMaterial({vertexShader:wingVert,fragmentShader:wingFrag,transparent:true,depthWrite:false,side:THREE.DoubleSide,
+        uniforms:{uA:{value:new THREE.Color(...ca)},uB:{value:new THREE.Color(...cb)},uFog:{value:FOG},uTime:this.flowerMat.uniforms.uTime,uSeed:{value:R()}}});
+      const g=new THREE.Group(),flap=new THREE.Group();
+      const right=new THREE.Mesh(wingGeo,mat),left=new THREE.Mesh(wingGeo,mat);left.scale.x=-1;
+      const body=new THREE.Mesh(bodyGeo,new THREE.MeshBasicMaterial({color:new THREE.Color(...cb).multiplyScalar(.6)}));body.scale.set(.09,.09,.75);
+      flap.add(right,left,body);g.add(flap);
+      const sc=.75+R()*.5;g.scale.setScalar(sc);
+      this.scene.add(g);
+      this.butterflies.push({g,right,left,s:12+R()*45,speed:1.1+R()*1.4,lat:(R()-.5)*12,h:-1.6+R()*3,f:9+R()*5,ph:R()*10,w1:.3+R()*.4,w2:.2+R()*.3,prev:new THREE.Vector3(),glide:0});
+    }
+  }
+  updateButterflies(dt,t){
+    const L=this.pathLen,wrap=d=>(((d%L)+L)%L)/L,tmp=new THREE.Vector3();
+    for(const b of this.butterflies){
+      b.s+=b.speed*dt*(.6+.4*Math.sin(t*.4+b.ph));
+      const rel=b.s-this.dist;
+      if(rel<3||rel>80){b.s=this.dist+(rel<3?35+Math.random()*30:12+Math.random()*25);b.lat=(Math.random()-.5)*12;b.prev.set(0,0,0)}
+      const u=wrap(b.s),p=this.curve.getPointAt(u),tan=this.curve.getTangentAt(u);
+      const lat=b.lat+Math.sin(t*b.w1+b.ph)*2.5+Math.sin(t*b.w2*2.3+b.ph*2)*1.2;
+      p.x+=-tan.z*lat;p.z+=tan.x*lat;
+      p.y+=b.h+Math.sin(t*1.3+b.ph)*.45+Math.sin(t*.37+b.ph)*.8+this.disperse*2.5;
+      if(b.prev.lengthSq()===0)b.prev.copy(p).sub(tan);
+      tmp.copy(p).add(p).sub(b.prev); // look along the direction of travel
+      b.g.position.copy(p);b.g.lookAt(tmp);
+      b.prev.lerp(p,Math.min(1,dt*4));
+      // flap in bursts with short glides
+      b.glide=Math.max(0,Math.sin(t*.9+b.ph*3)-.7)/.3;
+      const amp=1.15*(1-b.glide)+.25;
+      const ang=Math.sin(t*b.f+b.ph)*amp*.5+.35;
+      b.right.rotation.z=ang;b.left.rotation.z=-ang;
+    }
+  }
+
   buildPost(){
     const r=this.renderer;
     this.composer=new EffectComposer(r);
@@ -511,6 +571,7 @@ class Valley{
     u.uTime.value=t;u.uDisperse.value=this.disperse;u.uBloom.value=.25+.75*smooth(.05,.8,intro);
     this.sky.position.copy(pos);this.stars.position.copy(pos);this.starMat.uniforms.uTime.value=t;
     this.dustMat.uniforms.uCam.value.copy(pos);
+    this.updateButterflies(dt,t);
     for(const ray of this.rays){ray.rotation.y=Math.atan2(pos.x-ray.position.x,pos.z-ray.position.z);ray.material.uniforms.uFade.value=1-this.disperse*.6}
     this.final.uniforms.uTime.value=t;this.final.uniforms.uSpeed.value=this.speed;
     this.bloom.strength=.75+this.disperse*.15;
