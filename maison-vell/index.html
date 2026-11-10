@@ -117,18 +117,18 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
 </div>
 <div class="wait" id="wait"></div>
 <script>
-// one transparent sheet (1492 x 1448) holding the three looks; the pieces are cropped from the same sheet
-const SHEET='looks.webp',SW=1492,SH=1448,MODELS=SHEET,PIECES=SHEET;
-// each model's box on the sheet: x0, x1 (three looks, walked twice)
-const LOOKS=[[24,496],[520,953],[977,1468],[24,496],[520,953],[977,1468]],Y0=24,Y1=1424,FIRST=15;
+// one transparent sheet (2967 x 1448) holding the six looks; the pieces are cropped from the same sheet
+const SHEET='looks.webp',SW=2967,SH=1448,MODELS=SHEET,PIECES=SHEET;
+// each model's box on the sheet: x0, x1
+const LOOKS=[[24,496],[520,953],[977,1468],[1492,1891],[1915,2341],[2365,2943]],Y0=24,Y1=1424,FIRST=15;
 // each piece's box on the sheet: x0, x1, y0, y1, name, price
 const ITEMS=[
   [84,494,222,584,'Black Stretch Shirt','$390'],[150,444,560,1290,'Pleated Trousers','$450'],
   [532,952,194,714,'Black Two Button Suit','$1,850'],[630,952,1236,1424,'Leather Derby Shoes','$620'],
   [977,1413,204,724,'Pinstripe Double Breasted Blazer','$1,640'],[1063,1443,684,1364,'White Tailored Trousers','$520'],
-  [144,334,24,112,'Grey Flat Cap','$160'],[24,164,754,1094,'Leather Laptop Bag','$780'],
-  [620,800,232,454,'Black Silk Tie','$180'],[512,640,774,1160,'Leather Shoulder Bag','$690'],
-  [1073,1217,24,98,'Black Wool Flat Cap','$170'],[1063,1463,1264,1424,'White Court Sneakers','$340']];
+  [1492,1891,236,640,'Sky Oxford Shirt','$280'],[1550,1880,1250,1424,'Suede Loafers','$460'],
+  [1990,2170,24,108,'White Flat Cap','$160'],[1915,2075,730,1050,'Leather Laptop Bag','$780'],
+  [2365,2900,236,740,'White Linen Shirt','$320'],[2490,2943,620,1424,'Wide Linen Trousers','$410']];
 // depth stops from d = -1 (leaving past the rail) to d = 5 (arriving out of the haze)
 const KX=[1.2,.744,.496,.346,.235,.15,.085],KF=[1.14,.89,.777,.704,.651,.616,.59],KH=[1.18,.832,.574,.436,.334,.258,.19],
       KB=[0,0,1.5,4,8,12,17],KO=[1,1,1,1,.86,.5,0];
