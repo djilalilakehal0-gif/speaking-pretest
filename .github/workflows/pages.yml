@@ -85,6 +85,12 @@ jobs:
           mkdir -p _site/virtualfit
           cp virtualfit/index.html virtualfit/*.webp _site/virtualfit/
 
+      - name: Add the Fernhollow night flower valley hero
+        # A single static file (three.js loads from the jsDelivr CDN), served at /speaking-pretest/fernhollow/.
+        run: |
+          mkdir -p _site/fernhollow
+          cp fernhollow/index.html _site/fernhollow/
+
       - name: Redirect the old portfolio address to djilali.pages.dev
         # The portfolio now lives on Cloudflare Pages (https://djilali.pages.dev, built from portfolio/).
         # Old links (/portfolio/, /portfolio/fr/, /portfolio/ar/) forward there, keeping the language and #section.
