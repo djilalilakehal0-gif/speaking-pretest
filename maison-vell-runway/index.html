@@ -117,18 +117,17 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
 </div>
 <div class="wait" id="wait"></div>
 <script>
-const MODELS='https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261102_042056_1a704ff7-b0e5-4a9f-bbda-62392b819fb6.png&w=3840&q=85';
-const PIECES='https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261102_042057_080e85b0-b4aa-4072-8eb9-2304c7baf42b.png&w=2400&q=85';
-// each model's box on the 960 x 540 sheet: x0, x1
-const LOOKS=[[12,176],[178,330],[331,470],[476,633],[634,767],[767,956]],Y0=48,Y1=496,FIRST=15;
-// each piece's box on the 960 x 720 sheet: x0, x1, y0, y1, name, price
-const ITEMS=[
-  [26,224,28,214,'Feather Jacket','$2,900'],[304,412,22,236,'Satin Wide Leg Trousers','$1,450'],
-  [530,666,12,242,'Pleated Dress','$2,200'],[752,922,100,146,'Gold Waist Belt','$420'],
-  [70,176,246,466,'Satin Trench Dress','$2,350'],[294,422,294,432,'Top Handle Bag','$980'],
-  [508,688,240,452,'Billow Sleeve Blouse','$860'],[780,890,252,466,'Tie Waist Trousers','$740'],
-  [64,178,484,698,'Powder Long Coat','$1,980'],[316,396,482,698,'Ivory Straight Trousers','$690'],
-  [530,672,508,682,'Sculpted Ruffle Top','$1,120'],[754,916,484,700,'Pleated Maxi Skirt','$1,340']];
+const MODELS='models.webp',PIECES='pieces.webp';
+// each model's box on the 4281 x 1448 models sheet: x0, x1
+const LOOKS=[[24,549],[573,1364],[1388,2450],[2474,3313],[3337,3808],[3832,4257]],Y0=24,Y1=1424,FIRST=15,MW=4281,MH=1448;
+// each piece's box on the 3648 x 1216 pieces sheet: x0, x1, y0, y1, name, price
+const PW=3648,PH=1216,ITEMS=[
+  [72,536,24,584,'Iris Beaded Bodice','$1,450'],[721,1103,24,584,'Crepe Flare Skirt','$980'],
+  [1248,1792,24,584,'Ember Beaded Bodice','$2,100'],[1848,2408,26,581,'Ember Ball Skirt','$1,680'],
+  [2456,3016,66,542,'Lace Floral Corset','$2,400'],[3064,3624,68,540,'Lace Ball Skirt','$2,900'],
+  [25,582,632,1192,'Midnight Beaded Top','$1,350'],[632,1191,632,1192,'Satin Cascade Skirt','$1,780'],
+  [1289,1750,632,1192,'Gold Chain Peplum Top','$890'],[1971,2285,632,1192,'Scarlet Pleated Skirt','$760'],
+  [2517,2955,632,1192,'Peak Lapel Tuxedo Jacket','$1,650'],[3210,3477,632,1192,'Tuxedo Trousers','$620']];
 // depth stops from d = -1 (leaving past the rail) to d = 5 (arriving out of the haze)
 const KX=[1.2,.744,.496,.346,.235,.15,.085],KF=[1.14,.89,.777,.704,.651,.616,.59],KH=[1.18,.832,.574,.436,.334,.258,.19],
       KB=[0,0,1.5,4,8,12,17],KO=[1,1,1,1,.86,.5,0];
@@ -141,13 +140,13 @@ function crop(href,x0,y0,w,h,sheetW,sheetH){
   const i=document.createElementNS(NS,'image');i.setAttribute('href',href);i.setAttribute('width',sheetW);i.setAttribute('height',sheetH);f.append(i);s.append(f);return s;
 }
 const people=LOOKS.map(([a,b],i)=>{
-  const e=document.createElement('div');e.className='m';e.dataset.i=i;e.append(crop(MODELS,a,Y0,b-a,Y1-Y0,960,540));line.append(e);
+  const e=document.createElement('div');e.className='m';e.dataset.i=i;e.append(crop(MODELS,a,Y0,b-a,Y1-Y0,MW,MH));line.append(e);
   return{e,r:(b-a)/(Y1-Y0),f:'',o:''};
 });
 const cards=ITEMS.map(([a,b,c,d,name,price],i)=>{
   const e=document.createElement('article');e.className='card'+(i%2?' alt':'');
   e.innerHTML=`<button class="fav" aria-pressed="false" aria-label="Save ${name}"><svg viewBox="0 0 24 24"><path d="M12 20S3.5 15 3.5 9A4.6 4.6 0 0 1 12 6.6 4.600 4.600 0 0 1 20.500 9C20.500 15 12 20 12 20Z"/></svg></button><span class="shot"></span><div class="meta"><h3 class="wide">${name}</h3><span>${price}</span><button class="add" aria-label="Add ${name} to cart"></button></div>`;
-  e.querySelector('.shot').append(crop(PIECES,a,c,b-a,d-c,960,720));rail.append(e);return e;
+  e.querySelector('.shot').append(crop(PIECES,a,c,b-a,d-c,PW,PH));rail.append(e);return e;
 });
 for(let i=0;i<=N;i++){const b=document.createElement('b');b.textContent=FIRST+i%N;roll.append(b)}
 let cart=0;
