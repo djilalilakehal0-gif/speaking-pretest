@@ -133,9 +133,7 @@ section { position: relative; min-height: 100vh; height: 100vh; overflow: hidden
 </div>
 
 <nav class="nav">
-  <a class="logo" href="#top" aria-label="Home">
-    <svg viewBox="0 0 40 40"><path fill="currentColor" d="M20 0c1.2 11.5 8.5 18.8 20 20-11.5 1.2-18.8 8.5-20 20-1.2-11.5-8.5-18.8-20-20C11.5 18.8 18.8 11.5 20 0z"/></svg>
-  </a>
+  <a class="logo" href="#top" aria-label="Home"><svg viewBox="0 0 40 40"><path fill="currentColor" d="M20 0c1.2 11.5 8.5 18.8 20 20-11.5 1.2-18.8 8.5-20 20-1.2-11.5-8.5-18.8-20-20C11.5 18.8 18.8 11.5 20 0z"/></svg></a>
   <div class="nav__links"><a href="#about">Inside the class</a><a href="#contact">Ping us</a></div>
   <a class="nav__cta" href="#access">Buzz in!</a>
 </nav>
@@ -190,13 +188,18 @@ section { position: relative; min-height: 100vh; height: 100vh; overflow: hidden
 </main>
 
 <div class="badge">
-  <svg viewBox="0 0 20 20" fill="currentColor">
-    <circle cx="6" cy="6" r="4.2"/><circle cx="14" cy="6" r="4.2" opacity=".75"/>
-    <circle cx="6" cy="14" r="4.2" opacity=".75"/><circle cx="14" cy="14" r="4.2"/>
-  </svg>
+  <svg viewBox="0 0 20 20" fill="currentColor"><circle cx="6" cy="6" r="4.2"/><circle cx="14" cy="6" r="4.2" opacity=".75"/><circle cx="6" cy="14" r="4.2" opacity=".75"/><circle cx="14" cy="14" r="4.2"/></svg>
   Made by <b>Melli</b>
 </div>
 
+<script>
+/* 5b. Loader fallback: show the page after 2.5s even while the GLB streams
+   (classic script so it still runs if the three.js module fails to load). */
+setTimeout(function () {
+  document.getElementById('loader').classList.add('done');
+  document.body.classList.add('loaded');
+}, 2500);
+</script>
 <script type="importmap">
 { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
@@ -225,15 +228,15 @@ sections.forEach(s => io.observe(s));
 const speedEls = [...document.querySelectorAll('[data-speed]')];
 function onScroll() {
   const H = innerHeight;
-  for (const el of speedEls) {
+  speedEls.forEach(el => {
     const sec = el.closest('section');
     const p = -sec.getBoundingClientRect().top / H;
     const speed = parseFloat(el.dataset.speed);
     const rot = parseFloat(el.dataset.rot || 0);
     el.style.transform = `translate3d(0, ${p * speed * H}px, 0) rotate(${p * rot}deg)`;
-  }
+  });
   const y = H * 0.06;
-  const cur = sections.find(s => { const r = s.getBoundingClientRect(); return r.top <= y && r.bottom >= y; });
+  const cur = sections.find(s => { const r = s.getBoundingClientRect(); return r.top <= y && r.bottom > y; });
   document.body.classList.toggle('on-dark', !!cur && cur.dataset.theme === 'dark');
 }
 addEventListener('scroll', onScroll, { passive: true });
@@ -243,8 +246,7 @@ onScroll();
 /* ---------- 5b. Loader ---------- */
 const loaderEl = document.getElementById('loader');
 const canvas = document.getElementById('bee');
-function reveal() { loaderEl.classList.add('done'); document.body.classList.add('loaded'); }
-setTimeout(reveal, 2500);
+const reveal = () => { loaderEl.classList.add('done'); document.body.classList.add('loaded'); };
 
 /* ---------- 5c. three.js scene ---------- */
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -272,74 +274,78 @@ scene.add(new THREE.HemisphereLight(0xf2eeff, 0x7a62c9, 1.3));
 const key = new THREE.DirectionalLight(0xfff1d6, 2.6); key.position.set(3, 5, 6); scene.add(key);
 const rim = new THREE.DirectionalLight(0xc8b8ff, 2.2); rim.position.set(-5, 2, -4); scene.add(rim);
 
-const flight = new THREE.Group();   // world position, scale, yaw
-const beeRoot = new THREE.Group();  // roll / pitch. +X head, +Y up, +Z bee's right
+const flight = new THREE.Group();
+const beeRoot = new THREE.Group();
 flight.add(beeRoot);
 scene.add(flight);
 
-/* ---------- 5e. Wing texture + material ---------- */
+/* ---------- 5e. Procedural wings ---------- */
 const wingCanvas = document.createElement('canvas');
 wingCanvas.width = 1024; wingCanvas.height = 576;
 const wingTex = new THREE.CanvasTexture(wingCanvas);
 wingTex.colorSpace = THREE.SRGBColorSpace;
+{
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    const ctx = wingCanvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(img, 0, 0, 1024, 576);
+    try {
+      const data = ctx.getImageData(0, 0, 1024, 576);
+      const d = data.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], g = d[i + 1], b = d[i + 2];
+        const l = (r * .3 + g * .59 + b * .11) / 255;
+        d[i + 3] = clamp((l - .035) * 4.2, 0, 1) * 255;
+        d[i] = Math.min(255, r * 1.5 + 30);
+        d[i + 1] = Math.min(255, g * 1.5 + 30);
+        d[i + 2] = Math.min(255, b * 1.5 + 40);
+      }
+      ctx.putImageData(data, 0, 0);
+    } catch (e) { console.warn('Wing texture processing failed', e); }
+    wingTex.needsUpdate = true;
+  };
+  img.src = WING_TEX;
+}
 
-const wingImg = new Image();
-wingImg.crossOrigin = 'anonymous';
-wingImg.onload = () => {
-  const ctx = wingCanvas.getContext('2d', { willReadFrequently: true });
-  ctx.drawImage(wingImg, 0, 0, 1024, 576);
-  const img = ctx.getImageData(0, 0, 1024, 576);
-  const d = img.data;
-  for (let i = 0; i < d.length; i += 4) {
-    const r = d[i], g = d[i + 1], b = d[i + 2];
-    const l = (r * .3 + g * .59 + b * .11) / 255;
-    d[i + 3] = clamp((l - .035) * 4.2, 0, 1) * 255;
-    d[i]     = Math.min(255, r * 1.5 + 30);
-    d[i + 1] = Math.min(255, g * 1.5 + 30);
-    d[i + 2] = Math.min(255, b * 1.5 + 40);
-  }
-  ctx.putImageData(img, 0, 0);
-  wingTex.needsUpdate = true;
-};
-wingImg.src = WING_TEX;
-
+function wingGeometry(span) {
+  const g = new THREE.PlaneGeometry(span, span * 9 / 16);
+  g.translate(span / 2 - span * .03, 0, 0);
+  g.rotateX(-Math.PI / 2);
+  g.rotateY(-Math.PI / 2);
+  return g;
+}
 const wingMat = opacity => new THREE.MeshBasicMaterial({
   map: wingTex, transparent: true, opacity, side: THREE.DoubleSide,
   depthWrite: false, color: 0xffffff, blending: THREE.NormalBlending
 });
-function wingGeo(span) {
-  const g = new THREE.PlaneGeometry(span, span * 9 / 16);
-  g.translate(span / 2 - span * .03, 0, 0); // hinge at root
-  g.rotateX(-Math.PI / 2);                  // flat
-  g.rotateY(-Math.PI / 2);                  // span along +Z
-  return g;
-}
+
 const WINGS = [
-  { span: .72, sweep: -.42, phase: 0,   lift: .02 },
-  { span: .52, sweep: -.95, phase: -.5, lift: -.01 },
+  { span: .72, sweep: -.42, phase: 0, lift: .02 },
+  { span: .52, sweep: -.95, phase: -.5, lift: -.01 }
 ];
-const COPIES = [[0, .95], [.55, .28], [-.55, .28]];
+const LAYERS = [[0, .95], [.55, .28], [-.55, .28]];
 const flaps = [];
+
 function buildSide(anchor, mirror) {
   const side = new THREE.Group();
   side.position.copy(anchor);
   if (mirror) side.scale.z = -1;
-  for (const w of WINGS) {
+  WINGS.forEach(w => {
     const sweep = new THREE.Group();
     sweep.rotation.y = w.sweep;
     sweep.position.y = w.lift;
-    const geo = wingGeo(w.span);
-    for (const [off, op] of COPIES) {
+    const geo = wingGeometry(w.span);
+    LAYERS.forEach(([off, op]) => {
       const flap = new THREE.Group();
       const mesh = new THREE.Mesh(geo, wingMat(op));
       mesh.frustumCulled = false;
       flap.add(mesh);
-      flap.userData.phase = w.phase + off;
       sweep.add(flap);
-      flaps.push(flap);
-    }
+      flaps.push({ group: flap, phase: w.phase + off });
+    });
     side.add(sweep);
-  }
+  });
   beeRoot.add(side);
 }
 
@@ -356,14 +362,14 @@ new GLTFLoader().load(BEE_GLB, gltf => {
   });
   const holder = new THREE.Group();
   holder.add(model);
-  model.rotation.set(0, Math.PI / 2, 0); // head +Z → +X
+  model.rotation.set(0, Math.PI / 2, 0);
 
-  const box = new THREE.Box3().setFromObject(holder);
+  let box = new THREE.Box3().setFromObject(holder);
   const size = box.getSize(new THREE.Vector3());
   model.scale.multiplyScalar(1 / Math.max(size.x, size.y, size.z));
-  box.setFromObject(holder);
+  box = new THREE.Box3().setFromObject(holder);
   model.position.sub(box.getCenter(new THREE.Vector3()));
-  box.setFromObject(holder);
+  box = new THREE.Box3().setFromObject(holder);
   beeRoot.add(holder);
 
   const anchor = new THREE.Vector3(
@@ -377,32 +383,36 @@ new GLTFLoader().load(BEE_GLB, gltf => {
   loaded = true;
   canvas.classList.add('ready');
   reveal();
-}, undefined, err => { console.error(err); reveal(); });
+}, undefined, err => {
+  console.error('Bee model failed to load', err);
+  reveal();
+});
 
-/* ---------- 5f. Scroll-driven flight path ---------- */
-const K_DESK = [
-  { x: -.03, y: -.12, s: 1.00, yaw: 150, pitch: 6,  roll: -4 },
+/* ---------- 5f. Flight path ---------- */
+const K_DESKTOP = [
+  { x: -.03, y: -.12, s: 1.00, yaw: 150, pitch: 6, roll: -4 },
   { x: -.30, y: -.04, s: 1.00, yaw: 125, pitch: 10, roll: 6 },
-  { x:  .22, y: -.30, s: 1.00, yaw: 40,  pitch: -6, roll: -8 },
-  { x: -.22, y:  .02, s: 0.96, yaw: 160, pitch: 8,  roll: 4 },
-  { x:  .02, y: -.08, s: 0.92, yaw: 105, pitch: 4,  roll: 0 },
+  { x: .22, y: -.30, s: 1.00, yaw: 40, pitch: -6, roll: -8 },
+  { x: -.22, y: .02, s: 0.96, yaw: 160, pitch: 8, roll: 4 },
+  { x: .02, y: -.08, s: 0.92, yaw: 105, pitch: 4, roll: 0 }
 ];
-const K_MOB = [
-  { x: .05, y: -.02, s: .75, yaw: 150, pitch: 6,  roll: -4 },
-  { x: .10, y: .12,  s: .8,  yaw: 125, pitch: 10, roll: 6 },
-  { x: .15, y: -.20, s: .75, yaw: 40,  pitch: -6, roll: -8 },
-  { x: .25, y: .20,  s: .72, yaw: 160, pitch: 8,  roll: 4 },
-  { x: 0,   y: .1,   s: .7,  yaw: 105, pitch: 4,  roll: 0 },
+const K_MOBILE = [
+  { x: .05, y: -.02, s: .75, yaw: 150, pitch: 6, roll: -4 },
+  { x: .10, y: .12, s: .8, yaw: 125, pitch: 10, roll: 6 },
+  { x: .15, y: -.20, s: .75, yaw: 40, pitch: -6, roll: -8 },
+  { x: .25, y: .20, s: .72, yaw: 160, pitch: 8, roll: 4 },
+  { x: 0, y: .1, s: .7, yaw: 105, pitch: 4, roll: 0 }
 ];
+
 function targetAt() {
-  const K = innerWidth < 760 ? K_MOB : K_DESK;
+  const K = innerWidth < 760 ? K_MOBILE : K_DESKTOP;
   let p = scrollY / innerHeight;
   if (!isFinite(p)) p = 0;
   p = clamp(p, 0, K.length - 1);
   const i = Math.min(K.length - 2, Math.floor(p));
   const f = p - i;
-  const t = ease(clamp((f - .12) / .76, 0, 1));
   const a = K[i], b = K[i + 1];
+  const t = ease(clamp((f - .12) / .76, 0, 1));
   const arc = Math.sin(t * Math.PI);
   const dive = arc * -.22;
   return {
@@ -412,41 +422,41 @@ function targetAt() {
     yaw: lerpAngle(a.yaw, b.yaw, t),
     pitch: lerp(a.pitch, b.pitch, t),
     roll: lerp(a.roll, b.roll, t),
-    moving: arc,
+    moving: arc
   };
 }
 
 /* ---------- 5g. Animation loop ---------- */
 const mouse = { x: 0, y: 0, sx: 0, sy: 0 };
 addEventListener('pointermove', e => {
-  mouse.x = e.clientX / innerWidth * 2 - 1;
-  mouse.y = -(e.clientY / innerHeight * 2 - 1);
+  mouse.x = (e.clientX / innerWidth) * 2 - 1;
+  mouse.y = -((e.clientY / innerHeight) * 2 - 1);
 }, { passive: true });
 
-const cur = targetAt();
+const cur = { ...targetAt() };
 const clock = new THREE.Clock();
 
 function tick() {
   requestAnimationFrame(tick);
   const dt = Math.min(clock.getDelta(), .05);
   const t = clock.elapsedTime;
-  const tgt = targetAt();
+  const tg = targetAt();
 
-  const px = cur.x, py = cur.y;
   const k = 1 - Math.exp(-dt * 3.2);
-  cur.x = lerp(cur.x, tgt.x, k);
-  cur.y = lerp(cur.y, tgt.y, k);
-  cur.s = lerp(cur.s, tgt.s, k);
-  cur.pitch = lerp(cur.pitch, tgt.pitch, k);
-  cur.roll = lerp(cur.roll, tgt.roll, k);
-  cur.yaw = lerpAngle(cur.yaw, tgt.yaw, 1 - Math.exp(-dt * 2.6));
-  cur.moving = tgt.moving;
+  const px = cur.x, py = cur.y;
+  cur.x += (tg.x - cur.x) * k;
+  cur.y += (tg.y - cur.y) * k;
+  cur.s += (tg.s - cur.s) * k;
+  cur.pitch += (tg.pitch - cur.pitch) * k;
+  cur.roll += (tg.roll - cur.roll) * k;
+  cur.yaw = lerpAngle(cur.yaw, tg.yaw, 1 - Math.exp(-dt * 2.6));
+  cur.moving = tg.moving;
   const vx = dt > 0 ? (cur.x - px) / dt : 0;
   const vy = dt > 0 ? (cur.y - py) / dt : 0;
 
   const km = 1 - Math.exp(-dt * 2);
-  mouse.sx = lerp(mouse.sx, mouse.x, km);
-  mouse.sy = lerp(mouse.sy, mouse.y, km);
+  mouse.sx += (mouse.x - mouse.sx) * km;
+  mouse.sy += (mouse.y - mouse.sy) * km;
 
   const halfH = Math.tan(camera.fov * D2R / 2) * camera.position.z;
   const halfW = halfH * camera.aspect;
@@ -466,9 +476,9 @@ function tick() {
 
   const freq = Math.PI * 2 * (17 + cur.moving * 5);
   for (const f of flaps) {
-    const a = Math.sin(t * freq + f.userData.phase);
-    f.rotation.x = -.25 + a * .95;
-    f.rotation.y = a * .18;
+    const a = Math.sin(t * freq + f.phase);
+    f.group.rotation.x = -.25 + a * .95;
+    f.group.rotation.y = a * .18;
   }
 
   if (loaded) renderer.render(scene, camera);
