@@ -24,6 +24,7 @@ import {
   PHOTOS,
   PHOTOS_BEAT,
   PHOTO_BEATS,
+  STORE_BEATS,
 } from "./data";
 
 // Fonts ship with the project (public/fonts) so rendering needs no network.
@@ -41,9 +42,10 @@ const beatAt = (t: number) => {
   let i = -1;
   while (i + 1 < BEATS.length && BEATS[i + 1] <= t) i++;
   const since = i < 0 ? 99 : t - BEATS[i];
-  return { i, pulse: Math.exp(-since * 7) };
+  // beat numbers count from the end of the storefront opening
+  return { i: i - STORE_BEATS, pulse: Math.exp(-since * 7) };
 };
-const bt = (i: number) => BEATS[Math.min(i, BEATS.length - 1)];
+const bt = (i: number) => BEATS[Math.max(0, Math.min(i + STORE_BEATS, BEATS.length - 1))];
 const ramp = (t: number, start: number, dur: number, ease = outExpo) =>
   interpolate(t, [start, start + dur], [0, 1], { ...clamp, easing: ease });
 
@@ -572,13 +574,71 @@ const EndCard: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
   );
 };
 
+// ── Opening: the shop front ────────────────────────────────────────────────
+const Store: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
+  const end = bt(0);
+  const zoom = interpolate(t, [0, end], [1.14, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
+  const out = ramp(t, end - BEAT_LEN * 0.7, BEAT_LEN * 0.7, Easing.in(Easing.cubic));
+  const IH = (1080 * 1269) / 1240;
+  const cap = ramp(t, BEATS[2], 0.6);
+  return (
+    <AbsoluteFill style={{ background: "#000", overflow: "hidden" }}>
+      <Img
+        src={staticFile("store.webp")}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          filter: "blur(40px) brightness(.55)",
+          transform: "scale(1.2)",
+        }}
+      />
+      <Img
+        src={staticFile("store.webp")}
+        style={{
+          position: "absolute",
+          left: 0,
+          top: (1920 - IH) / 2 - 60,
+          width: 1080,
+          height: IH,
+          transformOrigin: "50% 20%",
+          transform: `scale(${zoom * (1 + 0.006 * pulse)})`,
+          boxShadow: "0 30px 70px rgba(0,0,0,.5)",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: (1920 + IH) / 2 + 10,
+          textAlign: "center",
+          color: "#fff",
+          fontFamily: SANS,
+          fontWeight: 600,
+          fontSize: 32,
+          letterSpacing: ".24em",
+          opacity: cap,
+          transform: `translateY(${(1 - cap) * 24}px)`,
+        }}
+      >
+        LES MUREAUX · 78130
+      </div>
+      <AbsoluteFill style={{ background: "#fff", opacity: Math.max(out, interpolate(t, [0, 0.4], [1, 0], clamp)) }} />
+    </AbsoluteFill>
+  );
+};
+
 export const Promo: React.FC = () => {
   const frame = useCurrentFrame();
   const t = frame / FPS;
   const { i, pulse } = beatAt(t);
 
   let scene: React.ReactNode;
-  if (i < PHOTOS_BEAT) scene = <Hero t={t} pulse={i < 0 ? 0 : pulse} beat={Math.max(0, i)} />;
+  if (i < 0) scene = <Store t={t} pulse={pulse} />;
+  else if (i < PHOTOS_BEAT) scene = <Hero t={t} pulse={i < 0 ? 0 : pulse} beat={Math.max(0, i)} />;
   else if (i < END_BEAT) scene = <Collection t={t} pulse={pulse} />;
   else scene = <EndCard t={t} pulse={pulse} />;
 

@@ -15,7 +15,9 @@ export const PHOTO_BEATS = 2; // beats per photo
 export const END_BEAT = PHOTOS_BEAT + 9 * PHOTO_BEATS; // 34
 export const LAST_BEAT = END_BEAT + 12; // 46
 
-export const DURATION = Math.ceil((BEATS[LAST_BEAT] + 0.5) * FPS);
+// The storefront opens the video; every scene after it starts this many beats later.
+export const STORE_BEATS = 6;
+export const DURATION = Math.ceil((BEATS[LAST_BEAT + STORE_BEATS] + 0.5) * FPS);
 
 export const GREEN_900 = "#0b2f20";
 export const GREEN_800 = "#11402c";
