@@ -9,7 +9,7 @@
 <meta name="description" content="Derya Couture Paris est une enseigne spécialisée dans la création sur mesure, la confection, la vente et la location de tenues de cérémonie et traditionnelles.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500&family=Michroma&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500&family=Michroma&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
 :root{--u:min(calc(100vw/1600),calc(100vh/900));--ink:#16191f;--mid:#737b86;--dim:#a4adb8;--line:#e6ebf0;--ice:#e9f0f7}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -26,6 +26,9 @@ header{display:flex;align-items:center;min-height:calc(86*var(--u))}
 .r1{width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
 .badge{position:absolute;z-index:8;left:calc(46*var(--u));top:calc(18*var(--u));width:calc(196*var(--u));height:calc(196*var(--u));border-radius:50%;background:#fff;box-shadow:0 0 0 calc(4*var(--u)) #0a0705,0 0 0 calc(6*var(--u)) #c9a24a,0 calc(16*var(--u)) calc(36*var(--u)) rgba(10,7,5,.35);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
 .badge img{display:block;width:100%;height:100%}
+.official{position:absolute;z-index:8;left:calc(6*var(--u));top:calc(220*var(--u));width:calc(276*var(--u));text-align:center;font-family:"Great Vibes",cursive;font-size:calc(40*var(--u));line-height:.98;transition:transform .25s}
+.official:hover{transform:scale(1.04)}
+.official span{display:block;background:linear-gradient(180deg,#2b9bff,#0a5fd8 60%,#0747a6);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(.4px 0 0 #0a5fd8) drop-shadow(-.4px 0 0 #0a5fd8) drop-shadow(0 1px 0 rgba(255,255,255,.7))}
 /* petite pastille bleue cochée sur le bord du logo de gauche */
 .badge .verified{position:absolute;right:calc(-2*var(--u));bottom:calc(10*var(--u));width:calc(46*var(--u));height:calc(46*var(--u));filter:drop-shadow(0 calc(2*var(--u)) calc(4*var(--u)) rgba(10,7,5,.35))}
 /* second logo, en miroir du premier à l'extrême droite */
@@ -152,6 +155,8 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 .info-addr a:hover{color:#000;border-color:#c9a24a}
 .info-addr svg{width:calc(17*var(--u));height:calc(17*var(--u));fill:#b8902f;flex:none}
 .info-addr .dot{color:#c9a24a}
+.info-addr .ig{font-weight:600;color:#8e2a6b}.info-addr .ig svg,.info-addr .fb svg{width:calc(19*var(--u));height:calc(19*var(--u))}
+.info-addr .fb{font-weight:600;color:#1462c8}
 .ready .info p{animation:infoIn .9s cubic-bezier(.2,.8,.2,1) forwards}
 .ready .info p:nth-child(2){animation-delay:.18s}
 .ready .info p:nth-child(3){animation-delay:.36s}
@@ -177,6 +182,22 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 .lc-meta b{display:block;font-weight:400;font-size:calc(11*var(--u));letter-spacing:.14em}
 .lc-meta span{display:block;margin-top:calc(5*var(--u));font-size:calc(14*var(--u));color:var(--mid)}
 .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(24*var(--u));max-width:calc(1200*var(--u));margin:0 auto}
+/* la vitrine en grand, les trois services empilés à l'extrême droite */
+.svc-wrap{display:grid;grid-template-columns:1fr calc(330*var(--u));gap:calc(24*var(--u));max-width:calc(1480*var(--u));margin:0 auto;align-items:stretch}
+.svc-wrap .svc-grid{grid-template-columns:1fr;grid-auto-rows:1fr;max-width:none;margin:0}
+.svc-wrap .svc{justify-content:center}
+/* cartes de services : fonds profonds, titres dorés en serif gras */
+.svc-wrap .svc{position:relative;border:1px solid #c9a24a;box-shadow:inset 0 0 0 calc(5*var(--u)) rgba(255,255,255,.04),inset 0 0 0 calc(6*var(--u)) rgba(201,162,74,.35),0 calc(14*var(--u)) calc(34*var(--u)) rgba(10,7,5,.22);color:#f6ecd6;padding:calc(30*var(--u)) calc(32*var(--u));gap:calc(12*var(--u))}
+.svc-wrap .s-mesure{background:radial-gradient(120% 90% at 0% 0%,#a3243f,#5b0b1f 70%)}
+.svc-wrap .s-achat{background:radial-gradient(120% 90% at 0% 0%,#3a2c14,#0b0806 70%)}
+.svc-wrap .s-loc{background:radial-gradient(120% 90% at 0% 0%,#22407a,#0b1633 70%)}
+.svc-wrap .svc h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:700;font-size:calc(38*var(--u));line-height:1;letter-spacing:.02em;background:linear-gradient(180deg,#fbe7a8,#d9ae4f 55%,#a77b24);-webkit-background-clip:text;background-clip:text;color:transparent}
+.svc-wrap .svc h3:after{content:"";display:block;width:calc(56*var(--u));height:2px;margin-top:calc(12*var(--u));background:linear-gradient(90deg,#d9ae4f,transparent)}
+.svc-wrap .svc p{flex:0 1 auto;font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:600;font-size:calc(20*var(--u));line-height:1.35;color:#f3e6c8}
+.svc-wrap .svc button{margin-top:calc(6*var(--u));background:linear-gradient(180deg,#f3d48a,#c9a24a);color:#1a1209;font-weight:600;box-shadow:0 calc(6*var(--u)) calc(16*var(--u)) rgba(0,0,0,.3)}
+.svc-wrap .svc button:hover{filter:brightness(1.08)}
+.shopfront{margin:0;border-radius:14px;overflow:hidden;background:#0a0705;box-shadow:0 calc(18*var(--u)) calc(44*var(--u)) rgba(10,7,5,.18)}
+.shopfront img{display:block;width:100%;height:100%;object-fit:cover}
 .svc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:calc(34*var(--u)) calc(30*var(--u));display:flex;flex-direction:column;gap:calc(14*var(--u))}
 .svc h3{font-weight:400;font-size:calc(14*var(--u));letter-spacing:.14em}
 .svc p{flex:1;font-size:calc(14.5*var(--u));line-height:1.6;color:var(--mid)}
@@ -200,6 +221,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   .badge{left:16px;top:calc(100vw*231/1213 + 9px);width:70px;height:70px;box-shadow:0 0 0 3px #0a0705,0 0 0 4px #c9a24a,0 8px 20px rgba(10,7,5,.3)}
   .badge-r{left:auto;right:16px}
   .badge .verified{right:-3px;bottom:2px;width:22px;height:22px}
+  .official{left:4px;top:calc(100vw*231/1213 + 84px);width:94px;font-size:17px;line-height:1.05}
   main{grid-template-columns:1fr;grid-template-rows:1fr 190px}
   .stage{cursor:auto}.m{cursor:auto}.ring{display:none}
   .intro{left:16px;top:10px;width:calc(100% - 32px)}
@@ -214,6 +236,8 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   .sec{padding:56px 16px}.sec-h{margin-bottom:28px}.sec-h h2{font-size:16px}
   .gallery{grid-template-columns:1fr 1fr;gap:12px}.look-card .pic{height:300px}
   .svc-grid{grid-template-columns:1fr;gap:14px}
+  .svc-wrap{grid-template-columns:1fr;gap:14px}.svc-wrap .svc-grid{grid-auto-rows:auto}
+  .svc-wrap .svc{padding:26px 24px}.svc-wrap .svc h3{font-size:32px}.svc-wrap .svc p{font-size:18px}
   .r1-pad,.acct{display:none}
   .r1{grid-template-columns:1fr}
   /* sur téléphone les boutons de musique se rangent en colonne sous le logo de droite */
@@ -239,7 +263,8 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
 <body>
 <div class="page">
   <a class="facade" href="#" aria-label="Derya Couture Paris"><img src="sign.webp" width="1213" height="231" alt="Derya Couture Paris"></a>
-  <a class="badge" href="#" aria-label="Derya Couture Paris, since 2021"><img src="logo.webp" width="640" height="640" alt="Derya Couture Paris logo"><img class="verified" src="verified.webp" width="128" height="128" alt="" aria-hidden="true"></a>
+  <a class="badge" href="https://www.instagram.com/derya.couture/" target="_blank" rel="noopener" aria-label="Page officielle Derya Couture sur Instagram"><img src="logo.webp" width="640" height="640" alt="Derya Couture Paris logo"><img class="verified" src="verified.webp" width="128" height="128" alt="" aria-hidden="true"></a>
+  <a class="official" lang="fr" href="https://www.instagram.com/derya.couture/" target="_blank" rel="noopener" aria-label="Page officielle Derya Couture sur Instagram"><span>Page officielle</span><span>Derya Couture</span></a>
   <a class="badge badge-r" href="#" aria-label="Derya Couture Paris, since 2021"><img src="logo-2.webp" width="640" height="640" alt="Derya Couture Paris, logo bordeaux et or"></a>
   <header>
     <div class="r1">
@@ -247,7 +272,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
       <div class="info" lang="fr">
         <p class="info-cat"><span class="w1">Robes traditionnelles</span> <b>·</b> <span class="w2">Mariage</span> <b>·</b> <span class="w3">Soirée</span> <b>·</b> <span class="w4">Abaya</span></p>
         <p class="info-svc"><i></i><em>Robe sur mesure / retouches</em><i></i></p>
-        <p class="info-addr"><a href="https://www.google.com/maps/search/?api=1&amp;query=31+rue+Aristide+Briand+78130+Les+Mureaux" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.2 7 12 7 12s7-6.8 7-12a7 7 0 0 0-7-7Zm0 9.6a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2Z"/></svg>31 rue Aristide Briand, 78130 Les Mureaux</a><span class="dot">·</span><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Zm.9 9.1 3.6 2.2-.9 1.5-4.5-2.7V6.5h1.8Z"/></svg>Du lundi au samedi de 9h à 19h</span></p>
+        <p class="info-addr"><a href="https://www.google.com/maps/search/?api=1&amp;query=31+rue+Aristide+Briand+78130+Les+Mureaux" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.2 7 12 7 12s7-6.8 7-12a7 7 0 0 0-7-7Zm0 9.6a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2Z"/></svg>31 rue Aristide Briand, 78130 Les Mureaux</a><span class="dot">·</span><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Zm.9 9.1 3.6 2.2-.9 1.5-4.5-2.7V6.5h1.8Z"/></svg>Du lundi au samedi de 9h à 19h</span><span class="dot">·</span><a class="ig" href="https://www.instagram.com/derya.couture/" target="_blank" rel="noopener" aria-label="Instagram : @derya.couture"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".35" stop-color="#fa7e1e"/><stop offset=".6" stop-color="#d62976"/><stop offset=".85" stop-color="#962fbf"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs><path fill="url(#igg)" fill-rule="evenodd" d="M16.3 2.5H7.7A5.2 5.2 0 0 0 2.5 7.7v8.6a5.2 5.2 0 0 0 5.2 5.2h8.6a5.2 5.2 0 0 0 5.2-5.2V7.7a5.2 5.2 0 0 0-5.2-5.2Zm3.5 13.8a3.5 3.5 0 0 1-3.5 3.5H7.7a3.5 3.5 0 0 1-3.5-3.5V7.7a3.5 3.5 0 0 1 3.5-3.5h8.6a3.5 3.5 0 0 1 3.5 3.5ZM12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm0 7.9a3.1 3.1 0 1 1 0-6.2 3.1 3.1 0 0 1 0 6.2Zm5.05-8.15a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0Z"/></svg>@derya.couture</a><span class="dot">·</span><a class="fb" href="https://www.facebook.com/share/1F7eDDfdA1/" target="_blank" rel="noopener" aria-label="Derya Couture sur Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="#1877f2"/><path fill="#fff" d="M13.4 21.4v-6.6h2.2l.4-2.6h-2.6v-1.6c0-.8.3-1.3 1.4-1.3h1.3V7a17 17 0 0 0-2-.1c-2 0-3.3 1.2-3.3 3.4v1.9H8.6v2.6h2.2v6.6Z"/></svg>Facebook</a></p>
       </div>
       <div class="audio" role="group" aria-label="Musique d'ambiance"><button class="vol" id="volDown" type="button" aria-label="Baisser la musique">&minus;</button><button class="sound" id="sound" type="button" aria-pressed="true" aria-label="Musique et message de bienvenue : activer ou couper"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="wv" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span id="soundLbl">Musique</span><b class="lvl" id="lvl" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></b></button><button class="vol" id="volUp" type="button" aria-label="Monter la musique">+</button></div>
     </div>
@@ -309,10 +334,13 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
 </section>
 <section class="sec sec-alt" id="services" aria-labelledby="servicesT">
   <div class="sec-h"><h2 id="servicesT" class="wide">Nos services</h2><p>Sur mesure, achat ou location, pour chaque cérémonie.</p></div>
+  <div class="svc-wrap">
+  <figure class="shopfront"><img src="storefront.webp" width="1240" height="1269" alt="La vitrine de la boutique Derya Couture Paris : robes de mariée, de soirée et smoking" loading="lazy"></figure>
   <div class="svc-grid">
-    <article class="svc"><h3 class="wide">Sur mesure</h3><p>Création et retouches à vos mesures, de la prise de mesures jusqu'à l'essayage final.</p><button type="button" data-service="Création sur mesure">Commander</button></article>
-    <article class="svc"><h3 class="wide">Achat</h3><p>Une sélection de robes traditionnelles, de mariage et de soirée, prêtes à porter.</p><button type="button" data-service="Achat">Commander</button></article>
-    <article class="svc"><h3 class="wide">Location</h3><p>Louez la tenue de votre événement, avec retouches si besoin.</p><button type="button" data-service="Location">Commander</button></article>
+    <article class="svc s-mesure"><h3>Sur mesure</h3><p>Création et retouches à vos mesures, de la prise de mesures jusqu'à l'essayage final.</p><button type="button" data-service="Création sur mesure">Commander</button></article>
+    <article class="svc s-achat"><h3>Achat</h3><p>Une sélection de robes traditionnelles, de mariage et de soirée, prêtes à porter.</p><button type="button" data-service="Achat">Commander</button></article>
+    <article class="svc s-loc"><h3>Location</h3><p>Louez la tenue de votre événement, avec retouches si besoin.</p><button type="button" data-service="Location">Commander</button></article>
+  </div>
   </div>
   <a class="back wide" href="#">Retour au défilé ↑</a>
 </section>
