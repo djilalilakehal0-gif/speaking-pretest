@@ -434,7 +434,12 @@ const PHOTOS=[
   ['photo-1.webp','Robe noire drapée à sequins'],
   ['photo-2.webp','Robe rouge en dentelle, ceinture dorée'],
   ['photo-3.webp','Robe champagne perlée, épaules dénudées'],
-  ['photo-4.webp','Collection perlée : brun, rouge et noir']];
+  ['photo-4.webp','Collection perlée : brun, rouge et noir'],
+  ['photo-5.webp','Robe blanche sirène, col en V et broderies'],
+  ['photo-6.webp','Robe marron à cape et ceinture de strass'],
+  ['photo-7.webp','Robe jaune pastel à cape drapée'],
+  ['photo-8.webp','Robe rouge à ceinture boucle et jupe brodée'],
+  ['photo-9.webp','Robe bordeaux brodée, voile et ceinture dorée']];
 PHOTOS.forEach(([src,label],k)=>{
   const btn=document.createElement('button');btn.type='button';btn.className='look-card';
   btn.innerHTML=`<span class="pic"><img src="${src}" width="800" height="1200" alt="${label}" loading="lazy"></span><span class="lc-meta"><b class="wide">Modèle ${k+1}</b><span>${label}</span></span>`;
