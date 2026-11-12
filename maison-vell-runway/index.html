@@ -76,7 +76,14 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 .add:before,.add:after{content:"";position:absolute;left:50%;top:50%;width:calc(15*var(--u));height:1.5px;margin:-.75px 0 0 calc(-7.5*var(--u));background:var(--ink)}
 .add:after{transform:rotate(90deg)}
 .add:hover{transform:rotate(90deg)}
-.sound{justify-self:end;align-self:center;display:inline-flex;align-items:center;gap:calc(8*var(--u));padding:calc(9*var(--u)) calc(14*var(--u));border:1px solid #d9dfe6;border-radius:99px;background:#fff;color:var(--ink);font-family:Michroma,sans-serif;text-transform:uppercase;font-size:calc(9.5*var(--u));letter-spacing:.12em;transition:border-color .2s}
+.audio{justify-self:end;align-self:center;display:inline-flex;align-items:center;gap:calc(6*var(--u))}
+.vol{width:calc(32*var(--u));height:calc(32*var(--u));display:inline-flex;align-items:center;justify-content:center;border:1px solid #d9dfe6;border-radius:50%;background:#fff;color:var(--ink);font-size:calc(17*var(--u));line-height:1;transition:border-color .2s,opacity .2s}
+.vol:hover{border-color:#c9a24a}.vol:disabled{opacity:.35;cursor:default;border-color:#d9dfe6}
+.lvl{display:inline-flex;align-items:flex-end;gap:calc(2*var(--u));height:calc(12*var(--u))}
+.lvl i{display:block;width:calc(3*var(--u));border-radius:1px;background:#d9dfe6}
+.lvl i:nth-child(1){height:30%}.lvl i:nth-child(2){height:45%}.lvl i:nth-child(3){height:62%}.lvl i:nth-child(4){height:80%}.lvl i:nth-child(5){height:100%}
+.lvl i.on{background:#c9a24a}.sound.muted .lvl i{background:#d9dfe6}
+.sound{display:inline-flex;align-items:center;gap:calc(8*var(--u));padding:calc(9*var(--u)) calc(14*var(--u));border:1px solid #d9dfe6;border-radius:99px;background:#fff;color:var(--ink);font-family:Michroma,sans-serif;text-transform:uppercase;font-size:calc(9.5*var(--u));letter-spacing:.12em;transition:border-color .2s}
 .sound:hover{border-color:#c9a24a}
 .sound svg{width:calc(16*var(--u));height:calc(16*var(--u));fill:currentColor;stroke:currentColor;stroke-width:1.4}
 .sound .wv{fill:none}
@@ -197,8 +204,10 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   .svc-grid{grid-template-columns:1fr;gap:14px}
   .r1-pad,.acct{display:none}
   .r1{grid-template-columns:1fr}
-  .sound{position:absolute;right:14px;top:14px;padding:0;width:38px;height:38px;justify-content:center;gap:0}
-  .sound span{display:none}
+  .audio{position:absolute;right:12px;top:10px;flex-direction:column-reverse;gap:4px}
+  .sound{padding:0;width:38px;height:38px;justify-content:center;gap:0}
+  .sound span,.sound .lvl{display:none}
+  .vol{width:30px;height:30px;font-size:17px;background:rgba(255,255,255,.92)}
   .sound svg{width:17px;height:17px}
   .info{padding:0 54px 0 94px;text-align:left}
   .info-cat{font-size:16px;line-height:1.2}
@@ -225,7 +234,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
         <p class="info-svc"><i></i><em>Robe sur mesure / retouches</em><i></i></p>
         <p class="info-addr"><a href="https://www.google.com/maps/search/?api=1&amp;query=31+rue+Aristide+Briand+78130+Les+Mureaux" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.2 7 12 7 12s7-6.8 7-12a7 7 0 0 0-7-7Zm0 9.6a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2Z"/></svg>31 rue Aristide Briand, 78130 Les Mureaux</a><span class="dot">·</span><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Zm.9 9.1 3.6 2.2-.9 1.5-4.5-2.7V6.5h1.8Z"/></svg>Du lundi au samedi de 9h à 19h</span></p>
       </div>
-      <button class="sound" id="sound" type="button" aria-pressed="true" aria-label="Son de bienvenue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="wv" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span id="soundLbl">Son activé</span></button>
+      <div class="audio" role="group" aria-label="Musique d'ambiance"><button class="vol" id="volDown" type="button" aria-label="Baisser la musique">&minus;</button><button class="sound" id="sound" type="button" aria-pressed="true" aria-label="Musique et message de bienvenue : activer ou couper"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="wv" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span id="soundLbl">Musique</span><b class="lvl" id="lvl" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></b></button><button class="vol" id="volUp" type="button" aria-label="Monter la musique">+</button></div>
     </div>
   </header>
   <main>
@@ -485,11 +494,25 @@ PHOTOS.forEach(([src,label,spin],k)=>{
   gal.append(btn);
 });
 
+// musique d'ambiance douce (music.mp3) avec boutons moins / plus / couper
+const music=new Audio('music.mp3');music.loop=true;music.preload='none';
+const LEVELS=[.03,.06,.1,.16,.24];let lvl=1;try{const v=localStorage.getItem('dc-vol');if(v!==null&&LEVELS[+v]!==undefined)lvl=+v}catch(e){}
+const volDown=$('volDown'),volUp=$('volUp');
+// iPhone ignore audio.volume : le volume passe par Web Audio quand il existe
+let actx=null,gain=null;
+function ensureGraph(){
+  if(actx)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+  try{actx=new AC();gain=actx.createGain();actx.createMediaElementSource(music).connect(gain).connect(actx.destination);applyVol()}catch(e){actx=null;gain=null}
+}
+function applyVol(){if(gain){gain.gain.value=LEVELS[lvl];music.volume=1}else music.volume=LEVELS[lvl];volDown.disabled=lvl===0;volUp.disabled=lvl===LEVELS.length-1;
+  document.querySelectorAll('#lvl i').forEach((b,k)=>b.classList.toggle('on',k<=lvl));try{localStorage.setItem('dc-vol',String(lvl))}catch(e){}}
+function playMusic(){if(muted||document.hidden)return;ensureGraph();if(actx&&actx.state==='suspended')actx.resume().catch(()=>{});music.play().catch(e=>{if(e&&e.name==='NotAllowedError')armGesture()})}
+
 // message de bienvenue : welcome.mp3 (voix féminine), sinon voix française du navigateur
 const welcome=new Audio('welcome.mp3');welcome.preload='auto';
 const soundBtn=$('sound');let muted=false;try{muted=localStorage.getItem('dc-muted')==='1'}catch(e){}
 let welcomed=false;
-function setSound(){soundBtn.classList.toggle('muted',muted);soundBtn.setAttribute('aria-pressed',String(!muted));$('soundLbl').textContent=muted?'Son coupé':'Son activé'}
+function setSound(){soundBtn.classList.toggle('muted',muted);soundBtn.setAttribute('aria-pressed',String(!muted));$('soundLbl').textContent=muted?'Son coupé':'Musique'}
 function speakFallback(){
   if(!('speechSynthesis' in window))return;
   const say=()=>{const vs=speechSynthesis.getVoices();const u=new SpeechSynthesisUtterance('Bienvenue chez Derya Couture.');u.lang='fr-FR';u.rate=.95;
@@ -504,22 +527,32 @@ function playWelcome(){
     else{welcomed=true;speakFallback()}                 // fichier absent : voix du navigateur
   });
 }
+let armed=false;
 function armGesture(){
+  if(armed)return;armed=true;
   const T=['pointerdown','keydown','touchstart','wheel'];
-  const go=()=>{T.forEach(t=>removeEventListener(t,go,true));playWelcome()};
+  const go=()=>{armed=false;T.forEach(t=>removeEventListener(t,go,true));playWelcome();playMusic()};
   T.forEach(t=>addEventListener(t,go,{capture:true,passive:true}));
 }
 soundBtn.addEventListener('click',()=>{
   muted=!muted;try{localStorage.setItem('dc-muted',muted?'1':'0')}catch(e){}
-  if(muted){welcome.pause();if('speechSynthesis' in window)speechSynthesis.cancel()}
-  else{playWelcome()}
+  if(muted){welcome.pause();music.pause();if('speechSynthesis' in window)speechSynthesis.cancel()}
+  else{playWelcome();playMusic()}
   setSound();
 });
-setSound();
+function stepVol(d){
+  lvl=Math.max(0,Math.min(LEVELS.length-1,lvl+d));applyVol();
+  if(muted){muted=false;try{localStorage.setItem('dc-muted','0')}catch(e){}setSound()}
+  playMusic();
+}
+volDown.addEventListener('click',()=>stepVol(-1));
+volUp.addEventListener('click',()=>stepVol(1));
+document.addEventListener('visibilitychange',()=>{if(document.hidden)music.pause();else playMusic()});
+applyVol();setSound();
 
 function loop(t){frame(t);requestAnimationFrame(loop)}
 Promise.all([MODELS,PIECES].map(u=>{const i=new Image;i.src=u;return i.decode().catch(()=>{})})).then(()=>document.fonts.ready).then(()=>{
-  size();paint();$('wait').classList.add('gone');document.body.classList.add('ready');playWelcome();
+  size();paint();$('wait').classList.add('gone');document.body.classList.add('ready');playWelcome();playMusic();
 });
 size();requestAnimationFrame(loop);
 </script>
