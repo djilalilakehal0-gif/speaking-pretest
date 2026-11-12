@@ -86,10 +86,10 @@ jobs:
           cp virtualfit/index.html virtualfit/*.webp _site/virtualfit/
 
       - name: Add the Maison Vell runway depth lookbook
-        # A single static file plus its images (model and piece sheets, sign, logo and icons), served at /speaking-pretest/maison-vell-runway/.
+        # A single static file plus its images (model and piece sheets, sign, logo and icons) and the gallery spin videos, served at /speaking-pretest/maison-vell-runway/.
         run: |
           mkdir -p _site/maison-vell-runway
-          cp maison-vell-runway/index.html maison-vell-runway/*.webp maison-vell-runway/*.png _site/maison-vell-runway/
+          cp maison-vell-runway/index.html maison-vell-runway/*.webp maison-vell-runway/*.png maison-vell-runway/*.mp4 _site/maison-vell-runway/
 
       - name: Redirect the old portfolio address to djilali.pages.dev
         # The portfolio now lives on Cloudflare Pages (https://djilali.pages.dev, built from portfolio/).
