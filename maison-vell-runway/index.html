@@ -13,8 +13,9 @@
 <style>
 :root{--u:min(calc(100vw/1600),calc(100vh/900));--ink:#16191f;--mid:#737b86;--dim:#a4adb8;--line:#e6ebf0;--ice:#e9f0f7}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#fff}
-body{font-family:Inter,system-ui,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;overflow:hidden}
+html{scroll-behavior:smooth}
+html,body{background:#fff}
+body{font-family:Inter,system-ui,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 ul{list-style:none}
@@ -132,6 +133,27 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 @keyframes infoLine{to{transform:scaleX(1)}}
 @keyframes infoShine{0%{background-position:100% 0}35%,100%{background-position:0 0}}
 @media (prefers-reduced-motion:reduce){.info p{opacity:1;transform:none}.info-svc i{transform:none}.ready .info p,.ready .info-svc i,.ready .info-cat span{animation:none}}
+.go{margin-left:calc(28*var(--u))}
+.sec{padding:calc(90*var(--u)) calc(46*var(--u));background:#fff}
+.sec-alt{background:#f6f8fa}
+.sec-h{text-align:center;margin-bottom:calc(44*var(--u))}
+.sec-h h2{font-weight:400;font-size:calc(22*var(--u));letter-spacing:.16em}
+.sec-h p{margin-top:calc(12*var(--u));font-size:calc(14*var(--u));color:var(--mid)}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(24*var(--u));max-width:calc(1200*var(--u));margin:0 auto}
+.look-card{display:block;width:100%;text-align:left;background:#f3f6fa;border-radius:14px;overflow:hidden;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.look-card:hover{transform:translateY(calc(-4*var(--u)));box-shadow:0 calc(18*var(--u)) calc(40*var(--u)) rgba(22,25,31,.12)}
+.look-card .pic{display:block;height:calc(430*var(--u))}
+.look-card svg{display:block;width:100%;height:100%}
+.lc-meta{display:block;padding:calc(14*var(--u)) calc(18*var(--u)) calc(18*var(--u))}
+.lc-meta b{display:block;font-weight:400;font-size:calc(11*var(--u));letter-spacing:.14em}
+.lc-meta span{display:block;margin-top:calc(5*var(--u));font-size:calc(14*var(--u));color:var(--mid)}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(24*var(--u));max-width:calc(1200*var(--u));margin:0 auto}
+.svc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:calc(34*var(--u)) calc(30*var(--u));display:flex;flex-direction:column;gap:calc(14*var(--u))}
+.svc h3{font-weight:400;font-size:calc(14*var(--u));letter-spacing:.14em}
+.svc p{flex:1;font-size:calc(14.5*var(--u));line-height:1.6;color:var(--mid)}
+.svc button{align-self:flex-start;margin-top:calc(8*var(--u));padding:calc(12*var(--u)) calc(22*var(--u));border-radius:99px;background:#0a0705;color:#f3d48a;font-family:Michroma,sans-serif;text-transform:uppercase;font-size:calc(10*var(--u));letter-spacing:.14em;transition:filter .2s}
+.svc button:hover{filter:brightness(1.2)}
+.back{display:block;width:max-content;margin:calc(50*var(--u)) auto 0;font-size:calc(10*var(--u));letter-spacing:.14em;padding-bottom:calc(4*var(--u));border-bottom:1px solid currentColor}
 button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 @media (max-width:820px){
   :root{--u:1px}
@@ -152,6 +174,10 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   .look{font-size:22px;line-height:30px}.win,.roll b{height:30px}
   .card{width:160px;height:100%;padding:12px}
   .fav{left:10px;top:10px}
+  .go{margin-left:14px}
+  .sec{padding:56px 16px}.sec-h{margin-bottom:28px}.sec-h h2{font-size:16px}
+  .gallery{grid-template-columns:1fr 1fr;gap:12px}.look-card .pic{height:300px}
+  .svc-grid{grid-template-columns:1fr;gap:14px}
   .r1-pad,.acct{display:none}
   .r1{grid-template-columns:1fr}
   .info{padding:0 0 0 94px;text-align:left}
@@ -187,6 +213,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
       <div class="tag">
         <div class="look wide" aria-live="polite"><span>Look</span><span class="win"><span class="roll" id="roll"></span></span></div>
         <a class="shop wide" href="#">Shop the look</a>
+        <a class="shop wide go" href="#modeles">Nos créations ↓</a>
       </div>
       <div class="ring" id="ring"></div>
     </section>
@@ -231,6 +258,19 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
     </form>
   </div>
 </dialog>
+<section class="sec" id="modeles" aria-labelledby="modelesT">
+  <div class="sec-h"><h2 id="modelesT" class="wide">Nos créations</h2><p>Cliquez sur une tenue pour la commander.</p></div>
+  <div class="gallery" id="gallery"></div>
+</section>
+<section class="sec sec-alt" id="services" aria-labelledby="servicesT">
+  <div class="sec-h"><h2 id="servicesT" class="wide">Nos services</h2><p>Sur mesure, achat ou location, pour chaque cérémonie.</p></div>
+  <div class="svc-grid">
+    <article class="svc"><h3 class="wide">Sur mesure</h3><p>Création et retouches à vos mesures, de la prise de mesures jusqu'à l'essayage final.</p><button type="button" data-service="Création sur mesure">Commander</button></article>
+    <article class="svc"><h3 class="wide">Achat</h3><p>Une sélection de robes traditionnelles, de mariage et de soirée, prêtes à porter.</p><button type="button" data-service="Achat">Commander</button></article>
+    <article class="svc"><h3 class="wide">Location</h3><p>Louez la tenue de votre événement, avec retouches si besoin.</p><button type="button" data-service="Location">Commander</button></article>
+  </div>
+  <a class="back wide" href="#">Retour au défilé ↑</a>
+</section>
 <div class="wait" id="wait"></div>
 <script>
 const MODELS='models.webp',PIECES='pieces.webp';
@@ -373,6 +413,20 @@ form.addEventListener('submit',e=>{
   if(d.get('msg').trim())lines.push(`• Message : ${d.get('msg').trim()}`);
   window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(lines.join('\n'))}`,'_blank','noopener');
 });
+
+// galerie des créations et services : chaque carte ouvre la commande
+const gal=$('gallery');
+LOOKS.forEach(([a,b],i)=>{
+  const btn=document.createElement('button');btn.type='button';btn.className='look-card';
+  btn.innerHTML=`<span class="pic"></span><span class="lc-meta"><b class="wide">Look ${FIRST+i}</b><span>${LOOK_NAMES[i]}</span></span>`;
+  btn.querySelector('.pic').append(crop(MODELS,a,Y0,b-a,Y1-Y0,MW,MH));
+  btn.addEventListener('click',()=>{lookSel.value=i;fillPieces(i,null);if(!order.open)order.showModal()});
+  gal.append(btn);
+});
+document.querySelectorAll('[data-service]').forEach(b=>b.addEventListener('click',()=>{
+  const r=form.querySelector(`input[name=service][value="${b.dataset.service}"]`);if(r)r.checked=true;
+  openOrder();
+}));
 
 function loop(t){frame(t);requestAnimationFrame(loop)}
 Promise.all([MODELS,PIECES].map(u=>{const i=new Image;i.src=u;return i.decode().catch(()=>{})})).then(()=>document.fonts.ready).then(()=>{
