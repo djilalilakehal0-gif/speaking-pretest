@@ -154,6 +154,7 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 .svc button{align-self:flex-start;margin-top:calc(8*var(--u));padding:calc(12*var(--u)) calc(22*var(--u));border-radius:99px;background:#0a0705;color:#f3d48a;font-family:Michroma,sans-serif;text-transform:uppercase;font-size:calc(10*var(--u));letter-spacing:.14em;transition:filter .2s}
 .svc button:hover{filter:brightness(1.2)}
 .back{display:block;width:max-content;margin:calc(50*var(--u)) auto 0;font-size:calc(10*var(--u));letter-spacing:.14em;padding-bottom:calc(4*var(--u));border-bottom:1px solid currentColor}
+.look-card .pic img{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
 button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 @media (max-width:820px){
   :root{--u:1px}
@@ -427,6 +428,22 @@ document.querySelectorAll('[data-service]').forEach(b=>b.addEventListener('click
   const r=form.querySelector(`input[name=service][value="${b.dataset.service}"]`);if(r)r.checked=true;
   openOrder();
 }));
+
+// photos de la boutique : chaque carte ouvre la commande avec la tenue pré-remplie
+const PHOTOS=[
+  ['photo-1.webp','Robe noire drapée à sequins'],
+  ['photo-2.webp','Robe rouge en dentelle, ceinture dorée'],
+  ['photo-3.webp','Robe champagne perlée, épaules dénudées'],
+  ['photo-4.webp','Collection perlée : brun, rouge et noir']];
+PHOTOS.forEach(([src,label],k)=>{
+  const btn=document.createElement('button');btn.type='button';btn.className='look-card';
+  btn.innerHTML=`<span class="pic"><img src="${src}" width="800" height="1200" alt="${label}" loading="lazy"></span><span class="lc-meta"><b class="wide">Modèle ${k+1}</b><span>${label}</span></span>`;
+  btn.addEventListener('click',()=>{
+    form.querySelector('[name=msg]').value=`Je souhaite commander : ${label} (Modèle ${k+1}, voir la photo sur le site).`;
+    if(!order.open)order.showModal();
+  });
+  gal.append(btn);
+});
 
 function loop(t){frame(t);requestAnimationFrame(loop)}
 Promise.all([MODELS,PIECES].map(u=>{const i=new Image;i.src=u;return i.decode().catch(()=>{})})).then(()=>document.fonts.ready).then(()=>{
