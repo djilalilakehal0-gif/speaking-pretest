@@ -203,6 +203,7 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 .svc p{flex:1;font-size:calc(14.5*var(--u));line-height:1.6;color:var(--mid)}
 .svc button{align-self:flex-start;margin-top:calc(8*var(--u));padding:calc(12*var(--u)) calc(22*var(--u));border-radius:99px;background:#0a0705;color:#f3d48a;font-family:Michroma,sans-serif;text-transform:uppercase;font-size:calc(10*var(--u));letter-spacing:.14em;transition:filter .2s}
 .svc button:hover{filter:brightness(1.2)}
+.robes-soon{text-align:center;font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:600;font-size:calc(24*var(--u));color:#8a6720}
 .back{display:block;width:max-content;margin:calc(50*var(--u)) auto 0;font-size:calc(10*var(--u));letter-spacing:.14em;padding-bottom:calc(4*var(--u));border-bottom:1px solid currentColor}
 .look-card .pic img{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
 .look-card .pic{position:relative}
@@ -284,6 +285,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
         <div class="look wide" aria-live="polite"><span>Look</span><span class="win"><span class="roll" id="roll"></span></span></div>
         <a class="shop wide" href="#">Shop the look</a>
         <a class="shop wide go" href="#modeles">Nos créations ↓</a>
+        <a class="shop wide go" href="#robes">Robes ↓</a>
       </div>
       <div class="ring" id="ring"></div>
     </section>
@@ -342,6 +344,11 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
     <article class="svc s-loc"><h3>Location</h3><p>Louez la tenue de votre événement, avec retouches si besoin.</p><button type="button" data-service="Location">Commander</button></article>
   </div>
   </div>
+</section>
+<section class="sec" id="robes" aria-labelledby="robesT">
+  <div class="sec-h"><h2 id="robesT" class="wide">Robes</h2><p>Nos robes en boutique. Cliquez sur une robe pour la commander.</p></div>
+  <div class="gallery" id="robesGal"></div>
+  <p class="robes-soon" id="robesSoon">Nouvelles robes bientôt en ligne.</p>
   <a class="back wide" href="#">Retour au défilé ↑</a>
 </section>
 <div class="wait" id="wait"></div>
@@ -536,6 +543,20 @@ PHOTOS.forEach(([src,label,spin],k)=>{
   });
   gal.append(btn);
 });
+
+// section Robes : ajouter ici les photos ['fichier.webp','Nom de la robe']
+const ROBES=[];
+const robesGal=$('robesGal');
+ROBES.forEach(([src,label],k)=>{
+  const btn=document.createElement('button');btn.type='button';btn.className='look-card';
+  btn.innerHTML=`<span class="pic"><img src="${src}" width="800" height="1200" alt="${label}" loading="lazy"></span><span class="lc-meta"><b class="wide">Robe ${k+1}</b><span>${label}</span></span>`;
+  btn.addEventListener('click',()=>{
+    form.querySelector('[name=msg]').value=`Je souhaite commander : ${label} (Robe ${k+1}, voir la photo sur le site).`;
+    if(!order.open)order.showModal();
+  });
+  robesGal.append(btn);
+});
+$('robesSoon').hidden=ROBES.length>0;
 
 // musique d'ambiance douce (music.mp3) avec boutons moins / plus / couper
 const music=new Audio('music.mp3');music.loop=true;music.preload='none';
