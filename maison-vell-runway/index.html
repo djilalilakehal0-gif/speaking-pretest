@@ -26,6 +26,8 @@ header{display:flex;align-items:center;min-height:calc(86*var(--u))}
 .r1{width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
 .badge{position:absolute;z-index:8;left:calc(46*var(--u));top:calc(18*var(--u));width:calc(196*var(--u));height:calc(196*var(--u));border-radius:50%;background:#fff;box-shadow:0 0 0 calc(4*var(--u)) #0a0705,0 0 0 calc(6*var(--u)) #c9a24a,0 calc(16*var(--u)) calc(36*var(--u)) rgba(10,7,5,.35);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
 .badge img{display:block;width:100%;height:100%}
+/* petite pastille bleue cochée sur le bord du logo de gauche */
+.badge .verified{position:absolute;right:calc(-2*var(--u));bottom:calc(10*var(--u));width:calc(46*var(--u));height:calc(46*var(--u));filter:drop-shadow(0 calc(2*var(--u)) calc(4*var(--u)) rgba(10,7,5,.35))}
 /* second logo, en miroir du premier à l'extrême droite */
 .badge-r{left:auto;right:calc(46*var(--u));background:#0a0705;overflow:hidden}
 .badge-r img{border-radius:50%}
@@ -197,6 +199,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   .r1{width:100%}
   .badge{left:16px;top:calc(100vw*231/1213 + 9px);width:70px;height:70px;box-shadow:0 0 0 3px #0a0705,0 0 0 4px #c9a24a,0 8px 20px rgba(10,7,5,.3)}
   .badge-r{left:auto;right:16px}
+  .badge .verified{right:-3px;bottom:2px;width:22px;height:22px}
   main{grid-template-columns:1fr;grid-template-rows:1fr 190px}
   .stage{cursor:auto}.m{cursor:auto}.ring{display:none}
   .intro{left:16px;top:10px;width:calc(100% - 32px)}
@@ -236,7 +239,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
 <body>
 <div class="page">
   <a class="facade" href="#" aria-label="Derya Couture Paris"><img src="sign.webp" width="1213" height="231" alt="Derya Couture Paris"></a>
-  <a class="badge" href="#" aria-label="Derya Couture Paris, since 2021"><img src="logo.webp" width="640" height="640" alt="Derya Couture Paris logo"></a>
+  <a class="badge" href="#" aria-label="Derya Couture Paris, since 2021"><img src="logo.webp" width="640" height="640" alt="Derya Couture Paris logo"><img class="verified" src="verified.webp" width="128" height="128" alt="" aria-hidden="true"></a>
   <a class="badge badge-r" href="#" aria-label="Derya Couture Paris, since 2021"><img src="logo-2.webp" width="640" height="640" alt="Derya Couture Paris, logo bordeaux et or"></a>
   <header>
     <div class="r1">
