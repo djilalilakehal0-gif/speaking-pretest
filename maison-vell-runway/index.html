@@ -197,7 +197,10 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 .svc-wrap .svc button{margin-top:calc(6*var(--u));background:linear-gradient(180deg,#f3d48a,#c9a24a);color:#1a1209;font-weight:600;box-shadow:0 calc(6*var(--u)) calc(16*var(--u)) rgba(0,0,0,.3)}
 .svc-wrap .svc button:hover{filter:brightness(1.08)}
 .shopfront{margin:0;border-radius:14px;overflow:hidden;background:#0a0705;box-shadow:0 calc(18*var(--u)) calc(44*var(--u)) rgba(10,7,5,.18)}
+.shopfront{position:relative}
 .shopfront img{display:block;width:100%;height:100%;object-fit:cover}
+.shopfront video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s}
+.shopfront video.on{opacity:1}
 .svc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:calc(34*var(--u)) calc(30*var(--u));display:flex;flex-direction:column;gap:calc(14*var(--u))}
 .svc h3{font-weight:400;font-size:calc(14*var(--u));letter-spacing:.14em}
 .svc p{flex:1;font-size:calc(14.5*var(--u));line-height:1.6;color:var(--mid)}
@@ -338,7 +341,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
 <section class="sec sec-alt" id="services" aria-labelledby="servicesT">
   <div class="sec-h"><h2 id="servicesT" class="wide">Nos services</h2><p>Sur mesure, achat ou location, pour chaque cérémonie.</p></div>
   <div class="svc-wrap">
-  <figure class="shopfront"><img src="storefront.webp" width="1240" height="1269" alt="La vitrine de la boutique Derya Couture Paris : robes de mariée, de soirée et smoking" loading="lazy"></figure>
+  <figure class="shopfront" id="shopfront"><img src="storefront.webp" width="1240" height="1269" alt="La vitrine de la boutique Derya Couture Paris : robes de mariée, de soirée et smoking" loading="lazy"></figure>
   <div class="svc-grid">
     <article class="svc s-mesure"><h3>Sur mesure</h3><p>Création et retouches à vos mesures, de la prise de mesures jusqu'à l'essayage final.</p><button type="button" data-service="Création sur mesure">Commander</button></article>
     <article class="svc s-achat"><h3>Achat</h3><p>Une sélection de robes traditionnelles, de mariage et de soirée, prêtes à porter.</p><button type="button" data-service="Achat">Commander</button></article>
@@ -544,6 +547,9 @@ PHOTOS.forEach(([src,label,spin],k)=>{
   });
   gal.append(btn);
 });
+
+// la vitrine : les mannequins tournent sur eux-mêmes (vidéo par-dessus la photo)
+addSpin($('shopfront'),'storefront-spin.mp4');
 
 // section Robes : ajouter ici les photos ['fichier.webp','Nom de la robe']
 const ROBES=[
