@@ -183,6 +183,16 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 .svc-wrap{display:grid;grid-template-columns:1fr calc(330*var(--u));gap:calc(24*var(--u));max-width:calc(1480*var(--u));margin:0 auto;align-items:stretch}
 .svc-wrap .svc-grid{grid-template-columns:1fr;grid-auto-rows:1fr;max-width:none;margin:0}
 .svc-wrap .svc{justify-content:center}
+/* cartes de services : fonds profonds, titres dorés en serif gras */
+.svc-wrap .svc{position:relative;border:1px solid #c9a24a;box-shadow:inset 0 0 0 calc(5*var(--u)) rgba(255,255,255,.04),inset 0 0 0 calc(6*var(--u)) rgba(201,162,74,.35),0 calc(14*var(--u)) calc(34*var(--u)) rgba(10,7,5,.22);color:#f6ecd6;padding:calc(30*var(--u)) calc(32*var(--u));gap:calc(12*var(--u))}
+.svc-wrap .s-mesure{background:radial-gradient(120% 90% at 0% 0%,#a3243f,#5b0b1f 70%)}
+.svc-wrap .s-achat{background:radial-gradient(120% 90% at 0% 0%,#3a2c14,#0b0806 70%)}
+.svc-wrap .s-loc{background:radial-gradient(120% 90% at 0% 0%,#22407a,#0b1633 70%)}
+.svc-wrap .svc h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:700;font-size:calc(38*var(--u));line-height:1;letter-spacing:.02em;background:linear-gradient(180deg,#fbe7a8,#d9ae4f 55%,#a77b24);-webkit-background-clip:text;background-clip:text;color:transparent}
+.svc-wrap .svc h3:after{content:"";display:block;width:calc(56*var(--u));height:2px;margin-top:calc(12*var(--u));background:linear-gradient(90deg,#d9ae4f,transparent)}
+.svc-wrap .svc p{flex:0 1 auto;font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:600;font-size:calc(20*var(--u));line-height:1.35;color:#f3e6c8}
+.svc-wrap .svc button{margin-top:calc(6*var(--u));background:linear-gradient(180deg,#f3d48a,#c9a24a);color:#1a1209;font-weight:600;box-shadow:0 calc(6*var(--u)) calc(16*var(--u)) rgba(0,0,0,.3)}
+.svc-wrap .svc button:hover{filter:brightness(1.08)}
 .shopfront{margin:0;border-radius:14px;overflow:hidden;background:#0a0705;box-shadow:0 calc(18*var(--u)) calc(44*var(--u)) rgba(10,7,5,.18)}
 .shopfront img{display:block;width:100%;height:100%;object-fit:cover}
 .svc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:calc(34*var(--u)) calc(30*var(--u));display:flex;flex-direction:column;gap:calc(14*var(--u))}
@@ -224,6 +234,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   .gallery{grid-template-columns:1fr 1fr;gap:12px}.look-card .pic{height:300px}
   .svc-grid{grid-template-columns:1fr;gap:14px}
   .svc-wrap{grid-template-columns:1fr;gap:14px}.svc-wrap .svc-grid{grid-auto-rows:auto}
+  .svc-wrap .svc{padding:26px 24px}.svc-wrap .svc h3{font-size:32px}.svc-wrap .svc p{font-size:18px}
   .r1-pad,.acct{display:none}
   .r1{grid-template-columns:1fr}
   /* sur téléphone les boutons de musique se rangent en colonne sous le logo de droite */
@@ -323,9 +334,9 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   <div class="svc-wrap">
   <figure class="shopfront"><img src="storefront.webp" width="1240" height="1269" alt="La vitrine de la boutique Derya Couture Paris : robes de mariée, de soirée et smoking" loading="lazy"></figure>
   <div class="svc-grid">
-    <article class="svc"><h3 class="wide">Sur mesure</h3><p>Création et retouches à vos mesures, de la prise de mesures jusqu'à l'essayage final.</p><button type="button" data-service="Création sur mesure">Commander</button></article>
-    <article class="svc"><h3 class="wide">Achat</h3><p>Une sélection de robes traditionnelles, de mariage et de soirée, prêtes à porter.</p><button type="button" data-service="Achat">Commander</button></article>
-    <article class="svc"><h3 class="wide">Location</h3><p>Louez la tenue de votre événement, avec retouches si besoin.</p><button type="button" data-service="Location">Commander</button></article>
+    <article class="svc s-mesure"><h3>Sur mesure</h3><p>Création et retouches à vos mesures, de la prise de mesures jusqu'à l'essayage final.</p><button type="button" data-service="Création sur mesure">Commander</button></article>
+    <article class="svc s-achat"><h3>Achat</h3><p>Une sélection de robes traditionnelles, de mariage et de soirée, prêtes à porter.</p><button type="button" data-service="Achat">Commander</button></article>
+    <article class="svc s-loc"><h3>Location</h3><p>Louez la tenue de votre événement, avec retouches si besoin.</p><button type="button" data-service="Location">Commander</button></article>
   </div>
   </div>
   <a class="back wide" href="#">Retour au défilé ↑</a>
