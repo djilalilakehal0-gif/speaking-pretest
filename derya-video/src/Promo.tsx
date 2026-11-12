@@ -547,6 +547,23 @@ const EndCard: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
       >
         à très vite !
       </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 330,
+          right: 40,
+          top: 1838,
+          textAlign: "center",
+          fontFamily: SANS,
+          fontWeight: 600,
+          fontSize: 26,
+          letterSpacing: ".2em",
+          color: "#fff",
+          opacity: 0.9 * c(6),
+        }}
+      >
+        DESIGNED BY <span style={{ fontWeight: 800 }}>LAKEHAL DJILALI</span>
+      </div>
       <div style={{ position: "absolute", left: 0, right: 0, top: 1268, height: 4 }}>
         <div style={{ margin: "0 auto", width: 120 * c(3), height: 3, background: GOLD }} />
       </div>
