@@ -206,8 +206,8 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 .svc p{flex:1;font-size:calc(14.5*var(--u));line-height:1.6;color:var(--mid)}
 .svc button{align-self:flex-start;margin-top:calc(8*var(--u));padding:calc(12*var(--u)) calc(22*var(--u));border-radius:99px;background:#0a0705;color:#f3d48a;font-family:Michroma,sans-serif;text-transform:uppercase;font-size:calc(10*var(--u));letter-spacing:.14em;transition:filter .2s}
 .svc button:hover{filter:brightness(1.2)}
-#robesGal .look-card .pic{height:auto;aspect-ratio:2/3}
-.robes-soon{text-align:center;font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:600;font-size:calc(24*var(--u));color:#8a6720}
+#robesGal .look-card .pic,#hommeGal .look-card .pic{height:auto;aspect-ratio:2/3}
+.robes-soon{margin-top:calc(30*var(--u));text-align:center;font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:600;font-size:calc(24*var(--u));color:#8a6720}
 .back{display:block;width:max-content;margin:calc(50*var(--u)) auto 0;font-size:calc(10*var(--u));letter-spacing:.14em;padding-bottom:calc(4*var(--u));border-bottom:1px solid currentColor}
 .look-card .pic img{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
 .look-card .pic{position:relative}
@@ -353,6 +353,11 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset
   <div class="sec-h"><h2 id="robesT" class="wide">Robes</h2><p>Nos robes en boutique. Cliquez sur une robe pour la commander.</p></div>
   <div class="gallery" id="robesGal"></div>
   <p class="robes-soon" id="robesSoon">Nouvelles robes bientôt en ligne.</p>
+</section>
+<section class="sec sec-alt" id="homme" aria-labelledby="hommeT">
+  <div class="sec-h"><h2 id="hommeT" class="wide">Derya Couture Homme</h2><p>Costumes et smokings pour homme. Cliquez sur une tenue pour la commander.</p></div>
+  <div class="gallery" id="hommeGal"></div>
+  <p class="robes-soon" id="hommeSoon">Nouvelle collection homme bientôt en ligne.</p>
   <a class="back wide" href="#">Retour au défilé ↑</a>
 </section>
 <div class="wait" id="wait"></div>
@@ -553,10 +558,28 @@ addSpin($('shopfront'),'storefront-spin.mp4');
 
 // section Robes : ajouter ici les photos ['fichier.webp','Nom de la robe']
 const ROBES=[
+  ['robe-1.webp','Robe noire drapée à sequins'],
   ['robe-2.webp','Robe rouge en dentelle, ceinture dorée'],
   ['robe-3.webp','Robe champagne perlée, épaules dénudées'],
+  ['robe-5.webp','Robe blanche sirène, col en V et broderies'],
   ['robe-6.webp','Robe marron à cape et ceinture de strass'],
   ['robe-7.webp','Robe jaune pastel à cape drapée'],
+  ['robe-8.webp','Robe rouge à ceinture boucle et jupe brodée'],
+  ['robe-9.webp','Robe bordeaux brodée, voile et ceinture dorée'],
+  ['robe-10.webp','Robe bleue brodée'],
+  ['robe-11.webp','Robe rouge perlée'],
+  ['robe-12.webp','Robe de mariée en dentelle'],
+  ['robe-13.webp','Robe bleu nuit perlée'],
+  ['robe-14.webp','Robe rouge plissée'],
+  ['robe-15.webp','Robe rouge en satin, col croisé et manches en dentelle'],
+  ['robe-16.webp','Caftan en velours noir brodé d\'or'],
+  ['robe-17.webp','Robe dorée à sequins, manches bouffantes en organza'],
+  ['robe-18.webp','Robe rose drapée et perlée'],
+  ['robe-19.webp','Robe bleu roi, manteau brocart et ceinture dorée'],
+  ['robe-20.webp','Robe noire à cape et ceinture de strass'],
+  ['robe-21.webp','Robe noire, haut à sequins argentés et jupe drapée'],
+  ['robe-22.webp','Robe noire drapée sans manches, broche argentée'],
+  ['robe-23.webp','Robe vert sauge à cape et ceinture de strass'],
   ['photo-4.webp','Collection perlée : brun, rouge et noir']];
 const robesGal=$('robesGal');
 ROBES.forEach(([src,label],k)=>{
@@ -569,6 +592,27 @@ ROBES.forEach(([src,label],k)=>{
   robesGal.append(btn);
 });
 $('robesSoon').hidden=ROBES.length>0;
+
+// section Derya Couture Homme : ajouter ici les tenues ['fichier.webp','Nom de la tenue']
+const HOMME=[
+  ['homme-1.webp','Smoking noir, gilet et nœud papillon'],
+  ['homme-2.webp','Costume noir, chemise blanche et cravate noire'],
+  ['homme-3.webp','Chemise noire et pantalon noir à pinces'],
+  ['homme-4.webp','Costume croisé blanc à rayures, col roulé noir'],
+  ['homme-5.webp','Chemise bordeaux et jean brut'],
+  ['homme-6.webp','Doudoune bordeaux à col fourrure et pantalon blanc'],
+  ['homme-7.webp','Chemise blanche et pantalon blanc']];
+const hommeGal=$('hommeGal');
+HOMME.forEach(([src,label],k)=>{
+  const btn=document.createElement('button');btn.type='button';btn.className='look-card';
+  btn.innerHTML=`<span class="pic"><img src="${src}" width="800" height="1200" alt="${label}" loading="lazy"></span><span class="lc-meta"><b class="wide">Homme ${k+1}</b><span>${label}</span></span>`;
+  btn.addEventListener('click',()=>{
+    form.querySelector('[name=msg]').value=`Je souhaite commander : ${label} (Homme ${k+1}, voir la photo sur le site).`;
+    if(!order.open)order.showModal();
+  });
+  hommeGal.append(btn);
+});
+$('hommeSoon').hidden=HOMME.length>1;
 
 // musique d'ambiance douce (music.mp3) avec boutons moins / plus / couper
 const music=new Audio('music.mp3');music.loop=true;music.preload='none';
