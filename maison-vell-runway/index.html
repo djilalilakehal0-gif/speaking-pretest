@@ -164,6 +164,7 @@ main{position:relative;display:grid;grid-template-columns:1fr calc(372*var(--u))
 .look-card .pic{position:relative}
 .look-card .pic video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:0;transition:opacity .5s}
 .look-card .pic video.on{opacity:1}
+.look-card .pic video.fit{object-fit:contain;-webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
 button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 @media (max-width:820px){
   :root{--u:1px}
@@ -428,12 +429,26 @@ form.addEventListener('submit',e=>{
   window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(lines.join('\n'))}`,'_blank','noopener');
 });
 
+// la mannequin tourne sur elle-même : la vidéo joue en boucle quand la carte est visible
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const spinIO='IntersectionObserver' in window?new IntersectionObserver(es=>es.forEach(e=>{
+  const v=e.target;if(e.isIntersecting){v.play().catch(()=>{})}else v.pause();
+}),{threshold:.35}):null;
+function addSpin(pic,src,fit){ // fit : vidéo entière sur fond clair (cartes Look)
+  if(!src||still||!spinIO)return;
+  const v=document.createElement('video');
+  v.muted=true;v.loop=true;v.playsInline=true;v.preload='none';v.src=src;v.setAttribute('aria-hidden','true');
+  if(fit)v.classList.add('fit');
+  v.addEventListener('playing',()=>v.classList.add('on'));
+  pic.append(v);spinIO.observe(v);
+}
 // galerie des créations et services : chaque carte ouvre la commande
 const gal=$('gallery');
 LOOKS.forEach(([a,b],i)=>{
   const btn=document.createElement('button');btn.type='button';btn.className='look-card';
   btn.innerHTML=`<span class="pic"></span><span class="lc-meta"><b class="wide">Look ${FIRST+i}</b><span>${LOOK_NAMES[i]}</span></span>`;
   btn.querySelector('.pic').append(crop(MODELS,a,Y0,b-a,Y1-Y0,MW,MH));
+  addSpin(btn.querySelector('.pic'),i<5?`spin-look-${i}.mp4`:null,true);
   btn.addEventListener('click',()=>{lookSel.value=i;fillPieces(i,null);if(!order.open)order.showModal()});
   gal.append(btn);
 });
@@ -453,20 +468,10 @@ const PHOTOS=[
   ['photo-7.webp','Robe jaune pastel à cape drapée','spin-7.mp4'],
   ['photo-8.webp','Robe rouge à ceinture boucle et jupe brodée','spin-8.mp4'],
   ['photo-9.webp','Robe bordeaux brodée, voile et ceinture dorée','spin-9.mp4']];
-// la mannequin tourne sur elle-même : la vidéo joue en boucle quand la carte est visible
-const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const spinIO='IntersectionObserver' in window?new IntersectionObserver(es=>es.forEach(e=>{
-  const v=e.target;if(e.isIntersecting){v.play().catch(()=>{})}else v.pause();
-}),{threshold:.35}):null;
 PHOTOS.forEach(([src,label,spin],k)=>{
   const btn=document.createElement('button');btn.type='button';btn.className='look-card';
   btn.innerHTML=`<span class="pic"><img src="${src}" width="800" height="1200" alt="${label}" loading="lazy"></span><span class="lc-meta"><b class="wide">Modèle ${k+1}</b><span>${label}</span></span>`;
-  if(spin&&!still&&spinIO){
-    const v=document.createElement('video');
-    v.muted=true;v.loop=true;v.playsInline=true;v.preload='none';v.src=spin;v.setAttribute('aria-hidden','true');
-    v.addEventListener('playing',()=>v.classList.add('on'));
-    btn.querySelector('.pic').append(v);spinIO.observe(v);
-  }
+  addSpin(btn.querySelector('.pic'),spin);
   btn.addEventListener('click',()=>{
     form.querySelector('[name=msg]').value=`Je souhaite commander : ${label} (Modèle ${k+1}, voir la photo sur le site).`;
     if(!order.open)order.showModal();
