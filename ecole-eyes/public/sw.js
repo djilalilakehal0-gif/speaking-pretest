@@ -1,6 +1,6 @@
 // Keeps the app shell available offline (the AI itself needs the internet).
-const CACHE = 'ecole-eyes-v1';
-const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'pdf.worker.min.mjs', 'icon.svg', 'manifest.webmanifest'];
+const CACHE = 'ecole-eyes-v2';
+const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'pdf.worker.min.mjs', 'logo.jpg', 'icon-192.png', 'manifest.webmanifest'];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });

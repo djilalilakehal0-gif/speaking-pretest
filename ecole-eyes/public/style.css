@@ -149,3 +149,4 @@ dialog button[type="submit"] { background: var(--accent); color: var(--accent-in
 @media (min-width: 900px) {
   body { max-width: 760px; margin: 0 auto; }
 }
+.brand .logo { border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--accent); }
