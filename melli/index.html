@@ -61,6 +61,8 @@ section { position: relative; min-height: 100vh; height: 100vh; overflow: hidden
 .join i { width: 25px; height: 32px; border: 1.8px solid currentColor; border-radius: 10px; display: grid; place-items: center; transition: transform .35s ease, background .35s; }
 .join i svg { width: 9px; height: 9px; }
 .join:hover i { transform: translateX(4px); }
+.derya-logo { position: absolute; left: 50%; top: 38vh; width: min(40vh,64vw); height: auto; margin-left: calc(min(40vh,64vw) / -2); z-index: 2; opacity: 0; filter: drop-shadow(0 24px 40px rgba(80,50,160,.22)); pointer-events: none; user-select: none; }
+.loaded .derya-logo { animation: fade 1s .4s ease forwards; }
 .hero .flower--cosmos { width: clamp(420px,64vw,1100px); left: -14vw; bottom: -24vw; transform-origin: 60% 40%; filter: drop-shadow(0 30px 40px rgba(80,50,160,.18)); z-index: 1; }
 
 /* SHARED TYPE */
@@ -76,8 +78,9 @@ section { position: relative; min-height: 100vh; height: 100vh; overflow: hidden
 /* SECTION 01 */
 .s1 { background: linear-gradient(180deg, #e4e0fa 0%, #ece9fc 100%); z-index: 2; }
 .s1 .flower--hang { width: clamp(380px,46vw,820px); left: -9vw; top: -14vw; transform-origin: 50% 0%; }
-.s1 .num { position: absolute; left: 6vw; top: 50vh; }
-.s1 .text { position: absolute; left: 50vw; top: 41vh; width: min(520px,44vw); }
+.derya-store { position: absolute; z-index: 1; left: 6vw; top: 13vh; width: min(54vh,40vw); height: auto; border-radius: 22px; box-shadow: 0 40px 70px rgba(60,30,140,.28); pointer-events: none; user-select: none; }
+.s1 .text { position: absolute; left: 50vw; top: 22vh; width: min(520px,44vw); }
+.s1 .title { margin-top: 22px; }
 
 /* SECTION 02 */
 .s2 { background: #3a1f8c url(https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261017_132814_c3d2b090-c27d-49d1-8107-66d0cfa216c2.png) center/cover no-repeat; color: #fff; z-index: 3; }
@@ -115,9 +118,10 @@ section { position: relative; min-height: 100vh; height: 100vh; overflow: hidden
 @media (max-width: 760px) {
   .nav__links { display: none; }
   .hero h1 { top: 14vh; }
+  .derya-logo { top: 29vh; }
+  .derya-store { left: 23vw; top: 11vh; width: 54vw; }
   .hero__side { top: auto; bottom: 14vh; right: 18px; width: 62vw; }
   .hero .flower--cosmos { width: 110vw; left: -38vw; bottom: -55vw; }
-  .s1 .num { top: 16vh; left: auto; right: 6vw; }
   .s1 .text, .s3 .text { left: 18px; right: 18px; width: auto; top: auto; bottom: 10vh; }
   .s2 .text { left: 18px; right: 18px; width: auto; top: 14vh; }
   .s3 .flower--passion { width: 90vw; }
@@ -142,7 +146,8 @@ section { position: relative; min-height: 100vh; height: 100vh; overflow: hidden
 
 <main>
   <section class="hero" id="top" data-theme="light">
-    <h1 data-speed="0.55"><span class="line"><span>Imagine your next site</span></span><span class="line"><span>built just like this</span></span></h1>
+    <h1 data-speed="0.55"><span class="line"><span>Derya Couture</span></span></h1>
+    <img class="derya-logo" src="derya-logo.webp" width="720" height="720" alt="Derya Couture Paris logo">
     <img class="flower flower--cosmos" data-speed="-0.25" data-rot="8" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261017_132919_c994332b-7f9d-43b5-933d-1e94faa91dd4.png" alt="">
     <div class="hero__side">
       <p>Master 3D animation in just three days with our newest program</p>
@@ -151,9 +156,10 @@ section { position: relative; min-height: 100vh; height: 100vh; overflow: hidden
   </section>
 
   <section class="s1" id="about" data-theme="light">
+    <img class="derya-store" src="derya-store.webp" width="900" height="1260" alt="Derya Couture Paris boutique window">
     <img class="flower flower--hang" data-speed="0.35" data-rot="-6" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261017_132924_764b726d-d37a-44cc-8eba-662d823d9a4c.png" alt="">
-    <div class="num reveal">01</div>
     <div class="text">
+      <div class="num reveal">01</div>
       <h2 class="title reveal d1">Explore this<br>Universe of<br>3D Motion</h2>
       <p class="copy reveal d2">Every lesson is crafted by studio veterans to equip you with the newest methods and software in 3D animation. Whether you're just starting or already a pro, our program will sharpen your skills fast.</p>
     </div>
@@ -390,8 +396,8 @@ new GLTFLoader().load(BEE_GLB, gltf => {
 
 /* ---------- 5f. Flight path ---------- */
 const K_DESKTOP = [
-  { x: -.03, y: -.12, s: 1.00, yaw: 150, pitch: 6, roll: -4 },
-  { x: -.30, y: -.04, s: 1.00, yaw: 125, pitch: 10, roll: 6 },
+  { x: -.03, y: -.12, s: .85, yaw: 150, pitch: 6, roll: -4 },
+  { x: -.30, y: -.04, s: .9, yaw: 125, pitch: 10, roll: 6 },
   { x: .22, y: -.30, s: 1.00, yaw: 40, pitch: -6, roll: -8 },
   { x: -.22, y: .02, s: 0.96, yaw: 160, pitch: 8, roll: 4 },
   { x: .02, y: -.08, s: 0.92, yaw: 105, pitch: 4, roll: 0 }
@@ -404,6 +410,22 @@ const K_MOBILE = [
   { x: 0, y: .1, s: .7, yaw: 105, pitch: 4, roll: 0 }
 ];
 
+/* The first two stops follow the Derya images: the bee flies from the logo
+   (hero) to the boutique photo (section 01), wherever the layout puts them. */
+const ANCHORS = [
+  { sel: '.derya-logo', fx: .88, fy: .2 },
+  { sel: '.derya-store', fx: .82, fy: .28 }
+];
+function anchored(k, i) {
+  const a = ANCHORS[i];
+  const el = a && document.querySelector(a.sel);
+  if (!el || !el.offsetHeight) return k;
+  const r = el.getBoundingClientRect();
+  const top = el.closest('section').getBoundingClientRect().top;
+  const px = r.left + r.width * a.fx, py = r.top - top + r.height * a.fy;
+  return { ...k, x: px / innerWidth * 2 - 1, y: 1 - py / innerHeight * 2 };
+}
+
 function targetAt() {
   const K = innerWidth < 760 ? K_MOBILE : K_DESKTOP;
   let p = scrollY / innerHeight;
@@ -411,7 +433,7 @@ function targetAt() {
   p = clamp(p, 0, K.length - 1);
   const i = Math.min(K.length - 2, Math.floor(p));
   const f = p - i;
-  const a = K[i], b = K[i + 1];
+  const a = anchored(K[i], i), b = anchored(K[i + 1], i + 1);
   const t = ease(clamp((f - .12) / .76, 0, 1));
   const arc = Math.sin(t * Math.PI);
   const dive = arc * -.22;

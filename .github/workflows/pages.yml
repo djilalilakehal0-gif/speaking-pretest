@@ -71,7 +71,7 @@ jobs:
         # A single static file (three.js loads from the jsDelivr CDN), served at /speaking-pretest/melli/.
         run: |
           mkdir -p _site/melli
-          cp melli/index.html _site/melli/
+          cp melli/index.html melli/*.webp _site/melli/
 
       - name: Add the DJILALI developer site (3D, FR/EN/AR)
         # A single static file (three.js loads from the jsDelivr CDN), served at /speaking-pretest/dev/.
