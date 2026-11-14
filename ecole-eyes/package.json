@@ -1,0 +1,25 @@
+{
+  "name": "ecole-eyes",
+  "private": true,
+  "version": "1.0.0",
+  "description": "école eyes — AI voice assistant for blind and visually impaired users (Capacitor Android + web)",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --serve"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "@capacitor-community/speech-recognition": "^7.0.1",
+    "@capacitor-community/text-to-speech": "^6.0.0",
+    "@capacitor/android": "^7.6.10",
+    "@capacitor/core": "^7.6.10",
+    "mammoth": "^1.13.0",
+    "pdfjs-dist": "^5.7.284"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.6.10",
+    "esbuild": "^0.28.2"
+  }
+}

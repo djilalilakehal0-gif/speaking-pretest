@@ -1,0 +1,6 @@
+name = "ecole-eyes-proxy"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+# After `npx wrangler deploy`, add the key:   npx wrangler secret put ANTHROPIC_API_KEY
+# Optional shared token checked on each request: npx wrangler secret put APP_TOKEN

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0b0b">
+<meta name="description" content="école eyes — مساعد ذكي بالصوت للمكفوفين وضعاف البصر">
+<title>école eyes</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <img class="logo" src="logo.jpg" alt="" width="48" height="48">
+    <div>
+      <h1>école eyes</h1>
+      <p data-t="tagline">مساعدك الذكي بالصوت</p>
+    </div>
+  </div>
+  <div class="top-actions">
+    <div class="lang-switch" role="group" aria-label="Language / اللغة / Langue">
+      <button type="button" data-lang="ar" lang="ar" aria-label="العربية">ع</button>
+      <button type="button" data-lang="fr" lang="fr" aria-label="Français">FR</button>
+      <button type="button" data-lang="en" lang="en" aria-label="English">EN</button>
+    </div>
+    <button type="button" id="open-settings" class="icon-btn" data-tl="settings" aria-label="الإعدادات">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.6 7.6 0 0 0-1.7-1L15 3h-4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.2 1.6 2 3.5 2.5-1a7.6 7.6 0 0 0 1.7 1L11 21h4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button type="button" class="tab" role="tab" data-section="chat" data-t="tabChat">المحادثة</button>
+  <button type="button" class="tab" role="tab" data-section="docs" data-t="tabDocs">المستندات</button>
+  <button type="button" class="tab" role="tab" data-section="camera" data-t="tabCamera">الكاميرا</button>
+</nav>
+
+<main>
+  <section id="sec-chat" class="section" role="tabpanel">
+    <div id="log" class="log" aria-live="polite"></div>
+  </section>
+
+  <section id="sec-docs" class="section" role="tabpanel" hidden>
+    <h2 data-t="docsTitle">اقرأ لي مستنداً</h2>
+    <p class="hint" data-t="docsHint"></p>
+    <div class="read-lang" role="group" data-tl="readLang">
+      <button type="button" data-rl="ar" lang="ar">العربية</button>
+      <button type="button" data-rl="fr" lang="fr">Français</button>
+      <button type="button" data-rl="en" lang="en">English</button>
+    </div>
+    <button type="button" id="pick" class="big-btn">
+      <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm0 2.5L17.5 8H14zM8 13h8v1.6H8zm0 3.4h8V18H8zM8 9.6h4v1.6H8z"/></svg>
+      <span data-t="pickFile">اختر ملفاً</span> <small>PDF · Word · TXT</small>
+    </button>
+    <input type="file" id="file" hidden accept=".pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain">
+    <form id="article-form" class="article">
+      <label for="article-url" data-t="articleUrl">رابط مقال علمي</label>
+      <div class="row">
+        <input id="article-url" type="url" inputmode="url" dir="ltr" placeholder="https://">
+        <button type="submit" data-t="articleGo">افتح المقال</button>
+      </div>
+    </form>
+    <div id="doc-info" class="doc-info" hidden>
+      <h3 id="doc-name"></h3>
+      <p id="doc-page" aria-live="polite"></p>
+      <div class="doc-controls">
+        <button type="button" id="doc-prev" data-t="prev">السابقة</button>
+        <button type="button" id="doc-play" data-t="play">تابع</button>
+        <button type="button" id="doc-next" data-t="next">التالية</button>
+        <button type="button" id="doc-sum" data-t="summarize">لخّص</button>
+      </div>
+      <div id="doc-text" class="doc-text"></div>
+    </div>
+  </section>
+
+  <section id="sec-camera" class="section" role="tabpanel" hidden>
+    <h2 data-t="camTitle">ماذا يوجد أمامي؟</h2>
+    <div class="cam">
+      <video id="video" playsinline muted aria-hidden="true"></video>
+      <div id="cam-placeholder" class="cam-placeholder" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="64" height="64"><path fill="currentColor" d="M9 3 7.2 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>
+      </div>
+    </div>
+    <div class="cam-controls">
+      <button type="button" id="cam-describe" data-t="camDescribe">صِف ما أمامي</button>
+      <button type="button" id="cam-read" data-t="camRead">اقرأ النص</button>
+      <button type="button" id="cam-live" aria-pressed="false" data-t="camLive">وصف مستمر</button>
+    </div>
+  </section>
+</main>
+
+<footer class="talk-area">
+  <p id="status" class="status" aria-live="polite"></p>
+  <button type="button" id="talk" class="talk" data-phase="idle">
+    <span class="ring" aria-hidden="true"></span>
+    <svg viewBox="0 0 24 24" width="64" height="64" aria-hidden="true"><path fill="currentColor" d="M12 15a4 4 0 0 0 4-4V5a4 4 0 1 0-8 0v6a4 4 0 0 0 4 4zm7-4a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.9V21H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-3.1A7 7 0 0 0 19 11z"/></svg>
+    <span id="talk-label">اضغط وتكلّم</span>
+  </button>
+</footer>
+
+<dialog id="settings">
+  <form id="settings-form" method="dialog">
+    <h2 data-t="settings">الإعدادات</h2>
+    <label for="set-proxy" data-t="proxyUrl"></label>
+    <input id="set-proxy" type="url" dir="ltr" placeholder="https://ecole-eyes.example.workers.dev">
+    <label for="set-key" data-t="apiKey"></label>
+    <input id="set-key" type="password" dir="ltr" autocomplete="off" placeholder="sk-ant-…">
+    <label class="check"><input id="set-auto" type="checkbox"> <span data-t="autoListen"></span></label>
+    <label for="set-rate" data-t="rate"></label>
+    <input id="set-rate" type="range" min="0.6" max="1.6" step="0.1">
+    <div class="row">
+      <button type="submit" data-t="save">حفظ</button>
+      <button type="button" id="settings-close" data-t="close">إغلاق</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js" type="module"></script>
+</body>
+</html>
