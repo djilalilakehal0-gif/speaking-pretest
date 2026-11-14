@@ -154,3 +154,12 @@ const CODE_SECRET='alfikr-almodi-speaking-pretest';
 - بثلاث لغات: الإنجليزية `/`، والفرنسية `/fr/`، والعربية `/ar/` (من اليمين إلى اليسار).
 - النصوص في `portfolio/src/content/locales/` (ملف لكل لغة)، والروابط والمشاريع ورقم الهاتف في `portfolio/src/content/site.ts`.
 - نموذج التواصل يرسل عبر واتساب. التفاصيل وطرق أخرى في `portfolio/README.md`.
+
+---
+
+## école eyes — مساعد صوتي ذكي للمكفوفين
+
+تطبيق في المجلد `ecole-eyes/`: محادثة صوتية مع الذكاء الاصطناعي، قراءة PDF و Word والمقالات العلمية بالعربية الفصحى أو الفرنسية أو الإنجليزية، وكاميرا تصف ما أمام المستخدم.
+- APK: Actions ← **Build école eyes Android APK** (الإصدار `ecole-eyes-1.N` في Releases).
+- الويب: `https://djilalilakehal0-gif.github.io/speaking-pretest/ecole-eyes/`
+- التجهيز وخادم المفتاح: `ecole-eyes/README.md`.

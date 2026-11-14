@@ -61,6 +61,19 @@ jobs:
           mkdir -p _site/napolitime
           cp -r napolitime/dist/. _site/napolitime/
 
+      - name: Build and add the école eyes voice assistant
+        # Served at /speaking-pretest/ecole-eyes/. The AI proxy address comes from the ECOLE_EYES_PROXY_URL variable.
+        env:
+          ECOLE_EYES_PROXY_URL: ${{ vars.ECOLE_EYES_PROXY_URL }}
+          ECOLE_EYES_APP_TOKEN: ${{ secrets.ECOLE_EYES_APP_TOKEN }}
+        run: |
+          cd ecole-eyes
+          npm ci
+          npm run build
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p _site/ecole-eyes
+          cp -r ecole-eyes/www/. _site/ecole-eyes/
+
       - name: Add the AXON motion research page
         # A single static file (three.js loads from the jsDelivr CDN), served at /speaking-pretest/axon/.
         run: |

@@ -1,0 +1,151 @@
+/* école eyes — high-contrast interface for low-vision users.
+   Yellow on near-black is the most readable pairing for most low-vision users. */
+
+:root {
+  --bg: #0b0b0b;
+  --panel: #171717;
+  --panel-2: #222;
+  --text: #ffffff;
+  --muted: #c9c9c9;
+  --accent: #ffd60a;
+  --accent-ink: #0b0b0b;
+  --listen: #2ee6a6;
+  --think: #6cb6ff;
+  --speak: #ffd60a;
+  --border: #3a3a3a;
+  --radius: 18px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", "Noto Naskh Arabic", Tahoma, sans-serif;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 20px;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 4px solid var(--accent); outline-offset: 3px; }
+
+.top {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 16px;
+}
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand h1 { margin: 0; font-size: 1.25rem; line-height: 1.1; letter-spacing: .3px; white-space: nowrap; }
+.brand p { margin: 0; font-size: .8rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand > div { min-width: 0; }
+@media (max-width: 400px) { .brand p { display: none; } }
+.top-actions { display: flex; align-items: center; gap: 8px; }
+
+.lang-switch { display: flex; border: 2px solid var(--border); border-radius: 999px; overflow: hidden; }
+.lang-switch button {
+  min-width: 46px; min-height: 46px; padding: 0 10px;
+  background: transparent; border: 0; font-weight: 700; font-size: 1rem;
+}
+.lang-switch button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.icon-btn {
+  width: 48px; height: 48px; display: grid; place-items: center;
+  background: var(--panel); border: 2px solid var(--border); border-radius: 50%;
+}
+
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 16px 10px; }
+.tab {
+  min-height: 56px; border-radius: 14px; border: 2px solid var(--border);
+  background: var(--panel); font-weight: 700; font-size: 1.05rem;
+}
+.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+main { flex: 1; min-height: 0; padding: 0 16px; overflow-y: auto; }
+.section h2 { margin: 6px 0; font-size: 1.3rem; }
+.hint { color: var(--muted); margin: 0 0 10px; font-size: 1rem; }
+
+.log { display: flex; flex-direction: column; gap: 10px; padding-bottom: 8px; }
+.msg { background: var(--panel); border-radius: var(--radius); padding: 10px 14px; border: 2px solid var(--border); }
+.msg b { display: block; font-size: .8rem; color: var(--muted); }
+.msg p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg.user { border-color: var(--accent); }
+
+.read-lang { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.read-lang button, .doc-controls button, .cam-controls button, .article button, dialog button {
+  min-height: 56px; border-radius: 14px; border: 2px solid var(--border);
+  background: var(--panel-2); font-weight: 700; padding: 6px 10px;
+}
+.read-lang button[aria-pressed="true"], #cam-live[aria-pressed="true"] {
+  background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
+}
+
+.big-btn {
+  width: 100%; min-height: 76px; display: flex; align-items: center; justify-content: center; gap: 10px;
+  border-radius: var(--radius); border: 3px dashed var(--accent); background: var(--panel);
+  font-size: 1.2rem; font-weight: 800;
+}
+.big-btn small { color: var(--muted); font-weight: 500; font-size: .85rem; }
+
+.article { margin: 14px 0; }
+.article label, dialog label { display: block; font-size: .95rem; color: var(--muted); margin: 10px 0 4px; }
+.row { display: flex; gap: 8px; }
+.row input { flex: 1; min-width: 0; }
+input[type="url"], input[type="password"] {
+  min-height: 52px; padding: 8px 12px; border-radius: 12px;
+  border: 2px solid var(--border); background: #000;
+}
+
+.doc-info { background: var(--panel); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 12px; }
+.doc-info h3 { margin: 0; overflow-wrap: anywhere; }
+.doc-info p { margin: 2px 0 10px; color: var(--accent); font-weight: 700; }
+.doc-controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.doc-text { margin-top: 12px; max-height: 40vh; overflow-y: auto; white-space: pre-wrap; font-size: 1.1rem; line-height: 1.9; }
+
+.cam { position: relative; border-radius: var(--radius); overflow: hidden; background: #000; aspect-ratio: 4 / 3; border: 2px solid var(--border); }
+.cam video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cam-placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: #555; }
+.cam-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
+
+/* The big talk button: the main way to use the app. */
+.talk-area { padding: 8px 16px 16px; }
+.status { min-height: 1.6em; margin: 0 0 8px; text-align: center; color: var(--muted); font-size: 1rem; overflow-wrap: anywhere; }
+.talk {
+  position: relative; width: 100%; min-height: clamp(140px, 24vh, 240px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  border: 0; border-radius: 28px; background: var(--accent); color: var(--accent-ink);
+  font-size: 1.5rem; font-weight: 900; overflow: hidden;
+}
+.talk .ring { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
+.talk[data-phase="listening"] { background: var(--listen); }
+.talk[data-phase="thinking"] { background: var(--think); }
+.talk[data-phase="listening"] .ring { animation: pulse 1.2s ease-out infinite; }
+.talk[data-phase="thinking"] .ring { animation: pulse 2s ease-in-out infinite; }
+.talk[data-phase="speaking"] svg { animation: bob 0.9s ease-in-out infinite; }
+@keyframes pulse { 0% { box-shadow: inset 0 0 0 0 rgba(0,0,0,.35); } 100% { box-shadow: inset 0 0 0 40px rgba(0,0,0,0); } }
+@keyframes bob { 50% { transform: scale(1.12); } }
+@media (prefers-reduced-motion: reduce) { .talk .ring, .talk svg { animation: none !important; } }
+
+dialog {
+  width: min(520px, calc(100vw - 32px)); border: 2px solid var(--accent); border-radius: var(--radius);
+  background: var(--panel); color: var(--text); padding: 18px;
+}
+dialog::backdrop { background: rgba(0,0,0,.8); }
+dialog h2 { margin-top: 0; }
+dialog input[type="url"], dialog input[type="password"] { width: 100%; }
+dialog input[type="range"] { width: 100%; accent-color: var(--accent); }
+.check { display: flex !important; align-items: center; gap: 10px; color: var(--text) !important; }
+.check input { width: 26px; height: 26px; accent-color: var(--accent); }
+dialog .row { margin-top: 16px; }
+dialog .row button { flex: 1; }
+dialog button[type="submit"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+@media (min-width: 900px) {
+  body { max-width: 760px; margin: 0 auto; }
+}

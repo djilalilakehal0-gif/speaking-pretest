@@ -1,0 +1,7 @@
+{
+  "appId": "com.ecoleeyes.app",
+  "appName": "école eyes",
+  "webDir": "www",
+  "backgroundColor": "#0b0b0b",
+  "android": { "allowMixedContent": false }
+}
