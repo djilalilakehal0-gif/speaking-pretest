@@ -87,9 +87,16 @@ private fun LocalizedRoot(graph: AppGraph, content: @Composable () -> Unit) {
         base.createConfigurationContext(cfg)
     }
     val cfg = remember(lang.lang, base) { Configuration(base.resources.configuration).apply { setLocale(lang.lang.locale); setLayoutDirection(lang.lang.locale) } }
+    // The localized context is not an Activity, so Compose could no longer find the ActivityResultRegistryOwner:
+    // rememberLauncherForActivityResult crashed the app when the camera screen opened. Provide it explicitly.
+    val registryOwner = base as? androidx.activity.result.ActivityResultRegistryOwner
+    val locals = buildList<androidx.compose.runtime.ProvidedValue<*>> {
+        add(LocalContext provides ctx)
+        add(LocalConfiguration provides cfg)
+        if (registryOwner != null) add(androidx.activity.compose.LocalActivityResultRegistryOwner provides registryOwner)
+    }
     CompositionLocalProvider(
-        LocalContext provides ctx,
-        LocalConfiguration provides cfg,
+        *locals.toTypedArray(),
         LocalLayoutDirection provides if (lang.lang.isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr,
         content = content,
     )
