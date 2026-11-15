@@ -1,0 +1,13 @@
+local.properties
+.gradle/
+build/
+*.keystore
+*.jks
+.idea/
+*.iml
+.kotlin/
+captures/
+backend/node_modules/
+backend/.wrangler/
+backend/.dev.vars
+dist/

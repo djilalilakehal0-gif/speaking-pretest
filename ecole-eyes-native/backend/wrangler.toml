@@ -1,0 +1,14 @@
+name = "ecole-eyes-proxy"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+# Optional: limit each IP to 30 requests per minute (needs a Cloudflare plan that includes rate limiting).
+# [[unsafe.bindings]]
+# name = "RATE_LIMITER"
+# type = "ratelimit"
+# namespace_id = "1001"
+# simple = { limit = 30, period = 60 }
+
+# After `npx wrangler deploy`:
+#   npx wrangler secret put ANTHROPIC_API_KEY     # your Anthropic key
+#   npx wrangler secret put APP_TOKEN             # any long random string; also put it in the app (ecoleEyesAppToken)

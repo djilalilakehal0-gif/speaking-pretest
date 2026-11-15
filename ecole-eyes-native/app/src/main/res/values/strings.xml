@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">ÉCOLE EYES</string>
+    <string name="tagline">Your voice-controlled AI assistant</string>
+
+    <!-- Home / UI -->
+    <string name="mic_idle">Tap to speak</string>
+    <string name="mic_listening">Listening…</string>
+    <string name="mic_thinking">Thinking…</string>
+    <string name="mic_speaking">Speaking — tap to interrupt</string>
+    <string name="mic_cd_idle">Voice button. Double tap, then speak your request.</string>
+    <string name="mic_cd_listening">Listening. Double tap to cancel.</string>
+    <string name="mic_cd_thinking">Working on your request.</string>
+    <string name="mic_cd_speaking">Speaking. Double tap to interrupt and talk.</string>
+    <string name="tile_assistant">AI conversation</string>
+    <string name="tile_camera">Smart camera</string>
+    <string name="tile_documents">Document reader</string>
+    <string name="tile_files">File search</string>
+    <string name="tile_language">Language</string>
+    <string name="tile_settings">Accessibility settings</string>
+    <string name="tile_privacy">Privacy</string>
+    <string name="nav_back">Back</string>
+    <string name="screen_assistant">AI conversation</string>
+    <string name="screen_camera">Smart camera</string>
+    <string name="screen_documents">Document reader</string>
+    <string name="screen_files">File search</string>
+    <string name="screen_settings">Settings</string>
+    <string name="screen_privacy">Privacy policy</string>
+    <string name="you_said">You said</string>
+    <string name="assistant_said">Assistant</string>
+    <string name="empty_conversation">Press the voice button and say, for example: “What is in front of me?”</string>
+    <string name="clear_history">Clear conversation history</string>
+    <string name="repeat_last">Repeat last answer</string>
+    <string name="stop_speaking">Stop speaking</string>
+    <string name="camera_describe">Describe what is in front of me</string>
+    <string name="camera_read_text">Read the text</string>
+    <string name="camera_live_start">Start continuous description</string>
+    <string name="camera_live_stop">Stop continuous description</string>
+    <string name="camera_preview_cd">Camera preview. The camera is pointed at your surroundings.</string>
+    <string name="camera_permission_needed">Camera permission is needed.</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="docs_add_folder">Allow a folder</string>
+    <string name="docs_add_file">Open a single file</string>
+    <string name="docs_folders">Folders you allowed</string>
+    <string name="docs_no_folders">No folder allowed yet. The app cannot see any of your files until you choose a folder.</string>
+    <string name="docs_remove_folder">Remove access to %1$s</string>
+    <string name="docs_recent">Latest documents</string>
+    <string name="docs_search_hint">Search by file name</string>
+    <string name="docs_search_cd">Search field. Type part of a file name.</string>
+    <string name="docs_read">Read %1$s</string>
+    <string name="docs_current">Now open: %1$s</string>
+    <string name="docs_pause">Pause</string>
+    <string name="docs_resume">Continue</string>
+    <string name="docs_prev_page">Previous page</string>
+    <string name="docs_next_page">Next page</string>
+    <string name="docs_repeat_paragraph">Repeat paragraph</string>
+    <string name="docs_page_of">Page %1$d of %2$d</string>
+    <string name="docs_none_found">No matching documents.</string>
+    <string name="docs_refresh">Refresh list</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_speed">Speech speed</string>
+    <string name="settings_volume">Speech volume</string>
+    <string name="settings_cloud">Allow cloud AI (sends your voice requests, camera photos and document text to the AI service)</string>
+    <string name="settings_offline_stt">Prefer on-device speech recognition</string>
+    <string name="settings_barge_in">Interrupt speech when I talk (works best with headphones)</string>
+    <string name="settings_announce">Announce before sending a photo or document</string>
+    <string name="settings_backend">AI backend address</string>
+    <string name="settings_backend_hint">https://…workers.dev</string>
+    <string name="settings_live_interval">Seconds between camera updates: %1$d</string>
+    <string name="settings_handsfree">Hands-free listening (foreground service)</string>
+    <string name="settings_handsfree_desc">Keeps the microphone on while a notification is visible, and reacts when you say “Hello École Eyes”. Android may stop it to save battery. Turn it off at any time.</string>
+    <string name="settings_save">Save</string>
+    <string name="settings_saved">Saved</string>
+    <string name="privacy_body">ÉCOLE EYES is designed so that you stay in control.\n\nMicrophone: the microphone is used only after you tap the voice button, or while hands-free listening is on (a notification is always visible). Speech recognition is performed by the speech service installed on your phone, which may send audio to its provider unless on-device recognition is selected. ÉCOLE EYES does not record or store audio.\n\nCamera: photos are taken only when you ask. When cloud AI is allowed, a reduced-size photo is sent once to the AI service to describe it, then discarded. It is never saved by the app.\n\nDocuments: the app can read only folders and files you explicitly allow, and you can remove access at any time. Document text is sent to the AI service only when you ask for a summary or explanation.\n\nConversation: your conversation history is stored encrypted on this phone. You can clear it by voice (“clear my history”) or from Settings.\n\nBackend: the AI key is kept on a server you control; it is never inside this app.\n\nSafety: camera descriptions can be wrong or incomplete. ÉCOLE EYES is not a safety device and cannot guarantee that a path is free of obstacles. Keep using your cane, guide dog or other trusted aids.</string>
+
+    <!-- Spoken: general -->
+    <string name="say_welcome">Welcome to École Eyes. Tap the big button in the middle of the screen and speak. Say “what can you do” to hear what I can help with.</string>
+    <string name="say_hello">Hello! I am École Eyes. How can I help you?</string>
+    <string name="say_help">I can describe what is in front of you with the camera, read text on signs and paper, find and read documents you have allowed, answer questions, tell the time, and change my language or volume. Just speak naturally. Say stop at any time to silence me.</string>
+    <string name="say_time">It is %1$s.</string>
+    <string name="say_volume_up">Volume increased.</string>
+    <string name="say_volume_down">Volume decreased.</string>
+    <string name="say_volume_max">The volume is already at maximum.</string>
+    <string name="say_volume_min">The volume is already at minimum.</string>
+    <string name="say_speed_up">Speaking faster.</string>
+    <string name="say_speed_down">Speaking slower.</string>
+    <string name="say_lang_en">Now speaking English.</string>
+    <string name="say_lang_fr">Je parle maintenant français.</string>
+    <string name="say_lang_ar">أتحدث الآن باللغة العربية.</string>
+    <string name="say_nothing_to_repeat">I have nothing to repeat yet.</string>
+    <string name="say_opened_camera">Camera open. Say “describe what is in front of me” or “read the text”.</string>
+    <string name="say_opened_documents">Documents. Say “find a document named…” or “read my latest PDF”.</string>
+    <string name="say_opened_files">File search. Say the name of the file you want.</string>
+    <string name="say_opened_settings">Settings.</string>
+    <string name="say_opened_assistant">AI conversation. Ask me anything.</string>
+    <string name="say_opened_privacy">Privacy policy.</string>
+    <string name="say_home">Home screen.</string>
+    <string name="say_no_back">You are already on the home screen.</string>
+    <string name="say_closing">Goodbye.</string>
+    <string name="say_history_cleared">Your conversation history has been cleared.</string>
+    <string name="say_listening_off">Hands-free listening is off.</string>
+    <string name="say_listening_on">Hands-free listening is on. Say Hello École Eyes when you need me.</string>
+    <string name="say_yes_prompt">Please answer yes or no.</string>
+    <string name="say_working">One moment.</string>
+    <string name="say_not_understood">Sorry, I did not understand. You can say “what can you do”.</string>
+
+    <!-- Spoken: consent -->
+    <string name="say_consent">Before we start, a few important things. To understand questions, describe photos and explain documents, I send your request, and only when you ask, a reduced photo or document text, to a secure AI service. Nothing is saved there by this app. You can change this in settings. Do you agree? Say yes or no.</string>
+    <string name="say_consent_yes">Thank you. Cloud assistance is on.</string>
+    <string name="say_consent_no">Understood. Cloud assistance stays off. I can still read documents and text with the phone alone.</string>
+    <string name="say_cloud_off">Cloud assistance is turned off. Say “allow cloud assistance” or open settings to turn it on.</string>
+    <string name="say_cloud_enabled">Cloud assistance is now on.</string>
+
+    <!-- Spoken: errors -->
+    <string name="err_offline">There is no internet connection. I can still read documents and text with the phone alone.</string>
+    <string name="err_timeout">The AI service took too long to answer. Please try again.</string>
+    <string name="err_auth">The AI service refused the request. The app token may be wrong. Please check the settings.</string>
+    <string name="err_rate">The AI service is busy. Please try again in a moment.</string>
+    <string name="err_server">The AI service has a problem right now. Please try again later.</string>
+    <string name="err_not_configured">The AI service address is not set. Ask someone to enter it in settings.</string>
+    <string name="err_ai_failed">I could not get an answer from the AI service.</string>
+    <string name="err_mic_denied">I need permission to use the microphone to hear you. Please allow it.</string>
+    <string name="err_mic_why">I need the microphone only to hear your voice requests, when you tap the voice button. Please allow it on the next screen.</string>
+    <string name="err_mic_unavailable">The microphone or speech recognition is not available on this phone.</string>
+    <string name="err_no_speech">I did not hear anything. Tap the button and try again.</string>
+    <string name="err_stt_busy">The microphone is busy. Please try again.</string>
+    <string name="err_stt_network">Speech recognition needs an internet connection on this phone, and none is available.</string>
+    <string name="err_cam_denied">I need permission to use the camera. Please allow it.</string>
+    <string name="err_cam_why">I need the camera to describe your surroundings, only when you ask. Please allow it on the next screen.</string>
+    <string name="err_cam_unavailable">I could not start the camera.</string>
+    <string name="err_image_unclear">The image is too dark or blurry. Please hold the phone steady and try again.</string>
+    <string name="err_perm_needed">That needs a permission I do not have yet.</string>
+    <string name="err_no_tts_voice">This phone has no %1$s voice installed. Install it in the phone’s text-to-speech settings.</string>
+    <string name="err_tts_failed">Speech output is not working on this phone.</string>
+
+    <!-- Spoken: camera -->
+    <string name="say_cam_safety">I can describe what the camera sees, but I can make mistakes and I cannot guarantee that the way ahead is safe. Please keep using your cane or guide.</string>
+    <string name="say_live_on">Continuous description is on. I will tell you when something changes. Say stop to end it.</string>
+    <string name="say_live_off">Continuous description is off.</string>
+    <string name="say_uploading_photo">Sending a photo to the AI service.</string>
+    <string name="say_uploading_doc">Sending the document text to the AI service.</string>
+    <string name="say_ocr_nothing">I could not find any readable text.</string>
+    <string name="say_ocr_uncertain">I am not sure I read this correctly.</string>
+    <string name="say_cam_wait">Starting the camera.</string>
+    <string name="say_ocr_cloud_needed">Reading this language needs the cloud assistant, which is not available right now.</string>
+
+    <!-- Spoken: documents -->
+    <string name="say_no_folder">I cannot see any files yet. I will open the folder picker. Choose the folder you want me to be able to read, for example Downloads.</string>
+    <string name="say_folder_added">Folder added. I found %1$d documents.</string>
+    <string name="say_folder_failed">I could not use that folder.</string>
+    <string name="say_found_one">I found one document: %1$s.</string>
+    <string name="say_found_many">I found %1$d documents. The first is %2$s. Say “read it” to hear it, or “next” for the next one.</string>
+    <string name="say_found_none">I found no document matching “%1$s”.</string>
+    <string name="say_latest_is">Your latest document is %1$s.</string>
+    <string name="say_no_documents">There are no documents in the folders you allowed.</string>
+    <string name="say_reading_start">Reading %1$s, %2$d pages.</string>
+    <string name="say_reading_resume">Continuing from page %1$d.</string>
+    <string name="say_page_x">Page %1$d.</string>
+    <string name="say_doc_end">End of the document.</string>
+    <string name="say_doc_start">You are at the beginning of the document.</string>
+    <string name="say_paused">Paused. Say continue when you are ready.</string>
+    <string name="say_no_doc_open">No document is open. Say “read my latest document” or “find a document named…”.</string>
+    <string name="say_doc_unreadable">I could not read that document. The file may be damaged, protected, or in an unsupported format.</string>
+    <string name="say_doc_empty">I found no readable text in that document.</string>
+    <string name="say_doc_partial">This format is only partly supported, so some text may be missing.</string>
+    <string name="say_doc_scanned_offline">This looks like a scanned page and I could not read it on the phone.</string>
+    <string name="say_doc_loading">Opening the document.</string>
+    <string name="say_which_doc">Which document do you mean? Say its name.</string>
+    <string name="say_next_candidate">Next: %1$s.</string>
+    <string name="say_no_more_candidates">That was the last match.</string>
+    <string name="say_scan_progress">Reading the scanned page, please wait.</string>
+    <string name="say_files_scanning">Looking through your allowed folders.</string>
+    <string name="say_remove_folder">Access to the folder was removed.</string>
+
+    <!-- Notification (hands-free) -->
+    <string name="notif_channel">Hands-free listening</string>
+    <string name="notif_title">École Eyes is listening</string>
+    <string name="notif_text">Say “Hello École Eyes”. Tap to open the app.</string>
+    <string name="notif_stop">Stop listening</string>
+</resources>

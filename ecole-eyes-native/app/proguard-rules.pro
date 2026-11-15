@@ -1,0 +1,7 @@
+-keep class com.tom_roush.pdfbox.** { *; }
+-dontwarn com.tom_roush.pdfbox.**
+-dontwarn com.gemalto.jp2.**
+-keepattributes *Annotation*, InnerClasses
+-keep,includedescriptorclasses class com.ecoleeyes.**$$serializer { *; }
+-keepclassmembers class com.ecoleeyes.** { *** Companion; }
+-keepclasseswithmembers class com.ecoleeyes.** { kotlinx.serialization.KSerializer serializer(...); }
