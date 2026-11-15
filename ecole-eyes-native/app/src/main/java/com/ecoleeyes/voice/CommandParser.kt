@@ -73,6 +73,7 @@ object CommandParser {
     // documents
     private val docNoun = "(?:documents?|files?|pdfs?|docs?|docx|word|word documents?|text files?|txt|rtf|images?|scans?|scanned documents?|fichiers?|pdf|fichier word|documents? word|ملفات|ملف|مستندات|مستند|وثيقه|وثائق)"
     private val readLatest = r("^(?:read|open|lis|lire|ouvre|اقرا|افتح)(?: me| moi| لي)? (?:the |my |mon |ma |le |la |ال)?(?:last|latest|most recent|newest|dernier|derniere|اخر|احدث)(?: downloaded| telecharge| telechargee| الذي حملته| الذي نزلته| المحمل| المنزل)? ?($docNoun)?(?: i downloaded| que j ai telecharge| que j ai telechargee)?$TAIL$|^(?:read|lis|اقرا) (?:the )?(?:last|dernier) (?:document|file) i downloaded$")
+    private val openAnyRe = r("^(?:open|launch|start|show|ouvre|ouvrir|lance|montre|افتح|شغل|اعرض)(?: me| moi| لي)? (?:the |my |a |an |le |la |les |mon |ma |mes |ال)?(.+)$")
     private val readNamed = r("^(?:read|open|lis|lire|ouvre|اقرا|افتح)(?: me| moi| لي)? (?:the |my |a |le |la |mon |ma |ال)?(?:$docNoun )?(?:named|called|nomme|nommee|appele|appelee|باسم|اسمه|اسمها|المسمي|المسمى|بعنوان) (.+)$")
     private val findVerb = "(?:find|search(?: for)?|look for|locate|show me|list|trouve|trouver|cherche|chercher|recherche|montre moi|liste|ابحث عن|ابحث|جد|اوجد|دور علي|اعرض لي)"
     private val findDocs = r("^(?:$PLEASE)$findVerb (.+)$")
@@ -177,6 +178,11 @@ object CommandParser {
             if (hasNoun || (explicitSearch && !looksVisual(body))) {
                 return Command.FindDocs(cleanQuery(body), docType(body))
             }
+        }
+
+        openAnyRe.find(t)?.let { m ->
+            val q = cleanQuery(m.groupValues[1])
+            if (q.isNotEmpty() && !looksVisual(q)) return Command.OpenAny(q)
         }
 
         yesNo()?.let { return it }

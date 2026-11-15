@@ -340,7 +340,12 @@ class AssistantController(
             Command.RepeatLast -> lastAnswer?.let { say(it, record = false) } ?: say(s(R.string.say_nothing_to_repeat), record = false)
             Command.Back -> goBack()
             Command.Close -> { say(s(R.string.say_closing), record = false); _events.emit(UiEvent.CloseApp) }
-            is Command.Open -> openScreen(cmd.screen, announce = true)
+            is Command.Open -> {
+                openScreen(cmd.screen, announce = true)
+                // Smart camera: opening it by voice immediately starts helping, no second command needed.
+                if (cmd.screen == Screen.CAMERA) cameraAutoAssist(original)
+            }
+            is Command.OpenAny -> openAny(cmd.query, original)
             is Command.SetCloud -> setCloud(cmd.allowed)
             Command.Yes, Command.No -> {
                 if (awaitingConsent) applyConsent(cmd == Command.Yes) else if (cmd == Command.Yes) say(s(R.string.say_hello), record = false) else say(s(R.string.say_not_understood), record = false)
@@ -617,6 +622,23 @@ class AssistantController(
         candidates = listOf(latest); candidateIdx = 0
         say(s(R.string.say_latest_is, latest.spokenName), record = false)
         readFile(latest)
+    }
+
+    /** After the camera screen opens: describe the scene (cloud) or read visible text on the phone alone. */
+    private suspend fun cameraAutoAssist(original: String) {
+        if (!camera.ready.value && !captureReadyOrOpen()) return
+        val cloudOk = settings.value.cloudAllowed && settings.value.backendConfigured && connectivity.isOnline()
+        if (cloudOk) askAi("Describe what the camera sees right now.") else readTextInView()
+    }
+
+    /** "Open <anything>": a file by that name if one exists, otherwise the AI decides (camera, settings, ...). */
+    private suspend fun openAny(query: String, original: String) {
+        if (docs.hasAccess()) {
+            docs.refresh()
+            val found = docs.search(query, DocType.ANY, 8)
+            if (found.isNotEmpty()) { candidates = found; candidateIdx = 0; readFile(found.first()); return }
+        }
+        askAi(original)
     }
 
     private suspend fun readNamed(query: String) {

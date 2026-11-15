@@ -161,4 +161,17 @@ class CommandParserTest {
     }
 
     @Test fun next_alone_is_context_dependent() = assertAll(Command.Next, "next", "suivant", "التالي")
+
+    @Test fun open_anything_tries_a_file_by_that_name() {
+        for ((q, name) in listOf("open my invoice" to "invoice", "ouvre le contrat" to "contrat", "افتح الفاتورة" to "فاتوره")) {
+            val c = p(q)
+            assertTrue("\"$q\" -> $c", c is Command.OpenAny)
+            assertEquals(name, TextNorm.normalize((c as Command.OpenAny).query))
+        }
+    }
+
+    @Test fun open_screens_still_win_over_open_anything() {
+        assertEquals(Command.Open(Screen.CAMERA), p("open the camera"))
+        assertEquals(Command.Open(Screen.SETTINGS), p("open settings"))
+    }
 }

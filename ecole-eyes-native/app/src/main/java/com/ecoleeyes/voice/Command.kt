@@ -33,6 +33,8 @@ sealed interface Command {
     data class FindDocs(val query: String, val type: DocType) : Command
     data class ReadLatest(val type: DocType) : Command
     data class ReadNamed(val query: String) : Command
+    /** "open <anything>" that is not a screen: try a file by that name, otherwise let the AI act on it. */
+    data class OpenAny(val query: String) : Command
     data object Describe : Command
     data object ReadTextInView : Command
     data object LiveStart : Command
