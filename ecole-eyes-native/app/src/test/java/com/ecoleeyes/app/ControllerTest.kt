@@ -133,9 +133,7 @@ class ControllerTest {
         val c = controller(this)
         say(c, "open the camera")
         assertEquals(Screen.CAMERA, c.state.value.screen)
-        assertTrue(speaker.texts.contains(str(Lang.EN, R.string.say_opened_camera)))
-        // The smart camera starts helping by itself; with no camera in the test it must say so honestly.
-        assertEquals(str(Lang.EN, R.string.err_cam_unavailable), speaker.texts.last())
+        assertEquals(str(Lang.EN, R.string.say_opened_camera), speaker.texts.last())
         say(c, "go back")
         assertEquals(Screen.HOME, c.state.value.screen)
         say(c, "go back")

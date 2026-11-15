@@ -169,4 +169,8 @@
     <string name="notif_title">École Eyes écoute</string>
     <string name="notif_text">Dites « Bonjour École Eyes ». Touchez pour ouvrir l’application.</string>
     <string name="notif_stop">Arrêter l’écoute</string>
+    <string name="say_local_describe">Sans internet, je ne peux donner qu’une idée approximative. Je vois : %1$s.</string>
+    <string name="say_local_text">Il y a aussi du texte : %1$s.</string>
+    <string name="say_local_limited">C’est une estimation approximative faite sur le téléphone, ne vous y fiez pas. Connectez le service d’IA pour une description complète.</string>
+    <string name="say_local_nothing">Je n’ai rien reconnu clairement. Bougez un peu le téléphone et réessayez.</string>
 </resources>

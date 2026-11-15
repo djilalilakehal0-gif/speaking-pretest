@@ -65,6 +65,10 @@ fun CameraScreen(graph: AppGraph) {
         }
     }
 
+    // The smart camera starts helping as soon as it is running: no extra command needed.
+    val cameraReady by graph.camera.ready.collectAsState()
+    LaunchedEffect(cameraReady) { if (cameraReady) c.cameraOpened() }
+
     ScreenFrame(stringResource(R.string.screen_camera), onBack = { c.navigate(Screen.HOME) }) {
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(

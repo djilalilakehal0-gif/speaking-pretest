@@ -169,4 +169,8 @@
     <string name="notif_title">إيكول آيز يستمع</string>
     <string name="notif_text">قل «مرحبًا إيكول آيز». اضغط لفتح التطبيق.</string>
     <string name="notif_stop">إيقاف الاستماع</string>
+    <string name="say_local_describe">بدون الإنترنت لا أستطيع إلا إعطاء فكرة تقريبية. أرى: %1$s.</string>
+    <string name="say_local_text">يوجد أيضًا نص: %1$s.</string>
+    <string name="say_local_limited">هذا تخمين تقريبي على الهاتف فقط، فلا تعتمد عليه. اربط خدمة الذكاء الاصطناعي لوصف كامل.</string>
+    <string name="say_local_nothing">لم أتعرف على شيء بوضوح. حرّك الهاتف قليلًا وحاول مرة أخرى.</string>
 </resources>

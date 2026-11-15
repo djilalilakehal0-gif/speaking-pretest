@@ -55,6 +55,7 @@ class AppGraph(app: Application) {
         brain = brain,
         camera = camera,
         ocr = ocr,
+        describer = com.ecoleeyes.vision.LocalDescriber(),
         docs = docs,
         history = history,
         feedback = feedback,

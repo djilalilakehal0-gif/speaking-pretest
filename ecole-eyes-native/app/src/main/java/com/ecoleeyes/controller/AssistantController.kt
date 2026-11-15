@@ -92,6 +92,7 @@ class AssistantController(
     private val connectivity: Connectivity,
     private val loaderFactory: (com.ecoleeyes.docs.LoaderEnv) -> DocumentLoader,
     private val serviceControl: (Boolean) -> Unit = {},
+    private val describer: com.ecoleeyes.vision.LocalDescriber? = null,
 ) {
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -342,8 +343,6 @@ class AssistantController(
             Command.Close -> { say(s(R.string.say_closing), record = false); _events.emit(UiEvent.CloseApp) }
             is Command.Open -> {
                 openScreen(cmd.screen, announce = true)
-                // Smart camera: opening it by voice immediately starts helping, no second command needed.
-                if (cmd.screen == Screen.CAMERA) cameraAutoAssist(original)
             }
             is Command.OpenAny -> openAny(cmd.query, original)
             is Command.SetCloud -> setCloud(cmd.allowed)
@@ -373,7 +372,7 @@ class AssistantController(
             Command.ReadTextInView -> readTextInView()
             Command.LiveStart -> startLive()
             Command.LiveStop -> { live.stop(); _state.update { it.copy(live = false) }; say(s(R.string.say_live_off)) }
-            Command.Describe -> askAi(original)
+            Command.Describe -> if (cloudReady()) askAi(original) else describeLocally()
             is Command.Ask -> askAi(cmd.text)
         }
     }
@@ -624,11 +623,35 @@ class AssistantController(
         readFile(latest)
     }
 
-    /** After the camera screen opens: describe the scene (cloud) or read visible text on the phone alone. */
-    private suspend fun cameraAutoAssist(original: String) {
-        if (!camera.ready.value && !captureReadyOrOpen()) return
-        val cloudOk = settings.value.cloudAllowed && settings.value.backendConfigured && connectivity.isOnline()
-        if (cloudOk) askAi("Describe what the camera sees right now.") else readTextInView()
+    private fun cloudReady() = settings.value.cloudAllowed && settings.value.backendConfigured && connectivity.isOnline()
+
+    private var cameraAssistJob: Job? = null
+
+    /** Called by the camera screen each time it opens, once the camera is running: the smart camera starts helping by itself. */
+    fun cameraOpened() {
+        cameraAssistJob?.cancel()
+        cameraAssistJob = scope.launch {
+            try {
+                if (cloudReady()) askAi("Describe what the camera sees right now.") else describeLocally()
+            } catch (e: Exception) { say(explain(e), record = false) }
+        }
+    }
+
+    /** No cloud: rough on-device description (ML Kit labels) plus any readable text. Says plainly that it is limited. */
+    private suspend fun describeLocally() {
+        val bmp = try { captureFrame() } catch (e: PermissionDenied) { return }
+        if (ImageQuality.assess(bmp) == ImageQuality.Verdict.TOO_DARK) { feedback.cue(Feedback.Cue.ERROR); say(s(R.string.err_image_unclear)); return }
+        thinking = true; refreshPhase()
+        try {
+            val labels = describer?.let { runCatching { it.labels(bmp) }.getOrDefault(emptyList()) }.orEmpty()
+            val text = runCatching { ocr.recognizeLocal(bmp).text }.getOrDefault("").take(300)
+            val parts = buildList {
+                if (labels.isNotEmpty()) add(s(R.string.say_local_describe, labels.joinToString(", ")))
+                if (text.isNotBlank()) add(s(R.string.say_local_text, text))
+            }
+            thinking = false; refreshPhase()
+            if (parts.isEmpty()) say(s(R.string.say_local_nothing)) else say(parts.joinToString(" ") + " " + s(R.string.say_local_limited))
+        } finally { thinking = false; refreshPhase() }
     }
 
     /** "Open <anything>": a file by that name if one exists, otherwise the AI decides (camera, settings, ...). */

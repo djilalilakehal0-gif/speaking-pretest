@@ -177,4 +177,8 @@
     <string name="notif_title">École Eyes is listening</string>
     <string name="notif_text">Say “Hello École Eyes”. Tap to open the app.</string>
     <string name="notif_stop">Stop listening</string>
+    <string name="say_local_describe">Without the internet I can only give a rough idea. I can see: %1$s.</string>
+    <string name="say_local_text">There is also some text: %1$s.</string>
+    <string name="say_local_limited">This is only a rough on-device guess, so do not rely on it. Connect the AI service for a full description.</string>
+    <string name="say_local_nothing">I could not recognise anything clearly. Move the phone a little and try again.</string>
 </resources>

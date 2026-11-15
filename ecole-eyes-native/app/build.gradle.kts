@@ -106,6 +106,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp)
     implementation(libs.mlkit.text)
+    implementation(libs.mlkit.labeling)
     implementation(libs.pdfbox.android)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
