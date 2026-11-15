@@ -173,4 +173,12 @@
     <string name="say_local_text">Il y a aussi du texte : %1$s.</string>
     <string name="say_local_limited">C’est une estimation approximative faite sur le téléphone, ne vous y fiez pas. Connectez le service d’IA pour une description complète.</string>
     <string name="say_local_nothing">Je n’ai rien reconnu clairement. Bougez un peu le téléphone et réessayez.</string>
+    <string name="settings_ai_title">Service d’IA</string>
+    <string name="settings_token">Jeton de l’application</string>
+    <string name="settings_ai_status_none">Le service d’IA n’est pas encore configuré. Saisissez l’adresse et le jeton ci-dessous, puis appuyez sur Tester la connexion.</string>
+    <string name="settings_ai_status_off">Le service d’IA est configuré mais désactivé. Activez l’IA dans le cloud ci-dessous pour l’utiliser.</string>
+    <string name="settings_ai_status_ready">Le service d’IA est configuré et activé. Appuyez sur Tester la connexion pour le vérifier.</string>
+    <string name="settings_ai_test">Tester la connexion</string>
+    <string name="settings_ai_testing">Test du service d’IA…</string>
+    <string name="settings_ai_ok">Le service d’IA fonctionne.</string>
 </resources>

@@ -181,4 +181,12 @@
     <string name="say_local_text">There is also some text: %1$s.</string>
     <string name="say_local_limited">This is only a rough on-device guess, so do not rely on it. Connect the AI service for a full description.</string>
     <string name="say_local_nothing">I could not recognise anything clearly. Move the phone a little and try again.</string>
+    <string name="settings_ai_title">AI service</string>
+    <string name="settings_token">App token</string>
+    <string name="settings_ai_status_none">The AI service is not set up yet. Enter the address and app token below, then press Test connection.</string>
+    <string name="settings_ai_status_off">The AI service is set up but turned off. Switch on cloud AI below to use it.</string>
+    <string name="settings_ai_status_ready">The AI service is set up and on. Press Test connection to check it.</string>
+    <string name="settings_ai_test">Test connection</string>
+    <string name="settings_ai_testing">Testing the AI service…</string>
+    <string name="settings_ai_ok">The AI service works.</string>
 </resources>

@@ -414,6 +414,24 @@ class AssistantController(
         interaction = scope.launch { say(text, record = false) }
     }
 
+    /** Settings "Test connection": a tiny text-only request (no personal data) so the user knows the AI service works. */
+    fun testAi(onResult: (Boolean, String) -> Unit) {
+        scope.launch {
+            say(s(R.string.settings_ai_testing), record = false)
+            try {
+                brain.oneShotText("This is a connectivity check.", "Reply with the single word OK.", 10)
+                val ok = s(R.string.settings_ai_ok)
+                onResult(true, ok); say(ok, record = false)
+            } catch (e: CancellationException) { throw e
+            } catch (e: Exception) {
+                val msg = explain(e)
+                onResult(false, msg); say(msg, record = false)
+            }
+        }
+    }
+
+    fun setCloudNow(on: Boolean) { scope.launch { setCloud(on) } }
+
     fun clearHistoryNow() { scope.launch { clearHistory() } }
 
     // ------------------------------------------------------------------------------------------------------------------

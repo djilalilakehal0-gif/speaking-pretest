@@ -173,4 +173,12 @@
     <string name="say_local_text">يوجد أيضًا نص: %1$s.</string>
     <string name="say_local_limited">هذا تخمين تقريبي على الهاتف فقط، فلا تعتمد عليه. اربط خدمة الذكاء الاصطناعي لوصف كامل.</string>
     <string name="say_local_nothing">لم أتعرف على شيء بوضوح. حرّك الهاتف قليلًا وحاول مرة أخرى.</string>
+    <string name="settings_ai_title">خدمة الذكاء الاصطناعي</string>
+    <string name="settings_token">رمز التطبيق</string>
+    <string name="settings_ai_status_none">خدمة الذكاء الاصطناعي لم تُضبط بعد. أدخل العنوان ورمز التطبيق أدناه ثم اضغط اختبار الاتصال.</string>
+    <string name="settings_ai_status_off">خدمة الذكاء الاصطناعي مضبوطة لكنها مطفأة. فعّل الذكاء الاصطناعي السحابي أدناه لاستخدامها.</string>
+    <string name="settings_ai_status_ready">خدمة الذكاء الاصطناعي مضبوطة ومفعّلة. اضغط اختبار الاتصال للتحقق منها.</string>
+    <string name="settings_ai_test">اختبار الاتصال</string>
+    <string name="settings_ai_testing">جارٍ اختبار خدمة الذكاء الاصطناعي…</string>
+    <string name="settings_ai_ok">خدمة الذكاء الاصطناعي تعمل.</string>
 </resources>
