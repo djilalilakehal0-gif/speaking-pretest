@@ -70,7 +70,7 @@ fun SettingsScreen(graph: AppGraph) {
 
             LabeledSlider(stringResource(R.string.settings_speed), st.speechRate, 0.5f..2.0f, "%.1fx".format(st.speechRate)) { v -> graph.settings.update { it.copy(speechRate = v) } }
             LabeledSlider(stringResource(R.string.settings_volume), st.speechVolume, 0.2f..1.0f, "${(st.speechVolume * 100).toInt()}%") { v -> graph.settings.update { it.copy(speechVolume = v) } }
-            LabeledSlider(stringResource(R.string.settings_live_interval, st.liveIntervalSec), st.liveIntervalSec.toFloat(), 4f..30f, "${st.liveIntervalSec}") { v -> graph.settings.update { it.copy(liveIntervalSec = v.toInt()) } }
+            LabeledSlider(stringResource(R.string.settings_live_interval, st.liveIntervalSec), st.liveIntervalSec.toFloat(), 4f..30f, "") { v -> graph.settings.update { it.copy(liveIntervalSec = v.toInt()) } }
 
             SwitchRow(stringResource(R.string.settings_cloud), st.consent == Consent.GRANTED) { on -> graph.settings.update { it.copy(consent = if (on) Consent.GRANTED else Consent.DENIED) } }
             SwitchRow(stringResource(R.string.settings_announce), st.announceUploads) { on -> graph.settings.update { it.copy(announceUploads = on) } }
@@ -122,11 +122,11 @@ private fun SwitchRow(label: String, checked: Boolean, onChange: (Boolean) -> Un
 @Composable
 private fun LabeledSlider(label: String, value: Float, range: ClosedFloatingPointRange<Float>, valueText: String, onChange: (Float) -> Unit) {
     Column(Modifier.fillMaxWidth()) {
-        Text("$label: $valueText", style = MaterialTheme.typography.bodyLarge, color = EeColors.OnDark)
+        Text(if (valueText.isBlank()) label else "$label: $valueText", style = MaterialTheme.typography.bodyLarge, color = EeColors.OnDark)
         Slider(
             value = value, onValueChange = onChange, valueRange = range,
             colors = SliderDefaults.colors(thumbColor = EeColors.Electric, activeTrackColor = EeColors.Electric),
-            modifier = Modifier.heightIn(min = 56.dp).semantics { contentDescription = label; stateDescription = valueText },
+            modifier = Modifier.heightIn(min = 56.dp).semantics { contentDescription = label; stateDescription = valueText.ifBlank { label } },
         )
     }
 }
