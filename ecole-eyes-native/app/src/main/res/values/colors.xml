@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ee_background">#050B1A</color>
+    <color name="ee_on_surface">#FFFFFF</color>
+    <color name="ic_launcher_background">#050B1A</color>
+</resources>
