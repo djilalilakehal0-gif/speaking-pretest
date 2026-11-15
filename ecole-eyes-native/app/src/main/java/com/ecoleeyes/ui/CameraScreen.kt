@@ -27,6 +27,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.delay
+import android.util.Log
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +56,14 @@ fun CameraScreen(graph: AppGraph) {
     val ctx = LocalContext.current
     var granted by remember { mutableStateOf(ContextCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted = it }
+    // The permission can also be granted through the voice flow (MainActivity's launcher), which this screen
+    // does not see, so re-check it until it is granted. Without this the preview never started after a voice grant.
+    LaunchedEffect(granted) {
+        while (!granted) {
+            granted = ContextCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+            if (!granted) delay(250)
+        }
+    }
 
     ScreenFrame(stringResource(R.string.screen_camera), onBack = { c.navigate(Screen.HOME) }) {
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -90,7 +101,9 @@ private fun CameraPreview(graph: AppGraph) {
     DisposableEffect(lifecycle) {
         val future = ProcessCameraProvider.getInstance(ctx)
         var provider: ProcessCameraProvider? = null
+        var disposed = false
         future.addListener({
+            if (disposed) return@addListener
             try {
                 val p = future.get()
                 provider = p
@@ -100,10 +113,12 @@ private fun CameraPreview(graph: AppGraph) {
                 p.bindToLifecycle(lifecycle, CameraSelector.DEFAULT_BACK_CAMERA, preview, capture)
                 graph.camera.attach(capture)
             } catch (e: Exception) {
+                Log.e("CameraScreen", "Could not start the camera", e)
                 graph.camera.detach()
             }
         }, ContextCompat.getMainExecutor(ctx))
         onDispose {
+            disposed = true
             graph.camera.detach()
             provider?.unbindAll()
         }
