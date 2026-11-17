@@ -132,6 +132,17 @@ object CommandParser {
         "هل يوجد احد(?: امامي| هنا| حولي)?", "هل هناك احد(?: امامي| هنا| حولي)?", "هل يوجد شخص(?: امامي| هنا)?", "هل هناك شخص(?: امامي| هنا)?", "كم شخص(?: امامي| هنا)?", "من امامي")
 
     private val trailingWake = r(" (?:ecole eyes|ايكول ايز|ايكول ايس)$")
+    // "... in detail" adds nothing to the command: descriptions are always detailed.
+    private val trailingDetail = r(" (?:in detail|in details|with details|en detail|en details|avec details|بالتفصيل|بالتفاصيل|بتفصيل)$")
+
+    // The object the user points the camera at or holds (including Maghrebi and Levantine "what is this").
+    private val describeObject = any(
+        "describe (?:this|that|it)(?: thing| object| item| one| product)?(?: for me)?", "describe (?:the )?(?:object|thing|item|product)(?: in front of me| in my hand)?",
+        "what(?: is| s|s) this(?: thing| object| item)?", "what(?: is| s|s) that(?: thing| object)?", "tell me what this is", "what am i holding(?: in my hand)?", "what(?: is| s|s)? in my hand", "what do i have in my hand",
+        "decris(?: moi)? (?:ceci|cela|ca|cet objet|cette chose|ce truc|l objet|ce que je tiens)", "qu est ce que c est(?: que ca| que cet objet)?", "c est quoi(?: ca| cet objet| ce truc)?", "qu est ce que je tiens(?: dans la main| dans ma main)?", "qu est ce que j ai dans la main",
+        "صف(?: لي)? (?:هذا|هذه|ذلك|هذا الشيء|هذا الشي|هذه الحاجه|هذا الغرض|هذه القطعه|ما في يدي|ما بيدي|الشيء الذي امامي|الشيء الذي في يدي|الشيء)",
+        "ما هذا(?: الشيء| الشي)?", "ما هذه(?: الحاجه)?", "ماهذا", "ما الذي في يدي", "ماذا في يدي", "ماذا احمل(?: في يدي)?", "ما هذا الذي في يدي", "ما هو هذا(?: الشيء)?",
+        "واش هذا", "واش هاذا", "واش هذي", "واشنو هذا", "اشنو هذا", "شنو هذا", "شنو هاذا", "ايش هذا", "شو هذا", "شو هيدا", "ايه ده")
 
     /** Strips the wake phrase. Returns the remainder, or "" if only the greeting was said. */
     fun stripWake(norm: String): String? {
@@ -154,6 +165,7 @@ object CommandParser {
         // "emergency école eyes", "read the document école eyes": a trailing wake phrase is not part of the request.
         t = trailingWake.replace(t, "").trim()
         if (t.isEmpty()) return Command.Greeting
+        t = trailingDetail.replace(t, "").trim()
 
         fun yesNo(): Command? = when {
             yes.matches(t) -> Command.Yes
@@ -227,6 +239,7 @@ object CommandParser {
         }
         if (readCurrent.matches(t)) return Command.ReadCurrent
 
+        if (describeObject.matches(t)) return Command.DescribeObject
         if (describe.matches(t)) return Command.Describe
         if (readView.matches(t)) return Command.ReadTextInView
         if (color.matches(t)) return Command.WhatColor

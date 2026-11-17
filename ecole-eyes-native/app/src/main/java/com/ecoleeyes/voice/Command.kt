@@ -60,6 +60,8 @@ sealed interface Command {
     data object Status : Command
     // on-device vision
     data object WhatColor : Command
+    /** "Describe this thing", "what is this", "واش هذا": a detailed description of the object in front of the camera. */
+    data object DescribeObject : Command
     data object People : Command
     /** "next" with no object: next search result or next page depending on context. */
     data object Next : Command

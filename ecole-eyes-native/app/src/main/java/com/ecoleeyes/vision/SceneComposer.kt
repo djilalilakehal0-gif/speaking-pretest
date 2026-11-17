@@ -135,6 +135,36 @@ object SceneComposer {
         return words.dropLast(1).joinToString(sep) + and + words.last()
     }
 
+    /**
+     * Offline "describe this": the central / largest object, its colour and any printed text read on the phone.
+     * Much less capable than the cloud model, and says so in one short sentence.
+     */
+    fun objectDetail(scene: LocalScene, color: ColorNamer.ColorResult?, text: String?, lang: Lang): String {
+        if (scene.tooDark) return compose(scene, lang)
+        val main = scene.objects
+            .filter { it.label != null && it.confidence >= 0.5f && it.label !in sceneOnly }
+            .minByOrNull { kotlin.math.abs(it.box.centerX - 0.5f) - it.box.area }   // central and big wins
+        val name = main?.label?.let { LabelDictionary.translate(it, lang) }
+            ?: scene.labels.firstOrNull { it.second >= 0.7f && it.first !in sceneOnly }?.first?.let { LabelDictionary.translate(it, lang) }
+        val parts = ArrayList<String>()
+        parts += when {
+            name != null -> when (lang) { Lang.EN -> "It looks like a $name."; Lang.FR -> "On dirait : $name."; Lang.AR -> "يبدو أنه $name." }
+            else -> when (lang) { Lang.EN -> "I cannot name the object on the phone alone."; Lang.FR -> "Je ne sais pas nommer l’objet sans internet."; Lang.AR -> "لا أستطيع تسمية هذا الشيء بدون إنترنت." }
+        }
+        if (color != null && !color.tooDark) {
+            val c = ColorNamer.phrase(color.main, lang)
+            parts += when (lang) { Lang.EN -> "Its main colour appears to be $c."; Lang.FR -> "Sa couleur principale semble être $c."; Lang.AR -> "لونه الغالب يبدو $c." }
+        }
+        val printed = text?.replace(Regex("\\s+"), " ")?.trim()?.take(300)
+        if (!printed.isNullOrEmpty()) parts += when (lang) { Lang.EN -> "Printed on it: $printed."; Lang.FR -> "Texte écrit dessus : $printed."; Lang.AR -> "المكتوب عليه: $printed." }
+        parts += when (lang) {
+            Lang.EN -> "Offline estimate; connect to the internet for a full description."
+            Lang.FR -> "Estimation hors ligne ; connectez-vous pour une description complète."
+            Lang.AR -> "هذا تقدير دون إنترنت؛ اتصل بالإنترنت لوصف كامل."
+        }
+        return parts.joinToString(" ")
+    }
+
     /** Offline answer to "is there someone in front of me?". */
     fun peopleAnswer(scene: LocalScene, lang: Lang): String {
         if (scene.tooDark) return compose(scene, lang)

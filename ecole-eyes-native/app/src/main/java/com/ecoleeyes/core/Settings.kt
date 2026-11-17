@@ -30,6 +30,10 @@ data class AppSettings(
     val emergencyNumber: String = "",
     /** Public emergency number to *dial* (never auto-called). 112 works on GSM phones in most countries; set the local one. */
     val emergencyServices: String = "112",
+    /** Opening the camera describes what is in front at once (no button, no question). */
+    val autoDescribeCamera: Boolean = true,
+    /** On the camera screen the microphone stays open between requests (with a sound before each listen). */
+    val cameraListening: Boolean = true,
 ) {
     val cloudAllowed: Boolean get() = consent == Consent.GRANTED
     val backendConfigured: Boolean get() = backendUrl.startsWith("https://")
@@ -62,6 +66,8 @@ class SettingsStore(context: Context) {
             .putString("emName", next.emergencyName)
             .putString("emNumber", next.emergencyNumber)
             .putString("emServices", next.emergencyServices)
+            .putBoolean("camAuto", next.autoDescribeCamera)
+            .putBoolean("camListen", next.cameraListening)
             .apply()
     }
 
@@ -83,6 +89,8 @@ class SettingsStore(context: Context) {
             emergencyName = prefs.getString("emName", null) ?: d.emergencyName,
             emergencyNumber = prefs.getString("emNumber", null) ?: d.emergencyNumber,
             emergencyServices = prefs.getString("emServices", null) ?: d.emergencyServices,
+            autoDescribeCamera = prefs.getBoolean("camAuto", d.autoDescribeCamera),
+            cameraListening = prefs.getBoolean("camListen", d.cameraListening),
         ).sanitized()
     }
 

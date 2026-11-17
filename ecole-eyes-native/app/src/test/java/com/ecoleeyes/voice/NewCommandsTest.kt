@@ -67,6 +67,13 @@ class NewCommandsTest {
         all(Command.People, "is there anyone in front of me", "is there someone here", "y a-t-il quelqu'un devant moi", "هل يوجد أحد أمامي")
     }
 
+    @Test fun describe_this_object_in_three_languages_and_dialects() {
+        all(Command.DescribeObject, "describe this", "describe this thing", "describe this in detail", "what is this", "what's this", "what am I holding",
+            "décris ceci", "décris cet objet en détail", "qu'est-ce que c'est", "c'est quoi ça",
+            "صف لي هذا الشيء", "صف لي هذا الشيء بالتفصيل", "صف هذا", "ما هذا", "ما هذا الشيء", "ماذا في يدي", "واش هذا", "شنو هذا", "شو هذا")
+        all(Command.Describe, "صف لي ما أمامي بالتفصيل", "describe what is in front of me in detail")
+    }
+
     @Test fun opening_other_apps() {
         assertEquals(Command.OpenApp("whatsapp"), p("open WhatsApp"))
         assertEquals(Command.OpenApp("google maps"), p("lance Google Maps"))

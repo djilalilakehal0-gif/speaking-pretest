@@ -84,11 +84,11 @@ class ControllerTest {
 
     @After fun tearDown() { db.close() }
 
-    private fun controller(scope: TestScope): AssistantController {
+    private fun controller(scope: TestScope, camera: CameraHub = CameraHub(ctx)): AssistantController {
         val ocr = OcrEngine(null)
         return AssistantController(
             context = ctx, scope = scope, settings = settings, l10n = l10n, speaker = speaker, stt = listener, brain = brain,
-            camera = CameraHub(ctx), ocr = ocr, docs = DocIndex(ctx), history = history, feedback = Feedback(ctx),
+            camera = camera, ocr = ocr, docs = DocIndex(ctx), history = history, feedback = Feedback(ctx),
             volume = VolumeControl(ctx), connectivity = Connectivity { online },
             loaderFactory = { env -> DocumentLoader(ctx, ocr, env) },
         )
@@ -130,10 +130,11 @@ class ControllerTest {
     }
 
     @Test fun open_camera_then_go_back() = runCtl {
+        settings.update { it.copy(autoDescribeCamera = false) }
         val c = controller(this)
         say(c, "open the camera")
         assertEquals(Screen.CAMERA, c.state.value.screen)
-        assertEquals(str(Lang.EN, R.string.say_opened_camera), speaker.texts.last())
+        assertEquals(str(Lang.EN, R.string.say_camera_ready), speaker.texts.last())
         say(c, "go back")
         assertEquals(Screen.HOME, c.state.value.screen)
         say(c, "go back")
@@ -209,10 +210,10 @@ class ControllerTest {
     }
 
     @Test fun follow_up_questions_carry_the_conversation() = runCtl {
-        val c = controller(this)
-        ai.reply("I can see a laptop and a white cup.").reply("The cup is next to the laptop.")
-        say(c, "What is in front of me?")
-        say(c, "What is next to the laptop?")
+        val c = controller(this, SolidCamera(ctx, SolidCamera.RED))
+        ai.reply("A laptop and a white cup on a desk.").reply("The cup is next to the laptop.")
+        say(c, "What is in front of me?")          // detailed description from one photo
+        say(c, "What is next to the laptop?")      // follow-up answered with that description in memory
         val second = ai.requests[1].messages
         assertEquals(3, second.size)    // previous question + previous answer + new question
         assertTrue(second[1]["content"]!!.jsonArray[0].jsonObject["text"]!!.jsonPrimitive.content.contains("white cup"))
@@ -344,13 +345,11 @@ class ControllerTest {
 
     @Test fun describing_with_a_camera_that_will_not_start_is_reported_not_faked() = runCtl {
         val c = controller(this)
-        ai.toolCall(Tools.CAPTURE_VIEW).reply("I could not use the camera.")
         c.submitText("What is in front of me?")
         advanceTimeBy(10_000); advanceUntilIdle()
         assertEquals(Screen.CAMERA, c.state.value.screen)       // it opened the camera
-        val toolResult = ai.requests[1].messages.last()["content"]!!.jsonArray[0].jsonObject
-        assertEquals("true", toolResult["is_error"]!!.jsonPrimitive.content)  // the model is told it failed
-        assertEquals("I could not use the camera.", speaker.texts.last())
+        assertTrue("nothing is sent or invented without a photo", ai.requests.isEmpty())
+        assertEquals(str(Lang.EN, R.string.err_cam_unavailable), speaker.texts.last())
     }
 
     @Test fun camera_permission_denied_is_explained() = runCtl {

@@ -128,7 +128,9 @@ If a voice is missing the app says so (in English) instead of staying silent.
 | Say | Does |
 |---|---|
 | "Hello École Eyes" / "What can you do?" | greeting / help |
-| "Open the camera" · "Describe what is in front of me" · "Read the text" | camera, scene description, OCR |
+| "Open the camera" | opens and **at once describes the object in front in detail**; the microphone stays open on the camera screen (sound before each listen, closes after two silences or "stop") |
+| "Describe this thing" · "What is this?" · "صف لي هذا الشيء" · "واش هذا" · "Décris cet objet" | detailed description of the object (what it is, colour, material, size, printed text read exactly), no filler |
+| "Describe what is in front of me" · "Read the text" | detailed scene layout, OCR |
 | "What color is this?" · "Is there a person in front of me?" · "Where is the chair?" | AI vision (uses a fresh photo) |
 | "Stay with me and describe what changes" · "Stop" | continuous assistance |
 | "Show me my files" · "Find a document named invoice" · "Read my latest PDF" | authorize folder, search, read |

@@ -85,7 +85,6 @@
     <string name="say_lang_fr">Je parle maintenant français.</string>
     <string name="say_lang_ar">أتحدث الآن باللغة العربية.</string>
     <string name="say_nothing_to_repeat">ليس لدي ما أعيده بعد.</string>
-    <string name="say_opened_camera">الكاميرا مفتوحة. قل «صف ما أمامي» أو «اقرأ النص».</string>
     <string name="say_opened_documents">المستندات. قل «ابحث عن مستند باسم…» أو «اقرأ آخر ملف PDF».</string>
     <string name="say_opened_files">البحث عن الملفات. قل اسم الملف الذي تريده.</string>
     <string name="say_opened_settings">الإعدادات.</string>
@@ -239,4 +238,7 @@
     <string name="settings_delete_notes">احذف كل ملاحظاتي</string>
     <string name="duration_and">%1$s و%2$s</string>
     <string name="camera_color">ما اللون؟</string>
+    <string name="say_camera_ready">الكاميرا جاهزة.</string>
+    <string name="settings_auto_describe">الوصف تلقائيًا عند فتح الكاميرا</string>
+    <string name="settings_camera_listen">الاستماع المتواصل في شاشة الكاميرا دون ضغط الزر (صوت تنبيه قبل كل استماع)</string>
 </resources>

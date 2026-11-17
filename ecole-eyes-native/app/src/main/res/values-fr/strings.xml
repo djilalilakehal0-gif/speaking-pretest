@@ -85,7 +85,6 @@
     <string name="say_lang_fr">Je parle maintenant français.</string>
     <string name="say_lang_ar">أتحدث الآن باللغة العربية.</string>
     <string name="say_nothing_to_repeat">Je n’ai encore rien à répéter.</string>
-    <string name="say_opened_camera">Caméra ouverte. Dites « décris ce qu’il y a devant moi » ou « lis le texte ».</string>
     <string name="say_opened_documents">Documents. Dites « trouve un document nommé… » ou « lis mon dernier PDF ».</string>
     <string name="say_opened_files">Recherche de fichiers. Dites le nom du fichier voulu.</string>
     <string name="say_opened_settings">Réglages.</string>
@@ -239,4 +238,7 @@
     <string name="settings_delete_notes">Supprimer toutes mes notes</string>
     <string name="duration_and">%1$s et %2$s</string>
     <string name="camera_color">Quelle couleur ?</string>
+    <string name="say_camera_ready">Caméra prête.</string>
+    <string name="settings_auto_describe">Décrire automatiquement à l’ouverture de la caméra</string>
+    <string name="settings_camera_listen">Rester à l’écoute sur l’écran caméra, sans bouton (un son avant chaque écoute)</string>
 </resources>

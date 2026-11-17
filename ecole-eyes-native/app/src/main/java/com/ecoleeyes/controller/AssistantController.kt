@@ -353,6 +353,8 @@ class AssistantController(
             feedback.cue(Feedback.Cue.ERROR)
             say(explain(e), record = false)
         }
+        // On the camera screen the user keeps talking without touching the screen.
+        if (cmd != Command.Stop) cameraConversation()
     }
 
     private suspend fun run(cmd: Command, original: String) {
@@ -406,7 +408,8 @@ class AssistantController(
             Command.ReadTextInView -> readTextInView()
             Command.LiveStart -> startLive()
             Command.LiveStop -> { live.stop(); _state.update { it.copy(live = false) }; say(s(R.string.say_live_off)) }
-            Command.Describe -> if (cloudUsable()) askAi(original) else localDescribe(peopleOnly = false)
+            Command.Describe -> if (cloudUsable()) describeDetailed(scene = true, userText = original) else localDescribe(peopleOnly = false)
+            Command.DescribeObject -> if (cloudUsable()) describeDetailed(scene = false, userText = original) else localObjectDetail()
             Command.People -> if (cloudUsable()) askAi(original) else localDescribe(peopleOnly = true)
             Command.WhatColor -> whatColor()
             Command.Emergency -> emergency()
@@ -533,10 +536,11 @@ class AssistantController(
     private suspend fun openScreen(screen: Screen, announce: Boolean) {
         navigate(screen)
         if (!announce) return
+        if (screen == Screen.CAMERA) { onCameraOpened(); return }
         val msg = when (screen) {
             Screen.HOME -> R.string.say_home
             Screen.ASSISTANT -> R.string.say_opened_assistant
-            Screen.CAMERA -> R.string.say_opened_camera
+            Screen.CAMERA -> R.string.say_camera_ready
             Screen.DOCUMENTS -> R.string.say_opened_documents
             Screen.FILES -> R.string.say_opened_files
             Screen.EMERGENCY -> R.string.say_opened_emergency
@@ -556,7 +560,7 @@ class AssistantController(
         if (prev == null) { say(s(R.string.say_no_back), record = false); return }
         _state.update { it.copy(screen = prev) }
         say(s(when (prev) {
-            Screen.HOME -> R.string.say_home; Screen.ASSISTANT -> R.string.say_opened_assistant; Screen.CAMERA -> R.string.say_opened_camera
+            Screen.HOME -> R.string.say_home; Screen.ASSISTANT -> R.string.say_opened_assistant; Screen.CAMERA -> R.string.say_camera_ready
             Screen.DOCUMENTS -> R.string.say_opened_documents; Screen.FILES -> R.string.say_opened_files; Screen.SETTINGS -> R.string.say_opened_settings
             Screen.EMERGENCY -> R.string.say_opened_emergency
             Screen.PRIVACY -> R.string.say_opened_privacy
@@ -820,7 +824,7 @@ class AssistantController(
             if (ImageQuality.assess(bmp) == ImageQuality.Verdict.TOO_DARK) {
                 return ToolOutput("The photo is almost completely black (too dark, or the camera is covered). Tell the user and suggest turning on a light or uncovering the camera.", isError = true)
             }
-            if (settings.value.announceUploads) quiet(s(R.string.say_uploading_photo))
+            noticePhotoUpload()
             val hint = if (input.bool("ocr") == true) runCatching { ocr.recognizeLocal(bmp).text }.getOrNull()?.takeIf { it.isNotBlank() } else null
             ToolOutput("Photo taken just now." + (hint?.let { " On-device text recognition (may contain errors): \"$it\"" } ?: ""), ImageUtil.toJpeg(bmp))
         }
@@ -944,6 +948,111 @@ class AssistantController(
         Tools.DEVICE_STATUS -> ToolOutput("Battery: ${phone.batteryPercent()?.let { "$it%" } ?: "unknown"}${if (phone.isCharging()) ", charging" else ""}. Online: ${connectivity.isOnline()}.")
         else -> ToolOutput("Unknown tool.", isError = true)
     } }
+
+    // ------------------------------------------------------------------------------------------------------------------
+    // Camera: describe at once, in detail, and keep listening (no button)
+    // ------------------------------------------------------------------------------------------------------------------
+
+    private var cameraLoop = false
+    private var photoNoticeGiven = false
+
+    /** Privacy notice before sending a photo: spoken the first time only, then a short sound (no repeated talk). */
+    private fun noticePhotoUpload() {
+        if (!settings.value.announceUploads) return
+        if (photoNoticeGiven) { feedback.cue(Feedback.Cue.TAP); return }
+        photoNoticeGiven = true
+        quiet(s(R.string.say_uploading_photo))
+    }
+
+    /** "Open the camera": no announcement to sit through; describe what is in front straight away. */
+    private suspend fun onCameraOpened() {
+        if (settings.value.autoDescribeCamera) {
+            if (cloudUsable()) describeDetailed(scene = false, userText = s(R.string.camera_describe)) else localObjectDetail()
+        } else {
+            say(s(R.string.say_camera_ready), record = false)
+        }
+    }
+
+    /** Camera tile on the home screen: same behaviour as saying "open the camera". */
+    fun openCameraFromUi() {
+        interaction?.cancel()
+        interaction = scope.launch {
+            try { openScreen(Screen.CAMERA, announce = true) } catch (e: CancellationException) { throw e } catch (e: Exception) { say(explain(e), record = false) }
+            cameraConversation()
+        }
+    }
+
+    /**
+     * Detailed description from one fresh photo (faster than the tool loop: one request). The answer is kept in the
+     * conversation memory so follow-ups work ("what colour is it?", "read the small text").
+     */
+    private suspend fun describeDetailed(scene: Boolean, userText: String) {
+        val bmp = try { captureFrame() } catch (e: PermissionDenied) { return }
+        if (ImageQuality.assess(bmp) == ImageQuality.Verdict.TOO_DARK) { feedback.cue(Feedback.Cue.ERROR); say(s(R.string.err_image_unclear)); return }
+        noticePhotoUpload()
+        thinking = true; refreshPhase()
+        val reply = try {
+            // On-device text recognition helps the model read small print exactly (Latin script; harmless otherwise).
+            val printed = runCatching { ocr.recognizeLocal(bmp).text }.getOrNull()?.trim()?.takeIf { it.length >= 3 }
+            val prompt = userText + (printed?.let { "\n\nOn-device text recognition (may contain errors): \"${it.take(600)}\"" } ?: "")
+            brain.oneShot(Prompt.detail(lang, scene), prompt, ImageUtil.toJpeg(bmp, 1280, 82), 500)
+        } finally { thinking = false; refreshPhase() }
+        brain.memory.addTurn(userText, reply)
+        say(reply)
+    }
+
+    /** Offline "describe this": object, colour and printed text, from the on-device models. */
+    private suspend fun localObjectDetail() {
+        val bmp = try { captureFrame() } catch (e: PermissionDenied) { return }
+        thinking = true; refreshPhase()
+        val text = try {
+            val scene = vision.analyze(bmp)
+            val color = runCatching { vision.color(bmp) }.getOrNull()
+            val printed = runCatching { ocr.recognizeLocal(bmp).text }.getOrNull()
+            SceneComposer.objectDetail(scene, color, printed, lang)
+        } catch (e: CancellationException) { throw e } catch (e: Exception) { null } finally { thinking = false; refreshPhase() }
+        if (text == null) { feedback.cue(Feedback.Cue.ERROR); say(s(R.string.say_local_vision_failed), record = false); return }
+        say(text)
+    }
+
+    /**
+     * While the camera screen is open the microphone re-opens after each answer, with the usual start sound, so the
+     * user never needs the button. It stops after two silences in a row (battery, privacy), on "stop", when the user
+     * leaves the camera, or when continuous description starts. The button resumes it.
+     */
+    private suspend fun cameraConversation() {
+        if (cameraLoop || !settings.value.cameraListening || handsFreeJob?.isActive == true) return
+        if (_state.value.screen != Screen.CAMERA || live.active || !hasPermission(Manifest.permission.RECORD_AUDIO)) return
+        cameraLoop = true
+        try {
+            var silences = 0
+            while (_state.value.screen == Screen.CAMERA && !live.active && silences < 2) {
+                while (speaker.speaking.value) delay(150)
+                listening = true; refreshPhase()
+                _state.update { it.copy(partial = "") }
+                feedback.cue(Feedback.Cue.LISTEN_START)
+                delay(180) // do not record our own beep
+                val r = try {
+                    stt.listen(lang, settings.value.preferOfflineStt, onPartial = { p -> _state.update { it.copy(partial = p) } })
+                } finally {
+                    listening = false; refreshPhase()
+                    _state.update { it.copy(partial = "") }
+                }
+                when (r) {
+                    is SttResult.Heard -> {
+                        silences = 0
+                        feedback.cue(Feedback.Cue.LISTEN_END)
+                        handleUtterance(r.text)
+                        if (CommandParser.parse(r.text) == Command.Stop) break
+                    }
+                    is SttResult.Failed -> if (r.error == SttError.NO_SPEECH) silences++ else { say(sttMessage(r.error), record = false); break }
+                }
+            }
+            if (silences >= 2) feedback.cue(Feedback.Cue.LISTEN_END)   // quiet end: no speech, the button resumes
+        } finally {
+            cameraLoop = false
+        }
+    }
 
     // ------------------------------------------------------------------------------------------------------------------
     // Yes / no questions

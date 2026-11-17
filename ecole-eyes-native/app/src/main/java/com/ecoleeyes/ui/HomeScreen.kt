@@ -83,7 +83,7 @@ fun HomeScreen(graph: AppGraph) {
         Spacer(Modifier.height(20.dp))
         TileRow(
             Tile(Icons.AutoMirrored.Filled.Chat, stringResource(R.string.tile_assistant)) { c.navigate(Screen.ASSISTANT) },
-            Tile(Icons.Filled.CameraAlt, stringResource(R.string.tile_camera)) { c.navigate(Screen.CAMERA) },
+            Tile(Icons.Filled.CameraAlt, stringResource(R.string.tile_camera)) { c.openCameraFromUi() },
         )
         TileRow(
             Tile(Icons.Filled.Description, stringResource(R.string.tile_documents)) { c.navigate(Screen.DOCUMENTS) },
