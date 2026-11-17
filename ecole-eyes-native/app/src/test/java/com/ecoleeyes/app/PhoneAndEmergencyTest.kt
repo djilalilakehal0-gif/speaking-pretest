@@ -177,6 +177,30 @@ class PhoneAndEmergencyTest {
         assertEquals(str(R.string.say_location_no_contact, "36.75380", "3.05880"), speaker.texts.last())
     }
 
+    @Test fun approximate_location_alone_is_enough() = runCtl {
+        shadowOf(ctx).denyPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
+        shadowOf(ctx).grantPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
+        settings.update { it.copy(emergencyName = "Amina", emergencyNumber = "0666000111") }
+        val c = controller(this)
+        listener.hear("yes")
+        say(c, "share my location")
+        assertEquals(1, phone.sms.size)
+    }
+
+    @Test fun location_is_requested_as_precise_and_approximate_together() = runCtl {
+        shadowOf(ctx).denyPermissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+        val c = controller(this)
+        val events = ArrayList<UiEvent>()
+        val job = launch(Dispatchers.Unconfined) { c.events.collect { events += it } }
+        c.submitText("share my location"); advanceUntilIdle()
+        // Android 12+ ignores a request for precise location alone.
+        assertEquals(UiEvent.RequestPermissions(listOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)), events.single())
+        c.onPermissionResult(Manifest.permission.ACCESS_FINE_LOCATION, false); advanceUntilIdle()
+        assertEquals(str(R.string.err_location_denied), speaker.texts.last())
+        assertTrue(phone.sms.isEmpty())
+        job.cancel()
+    }
+
     @Test fun no_location_fix_is_explained() = runCtl {
         settings.update { it.copy(emergencyName = "Amina", emergencyNumber = "0666000111") }
         phone.location = null
@@ -257,7 +281,7 @@ class PhoneAndEmergencyTest {
         say(c, "take a note")
         assertEquals(listOf("Doctor on Tuesday", "buy bread and milk"), history.notes().map { it.text })
         say(c, "read my notes")
-        assertEquals(str(R.string.say_notes_list, 2, "1. Doctor on Tuesday. 2. buy bread and milk."), speaker.texts.last())
+        assertEquals("You have 2 notes, newest first. 1. Doctor on Tuesday. 2. buy bread and milk.", speaker.texts.last())
         say(c, "clear my history")
         assertEquals("history does not delete notes", 2, history.notes().size)
         say(c, "delete my notes")
@@ -318,7 +342,7 @@ class PhoneAndEmergencyTest {
         phone.notificationAccess = true
         notifs = listOf(SpokenNotification("k", "WhatsApp", "Sara", "See you at 6", 0L))
         say(c, "read my notifications")
-        assertEquals(str(R.string.say_notif_list, 1, str(R.string.say_notif_item, "WhatsApp", "Sara: See you at 6")), speaker.texts.last())
+        assertEquals("You have 1 notification. " + str(R.string.say_notif_item, "WhatsApp", "Sara: See you at 6"), speaker.texts.last())
         val stored = history.transcript.first().map { it.text }
         assertFalse("notification content must not be saved", stored.any { it.contains("See you at 6") })
     }
@@ -386,6 +410,6 @@ class PhoneAndEmergencyTest {
         settings.update { it.copy(lang = Lang.FR) }
         assertEquals("1 heure et 5 minutes", c.formatDuration(65))
         settings.update { it.copy(lang = Lang.AR) }
-        assertEquals("ساعة واحدة و١٠ دقيقة", c.formatDuration(70))   // Arabic locale digits, read correctly by TTS
+        assertEquals("ساعة واحدة و١٠ دقائق", c.formatDuration(70))   // Arabic locale digits, read correctly by TTS
     }
 }

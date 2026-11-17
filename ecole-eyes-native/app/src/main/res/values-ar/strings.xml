@@ -139,14 +139,11 @@
     <string name="say_ocr_cloud_needed">قراءة هذه اللغة تحتاج إلى المساعد السحابي وهو غير متاح الآن.</string>
 
     <string name="say_no_folder">لا أرى أي ملفات بعد. سأفتح منتقي المجلدات. اختر المجلد الذي تريدني أن أقرأه، مثل التنزيلات.</string>
-    <string name="say_folder_added">تمت إضافة المجلد. وجدت %1$d مستندًا.</string>
     <string name="say_folder_failed">لم أستطع استخدام هذا المجلد.</string>
     <string name="say_found_one">وجدت مستندًا واحدًا: %1$s.</string>
-    <string name="say_found_many">وجدت %1$d مستندًا. الأول هو %2$s. قل «اقرأه» لسماعه أو «التالي» للمستند التالي.</string>
     <string name="say_found_none">لم أجد مستندًا مطابقًا لـ «%1$s».</string>
     <string name="say_latest_is">أحدث مستند لديك هو %1$s.</string>
     <string name="say_no_documents">لا توجد مستندات في المجلدات المسموح بها.</string>
-    <string name="say_reading_start">أقرأ %1$s، %2$d صفحة.</string>
     <string name="say_reading_resume">أتابع من الصفحة %1$d.</string>
     <string name="say_page_x">الصفحة %1$d.</string>
     <string name="say_doc_end">نهاية المستند.</string>
@@ -202,7 +199,6 @@
     <string name="say_note_what">ماذا أكتب؟ تكلم الآن.</string>
     <string name="say_note_saved">حُفظت الملاحظة: %1$s</string>
     <string name="say_notes_none">ليست لديك ملاحظات.</string>
-    <string name="say_notes_list">لديك %1$d ملاحظات، الأحدث أولًا. %2$s</string>
     <string name="say_notes_cleared">حُذفت كل ملاحظاتك.</string>
     <string name="say_reminder_set">حسنًا. بعد حوالي %1$s سأذكّرك: %2$s</string>
     <string name="say_reminder_set_plain">حسنًا. سأذكّرك بعد حوالي %1$s.</string>
@@ -215,7 +211,6 @@
     <string name="say_app_not_found">لم أجد تطبيقًا باسم %1$s على هذا الهاتف.</string>
     <string name="say_notif_access">لقراءة إشعاراتك، فعّل الوصول إلى الإشعارات لتطبيق ÉCOLE EYES في الشاشة التي سأفتحها ثم ارجع. تبقى الإشعارات على هاتفك.</string>
     <string name="say_notif_none">ليست لديك إشعارات جديدة.</string>
-    <string name="say_notif_list">لديك %1$d إشعارات. %2$s</string>
     <string name="say_notif_item">من %1$s: %2$s.</string>
     <string name="say_battery">البطارية عند %1$d بالمئة.</string>
     <string name="say_battery_charging">البطارية عند %1$d بالمئة وهي قيد الشحن.</string>
@@ -242,10 +237,6 @@
     <string name="settings_notif_access">الوصول إلى الإشعارات (لأقرأ إشعاراتك بصوت عالٍ)</string>
     <string name="settings_offline_title">ما يعمل بدون إنترنت</string>
     <string name="settings_delete_notes">احذف كل ملاحظاتي</string>
-    <string name="duration_minutes">%1$d دقيقة</string>
-    <string name="duration_minute">دقيقة واحدة</string>
-    <string name="duration_hours">%1$d ساعات</string>
-    <string name="duration_hour">ساعة واحدة</string>
     <string name="duration_and">%1$s و%2$s</string>
     <string name="camera_color">ما اللون؟</string>
 </resources>

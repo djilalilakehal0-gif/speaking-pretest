@@ -139,14 +139,11 @@
     <string name="say_ocr_cloud_needed">Lire cette langue demande l’assistant cloud, qui n’est pas disponible pour le moment.</string>
 
     <string name="say_no_folder">Je ne vois encore aucun fichier. J’ouvre le sélecteur de dossier. Choisissez le dossier que je peux lire, par exemple Téléchargements.</string>
-    <string name="say_folder_added">Dossier ajouté. J’ai trouvé %1$d documents.</string>
     <string name="say_folder_failed">Je n’ai pas pu utiliser ce dossier.</string>
     <string name="say_found_one">J’ai trouvé un document : %1$s.</string>
-    <string name="say_found_many">J’ai trouvé %1$d documents. Le premier est %2$s. Dites « lis-le » pour l’écouter, ou « suivant » pour le suivant.</string>
     <string name="say_found_none">Je n’ai trouvé aucun document correspondant à « %1$s ».</string>
     <string name="say_latest_is">Votre dernier document est %1$s.</string>
     <string name="say_no_documents">Il n’y a aucun document dans les dossiers autorisés.</string>
-    <string name="say_reading_start">Lecture de %1$s, %2$d pages.</string>
     <string name="say_reading_resume">Reprise à la page %1$d.</string>
     <string name="say_page_x">Page %1$d.</string>
     <string name="say_doc_end">Fin du document.</string>
@@ -202,7 +199,6 @@
     <string name="say_note_what">Que dois-je écrire ? Parlez maintenant.</string>
     <string name="say_note_saved">Note enregistrée : %1$s</string>
     <string name="say_notes_none">Vous n’avez aucune note.</string>
-    <string name="say_notes_list">Vous avez %1$d notes, de la plus récente à la plus ancienne. %2$s</string>
     <string name="say_notes_cleared">Toutes vos notes sont supprimées.</string>
     <string name="say_reminder_set">D’accord. Dans environ %1$s, je vous rappellerai : %2$s</string>
     <string name="say_reminder_set_plain">D’accord. Je vous ferai un rappel dans environ %1$s.</string>
@@ -215,7 +211,6 @@
     <string name="say_app_not_found">Je n’ai pas trouvé d’application appelée %1$s sur ce téléphone.</string>
     <string name="say_notif_access">Pour lire vos notifications, activez l’accès aux notifications pour ÉCOLE EYES dans l’écran que j’ouvre, puis revenez. Les notifications restent sur votre téléphone.</string>
     <string name="say_notif_none">Vous n’avez pas de nouvelles notifications.</string>
-    <string name="say_notif_list">Vous avez %1$d notifications. %2$s</string>
     <string name="say_notif_item">De %1$s : %2$s.</string>
     <string name="say_battery">La batterie est à %1$d pour cent.</string>
     <string name="say_battery_charging">La batterie est à %1$d pour cent et en charge.</string>
@@ -242,10 +237,6 @@
     <string name="settings_notif_access">Accès aux notifications (pour lire vos notifications à voix haute)</string>
     <string name="settings_offline_title">Ce qui fonctionne sans internet</string>
     <string name="settings_delete_notes">Supprimer toutes mes notes</string>
-    <string name="duration_minutes">%1$d minutes</string>
-    <string name="duration_minute">1 minute</string>
-    <string name="duration_hours">%1$d heures</string>
-    <string name="duration_hour">1 heure</string>
     <string name="duration_and">%1$s et %2$s</string>
     <string name="camera_color">Quelle couleur ?</string>
 </resources>

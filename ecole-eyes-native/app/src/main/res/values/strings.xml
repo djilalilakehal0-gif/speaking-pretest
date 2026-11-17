@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">ÉCOLE EYES</string>
     <string name="tagline">Your voice-controlled AI assistant</string>
 
@@ -146,14 +146,11 @@
 
     <!-- Spoken: documents -->
     <string name="say_no_folder">I cannot see any files yet. I will open the folder picker. Choose the folder you want me to be able to read, for example Downloads.</string>
-    <string name="say_folder_added">Folder added. I found %1$d documents.</string>
     <string name="say_folder_failed">I could not use that folder.</string>
     <string name="say_found_one">I found one document: %1$s.</string>
-    <string name="say_found_many">I found %1$d documents. The first is %2$s. Say “read it” to hear it, or “next” for the next one.</string>
     <string name="say_found_none">I found no document matching “%1$s”.</string>
     <string name="say_latest_is">Your latest document is %1$s.</string>
     <string name="say_no_documents">There are no documents in the folders you allowed.</string>
-    <string name="say_reading_start">Reading %1$s, %2$d pages.</string>
     <string name="say_reading_resume">Continuing from page %1$d.</string>
     <string name="say_page_x">Page %1$d.</string>
     <string name="say_doc_end">End of the document.</string>
@@ -210,7 +207,6 @@
     <string name="say_note_what">What should I write? Speak now.</string>
     <string name="say_note_saved">Note saved: %1$s</string>
     <string name="say_notes_none">You have no notes.</string>
-    <string name="say_notes_list">You have %1$d notes, newest first. %2$s</string>
     <string name="say_notes_cleared">All your notes are deleted.</string>
     <string name="say_reminder_set">Okay. In about %1$s I will remind you: %2$s</string>
     <string name="say_reminder_set_plain">Okay. I will remind you in about %1$s.</string>
@@ -223,10 +219,9 @@
     <string name="say_app_not_found">I did not find an app called %1$s on this phone.</string>
     <string name="say_notif_access">To read your notifications, turn on notification access for ÉCOLE EYES in the screen I am opening, then come back. Notifications stay on your phone.</string>
     <string name="say_notif_none">You have no new notifications.</string>
-    <string name="say_notif_list">You have %1$d notifications. %2$s</string>
     <string name="say_notif_item">From %1$s: %2$s.</string>
-    <string name="say_battery">The battery is at %1$d percent.</string>
-    <string name="say_battery_charging">The battery is at %1$d percent and charging.</string>
+    <string name="say_battery" tools:ignore="PluralsCandidate">The battery is at %1$d percent.</string>
+    <string name="say_battery_charging" tools:ignore="PluralsCandidate">The battery is at %1$d percent and charging.</string>
     <string name="say_battery_unknown">I cannot read the battery level on this phone.</string>
     <string name="say_date">Today is %1$s.</string>
     <string name="say_offline_can">Without internet I can still read your documents and printed text in Latin letters, roughly describe objects, people and colours, tell the time and date, take notes, set reminders, make calls and read notifications.</string>
@@ -250,10 +245,6 @@
     <string name="settings_notif_access">Notification access (lets me read your notifications aloud)</string>
     <string name="settings_offline_title">What works without internet</string>
     <string name="settings_delete_notes">Delete all my notes</string>
-    <string name="duration_minutes">%1$d minutes</string>
-    <string name="duration_minute">1 minute</string>
-    <string name="duration_hours">%1$d hours</string>
-    <string name="duration_hour">1 hour</string>
     <string name="duration_and">%1$s and %2$s</string>
     <string name="camera_color">What colour?</string>
 </resources>

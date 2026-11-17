@@ -3,6 +3,7 @@ package com.ecoleeyes.ui
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.provider.ContactsContract
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -36,6 +37,11 @@ class MainActivity : ComponentActivity() {
     private val folderLauncher = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { graph.controller.onFolderPicked(it) }
     private val fileLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { graph.controller.onFolderPicked(it) }
     private var lastPermission: String? = null
+    private var lastPermissions: List<String> = emptyList()
+    private val multiPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+        // Granted if the user allowed any of them (e.g. "approximate" location only).
+        lastPermissions.firstOrNull()?.let { graph.controller.onPermissionResult(it, result.values.any { granted -> granted }) }
+    }
 
     // Emergency contact from the system contact picker: Android grants read access to the one chosen entry only,
     // so no contacts permission is needed for this path.
@@ -61,6 +67,7 @@ class MainActivity : ComponentActivity() {
             graph.controller.events.collect { ev ->
                 when (ev) {
                     is UiEvent.RequestPermission -> { lastPermission = ev.permission; permissionLauncher.launch(ev.permission) }
+                    is UiEvent.RequestPermissions -> { lastPermissions = ev.permissions; multiPermissionLauncher.launch(ev.permissions.toTypedArray()) }
                     UiEvent.PickFolder -> folderLauncher.launch(null)
                     UiEvent.PickFile -> fileLauncher.launch(arrayOf("*/*"))
                     UiEvent.CloseApp -> finishAffinity()
@@ -98,11 +105,10 @@ class MainActivity : ComponentActivity() {
 private fun LocalizedRoot(graph: AppGraph, content: @Composable () -> Unit) {
     val lang by graph.settings.state.collectAsState()
     val base = LocalContext.current
-    val ctx = remember(lang.lang, base) {
-        val cfg = Configuration(base.resources.configuration).apply { setLocale(lang.lang.locale); setLayoutDirection(lang.lang.locale) }
-        base.createConfigurationContext(cfg)
-    }
     val cfg = remember(lang.lang, base) { Configuration(base.resources.configuration).apply { setLocale(lang.lang.locale); setLayoutDirection(lang.lang.locale) } }
+    // Wrap (do not replace) the Activity context: Compose finds the Activity through the wrapper chain for permission
+    // launchers, back handling and lifecycle. createConfigurationContext() broke that chain and crashed the camera screen.
+    val ctx = remember(lang.lang, base) { ContextThemeWrapper(base, base.theme).apply { applyOverrideConfiguration(cfg) } }
     CompositionLocalProvider(
         LocalContext provides ctx,
         LocalConfiguration provides cfg,

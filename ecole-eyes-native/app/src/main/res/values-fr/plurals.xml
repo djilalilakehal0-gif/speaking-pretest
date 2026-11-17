@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Counted phrases. Arabic uses all six plural forms (zero, one, two, few 3-10, many 11-99, other 100+). -->
+<resources>
+    <plurals name="say_folder_added">
+        <item quantity="one">Dossier ajouté. J’ai trouvé %1$d document.</item>
+        <item quantity="many">Dossier ajouté. J’ai trouvé %1$d documents.</item>
+        <item quantity="other">Dossier ajouté. J’ai trouvé %1$d documents.</item>
+    </plurals>
+    <plurals name="say_found_many">
+        <item quantity="one">J’ai trouvé %1$d document : %2$s. Dites « lis-le » pour l’écouter.</item>
+        <item quantity="many">J’ai trouvé %1$d documents. Le premier est %2$s. Dites « lis-le » pour l’écouter, ou « suivant » pour le suivant.</item>
+        <item quantity="other">J’ai trouvé %1$d documents. Le premier est %2$s. Dites « lis-le » pour l’écouter, ou « suivant » pour le suivant.</item>
+    </plurals>
+    <plurals name="say_reading_start">
+        <item quantity="one">Lecture de %1$s, %2$d page.</item>
+        <item quantity="many">Lecture de %1$s, %2$d pages.</item>
+        <item quantity="other">Lecture de %1$s, %2$d pages.</item>
+    </plurals>
+    <plurals name="say_notes_list">
+        <item quantity="one">Vous avez %1$d note. %2$s</item>
+        <item quantity="many">Vous avez %1$d notes, de la plus récente à la plus ancienne. %2$s</item>
+        <item quantity="other">Vous avez %1$d notes, de la plus récente à la plus ancienne. %2$s</item>
+    </plurals>
+    <plurals name="say_notif_list">
+        <item quantity="one">Vous avez %1$d notification. %2$s</item>
+        <item quantity="many">Vous avez %1$d notifications. %2$s</item>
+        <item quantity="other">Vous avez %1$d notifications. %2$s</item>
+    </plurals>
+    <plurals name="duration_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="many">%1$d minutes</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+    <plurals name="duration_hours">
+        <item quantity="one">%1$d heure</item>
+        <item quantity="many">%1$d heures</item>
+        <item quantity="other">%1$d heures</item>
+    </plurals>
+</resources>

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import com.ecoleeyes.a11y.Feedback
@@ -164,6 +165,7 @@ class AssistantController(
 
     private val lang: Lang get() = settings.value.lang
     private fun s(@StringRes id: Int, vararg a: Any) = l10n.str(lang, id, *a)
+    private fun p(@PluralsRes id: Int, count: Int, vararg a: Any) = l10n.plural(lang, id, count, *a)
 
     // ------------------------------------------------------------------------------------------------------------------
     // State helpers
@@ -304,6 +306,21 @@ class AssistantController(
         val waiter = CompletableDeferred<Boolean>()
         permissionWaiters[permission] = waiter
         _events.emit(UiEvent.RequestPermission(permission))
+        val granted = waiter.await()
+        if (!granted) { feedback.cue(Feedback.Cue.ERROR); say(s(denied), record = false) }
+        return granted
+    }
+
+    /**
+     * Like [ensurePermission] for a group asked in one dialog; true if any is granted.
+     * Location: Android 12+ ignores a request for precise location alone, and the user may choose "approximate".
+     */
+    private suspend fun ensureAnyPermission(permissions: List<String>, @StringRes why: Int, @StringRes denied: Int): Boolean {
+        if (permissions.any { hasPermission(it) }) return true
+        say(s(why), record = false)
+        val waiter = CompletableDeferred<Boolean>()
+        permissionWaiters[permissions.first()] = waiter
+        _events.emit(UiEvent.RequestPermissions(permissions))
         val granted = waiter.await()
         if (!granted) { feedback.cue(Feedback.Cue.ERROR); say(s(denied), record = false) }
         return granted
@@ -638,7 +655,7 @@ class AssistantController(
         when (found.size) {
             0 -> say(if (query.isEmpty()) s(R.string.say_no_documents) else s(R.string.say_found_none, query))
             1 -> say(s(R.string.say_found_one, found[0].spokenName))
-            else -> say(s(R.string.say_found_many, found.size, found[0].spokenName))
+            else -> say(p(R.plurals.say_found_many, found.size, found.size, found[0].spokenName))
         }
     }
 
@@ -685,7 +702,7 @@ class AssistantController(
         if (loaded.pages.notes.contains(DocNote.PARTIAL_FORMAT)) say(s(R.string.say_doc_partial), record = false)
         if (!autoStart) return
         if (saved != null && (page > 0 || para > 0) && startPage == null) say(s(R.string.say_reading_resume, page + 1), record = false)
-        else say(s(R.string.say_reading_start, file.spokenName, loaded.pages.count), record = false)
+        else say(p(R.plurals.say_reading_start, loaded.pages.count, file.spokenName, loaded.pages.count), record = false)
         session.start()
         refreshReader()
     }
@@ -706,7 +723,7 @@ class AssistantController(
             say(s(R.string.say_files_scanning), record = false)
             val all = docs.refresh()
             updateResults("")
-            say(s(R.string.say_folder_added, all.size), record = false)
+            say(p(R.plurals.say_folder_added, all.size, all.size), record = false)
         }
     }
 
@@ -1014,7 +1031,7 @@ class AssistantController(
     }
 
     private suspend fun shareLocation() {
-        if (!ensurePermission(Manifest.permission.ACCESS_FINE_LOCATION, R.string.err_location_why, R.string.err_location_denied)) return
+        if (!ensureAnyPermission(listOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), R.string.err_location_why, R.string.err_location_denied)) return
         say(s(R.string.say_location_finding), record = false)
         val p = phone.currentLocation()
         if (p == null) { say(s(R.string.say_location_none)); return }
@@ -1105,7 +1122,7 @@ class AssistantController(
         val notes = history.notes()
         if (notes.isEmpty()) { say(s(R.string.say_notes_none)); return }
         val list = notes.take(10).mapIndexed { i, n -> "${i + 1}. ${n.text.trimEnd('.')}." }.joinToString(" ")
-        say(s(R.string.say_notes_list, notes.size, list))
+        say(p(R.plurals.say_notes_list, notes.size, notes.size, list))
     }
 
     private suspend fun setReminder(minutes: Int, text: String) {
@@ -1121,11 +1138,11 @@ class AssistantController(
 
     fun formatDuration(minutes: Int): String {
         val h = minutes / 60; val m = minutes % 60
-        val hs = when (h) { 0 -> null; 1 -> s(R.string.duration_hour); else -> s(R.string.duration_hours, h) }
-        val ms = when (m) { 0 -> null; 1 -> s(R.string.duration_minute); else -> s(R.string.duration_minutes, m) }
+        val hs = if (h == 0) null else p(R.plurals.duration_hours, h, h)
+        val ms = if (m == 0) null else p(R.plurals.duration_minutes, m, m)
         return when {
             hs != null && ms != null -> s(R.string.duration_and, hs, ms)
-            else -> hs ?: ms ?: s(R.string.duration_minute)
+            else -> hs ?: ms ?: p(R.plurals.duration_minutes, 1, 1)
         }
     }
 
@@ -1152,7 +1169,7 @@ class AssistantController(
             s(R.string.say_notif_item, n.app, listOf(n.title, n.text).filter { it.isNotBlank() }.joinToString(": ").trimEnd('.'))
         }
         // Not recorded in history: notification content stays out of storage.
-        say(s(R.string.say_notif_list, items.size, spoken), record = false)
+        say(p(R.plurals.say_notif_list, items.size, items.size, spoken), record = false)
     }
 
     private suspend fun battery() {
