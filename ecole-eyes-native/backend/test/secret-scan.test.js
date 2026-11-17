@@ -9,7 +9,7 @@ const fake = {
   google: 'AIza' + 'b'.repeat(35),
   github: 'ghp_' + 'c'.repeat(36),
   pem: '-----BEGIN ' + 'PRIVATE KEY-----',
-  sa: '{"type": "service_account", "project_id": "p", "private_key": "x"}',
+  sa: JSON.stringify({ type: 'service' + '_account', project_id: 'p', ['private' + '_key']: 'x' }),
   discord: 'https://discord.com/api/webhooks/' + '1'.repeat(18) + '/' + 'd'.repeat(60),
 };
 
