@@ -22,7 +22,10 @@ checklist items apply (see "Not applicable" below).
 | 6 | Deploy tool `wrangler` 3.x: 8 advisories (7 high) in its dev-time dependencies (undici, ws, esbuild, sharp, zod…). Not in deployed code. | Low | Fixed: wrangler 4.163.0, lockfile added, `npm audit`: 0 vulnerabilities. |
 | 7 | BouncyCastle 1.72 (via pdfbox-android, reachable with encrypted PDFs): CVE-2024-29857, CVE-2024-30171, CVE-2024-30172. | Medium | Fixed: forced to 1.87 with a Gradle constraint. |
 | 8 | Unused libraries `androidx.documentfile`, Compose preview tooling. | Info | Removed. |
-| 9 | App token is embedded in the APK (extractable). | Medium | Documented design limit. Proper fix: Play Integrity (below). Mitigated by #2–#4 and the provider spending cap. |
+| 9 | App token is embedded in the APK (extractable). | Medium | Fixed in code: **Google Play Integrity**. The app attaches a proof bound to SHA-256 of the exact request body; the Worker verifies package, request hash, freshness (10 min), app and device verdicts with Google (`off` → `monitor` → `enforce`). Needs the owner's Google Cloud setup to switch on. Tests: `IntegrityHeaderTest`, `backend/test/integrity.test.js`. |
+| 10 | No spending cap in the service itself. | Medium | Fixed: daily caps for the whole service and per IP (`DAILY_REQUEST_LIMIT`, `DAILY_IP_LIMIT`, KV `USAGE`); failed calls are not counted; a KV outage never blocks users. Tests: `backend/test/guard.test.js`. |
+| 11 | No alerts. | Medium | Fixed: Slack/Discord webhook (`ALERT_WEBHOOK_URL`) at 80 % and 100 % of the daily budget, when the provider rejects the key (401/403) or hits its spending limit (429); once per event per day, never with user content. |
+| 12 | Nothing stopped a new secret from being committed. | Medium | Fixed: `.github/workflows/security.yml` scans every tracked file on each push/PR and weekly (keys, tokens, webhooks, private keys, service-account JSON, keystore and env files), runs `npm audit --audit-level=high` and the backend tests. Root `.gitignore` blocks keystores and env files. The known `KEYSTORE_BASE64.txt` is a warning until deleted. |
 
 ### Verified OK
 
@@ -63,17 +66,23 @@ checklist items apply (see "Not applicable" below).
 3. **Alerts:** Cloudflare → Notifications → add alerts for Worker error rate / request spikes. Set `DISABLED=true` in the
    Worker variables to stop all AI traffic immediately if spending looks wrong.
 4. **Rotate `APP_TOKEN`** whenever you suspect abuse (`npx wrangler secret put APP_TOKEN`, then rebuild the app).
-5. **Stronger client authentication before a large public launch:** Google Play Integrity. The app requests an integrity
-   token per session; the Worker verifies it with Google (needs a Google Cloud project linked in the Play Console and a
-   service-account secret on the Worker) and rejects modified apps and scripts. This replaces the embedded token as the
-   real gate.
+5. **Switch on Play Integrity** (the code is ready):
+   1. Play Console → App integrity → link a Google Cloud project; note its **project number**.
+   2. In that project enable the *Google Play Integrity API*, create a service account, download its JSON key.
+   3. `npx wrangler secret put GOOGLE_SERVICE_ACCOUNT` (paste the JSON) and set `INTEGRITY_MODE = "monitor"`.
+   4. Build the app with `-PecoleEyesCloudProjectNumber=<project number>` (or the repo variable in CI).
+   5. When the logs show `"integrity":"ok"` for real users, set `INTEGRITY_MODE = "enforce"`. APKs installed from GitHub
+      Releases are not "Play recognized": keep `INTEGRITY_ALLOW_SIDELOAD = "true"` while you still distribute them.
+6. **Turn on the daily cap and alerts:** `npx wrangler kv namespace create USAGE`, uncomment the binding and limits in
+   `wrangler.toml`, `npx wrangler secret put ALERT_WEBHOOK_URL` (a Slack or Discord incoming webhook).
 
 ## Re-run the audit
 
 ```bash
 # secrets in all history
 git log --all -p | grep -nE "sk-ant-|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35}|ghp_|github_pat_|BEGIN [A-Z ]*PRIVATE KEY"
-(cd backend && npm audit && npm test)                 # 0 vulnerabilities, 27 tests
-./gradlew testDebugUnitTest lintDebug                 # 224 tests, lint clean
+node backend/scripts/secret-scan.js                   # from the repository root; also runs in CI
+(cd backend && npm audit && npm test)                 # 0 vulnerabilities, 45 tests
+./gradlew testDebugUnitTest lintDebug                 # 228 tests, lint clean
 ./gradlew :app:dependencies --configuration releaseRuntimeClasspath | grep bouncycastle   # 1.87
 ```

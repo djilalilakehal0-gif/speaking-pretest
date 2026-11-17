@@ -1,0 +1,10 @@
+# Secrets must never be committed (also enforced by .github/workflows/security.yml).
+*.jks
+*.keystore
+*.p12
+*.pfx
+KEYSTORE_BASE64*.txt
+.env
+.env.local
+.env.production
+.dev.vars

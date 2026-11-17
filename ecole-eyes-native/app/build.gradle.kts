@@ -30,6 +30,8 @@ android {
         // Backend that holds the AI key. NEVER put an AI provider key here (see backend/README.md).
         buildConfigField("String", "BACKEND_URL", "\"${cfg("ecoleEyesBackendUrl")}\"")
         buildConfigField("String", "APP_TOKEN", "\"${cfg("ecoleEyesAppToken")}\"")
+        // Google Cloud project number for Play Integrity (public, not a secret). Empty = integrity proofs are not sent.
+        buildConfigField("String", "CLOUD_PROJECT_NUMBER", "\"${cfg("ecoleEyesCloudProjectNumber").filter { it.isDigit() }}\"")
         buildConfigField("String", "AI_MODEL", "\"${cfg("ecoleEyesModel", "claude-sonnet-5-5")}\"")
         resourceConfigurations += listOf("en", "fr", "ar")
     }
@@ -133,6 +135,7 @@ dependencies {
     implementation(libs.mlkit.labels)
     implementation(libs.mlkit.faces)
     implementation(libs.androidx.work)
+    implementation(libs.play.integrity)
     implementation(libs.pdfbox.android)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 

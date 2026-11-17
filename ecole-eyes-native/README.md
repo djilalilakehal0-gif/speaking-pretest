@@ -90,7 +90,8 @@ npm test                                       # 21 tests
 
 The app only ever talks to `https://<your-worker>/v1/messages`; the worker validates requests (token, model allow-list,
 only the app's own tools and content types, size and image caps, 20 requests/minute/IP) and adds the key. It logs one line
-per request without any content, and `DISABLED=true` stops all AI traffic instantly. Security audit and owner checklist:
+per request without any content, and `DISABLED=true` stops all AI traffic instantly. Optional: a daily request budget
+with Slack/Discord alerts, and Google Play Integrity verification (see `wrangler.toml` and `.dev.vars.example`). Security audit and owner checklist:
 [`SECURITY.md`](SECURITY.md). See [`backend/worker.js`](backend/worker.js).
 The provider is an interface in the app (`AiClient`), so another multimodal model/backend can replace
 `ClaudeProxyClient`.
@@ -236,11 +237,11 @@ spoken sentence in the user's language (`AssistantController.explain`, `sttMessa
 ## Testing
 
 ```bash
-./gradlew testDebugUnitTest            # 224 JVM + Robolectric tests (first run downloads Robolectric's Android jars;
+./gradlew testDebugUnitTest            # 228 JVM + Robolectric tests (first run downloads Robolectric's Android jars;
                                        # behind a rate-limited network add -ProbolectricRepoUrl=<Maven Central mirror>)
 ./gradlew lintDebug
 ./gradlew connectedDebugAndroidTest    # needs a device/emulator: Compose accessibility + navigation tests (not run in CI here)
-(cd backend && npm test)              # 21 tests
+(cd backend && npm test)              # 45 tests
 ```
 
 For a real TalkBack session: enable TalkBack, open the app, and confirm the home screen reads its heading, the voice button

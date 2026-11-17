@@ -15,6 +15,7 @@ mlkitObjects = "17.0.2"
 mlkitLabels = "17.0.9"
 mlkitFaces = "16.1.7"
 work = "2.10.0"
+playIntegrity = "1.4.0"
 securityCrypto = "1.1.0-alpha06"
 exif = "1.3.7"
 pdfbox = "2.0.27.0"
@@ -55,6 +56,7 @@ mlkit-text = { module = "com.google.mlkit:text-recognition", version.ref = "mlki
 mlkit-objects = { module = "com.google.mlkit:object-detection", version.ref = "mlkitObjects" }
 mlkit-labels = { module = "com.google.mlkit:image-labeling", version.ref = "mlkitLabels" }
 mlkit-faces = { module = "com.google.mlkit:face-detection", version.ref = "mlkitFaces" }
+play-integrity = { module = "com.google.android.play:integrity", version.ref = "playIntegrity" }
 androidx-work = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "work" }
 pdfbox-android = { module = "com.tom-roush:pdfbox-android", version.ref = "pdfbox" }
