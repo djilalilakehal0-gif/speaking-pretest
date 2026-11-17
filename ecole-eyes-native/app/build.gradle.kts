@@ -97,7 +97,14 @@ android {
             isReturnDefaultValues = true
             isIncludeAndroidResources = true
             // Robolectric downloads Android framework jars at test time; allow a Maven Central mirror (-ProbolectricRepoUrl=...).
-            all { test -> cfg("robolectricRepoUrl").takeIf { it.isNotEmpty() }?.let { test.systemProperty("robolectric.dependency.repo.url", it) } }
+            all { test ->
+                cfg("robolectricRepoUrl").takeIf { it.isNotEmpty() }?.let { test.systemProperty("robolectric.dependency.repo.url", it) }
+                // Screen images for visual review: -Pscreenshots=true (see ScreenshotTour).
+                if (cfg("screenshots") == "true") {
+                    test.systemProperty("ecoleeyes.screenshots", "true")
+                    test.systemProperty("ecoleeyes.screenshotDir", layout.buildDirectory.dir("screenshots").get().asFile.absolutePath)
+                }
+            }
         }
     }
     lint {

@@ -75,6 +75,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -161,6 +164,8 @@ class AssistantController(
     init {
         speaker.speaking.onEach { refreshPhase() }.launchIn(scope)
         settings.state.onEach { speaker.setRate(it.speechRate); speaker.setVolume(it.speechVolume) }.launchIn(scope)
+        // Language changed (by voice or in Settings): the caption under the voice button was in the old language.
+        settings.state.map { it.lang }.distinctUntilChanged().drop(1).onEach { _state.update { it.copy(lastSaid = "") } }.launchIn(scope)
     }
 
     private val lang: Lang get() = settings.value.lang

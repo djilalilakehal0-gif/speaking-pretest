@@ -64,7 +64,7 @@
     <string name="settings_announce">التنبيه قبل إرسال صورة أو مستند</string>
     <string name="settings_backend">عنوان خادم الذكاء الاصطناعي</string>
     <string name="settings_backend_hint">https://…workers.dev</string>
-    <string name="settings_live_interval">الثواني بين تحديثات الكاميرا: %1$d</string>
+    <string name="settings_live_interval">الثواني بين تحديثات الكاميرا</string>
     <string name="settings_handsfree">الاستماع دون لمس (خدمة في المقدمة)</string>
     <string name="settings_handsfree_desc">يبقي الميكروفون يعمل مع إشعار ظاهر، ويستجيب عندما تقول «مرحبًا إيكول آيز». قد يوقفه أندرويد لتوفير البطارية. يمكنك إيقافه في أي وقت.</string>
     <string name="settings_save">حفظ</string>

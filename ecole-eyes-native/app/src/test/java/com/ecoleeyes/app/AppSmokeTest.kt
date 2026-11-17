@@ -64,8 +64,19 @@ class AppSmokeTest {
             compose.onNodeWithText(t(R.string.screen_emergency)).assertExists()
             compose.onNodeWithText(t(R.string.em_btn_services, "112")).assertExists()
             open(Screen.SETTINGS); compose.onNodeWithText(t(R.string.screen_settings)).assertExists()
+            // the camera-interval value is shown once ("…: 6"), not twice ("…: 6: 6")
+            compose.onNodeWithText(t(R.string.settings_live_interval) + ": 6").assertExists()
             open(Screen.PRIVACY); compose.onNodeWithText(t(R.string.screen_privacy)).assertExists()
         }
+    }
+
+    @Test fun switching_language_in_settings_clears_the_old_language_caption() {
+        compose.runOnUiThread { app.graph.controller.readAloud("Hello in English") }
+        compose.waitForIdle()
+        assertEquals("Hello in English", app.graph.controller.state.value.lastSaid)
+        compose.runOnUiThread { app.graph.settings.update { it.copy(lang = if (it.lang == Lang.AR) Lang.FR else Lang.AR) } }
+        compose.waitForIdle()
+        assertEquals("", app.graph.controller.state.value.lastSaid)
     }
 
     @Test fun system_back_returns_home_from_any_screen() {

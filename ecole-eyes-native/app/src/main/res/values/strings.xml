@@ -66,7 +66,7 @@
     <string name="settings_announce">Announce before sending a photo or document</string>
     <string name="settings_backend">AI backend address</string>
     <string name="settings_backend_hint">https://…workers.dev</string>
-    <string name="settings_live_interval">Seconds between camera updates: %1$d</string>
+    <string name="settings_live_interval">Seconds between camera updates</string>
     <string name="settings_handsfree">Hands-free listening (foreground service)</string>
     <string name="settings_handsfree_desc">Keeps the microphone on while a notification is visible, and reacts when you say “Hello École Eyes”. Android may stop it to save battery. Turn it off at any time.</string>
     <string name="settings_save">Save</string>
