@@ -11,6 +11,10 @@ camerax = "1.4.1"
 lifecycle = "2.8.7"
 activityCompose = "1.9.3"
 mlkitText = "16.0.1"
+mlkitObjects = "17.0.2"
+mlkitLabels = "17.0.9"
+mlkitFaces = "16.1.7"
+work = "2.10.0"
 securityCrypto = "1.1.0-alpha06"
 documentfile = "1.0.1"
 exif = "1.3.7"
@@ -52,6 +56,11 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
 mlkit-text = { module = "com.google.mlkit:text-recognition", version.ref = "mlkitText" }
+mlkit-objects = { module = "com.google.mlkit:object-detection", version.ref = "mlkitObjects" }
+mlkit-labels = { module = "com.google.mlkit:image-labeling", version.ref = "mlkitLabels" }
+mlkit-faces = { module = "com.google.mlkit:face-detection", version.ref = "mlkitFaces" }
+androidx-work = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
+androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "work" }
 pdfbox-android = { module = "com.tom-roush:pdfbox-android", version.ref = "pdfbox" }
 junit = { module = "junit:junit", version.ref = "junit" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }

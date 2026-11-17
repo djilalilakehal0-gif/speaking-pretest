@@ -2,7 +2,7 @@ package com.ecoleeyes.voice
 
 import com.ecoleeyes.core.Lang
 
-enum class Screen { HOME, ASSISTANT, CAMERA, DOCUMENTS, FILES, SETTINGS, PRIVACY }
+enum class Screen { HOME, ASSISTANT, CAMERA, DOCUMENTS, FILES, EMERGENCY, SETTINGS, PRIVACY }
 
 enum class DocType { ANY, PDF, WORD, TEXT, RTF, IMAGE }
 
@@ -40,6 +40,27 @@ sealed interface Command {
     data class SetCloud(val allowed: Boolean) : Command
     data object Yes : Command
     data object No : Command
+    // emergency
+    data object Emergency : Command
+    data object CallEmergencyContact : Command
+    data object CallEmergencyServices : Command
+    data object ShareLocation : Command
+    data class SetEmergencyContact(val name: String) : Command
+    // phone
+    /** [who] is a contact name or a spoken number. */
+    data class Call(val who: String) : Command
+    data class OpenApp(val name: String) : Command
+    data class CreateNote(val text: String) : Command
+    data object ReadNotes : Command
+    data object ClearNotes : Command
+    data class Remind(val minutes: Int, val text: String) : Command
+    data object ReadNotifications : Command
+    data object Battery : Command
+    data object Date : Command
+    data object Status : Command
+    // on-device vision
+    data object WhatColor : Command
+    data object People : Command
     /** "next" with no object: next search result or next page depending on context. */
     data object Next : Command
     /** Free-form request for the AI (tools may still be used). [wake] is true if it began with the wake phrase. */

@@ -10,5 +10,7 @@ compatibility_date = "2026-10-01"
 # simple = { limit = 30, period = 60 }
 
 # After `npx wrangler deploy`:
-#   npx wrangler secret put ANTHROPIC_API_KEY     # your Anthropic key
 #   npx wrangler secret put APP_TOKEN             # any long random string; also put it in the app (ecoleEyesAppToken)
+#   npx wrangler secret put ANTHROPIC_API_KEY     # default provider
+# Or use any OpenAI-compatible provider instead (see .dev.vars.example):
+#   [vars] PROVIDER = "openai", OPENAI_BASE_URL = "...", OPENAI_MODEL = "..."  +  npx wrangler secret put OPENAI_API_KEY

@@ -33,7 +33,19 @@ import com.ecoleeyes.docs.DocumentException
 import com.ecoleeyes.docs.DocumentLoader
 import com.ecoleeyes.docs.ReaderSession
 import com.ecoleeyes.docs.ReaderState
+import com.ecoleeyes.phone.AndroidPhone
+import com.ecoleeyes.phone.Contact
+import com.ecoleeyes.phone.FuzzyMatch
+import com.ecoleeyes.phone.NotificationReader
+import com.ecoleeyes.phone.Phone
+import com.ecoleeyes.phone.ReminderParser
+import com.ecoleeyes.phone.ReminderScheduler
+import com.ecoleeyes.phone.SpokenNotification
+import com.ecoleeyes.phone.WorkReminderScheduler
 import com.ecoleeyes.vision.CameraException
+import com.ecoleeyes.vision.LocalVision
+import com.ecoleeyes.vision.MlKitVision
+import com.ecoleeyes.vision.SceneComposer
 import com.ecoleeyes.vision.CameraHub
 import com.ecoleeyes.vision.ContinuousAssist
 import com.ecoleeyes.vision.ImageQuality
@@ -92,6 +104,10 @@ class AssistantController(
     private val connectivity: Connectivity,
     private val loaderFactory: (com.ecoleeyes.docs.LoaderEnv) -> DocumentLoader,
     private val serviceControl: (Boolean) -> Unit = {},
+    private val vision: LocalVision = MlKitVision(),
+    private val phone: Phone = AndroidPhone(context),
+    private val reminders: ReminderScheduler = WorkReminderScheduler(context),
+    private val notifications: () -> List<SpokenNotification> = { NotificationReader.items.value },
 ) {
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -368,7 +384,24 @@ class AssistantController(
             Command.ReadTextInView -> readTextInView()
             Command.LiveStart -> startLive()
             Command.LiveStop -> { live.stop(); _state.update { it.copy(live = false) }; say(s(R.string.say_live_off)) }
-            Command.Describe -> askAi(original)
+            Command.Describe -> if (cloudUsable()) askAi(original) else localDescribe(peopleOnly = false)
+            Command.People -> if (cloudUsable()) askAi(original) else localDescribe(peopleOnly = true)
+            Command.WhatColor -> whatColor()
+            Command.Emergency -> emergency()
+            Command.CallEmergencyContact -> callEmergencyContact()
+            Command.CallEmergencyServices -> dialEmergencyServices()
+            Command.ShareLocation -> shareLocation()
+            is Command.SetEmergencyContact -> setEmergencyContact(cmd.name)
+            is Command.Call -> callWho(cmd.who)
+            is Command.OpenApp -> openApp(cmd.name, original)
+            is Command.CreateNote -> createNote(cmd.text)
+            Command.ReadNotes -> readNotes()
+            Command.ClearNotes -> { history.clearNotes(); say(s(R.string.say_notes_cleared)) }
+            is Command.Remind -> setReminder(cmd.minutes, cmd.text)
+            Command.ReadNotifications -> readNotifications()
+            Command.Battery -> battery()
+            Command.Date -> say(s(R.string.say_date, DateFormat.getDateInstance(DateFormat.FULL, lang.locale).format(Date())))
+            Command.Status -> status()
             is Command.Ask -> askAi(cmd.text)
         }
     }
@@ -484,6 +517,7 @@ class AssistantController(
             Screen.CAMERA -> R.string.say_opened_camera
             Screen.DOCUMENTS -> R.string.say_opened_documents
             Screen.FILES -> R.string.say_opened_files
+            Screen.EMERGENCY -> R.string.say_opened_emergency
             Screen.SETTINGS -> R.string.say_opened_settings
             Screen.PRIVACY -> R.string.say_opened_privacy
         }
@@ -502,6 +536,7 @@ class AssistantController(
         say(s(when (prev) {
             Screen.HOME -> R.string.say_home; Screen.ASSISTANT -> R.string.say_opened_assistant; Screen.CAMERA -> R.string.say_opened_camera
             Screen.DOCUMENTS -> R.string.say_opened_documents; Screen.FILES -> R.string.say_opened_files; Screen.SETTINGS -> R.string.say_opened_settings
+            Screen.EMERGENCY -> R.string.say_opened_emergency
             Screen.PRIVACY -> R.string.say_opened_privacy
         }), record = false)
     }
@@ -724,11 +759,27 @@ class AssistantController(
         todo.forEach { it() }
     }
 
+    private fun cloudUsable(): Boolean = settings.value.let { it.cloudAllowed && it.backendConfigured } && connectivity.isOnline()
+
     private suspend fun offlineFallback(text: String) {
-        val st = settings.value
         CommandParser.looseFind(text)?.let { findDocs(it.query, it.type); return }
+        if (settings.value.consent == Consent.UNKNOWN) {
+            askConsent()   // speaks the outcome itself
+            if (cloudUsable()) askAi(text)
+            return
+        }
+        // Do what the phone can do alone, and say so.
+        if (CommandParser.isCurrencyQuestion(text)) { say(s(R.string.say_currency_offline), record = false); return }
+        when (CommandParser.looseVisual(text)) {
+            Command.WhatColor -> { whatColor(); return }
+            Command.People -> { localDescribe(peopleOnly = true); return }
+            Command.Describe -> { localDescribe(peopleOnly = false); return }
+            Command.ReadTextInView -> { readTextInView(); return }
+            else -> {}
+        }
+        if (ReminderParser.isReminderRequest(text)) { say(s(R.string.say_reminder_need_time), record = false); return }
+        val st = settings.value
         when {
-            st.consent == Consent.UNKNOWN -> { askConsent(); if (settings.value.cloudAllowed && connectivity.isOnline() && settings.value.backendConfigured) askAi(text) }
             !st.cloudAllowed -> say(s(R.string.say_cloud_off), record = false)
             !st.backendConfigured -> say(s(R.string.err_not_configured), record = false)
             else -> say(s(R.string.err_offline), record = false)
@@ -823,6 +874,7 @@ class AssistantController(
                 "camera" -> navigate(Screen.CAMERA)
                 "documents" -> deferred += { openScreen(Screen.DOCUMENTS, announce = false); if (!docs.hasAccess()) ensureDocAccess() }
                 "files" -> deferred += { openScreen(Screen.FILES, announce = false); if (!docs.hasAccess()) ensureDocAccess() }
+                "emergency" -> navigate(Screen.EMERGENCY)
                 "settings" -> navigate(Screen.SETTINGS)
                 "privacy" -> navigate(Screen.PRIVACY)
                 else -> return ToolOutput("Unknown screen.", isError = true)
@@ -844,8 +896,286 @@ class AssistantController(
             ToolOutput(msg.ifBlank { "Nothing changed." })
         }
         Tools.CLEAR_HISTORY -> { deferred += { history.clearAll(); brain.memory.clear() }; ToolOutput("History will be cleared after your reply.") }
+        Tools.CALL_CONTACT -> {
+            val who = input.str("who").orEmpty()
+            deferred += { callWho(who) }
+            ToolOutput("The phone will ask the user to confirm, then call. Do not say the call is placed.")
+        }
+        Tools.CREATE_NOTE -> {
+            val text = input.str("text").orEmpty().trim()
+            if (text.isEmpty()) ToolOutput("Empty note.", isError = true) else { history.addNote(text); ToolOutput("Note saved.") }
+        }
+        Tools.READ_NOTES -> { deferred += { readNotes() }; ToolOutput("Notes will be read aloud after your reply. Keep the reply to a few words.") }
+        Tools.SET_REMINDER -> {
+            val m = input.int("minutes")
+            if (m == null || m !in 1..(7 * 24 * 60)) ToolOutput("Minutes must be between 1 and 10080.", isError = true)
+            else { scheduleReminder(m, input.str("text").orEmpty()); ToolOutput("Reminder scheduled in $m minutes (${formatDuration(m)}).") }
+        }
+        Tools.OPEN_APP -> {
+            val name = input.str("name").orEmpty()
+            val app = FuzzyMatch.rank(name, phone.installedApps(), { it.label }, 1).firstOrNull()?.first
+            if (app == null) ToolOutput("No installed app matches \"$name\".", isError = true)
+            else { deferred += { say(s(R.string.say_app_opening, app.label), record = false); phone.launch(app) }; ToolOutput("${app.label} will open after your reply. Keep the reply to a few words.") }
+        }
+        Tools.EMERGENCY -> { deferred += { emergency() }; ToolOutput("Emergency assistance starts after your reply. Reply with one short calm sentence.") }
+        Tools.READ_NOTIFICATIONS -> { deferred += { readNotifications() }; ToolOutput("Notifications will be read aloud on the phone after your reply. Keep the reply to a few words.") }
+        Tools.DEVICE_STATUS -> ToolOutput("Battery: ${phone.batteryPercent()?.let { "$it%" } ?: "unknown"}${if (phone.isCharging()) ", charging" else ""}. Online: ${connectivity.isOnline()}.")
         else -> ToolOutput("Unknown tool.", isError = true)
     } }
+
+    // ------------------------------------------------------------------------------------------------------------------
+    // Yes / no questions
+    // ------------------------------------------------------------------------------------------------------------------
+
+    /** Asks aloud and listens. true = yes, false = no / stop, null = no clear answer (treated as "no" by callers). */
+    private suspend fun askYesNo(question: String): Boolean? {
+        say(question, record = false)
+        for (attempt in 0..1) {
+            val heard = listenOnceRaw() ?: return null
+            when (CommandParser.parse(heard)) {
+                Command.Yes -> return true
+                Command.No, Command.Stop -> return false
+                else -> if (attempt == 0) say(s(R.string.say_yes_prompt), record = false)
+            }
+        }
+        return null
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------
+    // On-device vision (works offline)
+    // ------------------------------------------------------------------------------------------------------------------
+
+    private suspend fun localDescribe(peopleOnly: Boolean) {
+        val bmp = try { captureFrame() } catch (e: PermissionDenied) { return }
+        thinking = true; refreshPhase()
+        val scene = try { vision.analyze(bmp) } catch (e: CancellationException) { throw e } catch (e: Exception) { null } finally { thinking = false; refreshPhase() }
+        if (scene == null) { feedback.cue(Feedback.Cue.ERROR); say(s(R.string.say_local_vision_failed), record = false); return }
+        say(if (peopleOnly) SceneComposer.peopleAnswer(scene, lang) else SceneComposer.compose(scene, lang))
+    }
+
+    /** Colour of what the phone points at. Always on-device: instant, private, offline. */
+    private suspend fun whatColor() {
+        val bmp = try { captureFrame() } catch (e: PermissionDenied) { return }
+        val result = try { vision.color(bmp) } catch (e: CancellationException) { throw e } catch (e: Exception) { null }
+        if (result == null) { say(s(R.string.say_local_vision_failed), record = false); return }
+        say(result.spoken(lang))
+    }
+
+    fun colorNow() { interaction?.cancel(); interaction = scope.launch { try { whatColor() } catch (e: CancellationException) { throw e } catch (e: Exception) { say(explain(e), record = false) } } }
+
+    // ------------------------------------------------------------------------------------------------------------------
+    // Emergency
+    // ------------------------------------------------------------------------------------------------------------------
+
+    /** Spoken guidance, then offers (never forces) a call. Nothing is ever placed or sent without a spoken "yes". */
+    suspend fun emergency() {
+        live.stop(); _state.update { it.copy(live = false) }
+        reader?.pause()
+        navigate(Screen.EMERGENCY)
+        feedback.cue(Feedback.Cue.ERROR)
+        say(s(R.string.say_emergency_intro))
+        val st = settings.value
+        if (st.hasEmergencyContact) {
+            if (askYesNo(s(R.string.say_emergency_ask_call, contactLabel(st.emergencyName, st.emergencyNumber))) == true) {
+                placeCall(contactLabel(st.emergencyName, st.emergencyNumber), st.emergencyNumber); return
+            }
+        } else if (askYesNo(s(R.string.say_emergency_no_contact, spokenDigits(st.emergencyServices))) == true) {
+            dialEmergencyServices(); return
+        }
+        say(s(R.string.say_emergency_options), record = false)
+    }
+
+    private fun contactLabel(name: String, number: String) = name.ifBlank { spokenDigits(number) }
+
+    /** "0555123456" -> "0 5 5 5 1 2 3 4 5 6" so TTS reads digits, not "five hundred and fifty-five million…". */
+    private fun spokenDigits(number: String) = number.filter { it.isDigit() || it == '+' }.toList().joinToString(" ")
+
+    private suspend fun callEmergencyContact() {
+        val st = settings.value
+        if (!st.hasEmergencyContact) { say(s(R.string.em_btn_contact_none)); return }
+        val label = contactLabel(st.emergencyName, st.emergencyNumber)
+        if (askYesNo(s(R.string.say_call_confirm, label)) == true) placeCall(label, st.emergencyNumber) else say(s(R.string.say_call_cancelled), record = false)
+    }
+
+    /** Emergency numbers are only dialled: Android requires the user to press call, which also prevents accidental calls. */
+    private suspend fun dialEmergencyServices() {
+        val num = settings.value.emergencyServices
+        if (phone.dial(num)) say(s(R.string.say_dialer_open, spokenDigits(num))) else say(s(R.string.say_call_failed))
+    }
+
+    private suspend fun placeCall(label: String, number: String) {
+        val direct = ensurePermission(Manifest.permission.CALL_PHONE, R.string.err_call_why, R.string.err_call_denied)
+        if (direct) {
+            say(s(R.string.say_calling, label), record = false)
+            if (!phone.call(number)) say(s(R.string.say_call_failed))
+        } else {
+            if (phone.dial(number)) say(s(R.string.say_dialer_open, spokenDigits(number))) else say(s(R.string.say_call_failed))
+        }
+    }
+
+    private suspend fun shareLocation() {
+        if (!ensurePermission(Manifest.permission.ACCESS_FINE_LOCATION, R.string.err_location_why, R.string.err_location_denied)) return
+        say(s(R.string.say_location_finding), record = false)
+        val p = phone.currentLocation()
+        if (p == null) { say(s(R.string.say_location_none)); return }
+        val st = settings.value
+        if (!st.hasEmergencyContact) {
+            say(s(R.string.say_location_no_contact, "%.5f".format(Locale.US, p.lat), "%.5f".format(Locale.US, p.lng)))
+            return
+        }
+        val label = contactLabel(st.emergencyName, st.emergencyNumber)
+        if (askYesNo(s(R.string.say_location_confirm, label)) != true) { say(s(R.string.say_call_cancelled), record = false); return }
+        if (phone.composeSms(st.emergencyNumber, s(R.string.sms_location_body, p.mapsLink()))) say(s(R.string.say_location_sms_ready, label))
+        else say(s(R.string.say_call_failed))
+    }
+
+    private suspend fun setEmergencyContact(spoken: String) {
+        val number = FuzzyMatch.phoneNumber(spoken)?.takeIf { spoken.count { c -> c.isLetter() } == 0 }
+        val chosen: Contact = if (number != null) Contact(spokenDigits(number), number) else {
+            pickContact(spoken) ?: return
+        }
+        if (askYesNo(s(R.string.say_em_contact_ask, chosen.name)) == true) {
+            settings.update { it.copy(emergencyName = chosen.name, emergencyNumber = chosen.number) }
+            say(s(R.string.say_em_contact_set, chosen.name))
+        } else say(s(R.string.say_call_cancelled), record = false)
+    }
+
+    fun openNotificationAccess() { quiet(s(R.string.say_notif_access)); phone.openNotificationAccessSettings() }
+    fun clearNotesNow() { scope.launch { history.clearNotes(); say(s(R.string.say_notes_cleared), record = false) } }
+
+    // Emergency screen buttons
+    fun emergencyNow() { interaction?.cancel(); interaction = scope.launch { emergency() } }
+    fun callEmergencyContactNow() { interaction?.cancel(); interaction = scope.launch { callEmergencyContact() } }
+    fun dialEmergencyServicesNow() { interaction?.cancel(); interaction = scope.launch { dialEmergencyServices() } }
+    fun shareLocationNow() { interaction?.cancel(); interaction = scope.launch { shareLocation() } }
+
+    // ------------------------------------------------------------------------------------------------------------------
+    // Phone control
+    // ------------------------------------------------------------------------------------------------------------------
+
+    /** Finds a contact by spoken name (asks for the contacts permission first). Says why when nothing is found. */
+    private suspend fun pickContact(spoken: String): Contact? {
+        if (!ensurePermission(Manifest.permission.READ_CONTACTS, R.string.err_contacts_why, R.string.err_contacts_denied)) return null
+        var found = phone.findContacts(spoken)
+        // Arabic: "اتصل باحمد" — the preposition is glued to the name.
+        if (found.isEmpty() && spoken.startsWith("ب") && spoken.length > 2) found = phone.findContacts(spoken.drop(1))
+        if (found.isEmpty()) { say(s(R.string.say_contact_not_found, spoken)); return null }
+        return found.first()
+    }
+
+    private suspend fun callWho(spokenWho: String) {
+        var who = spokenWho.trim()
+        if (who.isEmpty()) {
+            say(s(R.string.say_contact_who), record = false)
+            who = listenOnceRaw()?.trim().orEmpty()
+            if (who.isEmpty()) return
+        }
+        val number = FuzzyMatch.phoneNumber(who)?.takeIf { who.count { c -> c.isLetter() } == 0 }
+        if (number != null) {
+            if (askYesNo(s(R.string.say_call_confirm, spokenDigits(number))) == true) placeCall(spokenDigits(number), number)
+            else say(s(R.string.say_call_cancelled), record = false)
+            return
+        }
+        val c = pickContact(who) ?: return
+        if (askYesNo(s(R.string.say_call_confirm, c.name)) == true) placeCall(c.name, c.number) else say(s(R.string.say_call_cancelled), record = false)
+    }
+
+    private suspend fun openApp(name: String, original: String) {
+        val app = FuzzyMatch.rank(name, phone.installedApps(), { it.label }, 1).firstOrNull()?.first
+        when {
+            app != null -> { say(s(R.string.say_app_opening, app.label), record = false); if (!phone.launch(app)) say(s(R.string.say_app_not_found, name)) }
+            cloudUsable() -> askAi(original)   // "open the door?" — maybe not an app at all
+            else -> say(s(R.string.say_app_not_found, name))
+        }
+    }
+
+    private suspend fun createNote(text: String) {
+        var body = text.trim()
+        if (body.isEmpty()) {
+            say(s(R.string.say_note_what), record = false)
+            body = listenOnceRaw()?.trim().orEmpty()
+            if (body.isEmpty()) return
+        }
+        history.addNote(body)
+        feedback.cue(Feedback.Cue.SUCCESS)
+        say(s(R.string.say_note_saved, body))
+    }
+
+    private suspend fun readNotes() {
+        val notes = history.notes()
+        if (notes.isEmpty()) { say(s(R.string.say_notes_none)); return }
+        val list = notes.take(10).mapIndexed { i, n -> "${i + 1}. ${n.text.trimEnd('.')}." }.joinToString(" ")
+        say(s(R.string.say_notes_list, notes.size, list))
+    }
+
+    private suspend fun setReminder(minutes: Int, text: String) {
+        if (android.os.Build.VERSION.SDK_INT >= 33 && !hasPermission(Manifest.permission.POST_NOTIFICATIONS)) {
+            ensurePermission(Manifest.permission.POST_NOTIFICATIONS, R.string.err_notif_why, R.string.err_notif_why)
+        }
+        scheduleReminder(minutes, text)
+        feedback.cue(Feedback.Cue.SUCCESS)
+        say(if (text.isBlank()) s(R.string.say_reminder_set_plain, formatDuration(minutes)) else s(R.string.say_reminder_set, formatDuration(minutes), text))
+    }
+
+    private fun scheduleReminder(minutes: Int, text: String) = reminders.schedule(minutes, text.trim())
+
+    fun formatDuration(minutes: Int): String {
+        val h = minutes / 60; val m = minutes % 60
+        val hs = when (h) { 0 -> null; 1 -> s(R.string.duration_hour); else -> s(R.string.duration_hours, h) }
+        val ms = when (m) { 0 -> null; 1 -> s(R.string.duration_minute); else -> s(R.string.duration_minutes, m) }
+        return when {
+            hs != null && ms != null -> s(R.string.duration_and, hs, ms)
+            else -> hs ?: ms ?: s(R.string.duration_minute)
+        }
+    }
+
+    /** Called by the reminder worker when a reminder is due. */
+    fun reminderText(text: String): String = if (text.isBlank()) s(R.string.reminder_text_empty) else s(R.string.reminder_text, text)
+
+    /** Speaks something the user asked to be told later (reminders). Does not interrupt a conversation in progress. */
+    fun announce(text: String) {
+        scope.launch {
+            while (listening || thinking) delay(500)
+            say(text)
+        }
+    }
+
+    private suspend fun readNotifications() {
+        if (!phone.notificationAccessGranted()) {
+            say(s(R.string.say_notif_access), record = false)
+            phone.openNotificationAccessSettings()
+            return
+        }
+        val items = notifications()
+        if (items.isEmpty()) { say(s(R.string.say_notif_none)); return }
+        val spoken = items.take(5).joinToString(" ") { n ->
+            s(R.string.say_notif_item, n.app, listOf(n.title, n.text).filter { it.isNotBlank() }.joinToString(": ").trimEnd('.'))
+        }
+        // Not recorded in history: notification content stays out of storage.
+        say(s(R.string.say_notif_list, items.size, spoken), record = false)
+    }
+
+    private suspend fun battery() {
+        val pct = phone.batteryPercent()
+        say(when {
+            pct == null -> s(R.string.say_battery_unknown)
+            phone.isCharging() -> s(R.string.say_battery_charging, pct)
+            else -> s(R.string.say_battery, pct)
+        })
+    }
+
+    /** Tells the user plainly which mode the app is in and what works without internet. */
+    private suspend fun status() {
+        val st = settings.value
+        val online = connectivity.isOnline()
+        val text = when {
+            online && st.cloudAllowed && st.backendConfigured -> s(R.string.say_status_online) + " " + s(R.string.say_offline_can)
+            !online -> s(R.string.say_status_offline) + " " + s(R.string.say_offline_can) + " " + s(R.string.say_online_needs)
+            !st.cloudAllowed -> s(R.string.say_status_cloud_off) + " " + s(R.string.say_offline_can) + " " + s(R.string.say_online_needs)
+            else -> s(R.string.say_status_no_backend) + " " + s(R.string.say_offline_can) + " " + s(R.string.say_online_needs)
+        }
+        say(text)
+    }
 
     // ------------------------------------------------------------------------------------------------------------------
     // Errors -> words

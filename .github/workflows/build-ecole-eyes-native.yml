@@ -71,7 +71,9 @@ jobs:
             -PECOLE_EYES_KEYSTORE_PASSWORD="$KS_PASS" -PECOLE_EYES_KEY_ALIAS=speakingpretest \
             -PversionCode=$((1000 + ${{ github.run_number }})) -PversionName="2.${{ github.run_number }}" \
             -PecoleEyesBackendUrl="$BACKEND" -PecoleEyesAppToken="$TOKEN"
-          cp app/build/outputs/apk/release/app-release.apk EcoleEyes.apk
+          # One APK per CPU type (see splits in app/build.gradle.kts). arm64 fits nearly every phone since 2017.
+          cp app/build/outputs/apk/release/app-arm64-v8a-release.apk EcoleEyes.apk
+          cp app/build/outputs/apk/release/app-armeabi-v7a-release.apk EcoleEyes-older-phones.apk
           cp app/build/outputs/bundle/release/app-release.aab EcoleEyes.aab
 
       - uses: actions/upload-artifact@v4
@@ -80,6 +82,7 @@ jobs:
           name: ecole-eyes-native-release
           path: |
             ecole-eyes-native/EcoleEyes.apk
+            ecole-eyes-native/EcoleEyes-older-phones.apk
             ecole-eyes-native/EcoleEyes.aab
 
       - name: Publish APK to GitHub Releases
@@ -89,7 +92,9 @@ jobs:
           tag_name: ecole-eyes-native-2.${{ github.run_number }}
           name: ÉCOLE EYES native 2.${{ github.run_number }}
           make_latest: false
-          files: ecole-eyes-native/EcoleEyes.apk
+          files: |
+            ecole-eyes-native/EcoleEyes.apk
+            ecole-eyes-native/EcoleEyes-older-phones.apk
           body: |
-            ÉCOLE EYES (native Android). Download EcoleEyes.apk, tap Install, allow the microphone and the camera.
+            ÉCOLE EYES (native Android). Download EcoleEyes.apk (EcoleEyes-older-phones.apk for 32-bit phones), tap Install, allow the microphone and the camera.
             Replaces the earlier web-wrapper build (same package, same signing key).

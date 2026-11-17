@@ -23,18 +23,20 @@ class CameraException(val reason: Reason, cause: Throwable? = null) : Exception(
  * Bridge between the camera screen (which owns the CameraX session) and the assistant (which asks
  * for photos by voice). Photos are returned in memory only and never written to storage.
  */
-class CameraHub(private val context: Context) {
+open class CameraHub(private val context: Context) {
     private val _ready = MutableStateFlow(false)
     val ready: StateFlow<Boolean> = _ready.asStateFlow()
     @Volatile private var imageCapture: ImageCapture? = null
 
     fun attach(capture: ImageCapture) { imageCapture = capture; _ready.value = true }
+    /** For tests and other frame sources (e.g. an external camera) that override [capture]. */
+    protected fun markReady(value: Boolean) { _ready.value = value }
     fun detach() { imageCapture = null; _ready.value = false }
 
     suspend fun awaitReady(timeoutMs: Long): Boolean =
         ready.value || withTimeoutOrNull(timeoutMs) { ready.first { it } } == true
 
-    suspend fun capture(): Bitmap {
+    open suspend fun capture(): Bitmap {
         val cap = imageCapture ?: throw CameraException(CameraException.Reason.NOT_READY)
         return suspendCancellableCoroutine { cont ->
             cap.takePicture(ContextCompat.getMainExecutor(context), object : ImageCapture.OnImageCapturedCallback() {

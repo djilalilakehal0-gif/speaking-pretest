@@ -32,7 +32,17 @@ android {
         buildConfigField("String", "APP_TOKEN", "\"${cfg("ecoleEyesAppToken")}\"")
         buildConfigField("String", "AI_MODEL", "\"${cfg("ecoleEyesModel", "claude-sonnet-5-5")}\"")
         resourceConfigurations += listOf("en", "fr", "ar")
-        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
+    }
+
+    // On-device ML (OCR, objects, labels, faces) ships native code per CPU type. One APK per CPU keeps downloads small:
+    // app-arm64-v8a-*.apk fits nearly every phone since 2017. Google Play (AAB) does this split automatically.
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a", "armeabi-v7a", "x86_64")
+            isUniversalApk = false
+        }
     }
 
     signingConfigs {
@@ -70,9 +80,18 @@ android {
         buildConfig = true
     }
     packaging {
+        // Compress native ML libraries inside the APK: roughly halves the download for people on limited mobile data.
+        jniLibs.useLegacyPackaging = true
         resources.excludes += setOf("/META-INF/{AL2.0,LGPL2.1}", "META-INF/DEPENDENCIES", "META-INF/LICENSE*", "META-INF/NOTICE*")
     }
-    testOptions { unitTests { isReturnDefaultValues = true; isIncludeAndroidResources = true } }
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+            isIncludeAndroidResources = true
+            // Robolectric downloads Android framework jars at test time; allow a Maven Central mirror (-ProbolectricRepoUrl=...).
+            all { test -> cfg("robolectricRepoUrl").takeIf { it.isNotEmpty() }?.let { test.systemProperty("robolectric.dependency.repo.url", it) } }
+        }
+    }
     lint {
         abortOnError = true
         warningsAsErrors = false
@@ -106,6 +125,10 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp)
     implementation(libs.mlkit.text)
+    implementation(libs.mlkit.objects)
+    implementation(libs.mlkit.labels)
+    implementation(libs.mlkit.faces)
+    implementation(libs.androidx.work)
     implementation(libs.pdfbox.android)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
@@ -115,6 +138,7 @@ dependencies {
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
+    testImplementation(libs.androidx.work.testing)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.androidx.test.ext.junit)

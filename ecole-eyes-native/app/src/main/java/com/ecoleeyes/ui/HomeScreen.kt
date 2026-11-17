@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Sos
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -88,16 +89,19 @@ fun HomeScreen(graph: AppGraph) {
             Tile(Icons.Filled.Description, stringResource(R.string.tile_documents)) { c.navigate(Screen.DOCUMENTS) },
             Tile(Icons.Filled.Search, stringResource(R.string.tile_files)) { c.navigate(Screen.FILES) },
         )
+        TileRow(
+            Tile(Icons.Filled.Sos, stringResource(R.string.tile_emergency), danger = true) { c.emergencyNow() },
+            Tile(Icons.Filled.Accessibility, stringResource(R.string.tile_settings)) { c.navigate(Screen.SETTINGS) },
+        )
         val langName = settings.lang.nativeName
         TileRow(
             Tile(Icons.Filled.Language, stringResource(R.string.tile_language) + ": " + langName) { c.cycleLanguage() },
-            Tile(Icons.Filled.Accessibility, stringResource(R.string.tile_settings)) { c.navigate(Screen.SETTINGS) },
+            Tile(Icons.Filled.PrivacyTip, stringResource(R.string.tile_privacy)) { c.navigate(Screen.PRIVACY) },
         )
-        TileRow(Tile(Icons.Filled.PrivacyTip, stringResource(R.string.tile_privacy)) { c.navigate(Screen.PRIVACY) }, null)
     }
 }
 
-private class Tile(val icon: ImageVector, val label: String, val onClick: () -> Unit)
+private class Tile(val icon: ImageVector, val label: String, val danger: Boolean = false, val onClick: () -> Unit)
 
 @Composable
 private fun TileRow(a: Tile, b: Tile?) {
@@ -114,15 +118,15 @@ private fun TileCard(t: Tile, modifier: Modifier) {
         modifier
             .heightIn(min = 112.dp)
             .clip(shape)
-            .background(EeColors.Surface)
-            .border(2.dp, EeColors.Electric, shape)
+            .background(if (t.danger) EeColors.Danger else EeColors.Surface)
+            .border(2.dp, if (t.danger) EeColors.OnDark else EeColors.Electric, shape)
             .clickable(role = Role.Button, onClick = t.onClick)
             .padding(12.dp)
             .semantics(mergeDescendants = true) { contentDescription = t.label },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Icon(t.icon, contentDescription = null, tint = EeColors.Electric, modifier = Modifier.size(40.dp))
+        Icon(t.icon, contentDescription = null, tint = if (t.danger) EeColors.OnDark else EeColors.Electric, modifier = Modifier.size(40.dp))
         Spacer(Modifier.height(8.dp))
         Text(t.label, style = MaterialTheme.typography.titleMedium, color = EeColors.OnDark, textAlign = TextAlign.Center)
     }

@@ -19,6 +19,7 @@ object EeColors {
     val OnDark = Color(0xFFFFFFFF)
     val Muted = Color(0xFFB8C7E0)        // secondary text: 10:1 on Background
     val Error = Color(0xFFFF8A80)
+    val Danger = Color(0xFFB3261E)       // emergency button fill, white text on it: 6.5:1
 }
 
 private val scheme = darkColorScheme(
