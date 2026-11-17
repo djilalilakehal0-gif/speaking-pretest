@@ -12,7 +12,11 @@
 //   APP_TOKEN          (secret, required*) shared token the app sends in x-app-token
 //                       (*set REQUIRE_APP_TOKEN=false only for local testing)
 //   ALLOWED_MODELS     (var, optional)     comma-separated model allow-list
-//   RATE_LIMITER       (binding, optional) Cloudflare rate-limit binding, see wrangler.toml
+//   RATE_LIMITER       (binding)           Cloudflare rate-limit binding (on by default in wrangler.toml)
+//   DISABLED           (var, optional)     "true" = refuse every AI request (503): an instant spending kill switch
+//
+// Logging: one JSON line per request (status, duration, provider, error type, hashed IP prefix). Never the body:
+// it contains the user's questions, photos and documents.
 
 import { DEFAULT_MODELS, MAX_BODY_BYTES, safeEqual, validateBody } from './validate.js';
 import { errorFromOpenAI, fromOpenAI, toOpenAI } from './providers.js';
@@ -24,12 +28,31 @@ const err = (status, type, message, extra) => json({ type: 'error', error: { typ
 
 export default {
   async fetch(request, env) {
+    const started = Date.now();
+    const res = await handle(request, env);
+    if (new URL(request.url).pathname === '/v1/messages') await logLine(request, env, res, started);
+    return res;
+  },
+};
+
+async function logLine(request, env, res, started) {
+  try {
+    const ip = request.headers.get('cf-connecting-ip') || '';
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip));
+    const ipHash = [...new Uint8Array(digest).slice(0, 4)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    console.log(JSON.stringify({ evt: 'ai_request', status: res.status, ms: Date.now() - started, provider: (env.PROVIDER || 'anthropic').toLowerCase(), ip: ipHash, country: request.cf?.country }));
+  } catch { /* logging must never break a request */ }
+}
+
+async function handle(request, env) {
     const url = new URL(request.url);
 
     if (request.method === 'GET' && url.pathname === '/') {
       return new Response('école eyes proxy OK', { headers: { 'content-type': 'text/plain; charset=utf-8' } });
     }
     if (request.method !== 'POST' || url.pathname !== '/v1/messages') return err(404, 'not_found', 'Not found');
+
+    if (env.DISABLED === 'true') return err(503, 'overloaded_error', 'Service temporarily disabled', { 'retry-after': '3600' });
 
     // 1. Who is calling?
     if (env.REQUIRE_APP_TOKEN !== 'false') {
@@ -80,8 +103,7 @@ export default {
     const retryAfter = upstream.headers.get('retry-after');
     if (retryAfter) headers['retry-after'] = retryAfter;
     return new Response(upstream.body, { status: upstream.status, headers });
-  },
-};
+}
 
 async function forwardOpenAI(body, env) {
   const base = (env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');

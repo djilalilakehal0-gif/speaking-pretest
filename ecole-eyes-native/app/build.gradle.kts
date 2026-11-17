@@ -101,13 +101,18 @@ android {
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 
 dependencies {
+    // Security: pdfbox-android pulls BouncyCastle 1.72 (CVE-2024-29857, CVE-2024-30171, CVE-2024-30172, fixed in 1.78+).
+    constraints {
+        listOf("bcprov", "bcpkix", "bcutil").forEach { m ->
+            implementation("org.bouncycastle:$m-jdk15to18:1.87") { because("security fixes; reached through encrypted PDFs") }
+        }
+    }
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.icons)
     implementation(libs.androidx.camera.core)
@@ -118,7 +123,6 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.security.crypto)
-    implementation(libs.androidx.documentfile)
     implementation(libs.androidx.exifinterface)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play)
@@ -130,7 +134,6 @@ dependencies {
     implementation(libs.mlkit.faces)
     implementation(libs.androidx.work)
     implementation(libs.pdfbox.android)
-    debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     testImplementation(libs.junit)

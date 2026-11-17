@@ -89,7 +89,9 @@ npm test                                       # 21 tests
 ```
 
 The app only ever talks to `https://<your-worker>/v1/messages`; the worker validates requests (token, model allow-list,
-whitelisted fields, size cap, optional rate limit) and adds the key. See [`backend/worker.js`](backend/worker.js).
+only the app's own tools and content types, size and image caps, 20 requests/minute/IP) and adds the key. It logs one line
+per request without any content, and `DISABLED=true` stops all AI traffic instantly. Security audit and owner checklist:
+[`SECURITY.md`](SECURITY.md). See [`backend/worker.js`](backend/worker.js).
 The provider is an interface in the app (`AiClient`), so another multimodal model/backend can replace
 `ClaudeProxyClient`.
 
