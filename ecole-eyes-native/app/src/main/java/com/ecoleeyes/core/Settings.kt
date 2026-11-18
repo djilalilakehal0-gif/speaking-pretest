@@ -34,6 +34,11 @@ data class AppSettings(
     val autoDescribeCamera: Boolean = true,
     /** On the camera screen the microphone stays open between requests (with a sound before each listen). */
     val cameraListening: Boolean = true,
+    /**
+     * Voice only (default): the app listens after every answer on every screen, and after a pause waits for
+     * "Hey École Eyes" instead of needing the button. A notification is shown while the microphone is on.
+     */
+    val voiceOnly: Boolean = true,
 ) {
     val cloudAllowed: Boolean get() = consent == Consent.GRANTED
     val backendConfigured: Boolean get() = backendUrl.startsWith("https://")
@@ -68,6 +73,7 @@ class SettingsStore(context: Context) {
             .putString("emServices", next.emergencyServices)
             .putBoolean("camAuto", next.autoDescribeCamera)
             .putBoolean("camListen", next.cameraListening)
+            .putBoolean("voiceOnly", next.voiceOnly)
             .apply()
     }
 
@@ -91,6 +97,7 @@ class SettingsStore(context: Context) {
             emergencyServices = prefs.getString("emServices", null) ?: d.emergencyServices,
             autoDescribeCamera = prefs.getBoolean("camAuto", d.autoDescribeCamera),
             cameraListening = prefs.getBoolean("camListen", d.cameraListening),
+            voiceOnly = prefs.getBoolean("voiceOnly", d.voiceOnly),
         ).sanitized()
     }
 

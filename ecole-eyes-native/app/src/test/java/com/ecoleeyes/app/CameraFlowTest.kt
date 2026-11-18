@@ -68,7 +68,7 @@ class CameraFlowTest {
         db = Room.inMemoryDatabaseBuilder(ctx, AppDatabase::class.java).allowMainThreadQueries()
             .setQueryExecutor(Runnable::run).setTransactionExecutor(Runnable::run).build()
         settings = SettingsStore(ctx)
-        settings.update { it.copy(lang = Lang.EN, consent = Consent.GRANTED, backendUrl = "https://backend.test", appToken = "", onboardingDone = true,
+        settings.update { it.copy(lang = Lang.EN, consent = Consent.GRANTED, backendUrl = "https://backend.test", appToken = "", onboardingDone = true, voiceOnly = false,
             announceUploads = false, autoDescribeCamera = true, cameraListening = true) }
         l10n = L10n(ctx)
         brain = AssistantBrain(ai)

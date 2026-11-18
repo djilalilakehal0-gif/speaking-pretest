@@ -76,7 +76,7 @@ class ControllerTest {
         db = Room.inMemoryDatabaseBuilder(ctx, AppDatabase::class.java).allowMainThreadQueries()
             .setQueryExecutor(Runnable::run).setTransactionExecutor(Runnable::run).build()
         settings = SettingsStore(ctx)
-        settings.update { it.copy(lang = Lang.EN, consent = Consent.GRANTED, backendUrl = "https://backend.test", appToken = "", onboardingDone = true, announceUploads = false) }
+        settings.update { it.copy(lang = Lang.EN, consent = Consent.GRANTED, backendUrl = "https://backend.test", appToken = "", onboardingDone = true, voiceOnly = false, announceUploads = false) }
         l10n = L10n(ctx)
         history = HistoryRepository(db, NoopCipher)
         brain = AssistantBrain(ai)

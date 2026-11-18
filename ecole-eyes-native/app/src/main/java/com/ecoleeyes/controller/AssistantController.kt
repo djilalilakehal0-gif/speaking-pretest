@@ -57,6 +57,7 @@ import com.ecoleeyes.voice.CommandParser
 import com.ecoleeyes.voice.DocType
 import com.ecoleeyes.voice.Screen
 import com.ecoleeyes.voice.SpeechListener
+import com.ecoleeyes.voice.TextNorm
 import com.ecoleeyes.voice.SpeechOutputException
 import com.ecoleeyes.voice.SttError
 import com.ecoleeyes.voice.SttResult
@@ -354,7 +355,7 @@ class AssistantController(
             say(explain(e), record = false)
         }
         // On the camera screen the user keeps talking without touching the screen.
-        if (cmd != Command.Stop) cameraConversation()
+        if (cmd != Command.Stop) conversation()
     }
 
     private suspend fun run(cmd: Command, original: String) {
@@ -481,12 +482,13 @@ class AssistantController(
             say(s(R.string.say_welcome), record = false)
             settings.update { it.copy(onboardingDone = true) }
             if (settings.value.consent == Consent.UNKNOWN) askConsent()
+            conversation()
         }
     }
 
     fun greetOnStart() {
         interaction?.cancel()
-        interaction = scope.launch { say(s(R.string.say_hello), record = false) }
+        interaction = scope.launch { say(s(R.string.say_hello), record = false); conversation() }
     }
 
     private suspend fun askConsent() {
@@ -978,7 +980,7 @@ class AssistantController(
         interaction?.cancel()
         interaction = scope.launch {
             try { openScreen(Screen.CAMERA, announce = true) } catch (e: CancellationException) { throw e } catch (e: Exception) { say(explain(e), record = false) }
-            cameraConversation()
+            conversation()
         }
     }
 
@@ -1016,43 +1018,90 @@ class AssistantController(
     }
 
     /**
-     * While the camera screen is open the microphone re-opens after each answer, with the usual start sound, so the
-     * user never needs the button. It stops after two silences in a row (battery, privacy), on "stop", when the user
-     * leaves the camera, or when continuous description starts. The button resumes it.
+     * The user talks; the app answers; the microphone re-opens by itself (with the start sound), so the button is never
+     * needed. Two modes:
+     *  - Voice only (default): on every screen. After two silences, or "stop", it goes to standby: it keeps listening
+     *    without beeps and wakes on "Hey École Eyes". A foreground notification shows while the microphone is on.
+     *  - Otherwise: only on the camera screen, and it simply stops after two silences (the button resumes it).
+     * The notification's Stop action, or turning the mode off, ends it.
      */
-    private suspend fun cameraConversation() {
-        if (cameraLoop || !settings.value.cameraListening || handsFreeJob?.isActive == true) return
-        if (_state.value.screen != Screen.CAMERA || live.active || !hasPermission(Manifest.permission.RECORD_AUDIO)) return
+    private suspend fun conversation() {
+        val st = settings.value
+        val voiceOnly = st.voiceOnly
+        if (cameraLoop || handsFreeJob?.isActive == true || !hasPermission(Manifest.permission.RECORD_AUDIO)) return
+        if (!voiceOnly && (!st.cameraListening || _state.value.screen != Screen.CAMERA || live.active)) return
         cameraLoop = true
+        conversationStopRequested = false
+        if (voiceOnly) { serviceControl(true); _state.update { it.copy(handsFreeActive = true) } }
+        var keepService = false
         try {
             var silences = 0
-            while (_state.value.screen == Screen.CAMERA && !live.active && silences < 2) {
-                while (speaker.speaking.value) delay(150)
-                listening = true; refreshPhase()
-                _state.update { it.copy(partial = "") }
-                feedback.cue(Feedback.Cue.LISTEN_START)
-                delay(180) // do not record our own beep
+            var failures = 0
+            var standby = false
+            while (true) {
+                if (!voiceOnly && (_state.value.screen != Screen.CAMERA || live.active || silences >= 2)) break
+                if (voiceOnly && !settings.value.voiceOnly) break
+                while (speaker.speaking.value || thinking) delay(150)
+                if (!standby) {
+                    listening = true; refreshPhase()
+                    _state.update { it.copy(partial = "") }
+                    feedback.cue(Feedback.Cue.LISTEN_START)
+                    delay(180) // do not record our own beep
+                }
                 val r = try {
-                    stt.listen(lang, settings.value.preferOfflineStt, onPartial = { p -> _state.update { it.copy(partial = p) } })
+                    stt.listen(lang, settings.value.preferOfflineStt, onPartial = { p -> if (!standby) _state.update { it.copy(partial = p) } })
                 } finally {
                     listening = false; refreshPhase()
                     _state.update { it.copy(partial = "") }
                 }
                 when (r) {
                     is SttResult.Heard -> {
-                        silences = 0
-                        feedback.cue(Feedback.Cue.LISTEN_END)
+                        failures = 0
+                        if (standby) {
+                            // Only speech addressed to the app wakes it: room conversation is ignored.
+                            val rest = CommandParser.stripWake(TextNorm.normalize(r.text)) ?: continue
+                            standby = false; silences = 0
+                            feedback.cue(Feedback.Cue.LISTEN_START)
+                            if (rest.isEmpty()) continue          // "Hey École Eyes" alone: listen for the request
+                        } else {
+                            silences = 0
+                            feedback.cue(Feedback.Cue.LISTEN_END)
+                        }
                         handleUtterance(r.text)
-                        if (CommandParser.parse(r.text) == Command.Stop) break
+                        if (CommandParser.parse(r.text) == Command.Stop) { if (voiceOnly) standby = true else break }
                     }
-                    is SttResult.Failed -> if (r.error == SttError.NO_SPEECH) silences++ else { say(sttMessage(r.error), record = false); break }
+                    is SttResult.Failed -> when (r.error) {
+                        SttError.NO_SPEECH -> when {
+                            standby -> delay(250)
+                            live.active -> delay(settings.value.liveIntervalSec * 1000L)   // leave the gap for continuous description
+                            else -> {
+                                silences++
+                                if (silences >= 2) {
+                                    feedback.cue(Feedback.Cue.LISTEN_END)       // quiet: no speech, just the end sound
+                                    if (voiceOnly) standby = true
+                                }
+                            }
+                        }
+                        SttError.BUSY -> delay(1000)
+                        SttError.NO_PERMISSION, SttError.UNAVAILABLE, SttError.LANGUAGE_UNSUPPORTED -> { say(sttMessage(r.error), record = false); break }
+                        else -> { failures++; delay(1500); if (failures >= 6) { say(sttMessage(r.error), record = false); break } }
+                    }
                 }
             }
-            if (silences >= 2) feedback.cue(Feedback.Cue.LISTEN_END)   // quiet end: no speech, the button resumes
+        } catch (e: CancellationException) {
+            // Interrupted by the button or a new request: it resumes right after, keep the service.
+            // Stopped on purpose (notification, setting): microphone and notification off.
+            keepService = voiceOnly && !conversationStopRequested
+            throw e
         } finally {
             cameraLoop = false
+            if (voiceOnly && !keepService) { serviceControl(false); _state.update { it.copy(handsFreeActive = false) } }
         }
     }
+
+    /** Notification "Stop" or the setting switched off: microphone off until the app is opened again. */
+    private var conversationStopRequested = false
+    private fun stopConversation() { if (cameraLoop) { conversationStopRequested = true; interaction?.cancel() } }
 
     // ------------------------------------------------------------------------------------------------------------------
     // Yes / no questions
@@ -1334,6 +1383,7 @@ class AssistantController(
     // ------------------------------------------------------------------------------------------------------------------
 
     fun setHandsFree(on: Boolean) {
+        if (!on) stopConversation()   // also ends voice-only listening (notification "Stop", settings switch)
         if (on == (handsFreeJob?.isActive == true)) return
         if (!on) {
             handsFreeJob?.cancel(); handsFreeJob = null

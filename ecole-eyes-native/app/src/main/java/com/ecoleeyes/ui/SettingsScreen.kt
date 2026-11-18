@@ -78,6 +78,7 @@ fun SettingsScreen(graph: AppGraph, onPickContact: () -> Unit = {}) {
             LabeledSlider(stringResource(R.string.settings_volume), st.speechVolume, 0.2f..1.0f, "${(st.speechVolume * 100).toInt()}%") { v -> graph.settings.update { it.copy(speechVolume = v) } }
             LabeledSlider(stringResource(R.string.settings_live_interval), st.liveIntervalSec.toFloat(), 4f..30f, "${st.liveIntervalSec}") { v -> graph.settings.update { it.copy(liveIntervalSec = v.toInt()) } }
 
+            SwitchRow(stringResource(R.string.settings_voice_only), st.voiceOnly) { on -> graph.settings.update { it.copy(voiceOnly = on) }; if (!on) c.setHandsFree(false) }
             SwitchRow(stringResource(R.string.settings_auto_describe), st.autoDescribeCamera) { on -> graph.settings.update { it.copy(autoDescribeCamera = on) } }
             SwitchRow(stringResource(R.string.settings_camera_listen), st.cameraListening) { on -> graph.settings.update { it.copy(cameraListening = on) } }
             SwitchRow(stringResource(R.string.settings_cloud), st.consent == Consent.GRANTED) { on -> graph.settings.update { it.copy(consent = if (on) Consent.GRANTED else Consent.DENIED) } }

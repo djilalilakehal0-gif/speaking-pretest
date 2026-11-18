@@ -147,6 +147,16 @@ If a voice is missing the app says so (in English) instead of staying silent.
 
 ## Using it
 
+**Voice only (default).** The app never needs the screen: after the greeting it listens (a beep before each listen),
+answers, and listens again, on every screen. After two silences, or "stop", it waits quietly for "Hey École Eyes" and
+ignores other conversation in the room. A notification is visible while the microphone is on; its *Stop* action turns
+the microphone off. Can be switched off in Settings (then the big button is used, and the camera screen alone keeps
+listening).
+
+What Android still requires a touch for, by design: the system permission dialogs (microphone, camera, contacts —
+the app explains each one aloud first, and TalkBack reads the dialog), choosing a folder for documents, pressing *call*
+for emergency numbers and *send* for the location SMS. Some speech recognizers play their own sound at each listen.
+
 | Say | Does |
 |---|---|
 | "Hello École Eyes" / "What can you do?" | greeting / help |

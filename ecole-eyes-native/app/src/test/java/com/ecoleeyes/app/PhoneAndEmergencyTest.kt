@@ -73,7 +73,7 @@ class PhoneAndEmergencyTest {
         db = Room.inMemoryDatabaseBuilder(ctx, AppDatabase::class.java).allowMainThreadQueries()
             .setQueryExecutor(Runnable::run).setTransactionExecutor(Runnable::run).build()
         settings = SettingsStore(ctx)
-        settings.update { it.copy(lang = Lang.EN, consent = Consent.GRANTED, backendUrl = "https://backend.test", appToken = "", onboardingDone = true,
+        settings.update { it.copy(lang = Lang.EN, consent = Consent.GRANTED, backendUrl = "https://backend.test", appToken = "", onboardingDone = true, voiceOnly = false,
             announceUploads = false, emergencyName = "", emergencyNumber = "", emergencyServices = "112") }
         l10n = L10n(ctx)
         history = HistoryRepository(db, NoopCipher)
