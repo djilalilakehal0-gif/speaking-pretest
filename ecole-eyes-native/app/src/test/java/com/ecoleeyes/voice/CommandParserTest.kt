@@ -148,7 +148,7 @@ class CommandParserTest {
     }
 
     @Test fun natural_questions_go_to_the_ai() {
-        for (q in listOf("What is the capital of France?", "What color is this object?", "Is there a person in front of me?", "Is there an obstacle ahead?",
+        for (q in listOf("What is the capital of France?", "What color is the chair?", "Is there an obstacle ahead?",
             "Translate good morning into Arabic", "ما هي عاصمة فرنسا", "Quelle est la capitale de l'Italie")) {
             val c = p(q)
             assertTrue("\"$q\" -> $c", c is Command.Ask)

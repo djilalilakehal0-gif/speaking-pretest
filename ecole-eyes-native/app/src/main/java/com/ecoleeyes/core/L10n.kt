@@ -2,6 +2,7 @@ package com.ecoleeyes.core
 
 import android.content.Context
 import android.content.res.Configuration
+import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import java.util.concurrent.ConcurrentHashMap
 
@@ -21,4 +22,8 @@ class L10n(private val base: Context) {
 
     fun str(lang: Lang, @StringRes id: Int, vararg args: Any): String =
         context(lang).getString(id, *args)
+
+    /** Counted phrase with the language's grammar ("1 page" / "2 pages"; Arabic's six plural forms). */
+    fun plural(lang: Lang, @PluralsRes id: Int, count: Int, vararg args: Any): String =
+        context(lang).resources.getQuantityString(id, count, *args)
 }

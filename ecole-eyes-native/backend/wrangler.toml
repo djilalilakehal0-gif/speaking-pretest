@@ -2,13 +2,38 @@ name = "ecole-eyes-proxy"
 main = "worker.js"
 compatibility_date = "2026-10-01"
 
-# Optional: limit each IP to 30 requests per minute (needs a Cloudflare plan that includes rate limiting).
-# [[unsafe.bindings]]
-# name = "RATE_LIMITER"
-# type = "ratelimit"
-# namespace_id = "1001"
-# simple = { limit = 30, period = 60 }
+# Request logs without content (Workers Logs). Set alerts in Cloudflare: Notifications -> Workers.
+[observability]
+enabled = true
+
+# Each IP may send at most 20 AI requests per minute (a conversation turn is 1-3 requests).
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 20
+  period = 60
 
 # After `npx wrangler deploy`:
-#   npx wrangler secret put ANTHROPIC_API_KEY     # your Anthropic key
 #   npx wrangler secret put APP_TOKEN             # any long random string; also put it in the app (ecoleEyesAppToken)
+#   npx wrangler secret put ANTHROPIC_API_KEY     # default provider
+# Or use any OpenAI-compatible provider instead (see .dev.vars.example):
+#   [vars] PROVIDER = "openai", OPENAI_BASE_URL = "...", OPENAI_MODEL = "..."  +  npx wrangler secret put OPENAI_API_KEY
+
+# --- Daily spending cap and alerts (guard.js) ---
+# 1. npx wrangler kv namespace create USAGE        -> paste the printed id below and uncomment
+# [[kv_namespaces]]
+# binding = "USAGE"
+# id = "<id printed by the command above>"
+# 2. Limits (requests per UTC day). A conversation turn is usually 1-3 requests.
+# [vars]
+# DAILY_REQUEST_LIMIT = "2000"
+# DAILY_IP_LIMIT = "200"
+# 3. npx wrangler secret put ALERT_WEBHOOK_URL     # Slack or Discord incoming-webhook URL
+
+# --- Google Play Integrity (integrity.js) ---
+# Start with INTEGRITY_MODE = "monitor" (logs only), switch to "enforce" once logs show genuine traffic passes.
+# INTEGRITY_MODE = "monitor"
+# INTEGRITY_ALLOW_SIDELOAD = "false"               # "true" also accepts APKs installed from GitHub Releases
+# npx wrangler secret put GOOGLE_SERVICE_ACCOUNT   # JSON key of a service account with the Play Integrity API enabled

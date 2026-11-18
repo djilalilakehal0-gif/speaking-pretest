@@ -25,6 +25,8 @@ data class UiState(
 /** One-shot requests from the controller to the Activity (things only an Activity can do). */
 sealed interface UiEvent {
     data class RequestPermission(val permission: String) : UiEvent
+    /** Several permissions in one system dialog (Android 12+ requires fine + coarse location together). */
+    data class RequestPermissions(val permissions: List<String>) : UiEvent
     data object PickFolder : UiEvent
     data object PickFile : UiEvent
     data object CloseApp : UiEvent

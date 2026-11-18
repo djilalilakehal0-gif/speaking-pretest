@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Videocam
@@ -68,7 +69,10 @@ fun CameraScreen(graph: AppGraph) {
                     }
                 }
             }
-            BigButton(stringResource(R.string.camera_describe), c::describeNow, Modifier.fillMaxWidth(), Icons.Filled.RemoveRedEye)
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                BigButton(stringResource(R.string.camera_describe), c::describeNow, Modifier.weight(1f), Icons.Filled.RemoveRedEye)
+                BigButton(stringResource(R.string.camera_color), c::colorNow, Modifier.weight(1f), Icons.Filled.Palette, emphasized = false)
+            }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
                 BigButton(stringResource(R.string.camera_read_text), c::readTextNow, Modifier.weight(1f), Icons.Filled.TextFields, emphasized = false)
                 BigButton(

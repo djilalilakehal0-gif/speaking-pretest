@@ -56,7 +56,9 @@ Privacy first: cloud features only with your spoken consent, nothing saved from 
 | Photos | Yes (only on user request) | Yes — to AI processing provider (service provider) | App functionality | Not stored. Optional (consent). |
 | Files / docs (text) | Yes (only on user request) | Yes — to AI processing provider | App functionality | Optional (consent). |
 | App interactions / messages | Yes — the user's request text | Yes — to AI processing provider | App functionality | |
-| Anything else (location, contacts, device IDs, ads) | No | — | — | |
+| Approximate/precise location | **Yes, only on request** (emergency "share my location") | No (the user sends it by SMS themselves) | App functionality | Not stored, not sent to the AI service. |
+| Contacts | **Yes, only on request** (call by name) | No | App functionality | Processed on device only. |
+| Anything else (device IDs, ads, analytics) | No | — | — | |
 
 * Data **encrypted in transit:** yes (HTTPS only). **Users can request deletion:** yes (in-app clear history; nothing stored server-side).
 * Processing by Anthropic through your backend counts as a **service provider**; check your final backend/logging setup
@@ -72,6 +74,10 @@ Privacy first: cloud features only with your spoken consent, nothing saved from 
 | `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_MICROPHONE` | Optional *hands-free listening* the user turns on; visible notification with a Stop action. **Console requires a declaration and a short video** showing: Settings → turn on hands-free → notification visible → say "Hello École Eyes" → turn off. |
 | `POST_NOTIFICATIONS` | Show the hands-free notification (Android 13+). Optional. |
 | `VIBRATE`, `MODIFY_AUDIO_SETTINGS` | Haptic confirmations; volume adjust by voice. |
+| `CALL_PHONE` | "Call Ahmed" / emergency contact for blind users who cannot use the dialer easily. Always confirmed aloud first; never used for emergency numbers (those only open the dialer). Declined → falls back to the dialer. |
+| `READ_CONTACTS` | Find the person to call by spoken name. On-device only. |
+| `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION` | Emergency "share my location": one-time read, put into an SMS the user sends. Foreground only, no background location. |
+| `BIND_NOTIFICATION_LISTENER_SERVICE` (service) | Optional "read my notifications". Enabled by the user in system settings; content stays in memory. Mention it in the accessibility-tool description. |
 
 No `READ_EXTERNAL_STORAGE`/`MANAGE_EXTERNAL_STORAGE`/media permissions: files are accessed only via the system picker (SAF),
 which also avoids the "all files access" policy review.
@@ -93,6 +99,12 @@ which also avoids the "all files access" policy review.
 3. TTS voices: switch to Arabic/French/English by voice; with a voice missing, the spoken English fallback explains.
 4. "What is in front of me?" in a lit room, a dark room (should say too dark), with the camera covered.
 5. "Read the text" on a French/English page offline; on an Arabic page with cloud on and off.
+5b. Airplane mode: "describe what is in front of me" (on-device estimate), "what colour is this" on red/blue/white/brown
+    objects, "is there anyone in front of me" with a person and without, "what works offline".
+5c. "Emergency École Eyes" with and without an emergency contact: confirm the call happens only after "yes", that 112/your
+    number opens the dialer (not a direct call), and "share my location" prepares an SMS with a working maps link.
+5d. "Call <contact>", "call 0555…", "open WhatsApp", "take a note …", "read my notes", "remind me in 2 minutes to …"
+    (with the screen off and the app in the background), "read my notifications" (before and after granting access).
 6. Folder grant → "Find a document named …" → "Read it" → pause / next page / repeat / kill the app / "continue" resumes.
 7. Scanned PDF and a photo of a page; a password-protected PDF; a `.doc`; a 100-page PDF (responsiveness).
 8. Airplane mode: friendly spoken messages; local reading still works.

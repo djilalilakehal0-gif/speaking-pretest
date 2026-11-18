@@ -1,6 +1,7 @@
 package com.ecoleeyes.voice
 
 import com.ecoleeyes.core.Lang
+import com.ecoleeyes.phone.ReminderParser
 
 /**
  * Fast, offline understanding of unambiguous commands in Arabic, French and English.
@@ -92,6 +93,57 @@ object CommandParser {
     private val yes = any("yes", "yeah", "yep", "sure", "ok", "okay", "i agree", "i do", "agreed", "of course", "yes please", "oui", "ouais", "d accord", "j accepte", "bien sur", "oui bien sur", "oui je suis d accord", "نعم", "ايوه", "اجل", "موافق", "اوافق", "حسنا", "طبعا", "بالطبع", "نعم اوافق")
     private val no = any("no", "nope", "no thanks", "i refuse", "i do not agree", "i don t agree", "refuse", "non", "non merci", "je refuse", "pas d accord", "لا", "لا شكرا", "ارفض", "لا اوافق", "غير موافق", "كلا")
 
+    // ---- emergency (checked first: must never be swallowed by another rule) ----
+    private val emergency = any("emergency", "emergency mode", "this is an emergency", "it s an emergency", "it is an emergency", "sos", "help help", "urgence", "c est une urgence", "mode urgence", "au secours", "a l aide", "urgence urgence",
+        "طوارئ", "حاله طوارئ", "الطوارئ", "النجده", "انجدني", "انقذوني", "اغيثوني", "النجده النجده", "وضع الطوارئ")
+    private val openEmergency = r("^(?:open|show|go to|ouvre|affiche|va a|افتح|اعرض|اذهب الي) (?:the |l |la |ال)?(?:emergency (?:screen|page)|ecran d urgence|page d urgence|شاشه الطوارئ|صفحه الطوارئ)$")
+    private val callServices = r("^(?:call|dial|phone|appelle|appeler|compose|اتصل|اطلب)(?: ب| علي| على|ب)? ?(?:the )?(?:emergency services|emergency number|emergencies|police|an ambulance|ambulance|fire brigade|firefighters|fire department|les urgences|urgences|le samu|samu|les pompiers|pompiers|la police|police|une ambulance|الاسعاف|اسعاف|الشرطه|شرطه|الحمايه المدنيه|الطوارئ|رقم الطوارئ|المطافئ)$")
+    private val callContactEm = r("^(?:call|phone|appelle|اتصل)(?: ب| علي|ب)? ?(?:my |mon |ma )?(?:emergency contact|contact d urgence|جهه اتصال الطوارئ|جهه الاتصال للطوارئ|رقم الطوارئ الخاص بي)$")
+    private val shareLoc = r("(?:share|send) (?:my )?(?:location|position)|(?:partage|envoie|envoyer|partager) ma (?:position|localisation)|(?:شارك|ارسل|ابعث) (?:موقعي|مكاني)")
+    private val setEmContact = listOf(
+        r("^(?:set|make|change) (.+?) (?:as|to be) my emergency contact$"), r("^(?:set|change) my emergency contact to (.+)$"),
+        r("^(?:mets|definis|choisis) (.+?) comme (?:mon )?contact d urgence$"), r("^(?:change|definis|mets) mon contact d urgence (?:a|en|pour|sur) (.+)$"),
+        r("^(?:اجعل|اضبط|عين|حدد) (.+?) (?:جهه اتصال الطوارئ|جهه الاتصال للطوارئ|رقم الطوارئ)$"),
+    )
+
+    // ---- phone ----
+    private val callLatin = r("^(?:call|phone|ring|dial|give a call to|appelle|appeler|telephone a|telephoner a|passe un appel a|appel) (.+)$")
+    private val callAr = r("^(?:اتصل|اتصلي|كلم|اطلب)(?: علي| على| مع)? (.+)$")
+    private val noteOnly = any("take a note", "make a note", "new note", "add a note", "write a note", "prends une note", "prendre une note", "nouvelle note", "ajoute une note", "سجل ملاحظه", "اكتب ملاحظه", "دون ملاحظه", "ملاحظه جديده", "اضف ملاحظه")
+    private val note = r("^(?:take a note|make a note|add a note|new note|write a note|note down|write down|note that|note|prends une note|prendre une note|ajoute une note|nouvelle note|note que|note|ecris|سجل ملاحظه|اكتب ملاحظه|دون ملاحظه|اضف ملاحظه|ملاحظه|سجل|دون|اكتب)(?: that| que| ان| saying| disant)? (.+)$")
+    private val readNotes = any("(?:read|list|tell me|what are|show)(?: me)? (?:my |the )?notes", "(?:my )?notes", "(?:lis|lire|montre|liste)(?: moi)? (?:mes|les) notes", "mes notes", "(?:اقرا|اعرض)(?: لي)? (?:ملاحظاتي|الملاحظات)", "ملاحظاتي", "ما هي ملاحظاتي")
+    private val clearNotes = r("^(?:delete|clear|erase|remove|wipe|efface|supprime|vide|امسح|احذف)(?: all)?(?: tous| toutes| كل)? (?:my |the |mes |les )?(?:notes|ملاحظاتي|الملاحظات)$")
+    private val notifications = r("^(?:(?:read|check|any|tell me|what are)(?: me)? (?:my |the |new )?notifications|(?:lis|lire|verifie)(?: moi)? (?:mes |les )?notifications|(?:mes |my )?notifications|(?:اقرا|اعرض)(?: لي)? (?:الاشعارات|اشعاراتي|التنبيهات)|الاشعارات|اشعاراتي)$")
+    private val battery = r("(?:battery|batterie|البطاريه|الشحن|شحن الهاتف)")
+    private val date = any("what(?: is| s|s)? (?:the )?date(?: today)?", "what(?: is| s|s)? today s date", "what day is (?:it|today)(?: today)?", "what is the day today",
+        "quelle est la date(?: d aujourd hui)?", "quelle date sommes nous", "quel jour sommes nous", "on est quel jour", "quel jour on est", "quel jour est on",
+        "ما هو التاريخ", "ما التاريخ", "ما تاريخ اليوم", "ما هو تاريخ اليوم", "ما هو اليوم", "اي يوم اليوم", "كم التاريخ", "ما اليوم")
+    private val status = any("are you online", "are you offline", "am i online", "am i offline", "status", "connection status", "what works offline", "what can you do offline", "offline mode", "online mode",
+        "es tu en ligne", "es tu hors ligne", "suis je connecte", "mode hors ligne", "que peux tu faire hors ligne", "qu est ce qui marche hors ligne", "qu est ce qui fonctionne hors ligne",
+        "هل انت متصل", "هل انا متصل", "الوضع دون اتصال", "ماذا تستطيع بدون انترنت", "ماذا يعمل بدون انترنت", "ماذا تستطيع ان تفعل بدون انترنت", "حاله الاتصال")
+    private val openApp = r("^(?:open|launch|start|ouvre|ouvrir|lance|lancer|demarre|افتح|شغل)(?: the| l| la| le| my| mon| ma)?(?: app| application| appli| تطبيق)? (.+?)(?: app| application| appli)?$")
+
+    // ---- on-device vision ----
+    private val color = any("what colou?r is (?:this|that|it|this thing|this one)", "what(?: s|s| is) (?:the |this |its )?colou?r(?: of this| of it)?", "which colou?r is (?:this|it)", "tell me the colou?r", "colou?r",
+        "quelle (?:est )?(?:la |cette )?couleur(?: est ce| c est| est ce que c est| a ceci)?", "c est quelle couleur", "de quelle couleur est ce(?:ci|la)?", "quelle couleur",
+        "ما هو اللون", "ما اللون", "ما لون هذا", "ما لون هذه", "اي لون هذا", "ما هو لون هذا", "ما هو لون هذه", "اللون", "ما لونه", "ما لونها")
+    private val people = any("is there (?:anyone|someone|somebody|a person|people|anybody)(?: in front of me| here| around(?: me)?| near me)?", "are there (?:any )?people(?: in front of me| here| around(?: me)?)?", "who is in front of me", "how many people(?: are there| are in front of me)?",
+        "y a t il quelqu un(?: devant moi| ici| autour de moi)?", "est ce qu il y a quelqu un(?: devant moi| ici)?", "il y a quelqu un(?: devant moi)?", "combien de personnes(?: y a t il| devant moi)?",
+        "هل يوجد احد(?: امامي| هنا| حولي)?", "هل هناك احد(?: امامي| هنا| حولي)?", "هل يوجد شخص(?: امامي| هنا)?", "هل هناك شخص(?: امامي| هنا)?", "كم شخص(?: امامي| هنا)?", "من امامي")
+
+    private val trailingWake = r(" (?:ecole eyes|ايكول ايز|ايكول ايس)$")
+    // "... in detail" adds nothing to the command: descriptions are always detailed.
+    private val trailingDetail = r(" (?:in detail|in details|with details|en detail|en details|avec details|بالتفصيل|بالتفاصيل|بتفصيل)$")
+
+    // The object the user points the camera at or holds (including Maghrebi and Levantine "what is this").
+    private val describeObject = any(
+        "describe (?:this|that|it)(?: thing| object| item| one| product)?(?: for me)?", "describe (?:the )?(?:object|thing|item|product)(?: in front of me| in my hand)?",
+        "what(?: is| s|s) this(?: thing| object| item)?", "what(?: is| s|s) that(?: thing| object)?", "tell me what this is", "what am i holding(?: in my hand)?", "what(?: is| s|s)? in my hand", "what do i have in my hand",
+        "decris(?: moi)? (?:ceci|cela|ca|cet objet|cette chose|ce truc|l objet|ce que je tiens)", "qu est ce que c est(?: que ca| que cet objet)?", "c est quoi(?: ca| cet objet| ce truc)?", "qu est ce que je tiens(?: dans la main| dans ma main)?", "qu est ce que j ai dans la main",
+        "صف(?: لي)? (?:هذا|هذه|ذلك|هذا الشيء|هذا الشي|هذه الحاجه|هذا الغرض|هذه القطعه|ما في يدي|ما بيدي|الشيء الذي امامي|الشيء الذي في يدي|الشيء)",
+        "ما هذا(?: الشيء| الشي)?", "ما هذه(?: الحاجه)?", "ماهذا", "ما الذي في يدي", "ماذا في يدي", "ماذا احمل(?: في يدي)?", "ما هذا الذي في يدي", "ما هو هذا(?: الشيء)?",
+        "واش هذا", "واش هاذا", "واش هذي", "واشنو هذا", "اشنو هذا", "شنو هذا", "شنو هاذا", "ايش هذا", "شو هذا", "شو هيدا", "ايه ده")
+
     /** Strips the wake phrase. Returns the remainder, or "" if only the greeting was said. */
     fun stripWake(norm: String): String? {
         val m = wake.find(norm) ?: return null
@@ -110,6 +162,10 @@ object CommandParser {
         // strip a leading "please"
         t = t.removePrefix("please ").removePrefix("s il te plait ").removePrefix("s il vous plait ").removePrefix("من فضلك ").removePrefix("لو سمحت ").trim()
         if (t.isEmpty()) return Command.Greeting
+        // "emergency école eyes", "read the document école eyes": a trailing wake phrase is not part of the request.
+        t = trailingWake.replace(t, "").trim()
+        if (t.isEmpty()) return Command.Greeting
+        t = trailingDetail.replace(t, "").trim()
 
         fun yesNo(): Command? = when {
             yes.matches(t) -> Command.Yes
@@ -117,10 +173,18 @@ object CommandParser {
             else -> null
         }
 
-        // Order matters: most specific first.
+        // Order matters: most specific first. Emergency always wins.
+        if (emergency.matches(t)) return Command.Emergency
+        if (openEmergency.matches(t)) return Command.Open(Screen.EMERGENCY)
+        if (callServices.matches(t)) return Command.CallEmergencyServices
+        if (callContactEm.matches(t)) return Command.CallEmergencyContact
+        if (t.split(' ').size <= 6 && shareLoc.containsMatchIn(t)) return Command.ShareLocation
+        for (re in setEmContact) re.find(t)?.let { m -> val n = m.groupValues[1].trim(); if (n.isNotEmpty()) return Command.SetEmergencyContact(n) }
+
         if (liveStop.containsMatchIn(t) && t.split(' ').size <= 6) return Command.LiveStop
         if (stop.matches(t)) return Command.Stop
         if (liveStart.containsMatchIn(t)) return Command.LiveStart
+        if (clearNotes.matches(t)) return Command.ClearNotes
         if (clear.containsMatchIn(t)) return Command.ClearHistory
         if (cloudOff.containsMatchIn(t)) return Command.SetCloud(false)
         if (cloudOn.containsMatchIn(t)) return Command.SetCloud(true)
@@ -129,6 +193,15 @@ object CommandParser {
         }
         if (help.matches(t)) return Command.Help
         if (time.matches(t)) return Command.Time
+        if (date.matches(t)) return Command.Date
+        if (status.matches(t)) return Command.Status
+        if (t.split(' ').size <= 7 && battery.containsMatchIn(t)) return Command.Battery
+        if (notifications.matches(t)) return Command.ReadNotifications
+        if (readNotes.matches(t)) return Command.ReadNotes
+        if (noteOnly.matches(t)) return Command.CreateNote("")
+        ReminderParser.parse(raw)?.let { return Command.Remind(it.minutes, it.text) }
+        if (ReminderParser.isReminderRequest(raw)) return Command.Ask(raw.trim())   // absolute time: the AI converts it
+        note.find(t)?.let { m -> return Command.CreateNote(noteText(raw, m.groupValues[1])) }
         if (speedUp.matches(t)) return Command.SpeedUp
         if (speedDown.matches(t)) return Command.SpeedDown
         if (t.split(' ').size <= 6 && volUp.containsMatchIn(t) && (t.contains("volume") || t.contains("son") || t.contains("صوت") || t.contains("louder") || t.contains("plus fort") || t.contains("sound"))) return Command.VolumeUp
@@ -166,8 +239,16 @@ object CommandParser {
         }
         if (readCurrent.matches(t)) return Command.ReadCurrent
 
+        if (describeObject.matches(t)) return Command.DescribeObject
         if (describe.matches(t)) return Command.Describe
         if (readView.matches(t)) return Command.ReadTextInView
+        if (color.matches(t)) return Command.WhatColor
+        if (people.matches(t)) return Command.People
+
+        callLatin.find(t)?.let { m -> return Command.Call(cleanWho(m.groupValues[1])) }
+        callAr.find(t)?.let { m -> return Command.Call(cleanWho(m.groupValues[1])) }
+        // "اتصل باحمد": the preposition is glued to the name
+        if (t.startsWith("اتصل ب") && t.length > 6) return Command.Call(t.removePrefix("اتصل ب").trim())
 
         findDocs.find(t)?.let { m ->
             val body = m.groupValues[1]
@@ -180,8 +261,37 @@ object CommandParser {
         }
 
         yesNo()?.let { return it }
+        openApp.find(t)?.let { m -> val n = m.groupValues[1].trim(); if (n.isNotEmpty() && n.split(' ').size <= 4) return Command.OpenApp(n) }
         return Command.Ask(raw.trim())
     }
+
+    private fun cleanWho(s: String) = s.trim().removePrefix("my ").removePrefix("mon ").removePrefix("ma ").removePrefix("the ").removeSuffix(" please").removeSuffix(" s il te plait").removeSuffix(" من فضلك").removeSuffix(" now").removeSuffix(" maintenant").trim()
+
+    /** Keeps the user's own wording (case, accents) for the note body when it can be found in the raw text. */
+    private fun noteText(raw: String, normalizedBody: String): String {
+        val words = normalizedBody.split(' ').size
+        val rawWords = raw.trim().split(Regex("\\s+"))
+        return if (rawWords.size >= words) rawWords.takeLast(words).joinToString(" ").trim().trimEnd('.') else normalizedBody
+    }
+
+    /**
+     * Offline fallback for visual questions the AI would normally answer ("what colour is the chair?").
+     * Returns the closest on-device command, or null.
+     */
+    fun looseVisual(raw: String): Command? {
+        val t = TextNorm.normalize(raw)
+        return when {
+            Regex("(?:colou?r|couleur|لون)").containsMatchIn(t) -> Command.WhatColor
+            Regex("(?:anyone|someone|somebody|person|people|quelqu un|personne|personnes|احد|شخص|اشخاص|ناس)").containsMatchIn(t) -> Command.People
+            Regex("(?:in front of me|around me|what do you see|describe|see|devant moi|autour de moi|decris|vois|امامي|حولي|صف|تري|ترى)").containsMatchIn(t) -> Command.Describe
+            Regex("(?:read|written|text|lis|ecrit|texte|اقرا|مكتوب|نص)").containsMatchIn(t) -> Command.ReadTextInView
+            else -> null
+        }
+    }
+
+    /** Money questions need the cloud model (no reliable offline banknote model is bundled). */
+    fun isCurrencyQuestion(raw: String): Boolean =
+        Regex("(?:banknote|bank note|bill|currency|money|coin|how much is this|billet|monnaie|piece|argent|combien vaut|ورقه نقديه|عمله|نقود|فلوس|قطعه نقديه|دينار|كم هذه)").containsMatchIn(TextNorm.normalize(raw))
 
     /**
      * Offline fallback for "find my electricity bill": a find/search verb not about something visible.

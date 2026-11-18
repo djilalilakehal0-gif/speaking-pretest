@@ -91,14 +91,15 @@ fun BigButton(
     emphasized: Boolean = true,
     description: String = label,
     stateText: String? = null,
+    danger: Boolean = false,
 ) {
     val shape = RoundedCornerShape(20.dp)
     Row(
         modifier
             .heightIn(min = 72.dp)
             .clip(shape)
-            .background(if (emphasized) EeColors.ElectricDeep else EeColors.Surface)
-            .border(BorderStroke(2.dp, EeColors.Electric), shape)
+            .background(if (danger) EeColors.Danger else if (emphasized) EeColors.ElectricDeep else EeColors.Surface)
+            .border(BorderStroke(2.dp, if (danger) EeColors.OnDark else EeColors.Electric), shape)
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 14.dp)
             .semantics(mergeDescendants = true) {
