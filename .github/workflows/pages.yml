@@ -92,11 +92,22 @@ jobs:
           mkdir -p _site/dev
           cp dev/index.html _site/dev/
 
-      - name: Add the Stride pâtisserie 3D landing page
-        # A single static file (fonts and pastry cut-outs embedded; three.js from jsDelivr, sheet and intro clip from Higgsfield), served at /speaking-pretest/stride/.
+      - name: Add the L'Excellence pâtisserie 3D landing page
+        # A single static file (fonts, pastry cut-outs and storefront photo embedded; three.js from jsDelivr, sheet and intro clip from Higgsfield), served at /speaking-pretest/lexcellence/.
+        # The old /stride/ address forwards to the new one, keeping any #section or ?query.
         run: |
-          mkdir -p _site/stride
-          cp stride/index.html _site/stride/
+          mkdir -p _site/lexcellence _site/stride
+          cp lexcellence/index.html _site/lexcellence/
+          cat > _site/stride/index.html <<'HTML'
+          <!doctype html>
+          <html lang="fr"><head><meta charset="utf-8">
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Pâtisserie</title>
+          <meta name="robots" content="noindex">
+          <meta http-equiv="refresh" content="0; url=../lexcellence/">
+          <script>location.replace("../lexcellence/" + location.search + location.hash)</script>
+          </head><body><a href="../lexcellence/">L'Excellence</a></body></html>
+          HTML
 
       - name: Add the VirtualFit spatial try-on page
         # A single static file (room and garment images load from images.higgs.ai; the five model photos ship beside it), served at /speaking-pretest/virtualfit/.
