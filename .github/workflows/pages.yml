@@ -92,6 +92,12 @@ jobs:
           mkdir -p _site/dev
           cp dev/index.html _site/dev/
 
+      - name: Add the Stride pâtisserie 3D landing page
+        # A single static file (fonts and pastry cut-outs embedded; three.js from jsDelivr, sheet and intro clip from Higgsfield), served at /speaking-pretest/stride/.
+        run: |
+          mkdir -p _site/stride
+          cp stride/index.html _site/stride/
+
       - name: Add the VirtualFit spatial try-on page
         # A single static file (room and garment images load from images.higgs.ai; the five model photos ship beside it), served at /speaking-pretest/virtualfit/.
         run: |
