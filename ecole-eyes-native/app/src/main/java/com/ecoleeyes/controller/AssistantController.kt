@@ -26,6 +26,12 @@ import com.ecoleeyes.core.L10n
 import com.ecoleeyes.core.Lang
 import com.ecoleeyes.core.SettingsStore
 import com.ecoleeyes.data.HistoryRepository
+import com.ecoleeyes.device.CallOutcome
+import com.ecoleeyes.device.ClockTime
+import com.ecoleeyes.device.DeviceActions
+import com.ecoleeyes.device.DeviceParsing
+import com.ecoleeyes.device.NameMatcher
+import com.ecoleeyes.device.SettingsKind
 import com.ecoleeyes.docs.DocFile
 import com.ecoleeyes.docs.DocIndex
 import com.ecoleeyes.docs.DocNote
@@ -42,6 +48,7 @@ import com.ecoleeyes.vision.OcrEngine
 import com.ecoleeyes.voice.Command
 import com.ecoleeyes.voice.CommandParser
 import com.ecoleeyes.voice.DocType
+import com.ecoleeyes.voice.LanguageDetector
 import com.ecoleeyes.voice.Screen
 import com.ecoleeyes.voice.SpeechListener
 import com.ecoleeyes.voice.SpeechOutputException
@@ -52,6 +59,8 @@ import com.ecoleeyes.voice.VolumeControl
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -68,6 +77,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -91,7 +101,10 @@ class AssistantController(
     private val volume: VolumeControl,
     private val connectivity: Connectivity,
     private val loaderFactory: (com.ecoleeyes.docs.LoaderEnv) -> DocumentLoader,
+    private val device: DeviceActions,
     private val serviceControl: (Boolean) -> Unit = {},
+    /** Dispatcher for blocking device queries (package manager, contacts). Tests pass the test dispatcher. */
+    private val io: kotlinx.coroutines.CoroutineDispatcher = Dispatchers.IO,
 ) {
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -255,7 +268,7 @@ class AssistantController(
         }
         feedback.cue(Feedback.Cue.LISTEN_END)
         return when (result) {
-            is SttResult.Heard -> { handleUtterance(result.text); result.text }
+            is SttResult.Heard -> { handleUtterance(result.text, detected = result.detectedLang); result.text }
             is SttResult.Failed -> { say(sttMessage(result.error), record = false); null }
         }
     }
@@ -303,8 +316,9 @@ class AssistantController(
 
     private var awaitingConsent = false
 
-    suspend fun handleUtterance(text: String, fromHandsFree: Boolean = false) {
+    suspend fun handleUtterance(text: String, fromHandsFree: Boolean = false, detected: Lang? = null) {
         val cmd = CommandParser.parse(text)
+        autoSwitchLanguage(text, cmd, detected)
         if (cmd != Command.ClearHistory) runCatching { history.add(true, text) }
         try {
             run(cmd, text)
@@ -370,7 +384,181 @@ class AssistantController(
             Command.LiveStop -> { live.stop(); _state.update { it.copy(live = false) }; say(s(R.string.say_live_off)) }
             Command.Describe -> askAi(original)
             is Command.Ask -> askAi(cmd.text)
+            Command.Date -> say(s(R.string.say_date, DateFormat.getDateInstance(DateFormat.FULL, lang.locale).format(Date())))
+            Command.Battery -> sayBattery()
+            is Command.OpenApp -> openApp(cmd.name)
+            is Command.SetAlarm -> setAlarm(cmd.time)
+            is Command.SetTimer -> setTimer(cmd.seconds)
+            is Command.Call -> placeCall(cmd.target)
+            Command.ReadNotifications -> readNotifications()
+            is Command.OpenSystemSettings -> openSystemSettings(cmd.kind)
         }
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------
+    // Language: answer in the language the user speaks
+    // ------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * If the recognizer reported (Android 14+) or the text clearly shows another supported language, switch to it so the
+     * answer comes back in the language the user spoke. Never on explicit "speak French" (handled as a command) or short
+     * ambiguous words.
+     */
+    private fun autoSwitchLanguage(text: String, cmd: Command, detected: Lang?) {
+        if (!settings.value.autoLanguage || cmd is Command.SetLang || awaitingConsent) return
+        val guess = detected ?: LanguageDetector.detect(text) ?: return
+        if (guess != lang) settings.update { it.copy(lang = guess) }
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------
+    // Phone control. Only documented Android intents; calls always need a spoken "yes" first.
+    // ------------------------------------------------------------------------------------------------------------------
+
+    /** Asks a yes/no question aloud and listens (twice at most). Anything but a clear yes is a no. */
+    private suspend fun confirm(question: String): Boolean {
+        say(question, record = false)
+        for (attempt in 0..1) {
+            val heard = listenOnceRaw() ?: return false
+            when (CommandParser.parse(heard)) {
+                Command.Yes -> return true
+                Command.No, Command.Stop -> return false
+                else -> if (attempt == 0) say(s(R.string.say_yes_prompt), record = false)
+            }
+        }
+        return false
+    }
+
+    private suspend fun sayBattery() {
+        val pct = device.batteryPercent()
+        say(when {
+            pct == null -> s(R.string.say_battery_unknown)
+            device.isCharging() == true -> s(R.string.say_battery_charging, pct)
+            else -> s(R.string.say_battery, pct)
+        })
+    }
+
+    /** Returns a short result for the AI, after speaking to the user when [speak] is true. */
+    private suspend fun openApp(name: String, speak: Boolean = true): String {
+        val apps = withContext(io) { device.launchableApps() }
+        val ranked = NameMatcher.rank(apps, name, { it.label })
+        if (ranked.isEmpty()) {
+            if (speak) say(s(R.string.say_app_not_found, name))
+            return "No installed app matches \"$name\"."
+        }
+        val (best, score) = ranked.first()
+        val close = ranked.getOrNull(1)?.let { it.second >= score - 0.05 } == true
+        if (speak && (score < 0.7 || (close && score < 0.97))) {
+            if (!confirm(s(R.string.say_app_confirm, best.label))) { say(s(R.string.say_cancelled), record = false); return "The user cancelled." }
+        }
+        if (speak) say(s(R.string.say_app_opening, best.label))
+        return if (device.launch(best)) "Opened ${best.label}." else {
+            if (speak) say(s(R.string.say_app_failed, best.label))
+            "Could not open ${best.label}."
+        }
+    }
+
+    private fun spokenTime(t: ClockTime): String {
+        val cal = Calendar.getInstance().apply { set(Calendar.HOUR_OF_DAY, t.hour); set(Calendar.MINUTE, t.minute) }
+        return DateFormat.getTimeInstance(DateFormat.SHORT, lang.locale).format(cal.time)
+    }
+
+    /** "1 hour and 30 minutes" / "1 heure et 30 minutes" / "ساعة واحدة و30 دقيقة", with Arabic dual and number agreement. */
+    fun spokenDuration(totalSec: Int): String {
+        val h = totalSec / 3600; val m = (totalSec % 3600) / 60; val sec = totalSec % 60
+        fun part(n: Int, one: Int, many: Int, arDual: String, arSing: String): String = when {
+            lang == Lang.AR && n == 2 -> arDual
+            lang == Lang.AR && n >= 11 -> "$n $arSing"
+            n == 1 -> s(one)
+            else -> s(many, n)
+        }
+        val parts = buildList {
+            if (h > 0) add(part(h, R.string.dur_hours_1, R.string.dur_hours_n, "ساعتان", "ساعة"))
+            if (m > 0) add(part(m, R.string.dur_minutes_1, R.string.dur_minutes_n, "دقيقتان", "دقيقة"))
+            if (sec > 0) add(part(sec, R.string.dur_seconds_1, R.string.dur_seconds_n, "ثانيتان", "ثانية"))
+        }
+        return parts.joinToString(s(R.string.dur_and))
+    }
+
+    private suspend fun setAlarm(time: ClockTime?) {
+        val t = time ?: run {
+            say(s(R.string.say_alarm_ask_time), record = false)
+            val heard = listenOnceRaw() ?: return
+            DeviceParsing.parseClock(com.ecoleeyes.voice.TextNorm.normalize(heard))
+        }
+        if (t == null) { say(s(R.string.say_time_not_understood), record = false); return }
+        if (device.setAlarm(t, null)) { feedback.cue(Feedback.Cue.SUCCESS); say(s(R.string.say_alarm_set, spokenTime(t))) }
+        else { feedback.cue(Feedback.Cue.ERROR); say(s(R.string.say_alarm_failed)) }
+    }
+
+    private suspend fun setTimer(seconds: Int?) {
+        val d = seconds ?: run {
+            say(s(R.string.say_timer_ask), record = false)
+            val heard = listenOnceRaw() ?: return
+            DeviceParsing.parseDuration(com.ecoleeyes.voice.TextNorm.normalize(heard))
+        }
+        if (d == null) { say(s(R.string.say_time_not_understood), record = false); return }
+        if (device.setTimer(d, null)) { feedback.cue(Feedback.Cue.SUCCESS); say(s(R.string.say_timer_set, spokenDuration(d))) }
+        else { feedback.cue(Feedback.Cue.ERROR); say(s(R.string.say_timer_failed)) }
+    }
+
+    /** Finds who to call, confirms aloud, then calls (or opens the dialer if the phone permission is refused). */
+    private suspend fun placeCall(target: String) {
+        val number = DeviceParsing.extractPhoneNumber(target)
+        val label: String
+        val dial: String
+        if (number != null) {
+            label = DeviceParsing.spokenNumber(number); dial = number
+        } else {
+            if (!ensurePermission(Manifest.permission.READ_CONTACTS, R.string.err_contacts_why, R.string.err_contacts_denied)) return
+            val contacts = withContext(io) { device.contacts() }
+            // Arabic "اتصل بأمي": the preposition is glued to the name.
+            val variants = listOf(target) + (if (target.startsWith("ب") && target.length > 3) listOf(target.drop(1)) else emptyList())
+            val best = variants.flatMap { NameMatcher.rank(contacts, it, { c -> c.name }, 3) }.maxByOrNull { it.second }
+            if (best == null) { say(s(R.string.say_contact_not_found, target)); return }
+            label = best.first.name; dial = best.first.number
+        }
+        if (!confirm(s(R.string.say_call_confirm, label))) { say(s(R.string.say_cancelled), record = false); return }
+        // Asking for the phone permission lets the call start directly; refusing still works through the dialer.
+        ensurePermission(Manifest.permission.CALL_PHONE, R.string.err_call_why, R.string.err_call_denied)
+        say(s(R.string.say_calling, label))
+        when (device.call(dial)) {
+            CallOutcome.CALLING -> feedback.cue(Feedback.Cue.SUCCESS)
+            CallOutcome.DIALER_OPENED -> say(s(R.string.say_dialer_opened), record = false)
+            CallOutcome.FAILED -> { feedback.cue(Feedback.Cue.ERROR); say(s(R.string.say_call_failed)) }
+        }
+    }
+
+    /** Spoken list of recent notifications (5 at most), or an offer to open the one-time access setting. */
+    private suspend fun readNotifications() {
+        if (!device.notificationAccessGranted()) {
+            if (confirm(s(R.string.say_notif_access_needed))) {
+                say(s(R.string.say_notif_access_opening), record = false)
+                if (!device.openNotificationAccessSettings()) say(s(R.string.say_settings_failed), record = false)
+            } else say(s(R.string.say_cancelled), record = false)
+            return
+        }
+        val items = device.recentNotifications()
+        if (items.isEmpty()) { say(s(R.string.say_notif_none)); return }
+        val sb = StringBuilder(if (items.size == 1) s(R.string.say_notif_one) else s(R.string.say_notif_count, items.size))
+        for (n in items.take(5)) {
+            val body = listOf(n.title, n.text).filter { it.isNotBlank() }.distinct().joinToString(". ")
+            sb.append(' ').append(s(R.string.say_notif_item, n.app, body))
+        }
+        if (items.size > 5) sb.append(' ').append(s(R.string.say_notif_more, items.size - 5))
+        say(sb.toString())
+    }
+
+    private suspend fun openSystemSettings(kind: SettingsKind) {
+        say(if (kind == SettingsKind.WIFI || kind == SettingsKind.BLUETOOTH || kind == SettingsKind.LOCATION) s(R.string.say_settings_toggle_note) else s(R.string.say_settings_opening), record = false)
+        if (!device.openSystemSettings(kind)) say(s(R.string.say_settings_failed), record = false)
+    }
+
+    private fun notificationsForAi(): String {
+        if (!device.notificationAccessGranted()) return "Notification access is not enabled. Ask the user if they want to enable it (they can say: read my notifications)."
+        val items = device.recentNotifications()
+        if (items.isEmpty()) return "No notifications."
+        if (settings.value.announceUploads) quiet(s(R.string.say_uploading_doc))
+        return items.take(10).joinToString("\n") { "${it.app} | ${it.title} | ${it.text}" }
     }
 
     private suspend fun readerOrNone(block: suspend (ReaderSession) -> Unit) {
@@ -843,6 +1031,47 @@ class AssistantController(
             }
             ToolOutput(msg.ifBlank { "Nothing changed." })
         }
+        Tools.OPEN_APP -> {
+            val name = input.str("name").orEmpty()
+            if (name.isBlank()) ToolOutput("Missing app name.", isError = true)
+            else {
+                val apps = withContext(io) { device.launchableApps() }
+                val best = NameMatcher.rank(apps, name, { it.label }).firstOrNull()
+                if (best == null) ToolOutput("No installed app matches \"$name\".", isError = true)
+                else { deferred += { openApp(name) }; ToolOutput("${best.first.label} will open after your reply. Keep the reply to a few words.") }
+            }
+        }
+        Tools.SET_ALARM -> {
+            val h = input.int("hour"); val m = input.int("minute") ?: 0
+            if (h == null || h !in 0..23 || m !in 0..59) ToolOutput("Invalid time.", isError = true)
+            else if (device.setAlarm(ClockTime(h, m), input.str("label"))) ToolOutput("Alarm set for ${"%02d:%02d".format(h, m)}.")
+            else ToolOutput("No clock app accepted the alarm.", isError = true)
+        }
+        Tools.SET_TIMER -> {
+            val sec = input.int("seconds")
+            if (sec == null || sec !in 1..86400) ToolOutput("Invalid duration.", isError = true)
+            else if (device.setTimer(sec, input.str("label"))) ToolOutput("Timer started for $sec seconds.")
+            else ToolOutput("No clock app accepted the timer.", isError = true)
+        }
+        Tools.PHONE_CALL -> {
+            val who = input.str("contact_or_number").orEmpty()
+            if (who.isBlank()) ToolOutput("Missing contact or number.", isError = true)
+            else { deferred += { placeCall(who) }; ToolOutput("After your reply the app will look up \"$who\" and ask the user to confirm aloud before calling. Do not say the call has started. Keep the reply to a few words.") }
+        }
+        Tools.READ_NOTIFICATIONS -> ToolOutput(notificationsForAi())
+        Tools.DEVICE_STATUS -> ToolOutput(buildString {
+            append("Battery: ").append(device.batteryPercent()?.let { "$it%" } ?: "unknown")
+            if (device.isCharging() == true) append(", charging")
+            append(". Date and time: ").append(DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT, Locale.ENGLISH).format(Date())).append('.')
+        })
+        Tools.OPEN_SYSTEM_SETTINGS -> {
+            val kind = when (input.str("page")) {
+                "wifi" -> SettingsKind.WIFI; "bluetooth" -> SettingsKind.BLUETOOTH; "accessibility" -> SettingsKind.ACCESSIBILITY
+                "sound" -> SettingsKind.SOUND; "display" -> SettingsKind.DISPLAY; "location" -> SettingsKind.LOCATION; else -> SettingsKind.GENERAL
+            }
+            deferred += { openSystemSettings(kind) }
+            ToolOutput("The ${kind.name.lowercase()} settings page will open after your reply. Apps cannot switch phone settings themselves; the user must use the switch.")
+        }
         Tools.CLEAR_HISTORY -> { deferred += { history.clearAll(); brain.memory.clear() }; ToolOutput("History will be cleared after your reply.") }
         else -> ToolOutput("Unknown tool.", isError = true)
     } }
@@ -912,7 +1141,7 @@ class AssistantController(
                         if (rest != null) {
                             feedback.cue(Feedback.Cue.LISTEN_START)
                             interaction?.cancel()
-                            val job = scope.launch { handleUtterance(r.text) }
+                            val job = scope.launch { handleUtterance(r.text, fromHandsFree = true, detected = r.detectedLang) }
                             interaction = job
                             job.join()
                             if (rest.isEmpty()) listenFollowUp()

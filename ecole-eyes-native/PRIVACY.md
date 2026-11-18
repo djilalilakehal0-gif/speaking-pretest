@@ -15,6 +15,13 @@ public URL before submitting to Google Play.**_
   memory, never saved by the app.
 * **Files.** The app has **no storage permission**. It can only read folders or files you pick in the Android file picker,
   and you can remove that access in the app (Documents → *Remove access*) or in Android settings.
+* **Contacts.** Only when you ask to call someone by name, and only after you allow it. The app looks the name up on your
+  phone; contacts are never uploaded or stored by the app.
+* **Phone calls.** The app calls only after you say "yes" to a spoken confirmation. If you refuse the phone permission, it
+  opens your phone app with the number instead.
+* **Notifications.** Only if you turn on notification access for the app in Android settings. The app keeps the 30 most
+  recent notifications in memory (never on disk) so it can read them to you when you ask. They are sent to the AI service
+  only if you ask the AI a question about them (with cloud consent); "read my notifications" itself works on the phone.
 * **Network.** Used to reach the AI service (below).
 
 ## What is sent to the AI service
@@ -24,6 +31,7 @@ Only if you gave consent (asked aloud on first use; changeable in Settings at an
 * your spoken request, as text;
 * when you ask about your surroundings or to read text the phone cannot read itself: **one reduced-size photo** (≤ 1280 px);
 * when you ask for a summary or explanation of a document: **the text of that document** (or the pages needed).
+* when you ask the AI about your notifications: **the recent notifications' app name, title and text**.
 
 Requests go to a server operated by the app's publisher, which adds the secret API key and forwards the request to the AI
 provider (Anthropic) to produce the answer. The publisher's server does not store or log request contents. The AI provider

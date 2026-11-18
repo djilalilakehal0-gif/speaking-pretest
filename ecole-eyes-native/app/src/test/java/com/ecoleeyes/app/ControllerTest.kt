@@ -65,6 +65,7 @@ class ControllerTest {
     private val listener = ScriptedListener()
     private val ai = ScriptedAi()
     private var online = true
+    private val device = FakeDevice()
     private lateinit var settings: SettingsStore
     private lateinit var l10n: L10n
     private lateinit var history: HistoryRepository
@@ -91,6 +92,7 @@ class ControllerTest {
             camera = CameraHub(ctx), ocr = ocr, docs = DocIndex(ctx), history = history, feedback = Feedback(ctx),
             volume = VolumeControl(ctx), connectivity = Connectivity { online },
             loaderFactory = { env -> DocumentLoader(ctx, ocr, env) },
+            device = device, io = kotlinx.coroutines.Dispatchers.Unconfined,
         )
     }
 
@@ -229,7 +231,8 @@ class ControllerTest {
             AiException.Offline() to R.string.err_offline,
         )
         for (lang in Lang.entries) {
-            settings.update { it.copy(lang = lang) }
+            // Same English request in every language setting: automatic language detection would (correctly) answer in English.
+            settings.update { it.copy(lang = lang, autoLanguage = false) }
             for ((ex, res) in cases) {
                 ai.fail(ex)
                 say(c, "tell me a joke please")   // unmatched -> AI
@@ -396,7 +399,7 @@ class ControllerTest {
         var serviceOn = false
         val c = AssistantController(
             ctx, this, settings, l10n, speaker, listener, brain, CameraHub(ctx), OcrEngine(null), DocIndex(ctx), history, Feedback(ctx), VolumeControl(ctx),
-            Connectivity { online }, { env -> DocumentLoader(ctx, OcrEngine(null), env) }, serviceControl = { serviceOn = it },
+            Connectivity { online }, { env -> DocumentLoader(ctx, OcrEngine(null), env) }, device = device, serviceControl = { serviceOn = it },
         )
         listener.hear("some people talking nearby").hear("Hello École Eyes what time is it")
         c.setHandsFree(true); runCurrent(); advanceUntilIdle()
@@ -417,5 +420,212 @@ class ControllerTest {
         assertEquals(str(Lang.EN, R.string.err_mic_why), speaker.texts.first())
         c.onPermissionResult(Manifest.permission.RECORD_AUDIO, false); advanceUntilIdle()
         assertFalse(settings.value.handsFree)
+    }
+
+    // ---- phone control --------------------------------------------------------------------------------------------------
+
+    private fun grantPhone() = shadowOf(ctx).grantPermissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CALL_PHONE)
+
+    @Test fun opens_another_app_by_name_in_every_language() = runCtl {
+        val c = controller(this)
+        say(c, "open WhatsApp")
+        assertEquals(listOf("com.whatsapp"), device.launched)
+        assertEquals(str(Lang.EN, R.string.say_app_opening, "WhatsApp"), speaker.texts.last())
+        settings.update { it.copy(lang = Lang.AR) }
+        say(c, "افتح اليوتيوب")
+        assertEquals("com.google.android.youtube", device.launched.last())
+        assertEquals(Lang.AR, speaker.said.last().second)
+        settings.update { it.copy(lang = Lang.FR) }
+        say(c, "ouvre l'application Maps")
+        assertEquals("com.google.android.apps.maps", device.launched.last())
+    }
+
+    @Test fun unknown_app_is_reported_not_guessed() = runCtl {
+        val c = controller(this)
+        say(c, "open Zorglub")
+        assertTrue(device.launched.isEmpty())
+        assertEquals(str(Lang.EN, R.string.say_app_not_found, "zorglub"), speaker.texts.last())
+    }
+
+    @Test fun alarm_with_and_without_a_spoken_time() = runCtl {
+        val c = controller(this)
+        say(c, "set an alarm for 7:30 pm")
+        assertEquals(listOf(com.ecoleeyes.device.ClockTime(19, 30)), device.alarms)
+        assertTrue(speaker.texts.last(), speaker.texts.last().startsWith("Alarm set for"))
+        listener.hear("6 30 in the morning")
+        say(c, "set an alarm")
+        assertEquals(str(Lang.EN, R.string.say_alarm_ask_time), speaker.texts[speaker.texts.size - 2])
+        assertEquals(com.ecoleeyes.device.ClockTime(6, 30), device.alarms.last())
+    }
+
+    @Test fun alarm_failure_is_explained() = runCtl {
+        device.actionsWork = false
+        val c = controller(this)
+        say(c, "réveille-moi à 7 heures")
+        assertEquals(str(Lang.FR, R.string.say_alarm_failed) to Lang.FR, speaker.said.last())
+    }
+
+    @Test fun timer_duration_is_spoken_naturally() = runCtl {
+        val c = controller(this)
+        say(c, "set a timer for 1 hour 30 minutes")
+        assertEquals(listOf(5400), device.timers)
+        assertEquals("Timer set for 1 hour and 30 minutes.", speaker.texts.last())
+        settings.update { it.copy(lang = Lang.AR) }
+        say(c, "شغل مؤقت دقيقتين")
+        assertEquals(120, device.timers.last())
+        assertEquals("تم ضبط المؤقت لمدة دقيقتان.", speaker.texts.last())
+        settings.update { it.copy(lang = Lang.FR) }
+        say(c, "lance un minuteur de 1 minute")
+        assertEquals("Minuteur réglé pour 1 minute.", speaker.texts.last())
+    }
+
+    @Test fun calling_a_contact_needs_a_spoken_yes() = runCtl {
+        grantPhone()
+        val c = controller(this)
+        listener.hear("yes")
+        say(c, "call Maman")
+        assertEquals(str(Lang.EN, R.string.say_call_confirm, "Maman"), speaker.texts.first { it.contains("call") && it.contains("Maman") })
+        assertEquals(listOf("0555123456"), device.calls)
+        assertEquals(str(Lang.EN, R.string.say_calling, "Maman"), speaker.texts.last())
+    }
+
+    @Test fun declining_or_unclear_answer_never_calls() = runCtl {
+        grantPhone()
+        val c = controller(this)
+        listener.hear("no")
+        say(c, "call Karim")
+        assertTrue(device.calls.isEmpty())
+        assertEquals(str(Lang.EN, R.string.say_cancelled), speaker.texts.last())
+        listener.hear("banana").hear("what")
+        say(c, "call Karim")
+        assertTrue(device.calls.isEmpty())
+    }
+
+    @Test fun calling_a_number_and_an_arabic_contact() = runCtl {
+        grantPhone()
+        device.contacts = device.contacts + com.ecoleeyes.device.PhoneContact("أمي", "0770000000")
+        val c = controller(this)
+        listener.hear("yes")
+        say(c, "call 0555 98 76 54")
+        assertEquals("0555987654", device.calls.single())
+        settings.update { it.copy(lang = Lang.AR) }
+        listener.hear("نعم")
+        say(c, "اتصل بأمي")
+        assertEquals("0770000000", device.calls.last())
+    }
+
+    @Test fun refused_phone_permission_falls_back_to_the_dialer() = runCtl {
+        shadowOf(ctx).grantPermissions(Manifest.permission.READ_CONTACTS)
+        device.callOutcome = com.ecoleeyes.device.CallOutcome.DIALER_OPENED
+        val c = controller(this)
+        listener.hear("yes")
+        c.submitText("call Maman"); advanceUntilIdle()
+        // the app explains why it wants the phone permission, then the user refuses
+        assertEquals(str(Lang.EN, R.string.err_call_why), speaker.texts.last())
+        c.onPermissionResult(Manifest.permission.CALL_PHONE, false); advanceUntilIdle()
+        assertEquals("0555123456", device.calls.single())
+        assertEquals(str(Lang.EN, R.string.say_dialer_opened), speaker.texts.last())
+    }
+
+    @Test fun unknown_contact_is_reported() = runCtl {
+        grantPhone()
+        val c = controller(this)
+        say(c, "call Zorglub")
+        assertTrue(device.calls.isEmpty())
+        assertEquals(str(Lang.EN, R.string.say_contact_not_found, "zorglub"), speaker.texts.last())
+    }
+
+    @Test fun notifications_need_one_time_access_then_are_read() = runCtl {
+        val c = controller(this)
+        listener.hear("yes")
+        say(c, "read my notifications")
+        assertEquals(1, device.notifSettingsOpened)
+        assertEquals(str(Lang.EN, R.string.say_notif_access_opening), speaker.texts.last())
+
+        device.notifAccess = true
+        device.notifications = listOf(
+            com.ecoleeyes.device.NotificationItem("WhatsApp", "Karim", "See you at 6", 2),
+            com.ecoleeyes.device.NotificationItem("Gmail", "Invoice", "Your invoice is ready", 1),
+        )
+        say(c, "read my notifications")
+        val spoken = speaker.texts.last()
+        assertTrue(spoken, spoken.startsWith(str(Lang.EN, R.string.say_notif_count, 2)))
+        assertTrue(spoken, spoken.contains("From WhatsApp: Karim. See you at 6.") && spoken.contains("From Gmail: Invoice. Your invoice is ready."))
+        device.notifications = emptyList()
+        say(c, "lis mes notifications")
+        assertEquals(str(Lang.FR, R.string.say_notif_none) to Lang.FR, speaker.said.last())
+    }
+
+    @Test fun battery_date_and_phone_settings() = runCtl {
+        val c = controller(this)
+        say(c, "battery level")
+        assertEquals("The battery is at 76 percent.", speaker.texts.last())
+        device.charging = true
+        settings.update { it.copy(lang = Lang.FR) }
+        say(c, "niveau de batterie")
+        assertEquals("La batterie est à 76 pour cent et en charge.", speaker.texts.last())
+        say(c, "quelle date sommes-nous")
+        assertTrue(speaker.texts.last(), speaker.texts.last().startsWith("Nous sommes le"))
+        say(c, "turn on the wifi")
+        assertEquals(listOf(com.ecoleeyes.device.SettingsKind.WIFI), device.settingsOpened)
+        assertEquals(str(Lang.EN, R.string.say_settings_toggle_note), speaker.texts.last())
+    }
+
+    @Test fun ai_phone_call_tool_still_requires_the_users_spoken_yes() = runCtl {
+        grantPhone()
+        val c = controller(this)
+        // The model asks for a call, but the user answers no: nothing is dialled.
+        ai.toolCall(Tools.PHONE_CALL, buildJsonObject { put("contact_or_number", "Maman") }).reply("Sure.")
+        listener.hear("no")
+        say(c, "could you ring my mother maman for me")   // free form -> AI
+        assertTrue(device.calls.isEmpty())
+        assertTrue(speaker.texts.contains(str(Lang.EN, R.string.say_call_confirm, "Maman")))
+        assertEquals(str(Lang.EN, R.string.say_cancelled), speaker.texts.last())
+        // the tool result told the model that a spoken confirmation is still pending
+        assertTrue(ai.requests.last().messages.toString().contains("confirm aloud"))
+        // Same request, the user says yes: now the call is placed.
+        ai.toolCall(Tools.PHONE_CALL, buildJsonObject { put("contact_or_number", "Maman") }).reply("Sure.")
+        listener.hear("yes")
+        say(c, "could you ring my mother maman for me")
+        assertEquals(listOf("0555123456"), device.calls)
+    }
+
+    @Test fun ai_alarm_and_status_tools() = runCtl {
+        val c = controller(this)
+        ai.toolCall(Tools.SET_ALARM, buildJsonObject { put("hour", 6); put("minute", 45) }).reply("Your alarm is set for 6:45.")
+        say(c, "I need to get up before my 7 o'clock bus tomorrow")
+        assertEquals(listOf(com.ecoleeyes.device.ClockTime(6, 45)), device.alarms)
+        assertEquals("Your alarm is set for 6:45.", speaker.texts.last())
+        ai.toolCall(Tools.DEVICE_STATUS).reply("76 percent.")
+        say(c, "will my phone last the evening")
+        assertTrue(ai.requests.last().messages.toString().contains("Battery: 76%"))
+    }
+
+    // ---- automatic language -------------------------------------------------------------------------------------------
+
+    @Test fun answers_in_the_language_the_user_speaks() = runCtl {
+        val c = controller(this)
+        say(c, "quelle heure est-il")
+        assertEquals(Lang.FR, settings.value.lang)
+        assertEquals(Lang.FR, speaker.said.last().second)
+        say(c, "كم الساعة الآن")
+        assertEquals(Lang.AR, speaker.said.last().second)
+        say(c, "what time is it")
+        assertEquals(Lang.EN, speaker.said.last().second)
+        // short words never flip the language
+        settings.update { it.copy(lang = Lang.FR) }
+        say(c, "stop")
+        assertEquals(Lang.FR, settings.value.lang)
+    }
+
+    @Test fun recognizer_language_signal_wins_and_setting_can_turn_it_off() = runCtl {
+        val c = controller(this)
+        listener.queue += SttResult.Heard("ok", detectedLang = Lang.AR)
+        c.onMicTap(); advanceUntilIdle()
+        assertEquals(Lang.AR, settings.value.lang)
+        settings.update { it.copy(lang = Lang.EN, autoLanguage = false) }
+        say(c, "quelle heure est-il")
+        assertEquals(Lang.EN, settings.value.lang)
+        assertEquals(Lang.EN, speaker.said.last().second)
     }
 }

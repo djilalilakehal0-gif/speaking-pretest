@@ -5,7 +5,8 @@ import com.ecoleeyes.core.Lang
 enum class SttError { NO_PERMISSION, NO_SPEECH, NETWORK, BUSY, UNAVAILABLE, LANGUAGE_UNSUPPORTED, OTHER }
 
 sealed interface SttResult {
-    data class Heard(val text: String, val alternatives: List<String> = emptyList()) : SttResult
+    /** [detectedLang] is set only when the recognizer itself confidently reported the spoken language (Android 14+). */
+    data class Heard(val text: String, val alternatives: List<String> = emptyList(), val detectedLang: Lang? = null) : SttResult
     data class Failed(val error: SttError) : SttResult
 }
 

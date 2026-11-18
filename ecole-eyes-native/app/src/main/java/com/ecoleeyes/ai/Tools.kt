@@ -51,6 +51,13 @@ object Tools {
     const val SET_LANGUAGE = "set_language"
     const val ADJUST_SPEECH = "adjust_speech"
     const val CLEAR_HISTORY = "clear_history"
+    const val OPEN_APP = "open_app"
+    const val SET_ALARM = "set_alarm"
+    const val SET_TIMER = "set_timer"
+    const val PHONE_CALL = "phone_call"
+    const val READ_NOTIFICATIONS = "read_notifications"
+    const val DEVICE_STATUS = "device_status"
+    const val OPEN_SYSTEM_SETTINGS = "open_system_settings"
 
     val all: List<JsonObject> = listOf(
         def(CAPTURE_VIEW,
@@ -90,5 +97,24 @@ object Tools {
                 str("speed", "Faster or slower.", listOf("faster", "slower"))
             }),
         def(CLEAR_HISTORY, "Erase the stored conversation history. Only when the user explicitly asks."),
+        def(OPEN_APP, "Open another app installed on the phone, by its name (e.g. WhatsApp, YouTube, Maps). It opens after your reply.", listOf("name"),
+            props = { str("name", "App name as the user said it, in any language.") }),
+        def(SET_ALARM, "Set an alarm in the phone's clock app.", listOf("hour"),
+            props = {
+                int("hour", "Hour, 0-23 (24-hour clock).")
+                int("minute", "Minute, 0-59.")
+                str("label", "Optional short label.")
+            }),
+        def(SET_TIMER, "Start a countdown timer in the phone's clock app.", listOf("seconds"),
+            props = {
+                int("seconds", "Duration in seconds (1 to 86400).")
+                str("label", "Optional short label.")
+            }),
+        def(PHONE_CALL, "Call a contact by name or a phone number. The app looks the contact up and asks the user to confirm aloud before calling; you never place the call yourself.", listOf("contact_or_number"),
+            props = { str("contact_or_number", "Contact name as said by the user, or the digits of the number.") }),
+        def(READ_NOTIFICATIONS, "Get the user's recent phone notifications (app, title, text) so you can read or summarize them. Only works if the user enabled notification access."),
+        def(DEVICE_STATUS, "Get the battery level, charging state and current date and time."),
+        def(OPEN_SYSTEM_SETTINGS, "Open a page of the phone's Android settings. Apps cannot switch Wi-Fi, Bluetooth etc. themselves; the user uses the switch on that page.",
+            props = { str("page", "Settings page.", listOf("general", "wifi", "bluetooth", "accessibility", "sound", "display", "location")) }),
     )
 }

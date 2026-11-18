@@ -11,16 +11,19 @@ files the user has authorized, answers questions, and can be navigated entirely 
 
 | Area | Status |
 |---|---|
-| Voice-command understanding (3 languages, language switching, ambiguity handling) | ✅ 27 unit tests covering ~200 spoken phrases |
+| Voice-command understanding (3 languages, language switching, ambiguity handling) | ✅ unit tests covering ~300 spoken phrases |
 | AI client: backend protocol, retries, timeouts, offline, auth/rate-limit/server errors | ✅ tested against a mock server |
 | AI tool-calling loop, conversation memory, follow-up context | ✅ tested with a scripted model |
 | Controller behaviour end to end (permissions → spoken rationale, consent, errors in AR/FR/EN, navigation, hands-free wake phrase) | ✅ 29 Robolectric tests with fake speech/AI/camera |
 | Reading real PDF / DOCX / RTF / DOC / TXT files, paging, resume position, pause/skip/repeat | ✅ real generated files through the real loader |
 | File search ranking (accents, Arabic, typos), SAF-only access model | ✅ tested (ranking); folder scan itself is **not** device-tested |
 | Encrypted history, hashed reading positions, settings persistence, all strings × 3 languages | ✅ tested |
+| Phone control: open apps, alarms, timers, calls (spoken yes required), notifications, battery, date, phone settings — parsing in 3 languages and controller behaviour | ✅ 34 new tests (time/duration/number parsing, app & contact matching incl. Arabic aliases, confirmation/decline/dialer fallback, AI tools still gated by the spoken yes) |
+| Automatic answer language (recognizer detection on Android 14+, text-based guess elsewhere) | ✅ detector + controller tests; ⚠️ the Android 14 recognizer signal is **not device-tested** |
 | Backend proxy (auth, validation, model allow-list, size/rate limits) | ✅ 15 Node tests |
 | Debug APK, R8-minified release APK, release AAB; Android Lint | ✅ build and lint clean |
-| **Real TextToSpeech / SpeechRecognizer / CameraX / ML Kit OCR / PdfRenderer-OCR of scanned pages** | ⚠️ **not run on a device** (no emulator or phone was available) |
+| **Real TextToSpeech / SpeechRecognizer / CameraX / ML Kit OCR / PdfRenderer-OCR of scanned pages** | ⚠️ **not run on a device** (no emulator or phone was available; the build machine has no KVM) |
+| Real intents on a phone: clock app accepting silent alarms, `ACTION_CALL`, launcher listing, notification listener binding | ⚠️ **not run on a device** — implemented with documented public APIs only; see checklist items 12–17 |
 | Compose accessibility tests, TalkBack session | ⚠️ written (`app/src/androidTest`) and compiled, **not executed** |
 | Foreground "hands-free" service on Android 14+, battery behaviour | ⚠️ not run on a device |
 | Quality of real AI answers | ⚠️ needs your backend + API key; prompts are designed, answers unmeasured |
@@ -41,6 +44,13 @@ Nothing here claims a feature "works" beyond the ✅ rows.
 * **Documents** — only folders/files the user grants through the Android Storage Access Framework (revocable in the app).
   PDF (text + scanned pages via OCR), DOC (best effort), DOCX, TXT, RTF, JPG/JPEG/PNG. Search by name (typo/accents/Arabic
   tolerant), "read my latest PDF", pause/resume/skip/repeat/page jumps, remembered position, AI summaries.
+* **Phone control by voice** — "open WhatsApp", "set an alarm for 7:30", "set a timer for 5 minutes", "call Mum" / "call
+  0555 12 34 56" (always confirmed aloud; dialer fallback), "read my notifications" (after the user enables notification
+  access once), "battery level", "what's the date", "open Wi-Fi settings". Public Android intents only: Android does not let
+  apps toggle Wi-Fi/Bluetooth or press buttons in other apps, so the assistant opens the right page and says so.
+* **Answers in the language you speak** — Android 14+ recognizers that support it detect French/Arabic/English and
+  transcribe in that language; elsewhere a conservative text-based detector switches only on clear sentences. Off switch
+  in Settings.
 * **Accessibility first** — every control labelled, roles/states, headings, ≥ 72 dp targets, 220 dp voice button, haptics and
   earcons, high-contrast dark theme, large type, RTL for Arabic, nothing conveyed by colour alone.
 * **Privacy by design** — spoken consent before any cloud use, spoken notice before each photo/document upload, nothing
@@ -57,6 +67,9 @@ echo "sdk.dir=$ANDROID_HOME" > local.properties
 # APK: app/build/outputs/apk/debug/app-debug.apk   (package com.ecoleeyes.app.debug)
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
+
+If Maven Central rate-limits your network (HTTP 429), point Gradle and Robolectric at Google's Central mirror with an init
+script instead of editing the build — see [`TECHNICAL_ARCHITECTURE.md`](TECHNICAL_ARCHITECTURE.md#build-environment-notes).
 
 ### 1. Deploy the AI backend (keeps the API key off the phone)
 
@@ -108,8 +121,17 @@ If a voice is missing the app says so (in English) instead of staying silent.
 | "Increase the volume" · "Speak faster" · "Speak French / تكلم بالعربية" | speech settings, language |
 | "Go back" · "Go home" · "Open settings" · "Repeat the last answer" · "Stop" · "Close the application" | navigation |
 | "Clear my history" | wipes conversation + reading positions |
+| "Open WhatsApp" · "Ouvre YouTube" · "افتح الخرائط" | open another installed app |
+| "Set an alarm for 7:30 pm" · "Réveille-moi à 6 heures" · "Set a timer for 5 minutes" · "شغل مؤقت دقيقتين" | clock app |
+| "Call Mum" · "Appelle Karim" · "اتصل بأمي" · "Call 0555 12 34 56" | call after a spoken **yes** |
+| "Read my notifications" · "Battery level" · "What's the date?" · "Open Wi-Fi settings" | phone status and settings |
 
 Anything else is understood by the AI, including follow-ups ("What is next to the laptop?").
+
+## Planning documents
+
+[`DEVELOPMENT_PLAN.md`](DEVELOPMENT_PLAN.md) (phases and status) · [`TECHNICAL_ARCHITECTURE.md`](TECHNICAL_ARCHITECTURE.md)
+(layers, data flow, decisions and deviations from the original spec) · [`TASKS.md`](TASKS.md) (done / open, kept current).
 
 ## Architecture
 
@@ -119,12 +141,14 @@ dependencies already point one way; it was not done to keep builds fast and the 
 ```
 com.ecoleeyes
 ├─ core/        Lang, L10n (strings in any language), SettingsStore (encrypted), TextCipher (Keystore AES-GCM), Connectivity
-├─ voice/       CommandParser + TextNorm (3-language NLU), Speaker/AndroidSpeaker (TTS), SpeechListener/AndroidSpeechListener (STT), ListeningService
+├─ voice/       CommandParser + TextNorm (3-language NLU), LanguageDetector, Speaker/AndroidSpeaker (TTS), SpeechListener/AndroidSpeechListener (STT), ListeningService
 ├─ ai/          AiClient/ClaudeProxyClient (retry, typed errors), Tools, Prompt, AssistantBrain (tool loop + memory)
 ├─ vision/      CameraHub (CameraX bridge), OcrEngine (ML Kit + cloud), ContinuousAssist (change detection), ImageQuality
 ├─ docs/        DocIndex (SAF grants + scan), DocSearch, Extractors (DOCX/RTF/DOC/TXT), DocumentLoader (PDF/images), Paginator, ReaderSession
 ├─ data/        Room: encrypted messages + hashed-key reading positions
 ├─ a11y/        Feedback (earcons + haptics)
+├─ device/      DeviceActions/AndroidDeviceActions (apps, alarms, timers, calls, settings pages, battery), DeviceParsing
+│               (spoken times, durations, numbers), NameMatcher (apps/contacts, Arabic aliases), NotificationReader (listener)
 ├─ controller/  AssistantController — the conductor: listen → understand → act → speak; permissions, consent, errors → words
 └─ ui/          Compose screens (Home, Assistant, Camera, Documents/Files, Settings, Privacy), theme, components
 backend/        Cloudflare Worker proxy + tests
@@ -137,7 +161,10 @@ spoken sentence in the user's language (`AssistantController.explain`, `sttMessa
 ## Privacy, security, permissions
 
 * Permissions asked only at the moment of need, **with a spoken reason first**: microphone (voice), camera (photos on
-  request), notifications + foreground-service-microphone (only for the optional hands-free mode).
+  request), notifications + foreground-service-microphone (only for the optional hands-free mode), contacts (first "call
+  <name>"), phone (first call; refusing falls back to the dialer). Notification access is a one-time switch the user turns
+  on in Android settings, offered aloud.
+* Calls always need a spoken "yes" — also when the AI requests one through its `phone_call` tool; the model cannot bypass it.
 * Files: **no storage permission at all** — SAF grants only. Grants are Android persisted URI permissions.
 * Cloud use needs explicit consent (spoken yes/no on first run; toggle in Settings). Photos are downscaled, sent once, never
   saved. Document text is sent only when you ask for a summary/explanation. A spoken notice precedes each upload (switchable).
@@ -153,15 +180,21 @@ spoken sentence in the user's language (`AssistantController.explain`, `sttMessa
 * Arabic-script OCR/handwriting need the cloud; embedded-text Arabic PDFs may extract in the wrong order (cloud OCR is used when allowed).
 * Legacy `.doc` is best effort (user is warned); convert to `.docx` for reliability. Password-protected PDFs are refused.
 * Hands-free mode: Android 14+ only starts microphone services while the app is visible, may stop them to save battery, and
-  some recognizers beep on each restart. It is a convenience, not an always-on assistant. Android offers no way for an app to
-  control other apps or system settings by voice without an AccessibilityService, which this app deliberately does **not** use.
+  some recognizers beep on each restart. It is a convenience, not an always-on assistant. It is not a true low-power wake-word
+  engine (that would need a third-party SDK such as Porcupine and its licence key).
+* Phone control is limited to what public intents allow: open apps, alarms/timers (some clock apps show their screen despite
+  the "skip UI" request), calls, opening settings pages, reading notifications. It cannot press buttons inside other apps, send
+  messages, or toggle Wi-Fi/Bluetooth — that would require an AccessibilityService, which this app deliberately does **not** use.
+* Without Android 14 recognizer language detection, the recognizer still listens in the selected language: speaking French
+  while English is selected gives a poor transcript, so automatic switching mostly helps on Android 14+ and with typed text.
+  Saying "speak French" always works.
 * "Interrupt when I talk" can hear the phone's own voice; best with headphones.
 * The embedded app token is extractable (see above).
 
 ## Testing
 
 ```bash
-./gradlew testDebugUnitTest            # 160 JVM + Robolectric tests (first run downloads Robolectric's Android jars)
+./gradlew testDebugUnitTest            # 194 JVM + Robolectric tests (first run downloads Robolectric's Android jars)
 ./gradlew lintDebug
 ./gradlew connectedDebugAndroidTest    # needs a device/emulator: Compose accessibility + navigation tests (not run in CI here)
 (cd backend && npm test)

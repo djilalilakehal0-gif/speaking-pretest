@@ -25,6 +25,8 @@ data class AppSettings(
     val liveIntervalSec: Int = 6,
     val handsFree: Boolean = false,
     val onboardingDone: Boolean = false,
+    /** Answer in the language the user just spoke (recognizer detection on Android 14+, otherwise a text-based guess). */
+    val autoLanguage: Boolean = true,
 ) {
     val cloudAllowed: Boolean get() = consent == Consent.GRANTED
     val backendConfigured: Boolean get() = backendUrl.startsWith("https://")
@@ -53,6 +55,7 @@ class SettingsStore(context: Context) {
             .putInt("liveSec", next.liveIntervalSec)
             .putBoolean("handsFree", next.handsFree)
             .putBoolean("onboarded", next.onboardingDone)
+            .putBoolean("autoLang", next.autoLanguage)
             .apply()
     }
 
@@ -71,6 +74,7 @@ class SettingsStore(context: Context) {
             liveIntervalSec = prefs.getInt("liveSec", d.liveIntervalSec),
             handsFree = prefs.getBoolean("handsFree", d.handsFree),
             onboardingDone = prefs.getBoolean("onboarded", d.onboardingDone),
+            autoLanguage = prefs.getBoolean("autoLang", d.autoLanguage),
         ).sanitized()
     }
 

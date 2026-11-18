@@ -1,6 +1,8 @@
 package com.ecoleeyes.voice
 
 import com.ecoleeyes.core.Lang
+import com.ecoleeyes.device.DeviceParsing
+import com.ecoleeyes.device.SettingsKind
 
 /**
  * Fast, offline understanding of unambiguous commands in Arabic, French and English.
@@ -89,6 +91,23 @@ object CommandParser {
         "lis le texte", "lis le texte devant moi", "lis ce papier", "lis ceci", "qu est ce qui est ecrit", "qu est ce qui est ecrit ici", "dis moi ce qui est ecrit", "dis moi ce qui est ecrit sur ce papier", "que dit ce papier",
         "اقرا النص", "اقرا النص امامي", "اقرا لي النص", "اقرا هذا", "اقرا هذه الورقه", "ماذا مكتوب", "ماذا مكتوب هنا", "ماذا مكتوب على هذه الورقه", "ماذا مكتوب علي هذه الورقه", "اخبرني ماذا مكتوب", "اخبرني ماذا مكتوب على هذه الورقه", "اخبرني ماذا مكتوب علي هذه الورقه")
 
+    // phone control
+    private val date = r("^(?:what(?: is| s|s)? (?:the |today s )?(?:date|day)(?: today| is it| is it today)?|what day is (?:it|today)(?: today)?|what is the date today|tell me the date|today s date|quelle (?:est la )?date(?: sommes nous| est on| on est)?(?: aujourd hui)?|quel jour (?:on est|sommes nous|est on|est il|nous sommes)(?: aujourd hui)?|on est quel jour(?: aujourd hui)?|on est le combien|la date(?: d aujourd hui)?|ما التاريخ|ما هو التاريخ|ما تاريخ اليوم|كم التاريخ|كم التاريخ اليوم|اي يوم اليوم|ما اليوم|ما هو اليوم|ما هو تاريخ اليوم)" + TAIL + "$")
+    private val battery = r("(?:battery|batterie|البطاريه|بطاريه|بطاريتي|الشحن)")
+    private val alarm = r("(?:^| )(?:set|create|add|make|put|schedule|mets|met|mettre|regle|regler|programme|ajoute|cree|اضبط|ضع|اعمل|فعل|شغل|حط)(?: me)? (?:an |a |the |une |un |l |ال)?(?:alarm|alarme|reveil|منبه|المنبه)|^(?:wake me(?: up)?|reveille moi|reveillez moi|ايقظني|صحيني|فيقني)(?: |$)|^(?:alarm|alarme|منبه|المنبه) (?:for |at |a |pour |علي |على |الساعه )")
+    private val timer = r("(?:^| )(?:set|start|create|put|mets|met|lance|demarre|regle|programme|اضبط|ضع|شغل|ابدا|حط)(?: me)? (?:a |an |the |un |une |le |ال)?(?:timer|countdown|minuteur|compte a rebours|chrono|مؤقت|المؤقت|عداد)|^(?:timer|minuteur|مؤقت|المؤقت) |^(?:remind me in|rappelle moi dans|ذكرني بعد) ")
+    private val call = r("^(?:call|phone|ring|dial|telephone|appelle|appeler|appelez|telephone a|compose(?: le)?|اتصل(?: علي| على)?|اتصلي|كلم|اطلب)(?: to| a)? (.+)$")
+    private val notifications = r("(?:notifications?|notifs?|الاشعارات|اشعاراتي|اشعارات|التنبيهات|تنبيهاتي)")
+    private val sysGeneral = r("(?:(?:phone|system|android|device) settings|settings (?:of|on) (?:the|my) phone|parametres du (?:telephone|systeme|portable)|reglages du (?:telephone|systeme)|parametres android|اعدادات (?:الهاتف|الجهاز|النظام|الجوال|التلفون))")
+    private val sysWifi = r("(?:^| )(?:wifi|wi fi|wlan|الواي فاي|الوايفاي|واي فاي|وايفاي)(?: |$)")
+    private val sysBt = r("(?:^| )(?:bluetooth|blue tooth|البلوتوث|بلوتوث)(?: |$)")
+    private val sysA11y = r("(?:(?:android|phone|system|talkback) accessibility|talkback settings|accessibilite (?:du telephone|d android|android)|parametres (?:de )?talkback|parametres d accessibilite du telephone|اعدادات تولك باك|اعدادات سهوله الوصول في الهاتف|سهوله الوصول في الهاتف)")
+    private val sysSound = r("(?:sound settings|ringtone settings|parametres (?:du |de )?son|reglages (?:du )?son|sonnerie|اعدادات الصوت|اعدادات الرنين|نغمه الرنين)")
+    private val sysDisplay = r("(?:display settings|screen brightness|brightness|parametres d affichage|luminosite|اعدادات الشاشه|اعدادات العرض|سطوع الشاشه|السطوع)")
+    private val sysLocation = r("(?:location settings|gps settings|turn on (?:the )?(?:location|gps)|localisation|parametres de localisation|اعدادات الموقع|خدمات الموقع|تحديد الموقع)")
+    private val openVerb = "(?:open|launch|start|run|ouvre|ouvrir|ouvrez|lance|lancer|demarre|افتح|افتحي|شغل|شغلي)"
+    private val openApp = r("^$PLEASE$openVerb (?:the |my |l |la |le |mon |ma )?(?:app |application |appli |l application |تطبيق |التطبيق |برنامج )?(.+?)$TAIL$")
+
     private val yes = any("yes", "yeah", "yep", "sure", "ok", "okay", "i agree", "i do", "agreed", "of course", "yes please", "oui", "ouais", "d accord", "j accepte", "bien sur", "oui bien sur", "oui je suis d accord", "نعم", "ايوه", "اجل", "موافق", "اوافق", "حسنا", "طبعا", "بالطبع", "نعم اوافق")
     private val no = any("no", "nope", "no thanks", "i refuse", "i do not agree", "i don t agree", "refuse", "non", "non merci", "je refuse", "pas d accord", "لا", "لا شكرا", "ارفض", "لا اوافق", "غير موافق", "كلا")
 
@@ -134,6 +153,8 @@ object CommandParser {
         if (t.split(' ').size <= 6 && volUp.containsMatchIn(t) && (t.contains("volume") || t.contains("son") || t.contains("صوت") || t.contains("louder") || t.contains("plus fort") || t.contains("sound"))) return Command.VolumeUp
         if (t.split(' ').size <= 6 && volDown.containsMatchIn(t) && (t.contains("volume") || t.contains("son") || t.contains("صوت") || t.contains("quieter") || t.contains("moins fort") || t.contains("sound"))) return Command.VolumeDown
 
+        deviceCommand(t, raw)?.let { return it }
+
         if (closeCamera.matches(t)) return Command.Back
         if (openCamera.matches(t)) return Command.Open(Screen.CAMERA)
         if (openAssistant.matches(t)) return Command.Open(Screen.ASSISTANT)
@@ -166,6 +187,13 @@ object CommandParser {
         }
         if (readCurrent.matches(t)) return Command.ReadCurrent
 
+        openApp.find(t)?.let { m ->
+            val name = m.groupValues[1].trim()
+            val notApp = name in setOf("it", "this", "that", "ca", "le", "la", "ce", "ceci", "هذا", "هذه", "ه") ||
+                Regex("(?:^| )$docNoun(?: |$)").containsMatchIn(name) || name.split(' ').size > 4
+            if (!notApp && name.isNotEmpty()) return Command.OpenApp(name)
+        }
+
         if (describe.matches(t)) return Command.Describe
         if (readView.matches(t)) return Command.ReadTextInView
 
@@ -181,6 +209,32 @@ object CommandParser {
 
         yesNo()?.let { return it }
         return Command.Ask(raw.trim())
+    }
+
+    /** Phone-control requests. Checked before app navigation so "open the Wi-Fi settings" is not the app's own settings. */
+    private fun deviceCommand(t: String, raw: String): Command? {
+        val words = t.split(' ').size
+        if (date.matches(t)) return Command.Date
+        if (words <= 8 && battery.containsMatchIn(t) && !t.contains("settings") && !t.contains("parametres") && !t.contains("اعدادات")) return Command.Battery
+        if (timer.containsMatchIn(t)) return Command.SetTimer(DeviceParsing.parseDuration(t))
+        if (alarm.containsMatchIn(t)) return Command.SetAlarm(DeviceParsing.parseClock(t))
+        if (words <= 8 && notifications.containsMatchIn(t) && !t.contains("settings") && !t.contains("parametres")) return Command.ReadNotifications
+        if (words <= 8) {
+            if (sysWifi.containsMatchIn(t)) return Command.OpenSystemSettings(SettingsKind.WIFI)
+            if (sysBt.containsMatchIn(t)) return Command.OpenSystemSettings(SettingsKind.BLUETOOTH)
+            if (sysA11y.containsMatchIn(t)) return Command.OpenSystemSettings(SettingsKind.ACCESSIBILITY)
+            if (sysGeneral.containsMatchIn(t)) return Command.OpenSystemSettings(SettingsKind.GENERAL)
+            if (sysSound.containsMatchIn(t)) return Command.OpenSystemSettings(SettingsKind.SOUND)
+            if (sysDisplay.containsMatchIn(t)) return Command.OpenSystemSettings(SettingsKind.DISPLAY)
+            if (sysLocation.containsMatchIn(t)) return Command.OpenSystemSettings(SettingsKind.LOCATION)
+        }
+        call.find(t)?.let { m ->
+            val target = m.groupValues[1].trim()
+            // keep the original digits/spelling for numbers and names
+            val rawTarget = DeviceParsing.extractPhoneNumber(raw) ?: target
+            if (target.isNotEmpty() && target !in setOf("me", "moi", "it")) return Command.Call(rawTarget)
+        }
+        return null
     }
 
     /**

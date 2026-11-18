@@ -77,6 +77,19 @@ fun SettingsScreen(graph: AppGraph) {
             SwitchRow(stringResource(R.string.settings_offline_stt), st.preferOfflineStt) { on -> graph.settings.update { it.copy(preferOfflineStt = on) } }
             SwitchRow(stringResource(R.string.settings_barge_in), st.bargeIn) { on -> graph.settings.update { it.copy(bargeIn = on) } }
             SwitchRow(stringResource(R.string.settings_handsfree) + ". " + stringResource(R.string.settings_handsfree_desc), st.handsFree) { on -> c.setHandsFree(on) }
+            SwitchRow(stringResource(R.string.settings_auto_lang), st.autoLanguage) { on -> graph.settings.update { it.copy(autoLanguage = on) } }
+
+            Section(stringResource(R.string.settings_notif_access))
+            var notifGranted by remember { mutableStateOf(graph.devices.notificationAccessGranted()) }
+            // Re-check when the user comes back from Android settings.
+            androidx.lifecycle.compose.LifecycleResumeEffect(Unit) {
+                notifGranted = graph.devices.notificationAccessGranted()
+                onPauseOrDispose { }
+            }
+            BigButton(
+                stringResource(if (notifGranted) R.string.settings_notif_access_on else R.string.settings_notif_access_off),
+                { graph.devices.openNotificationAccessSettings() }, Modifier.fillMaxWidth(), emphasized = !notifGranted,
+            )
 
             Section(stringResource(R.string.settings_backend))
             val colors = OutlinedTextFieldDefaults.colors(

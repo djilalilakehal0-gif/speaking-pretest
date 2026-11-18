@@ -37,6 +37,7 @@ class AndroidSpeechListener(private val context: Context) : SpeechListener {
                 cont.resume(SttResult.Failed(SttError.UNAVAILABLE)); return@suspendCancellableCoroutine
             }
             var finished = false
+            var detected: Lang? = null
             fun finish(r: SttResult) {
                 if (finished) return
                 finished = true
@@ -50,13 +51,20 @@ class AndroidSpeechListener(private val context: Context) : SpeechListener {
                 override fun onBufferReceived(buffer: ByteArray?) {}
                 override fun onEndOfSpeech() {}
                 override fun onEvent(eventType: Int, params: Bundle?) {}
+                // Android 14+: the recognizer tells us which language it heard (only called on API 34+).
+                override fun onLanguageDetection(results: Bundle) {
+                    if (Build.VERSION.SDK_INT < 34) return
+                    val level = results.getInt(SpeechRecognizer.LANGUAGE_DETECTION_CONFIDENCE_LEVEL, 0)
+                    if (level < SpeechRecognizer.LANGUAGE_DETECTION_CONFIDENCE_LEVEL_CONFIDENT) return
+                    detected = langOf(results.getString(SpeechRecognizer.DETECTED_LANGUAGE))
+                }
                 override fun onPartialResults(partialResults: Bundle?) {
                     partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()?.let(onPartial)
                 }
                 override fun onResults(results: Bundle?) {
                     val list = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).orEmpty()
                     val best = list.firstOrNull()?.trim().orEmpty()
-                    finish(if (best.isEmpty()) SttResult.Failed(SttError.NO_SPEECH) else SttResult.Heard(best, list.drop(1)))
+                    finish(if (best.isEmpty()) SttResult.Failed(SttError.NO_SPEECH) else SttResult.Heard(best, list.drop(1), detected))
                 }
                 override fun onError(error: Int) = finish(SttResult.Failed(mapError(error)))
             })
@@ -73,6 +81,13 @@ class AndroidSpeechListener(private val context: Context) : SpeechListener {
                 putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
                 putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, preferOffline)
                 putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
+                if (Build.VERSION.SDK_INT >= 34) {
+                    // Lets supporting recognizers detect French/Arabic/English and transcribe in the language actually spoken.
+                    putExtra(RecognizerIntent.EXTRA_ENABLE_LANGUAGE_DETECTION, true)
+                    putStringArrayListExtra(RecognizerIntent.EXTRA_LANGUAGE_DETECTION_ALLOWED_LANGUAGES, DETECT_TAGS)
+                    putExtra(RecognizerIntent.EXTRA_ENABLE_LANGUAGE_SWITCH, RecognizerIntent.LANGUAGE_SWITCH_BALANCED)
+                    putStringArrayListExtra(RecognizerIntent.EXTRA_LANGUAGE_SWITCH_ALLOWED_LANGUAGES, DETECT_TAGS)
+                }
             }
             recognizer.startListening(intent)
         }
@@ -86,6 +101,12 @@ class AndroidSpeechListener(private val context: Context) : SpeechListener {
     } catch (e: Exception) { null }
 
     companion object {
+        private val DETECT_TAGS = arrayListOf("en-US", "fr-FR", "ar-SA")
+
+        fun langOf(tag: String?): Lang? = when (tag?.lowercase()?.take(2)) {
+            "en" -> Lang.EN; "fr" -> Lang.FR; "ar" -> Lang.AR; else -> null
+        }
+
         fun mapError(code: Int): SttError = when (code) {
             SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> SttError.NO_SPEECH
             SpeechRecognizer.ERROR_NETWORK, SpeechRecognizer.ERROR_NETWORK_TIMEOUT, SpeechRecognizer.ERROR_SERVER -> SttError.NETWORK

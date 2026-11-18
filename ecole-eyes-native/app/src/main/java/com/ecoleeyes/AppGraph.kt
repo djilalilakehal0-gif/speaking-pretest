@@ -13,6 +13,7 @@ import com.ecoleeyes.core.L10n
 import com.ecoleeyes.core.SettingsStore
 import com.ecoleeyes.data.AppDatabase
 import com.ecoleeyes.data.HistoryRepository
+import com.ecoleeyes.device.AndroidDeviceActions
 import com.ecoleeyes.docs.DocIndex
 import com.ecoleeyes.docs.DocumentLoader
 import com.ecoleeyes.vision.CameraHub
@@ -45,6 +46,8 @@ class AppGraph(app: Application) {
         brain.oneShot("You transcribe text from photographs for a blind reader. Output only the transcription.", Prompt.transcribe(lang), jpeg, 1500)
     })
 
+    val devices = AndroidDeviceActions(app)
+
     val controller = AssistantController(
         context = app,
         scope = scope,
@@ -61,6 +64,7 @@ class AppGraph(app: Application) {
         volume = VolumeControl(app),
         connectivity = connectivity,
         loaderFactory = { env -> DocumentLoader(app, ocr, env) },
+        device = devices,
         serviceControl = { on -> if (on) ListeningService.start(app) else ListeningService.stop(app) },
     )
 }

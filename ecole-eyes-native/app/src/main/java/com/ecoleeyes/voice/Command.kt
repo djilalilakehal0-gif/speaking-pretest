@@ -1,6 +1,8 @@
 package com.ecoleeyes.voice
 
 import com.ecoleeyes.core.Lang
+import com.ecoleeyes.device.ClockTime
+import com.ecoleeyes.device.SettingsKind
 
 enum class Screen { HOME, ASSISTANT, CAMERA, DOCUMENTS, FILES, SETTINGS, PRIVACY }
 
@@ -42,6 +44,19 @@ sealed interface Command {
     data object No : Command
     /** "next" with no object: next search result or next page depending on context. */
     data object Next : Command
+
+    // ---- phone control (public Android intents only; calls are confirmed aloud first) ----
+    data object Date : Command
+    data object Battery : Command
+    data class OpenApp(val name: String) : Command
+    /** [time] null = the user did not say a time we understood: ask for it. */
+    data class SetAlarm(val time: ClockTime?) : Command
+    /** [seconds] null = ask for the duration. */
+    data class SetTimer(val seconds: Int?) : Command
+    /** [target] is a contact name or spoken digits. */
+    data class Call(val target: String) : Command
+    data object ReadNotifications : Command
+    data class OpenSystemSettings(val kind: SettingsKind) : Command
     /** Free-form request for the AI (tools may still be used). [wake] is true if it began with the wake phrase. */
     data class Ask(val text: String) : Command
 }
