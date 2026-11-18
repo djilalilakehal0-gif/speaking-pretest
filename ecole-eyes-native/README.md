@@ -76,7 +76,29 @@ echo "sdk.dir=$ANDROID_HOME" > local.properties
 adb install -r app/build/outputs/apk/debug/app-arm64-v8a-debug.apk     # armeabi-v7a for old 32-bit phones, x86_64 for emulators
 ```
 
-### 1. Deploy the AI backend (keeps the API key off the phone)
+### Make the app work online (automatic, no command line)
+
+GitHub deploys the backend and builds an app connected to it. Once:
+
+1. **AI key** — console.anthropic.com → *API keys* → create a key. In *Settings → Limits* set a monthly spending limit.
+2. **Cloudflare token** — dash.cloudflare.com → open *Workers & Pages* once (this creates your `workers.dev` address) →
+   *My Profile → API Tokens → Create Token* → template **Edit Cloudflare Workers** → create and copy the token.
+3. **GitHub secrets** — this repository → *Settings → Secrets and variables → Actions → New repository secret*:
+   | Name | Value |
+   |---|---|
+   | `CLOUDFLARE_API_TOKEN` | the Cloudflare token |
+   | `ANTHROPIC_API_KEY` | the AI key |
+   | `ECOLE_EYES_APP_TOKEN` | any long random text (the app and the backend share it) |
+   | `CLOUDFLARE_ACCOUNT_ID` | only if your Cloudflare login has several accounts |
+4. **Run it** — merge to `main`, or *Actions → Build ÉCOLE EYES (native Android) → Run workflow*. The run deploys the
+   Worker, stores its secrets, checks it answers (without calling the AI), then builds the app with its address. The
+   address appears in the run summary.
+5. **Install** — download `EcoleEyes.apk` from *Releases*. On first launch answer "yes" to cloud assistance.
+
+Rotate a key: update the GitHub secret and run the workflow again. Stop all AI spending at once: Cloudflare →
+the `ecole-eyes-proxy` Worker → *Settings → Variables* → add `DISABLED` = `true`.
+
+### 1. Deploy the AI backend by hand (alternative)
 
 ```bash
 cd backend && npm install

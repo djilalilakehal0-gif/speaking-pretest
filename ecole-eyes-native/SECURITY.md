@@ -61,19 +61,21 @@ checklist items apply (see "Not applicable" below).
       branch). This does not undo the exposure. Do not replace the key: phones that installed the app from GitHub could no
       longer update. Before publishing on Google Play, enrol in **Play App Signing** so Google holds the app key and the
       upload key can be reset if it is ever compromised.
-2. **Spending cap:** set a monthly limit and a budget e-mail alert in the AI provider console (Anthropic: Settings →
+2. **Go online:** add `CLOUDFLARE_API_TOKEN`, `ANTHROPIC_API_KEY` and `ECOLE_EYES_APP_TOKEN` as repository secrets
+   (README, "Make the app work online"); the native workflow deploys and checks the Worker on each push to `main`.
+3. **Spending cap:** set a monthly limit and a budget e-mail alert in the AI provider console (Anthropic: Settings →
    Limits; OpenAI-compatible providers have an equivalent).
-3. **Alerts:** Cloudflare → Notifications → add alerts for Worker error rate / request spikes. Set `DISABLED=true` in the
+4. **Alerts:** Cloudflare → Notifications → add alerts for Worker error rate / request spikes. Set `DISABLED=true` in the
    Worker variables to stop all AI traffic immediately if spending looks wrong.
-4. **Rotate `APP_TOKEN`** whenever you suspect abuse (`npx wrangler secret put APP_TOKEN`, then rebuild the app).
-5. **Switch on Play Integrity** (the code is ready):
+5. **Rotate `APP_TOKEN`** whenever you suspect abuse (`npx wrangler secret put APP_TOKEN`, then rebuild the app).
+6. **Switch on Play Integrity** (the code is ready):
    1. Play Console → App integrity → link a Google Cloud project; note its **project number**.
    2. In that project enable the *Google Play Integrity API*, create a service account, download its JSON key.
    3. `npx wrangler secret put GOOGLE_SERVICE_ACCOUNT` (paste the JSON) and set `INTEGRITY_MODE = "monitor"`.
    4. Build the app with `-PecoleEyesCloudProjectNumber=<project number>` (or the repo variable in CI).
    5. When the logs show `"integrity":"ok"` for real users, set `INTEGRITY_MODE = "enforce"`. APKs installed from GitHub
       Releases are not "Play recognized": keep `INTEGRITY_ALLOW_SIDELOAD = "true"` while you still distribute them.
-6. **Turn on the daily cap and alerts:** `npx wrangler kv namespace create USAGE`, uncomment the binding and limits in
+7. **Turn on the daily cap and alerts:** `npx wrangler kv namespace create USAGE`, uncomment the binding and limits in
    `wrangler.toml`, `npx wrangler secret put ALERT_WEBHOOK_URL` (a Slack or Discord incoming webhook).
 
 ## Re-run the audit

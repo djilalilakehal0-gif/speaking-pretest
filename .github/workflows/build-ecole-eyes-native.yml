@@ -3,7 +3,11 @@ name: Build ÉCOLE EYES (native Android)
 # Tests + lint + APK for the native Kotlin app in ecole-eyes-native/.
 # On pushes to main it also builds a signed release APK + AAB (needs the KEYSTORE_PASSWORD secret and the
 # keystore, exactly like the other apps in this repository) and publishes the APK to GitHub Releases.
-# AI backend address/token (optional, baked into the build):  repo variable ECOLE_EYES_BACKEND_URL, secret ECOLE_EYES_APP_TOKEN.
+# Online AI: on pushes to main (or "Run workflow") the deploy-backend job deploys the Cloudflare Worker in
+# ecole-eyes-native/backend, sets its secrets, checks it answers, and passes its address to the app build.
+# Repository secrets: CLOUDFLARE_API_TOKEN, ANTHROPIC_API_KEY, ECOLE_EYES_APP_TOKEN (optional CLOUDFLARE_ACCOUNT_ID).
+# Without them the app is still built and works on the phone only. A fixed address can also be given in the
+# repository variable ECOLE_EYES_BACKEND_URL.
 
 on:
   push:
@@ -26,7 +30,86 @@ jobs:
         with: { node-version: 22 }
       - run: npm test
 
+  deploy-backend:
+    name: Deploy AI backend (Cloudflare Worker)
+    needs: backend
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: ecole-eyes-native/backend } }
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      APP_TOKEN: ${{ secrets.ECOLE_EYES_APP_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+
+      - name: Check configuration
+        id: cfg
+        run: |
+          missing=""
+          [ -n "$CLOUDFLARE_API_TOKEN" ] || missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -n "$ANTHROPIC_API_KEY" ] || missing="$missing ANTHROPIC_API_KEY"
+          [ -n "$APP_TOKEN" ] || missing="$missing ECOLE_EYES_APP_TOKEN"
+          if [ -n "$missing" ]; then
+            echo "::warning::AI backend not deployed (the app will work on the phone only). Missing repository secrets:$missing. See ecole-eyes-native/README.md, 'Make the app work online'."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.cfg.outputs.ready == 'true'
+        run: npm ci --ignore-scripts
+
+      - name: Deploy the Worker
+        id: deploy
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          out=$(npx wrangler deploy 2>&1) || { echo "$out"; exit 1; }
+          echo "$out"
+          url=$(echo "$out" | grep -oE 'https://[a-z0-9.-]+\.workers\.dev' | head -1)
+          if [ -z "$url" ]; then
+            echo "::error::Deployed, but Cloudflare printed no workers.dev address. Open Cloudflare > Workers & Pages once to create your workers.dev subdomain, then run this workflow again."
+            exit 1
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "### AI backend: $url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Store the Worker secrets
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          f="$RUNNER_TEMP/worker-secrets.json"
+          node -e 'process.stdout.write(JSON.stringify({ ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY, APP_TOKEN: process.env.APP_TOKEN }))' > "$f"
+          npx wrangler secret bulk "$f"; status=$?
+          rm -f "$f"
+          exit $status
+
+      - name: Check the backend answers (no AI call, no cost)
+        if: steps.cfg.outputs.ready == 'true'
+        env:
+          URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          code() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
+          for i in 1 2 3 4 5 6; do   # new secrets can take a few seconds to reach every Cloudflare location
+            health=$(curl -s "$URL/")
+            nok=$(code -X POST "$URL/v1/messages" -H 'content-type: application/json' -d '{}')
+            withtok=$(code -X POST "$URL/v1/messages" -H 'content-type: application/json' -H "x-app-token: $APP_TOKEN" -d '{}')
+            echo "health='$health' without token=$nok with token=$withtok"
+            # 401 without the app token; 400 with it (token accepted, invalid body refused before reaching the AI)
+            if echo "$health" | grep -q 'proxy OK' && [ "$nok" = 401 ] && [ "$withtok" = 400 ]; then echo "Backend OK"; exit 0; fi
+            sleep 10
+          done
+          echo "::error::The backend did not answer as expected (see the codes above). 500 usually means a secret is missing."
+          exit 1
+
   android:
+    needs: deploy-backend
+    # Runs on pull requests too (deploy-backend is skipped there).
+    if: ${{ !cancelled() && (needs.deploy-backend.result == 'success' || needs.deploy-backend.result == 'skipped') }}
     runs-on: ubuntu-latest
     defaults: { run: { working-directory: ecole-eyes-native } }
     steps:
@@ -69,7 +152,7 @@ jobs:
         if: github.event_name != 'pull_request'
         env:
           KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
-          BACKEND: ${{ vars.ECOLE_EYES_BACKEND_URL }}
+          BACKEND: ${{ needs.deploy-backend.outputs.url || vars.ECOLE_EYES_BACKEND_URL }}
           TOKEN: ${{ secrets.ECOLE_EYES_APP_TOKEN }}
         run: |
           ./gradlew assembleRelease bundleRelease \
