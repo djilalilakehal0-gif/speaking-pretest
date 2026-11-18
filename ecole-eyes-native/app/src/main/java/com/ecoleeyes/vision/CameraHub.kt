@@ -26,9 +26,15 @@ class CameraException(val reason: Reason, cause: Throwable? = null) : Exception(
 class CameraHub(private val context: Context) {
     private val _ready = MutableStateFlow(false)
     val ready: StateFlow<Boolean> = _ready.asStateFlow()
+    private val _error = MutableStateFlow<String?>(null)
+    /** Set when the camera could not be started (no camera, in use by another app, binding failed). Never silent. */
+    val error: StateFlow<String?> = _error.asStateFlow()
     @Volatile private var imageCapture: ImageCapture? = null
 
-    fun attach(capture: ImageCapture) { imageCapture = capture; _ready.value = true }
+    fun fail(reason: String) { imageCapture = null; _ready.value = false; _error.value = reason }
+    fun clearError() { _error.value = null }
+
+    fun attach(capture: ImageCapture) { imageCapture = capture; _error.value = null; _ready.value = true }
     fun detach() { imageCapture = null; _ready.value = false }
 
     suspend fun awaitReady(timeoutMs: Long): Boolean =

@@ -366,6 +366,28 @@ class ControllerTest {
         assertTrue(speaker.texts.contains(str(Lang.EN, R.string.err_cam_denied)))
     }
 
+    @Test fun open_camera_by_voice_asks_for_the_permission_aloud() = runCtl {
+        shadowOf(ctx).denyPermissions(Manifest.permission.CAMERA)
+        val c = controller(this)
+        c.submitText("open the camera"); advanceUntilIdle()
+        assertEquals(Screen.CAMERA, c.state.value.screen)
+        assertEquals(str(Lang.EN, R.string.say_opened_camera), speaker.texts[0])
+        assertEquals(str(Lang.EN, R.string.err_cam_why), speaker.texts[1])
+        c.onPermissionResult(Manifest.permission.CAMERA, false); advanceUntilIdle()
+        assertEquals(str(Lang.EN, R.string.err_cam_denied), speaker.texts.last())
+    }
+
+    @Test fun a_camera_that_fails_to_start_is_announced_aloud() = runCtl {
+        val cam = CameraHub(ctx)
+        val c = AssistantController(
+            ctx, this, settings, l10n, speaker, listener, brain, cam, OcrEngine(null), DocIndex(ctx), history, Feedback(ctx), VolumeControl(ctx),
+            Connectivity { online }, { env -> DocumentLoader(ctx, OcrEngine(null), env) }, device = device,
+        )
+        cam.fail("no camera"); advanceUntilIdle()
+        assertEquals(str(Lang.EN, R.string.err_cam_unavailable), speaker.texts.last())
+        assertEquals(null, cam.error.value)
+    }
+
     @Test fun reading_text_with_arabic_but_no_cloud_says_what_is_missing() = runCtl {
         settings.update { it.copy(lang = Lang.AR, consent = Consent.DENIED) }
         val c = controller(this)

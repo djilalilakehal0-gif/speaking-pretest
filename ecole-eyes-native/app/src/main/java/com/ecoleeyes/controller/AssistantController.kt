@@ -157,6 +157,8 @@ class AssistantController(
     init {
         speaker.speaking.onEach { refreshPhase() }.launchIn(scope)
         settings.state.onEach { speaker.setRate(it.speechRate); speaker.setVolume(it.speechVolume) }.launchIn(scope)
+        // A camera that fails to start is always announced: the user cannot see an error on screen.
+        camera.error.onEach { if (it != null) { feedback.cue(Feedback.Cue.ERROR); say(s(R.string.err_cam_unavailable), record = false); camera.clearError() } }.launchIn(scope)
     }
 
     private val lang: Lang get() = settings.value.lang
@@ -676,6 +678,8 @@ class AssistantController(
             Screen.PRIVACY -> R.string.say_opened_privacy
         }
         say(s(msg), record = false)
+        // "Open the camera" must ask for the permission itself (with a spoken reason): a blind user cannot find a grant button.
+        if (screen == Screen.CAMERA) ensurePermission(Manifest.permission.CAMERA, R.string.err_cam_why, R.string.err_cam_denied)
         if (screen == Screen.DOCUMENTS || screen == Screen.FILES) {
             if (!docs.hasAccess()) { say(s(R.string.say_no_folder), record = false); _events.emit(UiEvent.PickFolder) }
             else { docs.refresh(); updateResults("") }

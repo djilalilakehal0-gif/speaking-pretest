@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -53,6 +54,12 @@ fun CameraScreen(graph: AppGraph) {
     val ctx = LocalContext.current
     var granted by remember { mutableStateOf(ContextCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted = it }
+    // The permission can be granted from elsewhere (the voice flow's system dialog): re-check whenever we come back.
+    LifecycleResumeEffect(Unit) {
+        granted = ContextCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        onPauseOrDispose { }
+    }
+    val camError by graph.camera.error.collectAsState()
 
     ScreenFrame(stringResource(R.string.screen_camera), onBack = { c.navigate(Screen.HOME) }) {
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -61,6 +68,9 @@ fun CameraScreen(graph: AppGraph) {
             ) {
                 if (granted) {
                     CameraPreview(graph)
+                    camError?.let {
+                        Text(stringResource(R.string.err_cam_unavailable), style = MaterialTheme.typography.bodyLarge, color = EeColors.OnDark, modifier = Modifier.padding(16.dp))
+                    }
                 } else {
                     Column(Modifier.padding(16.dp)) {
                         Text(stringResource(R.string.camera_permission_needed), style = MaterialTheme.typography.bodyLarge, color = EeColors.OnDark)
@@ -94,13 +104,20 @@ private fun CameraPreview(graph: AppGraph) {
             try {
                 val p = future.get()
                 provider = p
+                // Back camera first; phones/tablets/emulators without one fall back to whatever camera exists.
+                val selector = when {
+                    p.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA) -> CameraSelector.DEFAULT_BACK_CAMERA
+                    p.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA) -> CameraSelector.DEFAULT_FRONT_CAMERA
+                    else -> null
+                }
+                if (selector == null) { graph.camera.fail("no camera"); return@addListener }
                 val preview = Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
                 val capture = ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build()
                 p.unbindAll()
-                p.bindToLifecycle(lifecycle, CameraSelector.DEFAULT_BACK_CAMERA, preview, capture)
+                p.bindToLifecycle(lifecycle, selector, preview, capture)
                 graph.camera.attach(capture)
             } catch (e: Exception) {
-                graph.camera.detach()
+                graph.camera.fail(e.javaClass.simpleName + ": " + (e.message ?: ""))
             }
         }, ContextCompat.getMainExecutor(ctx))
         onDispose {
