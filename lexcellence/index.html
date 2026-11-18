@@ -272,6 +272,15 @@ body{background:#0a0708 var(--marble) 0 0/1600px auto;color:#f2e6cf}
 .reveal{display:none}
 .rings{background:repeating-radial-gradient(circle,rgba(232,182,83,.1) 0,rgba(232,182,83,.012) calc(40*var(--u)),rgba(232,182,83,.1) calc(80*var(--u)))}
 .arch{position:absolute;left:50%;top:calc(50% - 250*var(--u));width:calc(1010*var(--u));height:calc(560*var(--u));transform:translateX(-50%);border-radius:50% 50% 0 0/100% 100% 0 0;border:2px solid transparent;border-top-color:rgba(240,192,96,.7);pointer-events:none;box-shadow:0 -16px 50px -26px rgba(240,192,96,.55);-webkit-mask-image:linear-gradient(#000 20%,transparent 85%);mask-image:linear-gradient(#000 20%,transparent 85%)}
+.contact{position:absolute;z-index:58;left:calc(42*var(--n));bottom:calc(150*var(--u));display:flex;flex-direction:column;gap:calc(14*var(--n))}
+.cpill{display:flex;align-items:center;gap:calc(14*var(--n));width:max-content;min-width:calc(280*var(--n));padding:calc(8*var(--n)) calc(20*var(--n)) calc(8*var(--n)) calc(8*var(--n));border-radius:99px;border:1.6px solid #e8b653;background:linear-gradient(90deg,#5c0f20 0,#2c0812 62%,#16070b 100%);box-shadow:0 0 22px rgba(232,182,83,.22),inset 0 0 18px rgba(255,200,120,.07),0 8px 20px rgba(0,0,0,.5);color:#fff;text-decoration:none;transition:transform .3s var(--ease),box-shadow .3s}
+.cpill:hover{transform:translateX(4px);box-shadow:0 0 30px rgba(232,182,83,.4),inset 0 0 18px rgba(255,200,120,.1),0 8px 20px rgba(0,0,0,.5)}
+.ci{flex:none;display:grid;place-items:center;width:calc(46*var(--n));height:calc(46*var(--n));border-radius:50%;background:var(--goldg);color:#4a0c1b;box-shadow:0 0 12px rgba(232,182,83,.5)}
+.ci svg{width:52%;height:52%}
+.ct{position:relative;padding-left:calc(14*var(--n));display:flex;flex-direction:column;gap:2px}
+.ct::before{content:"";position:absolute;left:0;top:6%;bottom:6%;width:1.5px;background:linear-gradient(transparent,#e8b653,transparent)}
+.ct b{font:600 calc(20*var(--n))/1.15 Inter,sans-serif;letter-spacing:.01em;white-space:nowrap}
+.ct small{font:500 calc(14.5*var(--n))/1.2 Inter,sans-serif;opacity:.92;white-space:nowrap}
 .rib{position:absolute;pointer-events:none;z-index:0}
 .rib img{display:block;width:100%;height:auto}
 .ra{right:calc(24*var(--n));top:calc(20*var(--n));width:calc(236*var(--n))}
@@ -334,7 +343,7 @@ footer{background:#070405;color:rgba(232,182,83,.6)}
 #skip{color:#1c1a1f}
 @media (max-width:819px){
   
-  .rib,.arch{display:none}
+  .rib,.arch,.contact{display:none}
   .pill,.pill.light{left:50%;top:auto;bottom:calc(14px + var(--safe));transform:translateX(-50%);background:rgba(10,7,8,.72)}
   .pill a{height:34px;padding:0 14px;font-size:14.5px}
   #title{font-size:calc(58*var(--u))}
@@ -386,6 +395,10 @@ footer{background:#070405;color:rgba(232,182,83,.6)}
   <h1 id="title" class="disp" aria-live="polite"><span class="sr" id="titleSr">Mille-feuille</span></h1>
   <div id="count" class="disp" aria-hidden="true"><span>02</span></div>
   <button id="auto" type="button" aria-pressed="true"><span class="rg"><svg class="pa" viewBox="0 0 10 10"><rect x="1.6" y="1" width="2.3" height="8" rx="1.1" fill="#fff"/><rect x="6.1" y="1" width="2.3" height="8" rx="1.1" fill="#fff"/></svg><svg class="pl" viewBox="0 0 10 10"><path d="M2.5 1.3v7.4c0 .5.5.8.9.5l5.6-3.7a.6.6 0 0 0 0-1L3.4.8c-.4-.3-.9 0-.9.5z" fill="#fff"/></svg></span>Lecture auto</button>
+  <aside class="contact" aria-label="Contact">
+    <a class="cpill" href="tel:+33134759631"><span class="ci"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1z"/></svg></span><span class="ct"><b>+33 1 34 75 96 31</b></span></a>
+    <a class="cpill" href="https://www.google.com/maps/search/?api=1&amp;query=9+rue+Henri+Dunant+78130+Les+Mureaux+France" target="_blank" rel="noopener"><span class="ci"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg></span><span class="ct"><b>9 rue Henri Dunant</b><small>78130 Les Mureaux, France</small></span></a>
+  </aside>
 </section>
 
 <section id="inside" aria-label="Ce qu'il y a dedans">
