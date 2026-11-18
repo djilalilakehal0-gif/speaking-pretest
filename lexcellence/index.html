@@ -763,12 +763,14 @@ function startBgm() {
   if (p && p.then) p.then(() => { bgmOn = true; }).catch(() => { armBgm(); }); else bgmOn = true;
 }
 function armBgm() {
-  const go = () => { ['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach(t => removeEventListener(t, go, true)); if (vol > 0) startBgm(); };
-  ['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach(t => addEventListener(t, go, {capture: true, passive: true}));
+  const go = () => { ['pointerup', 'click', 'keydown', 'touchend'].forEach(t => removeEventListener(t, go, true)); if (vol > 0) startBgm(); };
+  ['pointerup', 'click', 'keydown', 'touchend'].forEach(t => addEventListener(t, go, {capture: true, passive: true}));
 }
 $('#volDn').addEventListener('click', () => setVol(vol - 0.1));
 $('#volUp').addEventListener('click', () => setVol(vol + 0.1));
 paintVol();
+volEl.hidden = false;
+if (vol > 0) { startBgm(); armBgm(); }
 document.addEventListener('visibilitychange', () => { if (document.hidden) bgm.pause(); else if (bgmOn && vol > 0) bgm.play().catch(() => {}); });
 
 addEventListener('keydown', e => { if (e.key === 'Escape') bLb.hidden = true; });
@@ -1318,7 +1320,7 @@ function enterHero() {
   intro.classList.add('gone'); document.body.classList.remove('locked');
   try { iv.pause(); } catch (_) {}
   nav.classList.add('in');
-  volEl.hidden = false; if (vol > 0) startBgm();
+  volEl.hidden = false;
   if (RM) {
     nav.style.transform = 'none';
     [rings, playBtn, countEl, autoBtn].forEach(e => e.style.opacity = 1);
