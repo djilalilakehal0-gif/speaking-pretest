@@ -456,7 +456,7 @@ footer{background:#070405;color:rgba(232,182,83,.6)}
   <div class="cards" id="cards"></div>
 </section>
 
-<section id="range" aria-label="Composez votre box de 3">
+<section id="range" aria-label="Composez votre box de 3" hidden style="display:none">
   <h2 class="b-h disp rv" id="bH"><span class="line"><span>Composez</span></span><span class="line"><span>la box <span class="three">3</span> &amp;</span></span><span class="line"><span>gagnez 1,49&nbsp;€</span></span></h2>
   <div class="glow" id="glow"></div>
   <div class="thumbs" id="thumbs"></div>
@@ -975,7 +975,7 @@ renderPack();
 
 /* ================= nav ================= */
 const navLinks = [...pill.querySelectorAll('a')], hl = pill.querySelector('.hl');
-const secs = ['#flavors', '#inside', '#shop', '#range'].map(s => $(s));
+const secs = ['#flavors', '#inside', '#shop'].map(s => $(s));
 let activeIdx = -1;
 function updateNav() {
   let a = 0;
@@ -986,7 +986,7 @@ function updateNav() {
   }
   const y = nav.offsetHeight / 2;
   const under = secs.findIndex(s => { const r = s.getBoundingClientRect(); return r.top <= y && r.bottom > y; });
-  nav.classList.toggle('dark', under === 3 || (under === -1 && scrollY > 100));
+  nav.classList.toggle('dark', under === -1 && scrollY > 100);
   nav.classList.toggle('compact', scrollY > 40);
   const py = isPhone() ? pill.getBoundingClientRect().top + 20 : y;
   const under2 = secs.findIndex(s => { const r = s.getBoundingClientRect(); return r.top <= py && r.bottom > py; });
