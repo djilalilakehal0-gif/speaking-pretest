@@ -21,12 +21,34 @@ def box(name, x, ytop, w, h, z0, z1, c):
 C = dict(wall='#eceff1', roof='#cfd8dc', slab='#b0bec5', base='#90a4ae',
          door='#78909c', rail='#f9a825', railcap='#e69500', frame='#f5f5f5',
          glass='#6f9bb5', sill='#cfd8dc', knob='#263238',
-         panel='#8fa4af', brass='#c9a227')
+         panel='#8fa4af', brass='#c9a227',
+         quoin='#dfe5e8', groove='#c5cdd2', tar='#6d7d86', coping='#b0bec5',
+         tank='#78909c', vent='#90a4ae')
 
 # ground, roof, walls
 box('base', 60, 566, 520, 30, -30, 320, C['base'])
 box('roof', 110, 90, 420, 26, -10, 210, C['roof'])
-box('roof_parapet', 110, 82, 420, 8, -10, 210, C['slab'])
+# roof: dark membrane, hollow parapet ring with coping, drip edge
+box('roof_tar', 120, 86, 400, 4, 0, 200, C['tar'])
+box('roof_drip', 106, 112, 428, 4, -14, 214, C['slab'])
+for nm, x, w, z0, z1 in [('pF', 110, 420, 200, 210), ('pB', 110, 420, -10, 0),
+                         ('pL', 110, 10, 0, 200), ('pR', 520, 10, 0, 200)]:
+    box('roof_' + nm, x, 74, w, 16, z0, z1, C['slab'])
+box('roof_copF', 107, 71, 426, 3, 198, 213, C['coping'])
+box('roof_copB', 107, 71, 426, 3, -13, 2, C['coping'])
+box('roof_copL', 107, 71, 15, 3, 0, 200, C['coping'])
+box('roof_copR', 518, 71, 15, 3, 0, 200, C['coping'])
+# rooftop stair-head, water tank on legs, vent pipes
+box('roof_stairhead', 150, 40, 90, 46, 30, 110, C['wall'])
+box('roof_stairhead_top', 146, 37, 98, 3, 26, 114, C['coping'])
+box('roof_stairhead_door', 180, 56, 30, 30, 110, 112, C['door'])
+for k, (lx, lz) in enumerate([(400, 40), (450, 40), (400, 90), (450, 90)]):
+    box(f'roof_tankleg{k}', lx, 66, 5, 20, lz, lz + 5, C['vent'])
+box('roof_tank', 395, 36, 65, 30, 35, 100, C['tank'])
+box('roof_tank_lid', 392, 33, 71, 3, 32, 103, C['coping'])
+for k, vx in enumerate([300, 330, 360]):
+    box(f'roof_vent{k}', vx, 62, 6, 24, 60, 66, C['vent'])
+    box(f'roof_vent{k}_cap', vx - 2, 59, 10, 3, 58, 68, C['coping'])
 
 
 def window(n, x, y, w=45, h=80):
@@ -82,6 +104,21 @@ def door(n, x, y, w=70, h=105):
     box(n + '_key', hx + 1.5, y + 59, 2, 3, 206.5, 207, C['railcap'])
 
 
+def side_window(n, face, zc, y, w=45, h=80):
+    x0 = 114 if face == 'L' else 520          # protrudes 6 from the side wall
+    gx = x0 + 4 if face == 'L' else x0         # glass flush against the wall
+    f = 4
+    z0 = zc - w / 2
+    box(n + '_glass', gx, y, 2, h, z0, z0 + w, C['glass'])
+    box(n + '_fT', x0, y - f, 6, f, z0 - f, z0 + w + f, C['frame'])
+    box(n + '_fB', x0, y + h, 6, f, z0 - f, z0 + w + f, C['frame'])
+    box(n + '_fL', x0, y, 6, h, z0 - f, z0, C['frame'])
+    box(n + '_fR', x0, y, 6, h, z0 + w, z0 + w + f, C['frame'])
+    box(n + '_mV', x0 + 1, y, 4, h, zc - 1.5, zc + 1.5, C['frame'])
+    box(n + '_mH', x0 + 1, y + h * 0.4 - 1.5, 4, 3, z0, z0 + w, C['frame'])
+    box(n + '_sill', x0 - 2, y + h + f, 10, 5, z0 - f - 5, z0 + w + f + 5, C['sill'])
+
+
 def railing_front(n, x0, x1, top, z):
     zf, zb = z - 2, z + 2       # 4-unit-thick plane around z
     # handrail (wide, flat), mid rail, bottom rail
@@ -122,6 +159,17 @@ for i, fy in enumerate([130, 280, 430]):
     box(n + '_wall', 120, fy - 14, 400, 150, 0, 200, C['wall'])
     window(n + '_winL', 155, fy + 10)
     window(n + '_winR', 440, fy + 10)
+    # wall details: corner pilasters, side windows, cornice dentils
+    box(n + '_quoinL', 120, fy - 14, 14, 150, 200, 204, C['quoin'])
+    box(n + '_quoinR', 506, fy - 14, 14, 150, 200, 204, C['quoin'])
+    for k, zc in enumerate([50, 150]):
+        side_window(f'{n}_swL{k}', 'L', zc, fy + 10)
+        side_window(f'{n}_swR{k}', 'R', zc, fy + 10)
+    # horizontal rustication grooves (ground floor) / floor-line band
+    if n == 'f1':
+        for k in range(11):
+            box(f'{n}_rust{k}', 134, fy - 14 + 12 * (k + 1), 372, 1.5, 200, 201, C['groove'])
+    box(n + '_band', 118, fy + 134, 404, 4, 200, 203, C['quoin'])
     door(n + '_door', 285, fy - 5)
     sy = fy + 116
     box(n + '_slab', 100, sy, 440, 12, 0, 250, C['slab'])
@@ -134,6 +182,18 @@ for i, fy in enumerate([130, 280, 430]):
     for k, px in enumerate([101, 539]):
         post(f'{n}_sidepost{k}', px, 201, top)
 
+# cornice dentils under the roof slab (front and both sides)
+x = 126
+k = 0
+while x < 514:
+    box(f'dent_f{k}', x, 116, 8, 7, 200, 210, C['quoin'])
+    x += 14
+    k += 1
+for k, z in enumerate(range(10, 196, 14)):
+    box(f'dent_l{k}', 114, 116, 6, 7, z, z + 8, C['quoin'])
+    box(f'dent_r{k}', 520, 116, 6, 7, z, z + 8, C['quoin'])
+# plinth around the ground-floor wall
+box('plinth', 116, 556, 408, 10, -4, 204, C['slab'])
 box('step2', 240, 542, 160, 24, 250, 280, C['roof'])
 box('step1', 260, 554, 120, 12, 280, 300, C['slab'])
 
