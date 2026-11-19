@@ -20,7 +20,8 @@ def box(name, x, ytop, w, h, z0, z1, c):
 
 C = dict(wall='#eceff1', roof='#cfd8dc', slab='#b0bec5', base='#90a4ae',
          door='#78909c', rail='#f9a825', railcap='#e69500', frame='#f5f5f5',
-         glass='#6f9bb5', sill='#cfd8dc', knob='#263238')
+         glass='#6f9bb5', sill='#cfd8dc', knob='#263238',
+         panel='#8fa4af', brass='#c9a227')
 
 # ground, roof, walls
 box('base', 60, 566, 520, 30, -30, 320, C['base'])
@@ -44,6 +45,41 @@ def window(n, x, y, w=45, h=80):
     # lintel above and projecting sill below
     box(n + '_lintel', x - f - 4, y - f - 5, w + 2 * f + 8, 5, 200, 209, C['sill'])
     box(n + '_sill', x - f - 5, y + h + f, w + 2 * f + 10, 5, 200, 212, C['sill'])
+
+
+def door(n, x, y, w=70, h=105):
+    f = 5                                   # frame thickness
+    # door leaf
+    box(n + '_leaf', x, y, w, h, 198, 205, C['door'])
+    # frame (top, left, right) + lintel + threshold step
+    box(n + '_fT', x - f, y - f, w + 2 * f, f, 198, 208, C['frame'])
+    box(n + '_fL', x - f, y, f, h, 198, 208, C['frame'])
+    box(n + '_fR', x + w, y, f, h, 198, 208, C['frame'])
+    box(n + '_lintel', x - f - 5, y - f - 5, w + 2 * f + 10, 5, 198, 210, C['sill'])
+    box(n + '_step', x - f - 3, y + h, w + 2 * f + 6, 16, 198, 212, C['sill'])
+    # raised panels: 2 columns x 3 rows (top row = glass)
+    pw, ph, gap, m = 23, 25, 6, 8
+    for r in range(3):
+        for c in range(2):
+            px = x + m + c * (pw + gap)
+            py = y + m + r * (ph + gap)
+            if r == 0:
+                box(f'{n}_glass{r}{c}', px, py, pw, ph, 205, 206, C['glass'])
+                box(f'{n}_gfr{r}{c}T', px - 2, py - 2, pw + 4, 2, 205, 207, C['frame'])
+                box(f'{n}_gfr{r}{c}B', px - 2, py + ph, pw + 4, 2, 205, 207, C['frame'])
+                box(f'{n}_gfr{r}{c}L', px - 2, py, 2, ph, 205, 207, C['frame'])
+                box(f'{n}_gfr{r}{c}R', px + pw, py, 2, ph, 205, 207, C['frame'])
+            else:
+                box(f'{n}_pan{r}{c}', px, py, pw, ph, 205, 207, C['panel'])
+    # hinges (left edge)
+    for k, hy in enumerate([y + 12, y + h - 22]):
+        box(f'{n}_hinge{k}', x, hy, 3, 10, 205, 207, C['knob'])
+    # handle: backplate, lever, keyhole
+    hx = x + w - 13
+    box(n + '_plate', hx, y + 46, 5, 18, 205, 206.5, C['knob'])
+    box(n + '_lever', hx - 8, y + 52, 13, 3, 206.5, 210, C['brass'])
+    box(n + '_stem', hx + 1, y + 50, 3, 7, 206.5, 210, C['brass'])
+    box(n + '_key', hx + 1.5, y + 59, 2, 3, 206.5, 207, C['railcap'])
 
 
 def railing_front(n, x0, x1, top, z):
@@ -86,8 +122,7 @@ for i, fy in enumerate([130, 280, 430]):
     box(n + '_wall', 120, fy - 14, 400, 150, 0, 200, C['wall'])
     window(n + '_winL', 155, fy + 10)
     window(n + '_winR', 440, fy + 10)
-    box(n + '_door', 285, fy - 5, 70, 105, 198, 205, C['door'])
-    box(n + '_knob', 343, fy + 48, 4, 4, 205, 208, C['knob'])
+    door(n + '_door', 285, fy - 5)
     sy = fy + 116
     box(n + '_slab', 100, sy, 440, 12, 0, 250, C['slab'])
     top = fy + 90
