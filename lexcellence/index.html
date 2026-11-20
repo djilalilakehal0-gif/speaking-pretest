@@ -433,7 +433,7 @@ footer{background:#070405;color:rgba(232,182,83,.6)}
 .menu-head h2{font-size:calc(120*var(--w));line-height:.9;background:var(--goldg);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;text-transform:none;padding-bottom:.06em}
 .menu-jump{display:flex;gap:calc(10*var(--w));flex-wrap:wrap;padding-bottom:calc(14*var(--w))}
 .menu-jump a{display:inline-flex;align-items:center;height:max(38px,calc(46*var(--w)));padding:0 calc(22*var(--w));border-radius:99px;border:1.5px solid rgba(232,182,83,.7);color:#f4dfae;text-decoration:none;font:600 calc(17*var(--w))/1 "Playfair Display",Georgia,serif;transition:background .25s,color .25s,border-color .25s}
-#cansView{position:fixed;inset:0;z-index:300;background:#1D1B1C;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}
+#cansView{position:fixed;inset:0;z-index:300;overscroll-behavior:contain;background:#1D1B1C;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}
 #cansView.open{opacity:1;visibility:visible;transition:opacity .45s ease}
 #cansFrame{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#1D1B1C}
 #cansClose{position:absolute;left:max(16px,env(safe-area-inset-left));top:calc(21px + env(safe-area-inset-top));z-index:2;display:flex;align-items:center;gap:8px;height:42px;padding:0 18px 0 13px;border-radius:99px;border:1.5px solid rgba(232,182,83,.75);background:rgba(10,7,8,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#f4dfae;font:600 15px/1 "Playfair Display",Georgia,serif;cursor:pointer;transition:background .25s,color .25s}
