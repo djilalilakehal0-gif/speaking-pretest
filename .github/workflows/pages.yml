@@ -122,8 +122,8 @@ jobs:
           cp maison-vell-runway/index.html maison-vell-runway/*.webp maison-vell-runway/*.png maison-vell-runway/*.mp4 maison-vell-runway/*.mp3 _site/maison-vell-runway/
 
       - name: Add the L'Excellence 3D soda can showcase
-        # A single static file (three.js loads from the jsDelivr CDN) plus its can texture atlas and logo background, served at /speaking-pretest/lexcellence/canettes/.
-        # The old /sunfizz/ address forwards to it.
+        # A single static file (three.js loads from the jsDelivr CDN) plus its can texture atlas and logo background, served at /speaking-pretest/lexcellence/canettes/ and shown inside the
+        # L'Excellence page (one link: /lexcellence/#canettes). Opened on its own, and from the old /sunfizz/ address, it forwards there.
         run: |
           mkdir -p _site/lexcellence/canettes _site/sunfizz
           cp lexcellence/canettes/index.html lexcellence/canettes/cans.jpg lexcellence/canettes/logo.png _site/lexcellence/canettes/
@@ -133,9 +133,9 @@ jobs:
           <meta name="viewport" content="width=device-width,initial-scale=1">
           <title>L'Excellence — Canettes</title>
           <meta name="robots" content="noindex">
-          <meta http-equiv="refresh" content="0; url=../lexcellence/canettes/">
-          <script>location.replace("../lexcellence/canettes/" + location.search + location.hash)</script>
-          </head><body><a href="../lexcellence/canettes/">L'Excellence — Canettes</a></body></html>
+          <meta http-equiv="refresh" content="0; url=../lexcellence/#canettes">
+          <script>location.replace("../lexcellence/#canettes")</script>
+          </head><body><a href="../lexcellence/#canettes">L'Excellence — Canettes</a></body></html>
           HTML
 
       - name: Redirect the old portfolio address to djilali.pages.dev

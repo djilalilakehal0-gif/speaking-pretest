@@ -433,6 +433,16 @@ footer{background:#070405;color:rgba(232,182,83,.6)}
 .menu-head h2{font-size:calc(120*var(--w));line-height:.9;background:var(--goldg);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;text-transform:none;padding-bottom:.06em}
 .menu-jump{display:flex;gap:calc(10*var(--w));flex-wrap:wrap;padding-bottom:calc(14*var(--w))}
 .menu-jump a{display:inline-flex;align-items:center;height:max(38px,calc(46*var(--w)));padding:0 calc(22*var(--w));border-radius:99px;border:1.5px solid rgba(232,182,83,.7);color:#f4dfae;text-decoration:none;font:600 calc(17*var(--w))/1 "Playfair Display",Georgia,serif;transition:background .25s,color .25s,border-color .25s}
+#cansView{position:fixed;inset:0;z-index:300;background:#1D1B1C;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}
+#cansView.open{opacity:1;visibility:visible;transition:opacity .45s ease}
+#cansFrame{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#1D1B1C}
+#cansClose{position:absolute;left:max(16px,env(safe-area-inset-left));top:calc(21px + env(safe-area-inset-top));z-index:2;display:flex;align-items:center;gap:8px;height:42px;padding:0 18px 0 13px;border-radius:99px;border:1.5px solid rgba(232,182,83,.75);background:rgba(10,7,8,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#f4dfae;font:600 15px/1 "Playfair Display",Georgia,serif;cursor:pointer;transition:background .25s,color .25s}
+#cansClose svg{width:18px;height:18px;flex:none}
+#cansClose:hover,#cansClose:focus-visible{background:var(--goldg);color:#2a1604}
+#cansClose:focus-visible{outline:3px solid #fff2c4;outline-offset:3px}
+html.cans-open,html.cans-open body{overflow:hidden}
+@media (max-width:600px){#cansClose{top:calc(13px + env(safe-area-inset-top));width:42px;padding:0;justify-content:center}#cansClose span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
+@media (prefers-reduced-motion:reduce){#cansView,#cansView.open,#cansClose{transition:none}}
 .dk-3dlink{display:flex;align-items:center;gap:12px;width:fit-content;max-width:100%;margin-top:16px;height:50px;padding:0 22px;border-radius:99px;border:1.5px solid rgba(232,182,83,.75);color:#f4dfae;text-decoration:none;font:600 16px/1.1 "Playfair Display",Georgia,serif;transition:background .25s,color .25s,border-color .25s}
 .dk-3dlink svg{width:20px;height:20px;flex:none}.dk-3dlink .go{width:16px;height:16px;transition:transform .25s}
 .dk-3dlink:hover,.dk-3dlink:focus-visible{background:var(--goldg);color:#2a1604;border-color:#fff2c4}.dk-3dlink:hover .go{transform:translateX(3px)}
@@ -678,7 +688,7 @@ footer{background:#070405;color:rgba(232,182,83,.6)}
   <header class="menu-head">
     <h2 class="disp">La carte</h2>
     <nav class="menu-jump" aria-label="Aller à une rubrique">
-      <a href="#m-pain">Boulangerie</a><a href="#m-burger">Burgers</a><a href="#m-boisson">Boissons</a><a href="canettes/" class="mj-3d">Canettes 3D</a>
+      <a href="#m-pain">Boulangerie</a><a href="#m-burger">Burgers</a><a href="#m-boisson">Boissons</a><a href="#canettes" class="mj-3d">Canettes 3D</a>
     </nav>
   </header>
   <article class="mp mp-bread" id="m-pain">
@@ -744,7 +754,7 @@ footer{background:#070405;color:rgba(232,182,83,.6)}
         </a>
       </div>
       <a class="mp-cta dk-cta" href="https://wa.me/33134759631?text=Bonjour%20L%27Excellence%2C%20je%20souhaite%20commander%20des%20boissons." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2.5l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L21 8H6.6"/><circle cx="10" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>Commander des boissons</a>
-      <a class="dk-3dlink" href="canettes/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8l1 2v13l-1 2H8l-1-2V6z"/><path d="M7 9h10M7 16h10"/></svg><span>Découvrir nos canettes en 3D</span><svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a>
+      <a class="dk-3dlink" href="#canettes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8l1 2v13l-1 2H8l-1-2V6z"/><path d="M7 9h10M7 16h10"/></svg><span>Découvrir nos canettes en 3D</span><svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a>
     </div>
   </article>
   <figure class="mp-banner" id="m-infos">
@@ -766,6 +776,9 @@ footer{background:#070405;color:rgba(232,182,83,.6)}
 
 <footer>Pâtisserie artisanale · Cuit chaque jour</footer>
 
+<div id="cansView" role="dialog" aria-modal="true" aria-label="Nos canettes en 3D" aria-hidden="true">
+  <button id="cansClose" type="button" aria-label="Retour au site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg><span>Retour</span></button>
+</div>
 <script type="module">
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -2040,6 +2053,7 @@ function css(el, k, v) { const c = el._c || (el._c = {}); if (c[k] !== v) { c[k]
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(100, now - last); last = now;
+  if (cansOpen) { requestAnimationFrame(frame); return; }
   // smooth scroll
   if (sTarget !== null) {
     sCur += (sTarget - sCur) * (1 - Math.exp(-dt / 120));
@@ -2213,6 +2227,45 @@ if (RM) enterHero(); else startIntro();
 document.addEventListener('visibilitychange', () => { if (!document.hidden) lastInteract = performance.now(); });
 initGL();
 requestAnimationFrame(frame);
+/* ================= canettes 3D: same page, same link (#canettes) ================= */
+var cansOpen = false;
+const cansView = $('#cansView');
+let cansFrame = null, cansMusic = false, cansPushed = false, cansUnload = 0;
+/* a fresh iframe each time: changing an iframe's address would add steps to the browser history */
+function openCans(push) {
+  if (cansOpen) return; cansOpen = true;
+  if (!entered) enterHero();
+  clearTimeout(cansUnload);
+  if (!cansFrame) {
+    cansFrame = document.createElement('iframe');
+    cansFrame.id = 'cansFrame'; cansFrame.title = 'Nos canettes en 3D'; cansFrame.allow = 'fullscreen'; cansFrame.tabIndex = 0;
+    cansFrame.src = 'canettes/';
+    cansView.appendChild(cansFrame);
+  }
+  document.documentElement.classList.add('cans-open');
+  cansView.classList.add('open'); cansView.setAttribute('aria-hidden', 'false');
+  cansMusic = !bgm.paused; if (cansMusic) bgm.pause();
+  if (push) { history.pushState({cans: 1}, '', '#canettes'); cansPushed = true; }
+  setTimeout(() => { try { cansFrame && cansFrame.focus(); } catch (_) {} }, 80);
+}
+function closeCans(fromHistory) {
+  if (!cansOpen) return; cansOpen = false;
+  cansView.classList.remove('open'); cansView.setAttribute('aria-hidden', 'true');
+  document.documentElement.classList.remove('cans-open');
+  if (cansMusic && vol > 0) bgm.play().catch(() => {});
+  cansUnload = setTimeout(() => { if (!cansOpen && cansFrame) { cansFrame.remove(); cansFrame = null; } }, 600); /* frees the second 3D scene */
+  if (!fromHistory) { if (cansPushed) history.back(); else history.replaceState(null, '', location.pathname + location.search); }
+  cansPushed = false;
+  lastInteract = performance.now(); glSig = "";
+  const back = document.querySelector('.dk-3dlink'); if (back) back.focus({preventScroll: true});
+}
+document.querySelectorAll('a[href="#canettes"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openCans(true); }));
+$('#cansClose').addEventListener('click', () => closeCans(false));
+addEventListener('keydown', e => { if (e.key === 'Escape' && cansOpen) closeCans(false); });
+addEventListener('message', e => { if (e.origin === location.origin && e.data && e.data.type === 'cans:close') closeCans(false); });
+addEventListener('popstate', () => { if (location.hash === '#canettes') openCans(false); else closeCans(true); });
+document.addEventListener('visibilitychange', () => { if (cansOpen && !document.hidden) bgm.pause(); });
+if (location.hash === '#canettes') openCans(false);
 </script>
 </body>
 </html>
