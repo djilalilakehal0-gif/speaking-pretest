@@ -97,7 +97,7 @@ jobs:
         # The old /stride/ address forwards to the new one, keeping any #section or ?query.
         run: |
           mkdir -p _site/lexcellence _site/stride
-          cp lexcellence/index.html lexcellence/intro.mp4 lexcellence/intro.webm _site/lexcellence/
+          cp lexcellence/index.html lexcellence/intro.mp4 lexcellence/intro.webm _site/lexcellence/ && cp -r lexcellence/bx _site/lexcellence/bx
           cat > _site/stride/index.html <<'HTML'
           <!doctype html>
           <html lang="fr"><head><meta charset="utf-8">
