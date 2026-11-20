@@ -95,9 +95,13 @@ body.intro-ui .nav{opacity:1;transform:none}
   .title{font-size:clamp(30px,4.4vw,48px)}
 }
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01s!important}}
+html.card,html.card body{overflow:hidden;background:#4a1216}
+html.card .nav,html.card #title,html.card #story,html.card .arr{display:none!important}
+html.card #track{height:100vh}
 </style>
 </head>
 <body>
+<script>if (/[?&]card\b/.test(location.search)) document.documentElement.classList.add('card');</script>
 <canvas id="gl" aria-label="3D soda cans"></canvas>
 
 <header class="nav">
@@ -207,6 +211,7 @@ const PAL = {
   mani:  ['#1D1B1C', '#1D1B1C', '#33261A', [.5, .42], .5, 1.8, 1, 0],
   line:  ['#1A1819', '#121011', '#5A3E22', [.3, .05], 0, 2, 0, .8]
 };
+if (document.documentElement.classList.contains('card')) PAL.hero = ['#5a161b', '#2e090c', '#8f2f22', [.5, .3], .55, 2.4, 0, 0];
 for (const k in PAL) { const p = PAL[k]; p[0] = hex3(p[0]); p[1] = hex3(p[1]); p[2] = hex3(p[2]); p[3] = new THREE.Vector2(...p[3]); }
 function mixPal(a, b, t, o) {
   o[0].lerpVectors(a[0], b[0], t); o[1].lerpVectors(a[1], b[1], t); o[2].lerpVectors(a[2], b[2], t); o[3].lerpVectors(a[3], b[3], t);
