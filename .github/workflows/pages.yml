@@ -93,11 +93,11 @@ jobs:
           cp dev/index.html _site/dev/
 
       - name: Add the L'Excellence pâtisserie 3D landing page
-        # A single static file (fonts, pastry cut-outs and storefront photo embedded; three.js from jsDelivr, sheet and intro clip from Higgsfield), served at /speaking-pretest/lexcellence/.
+        # The page (fonts, pastry cut-outs and photos embedded; three.js from jsDelivr, sheet from Higgsfield) plus its intro film (intro.mp4, with intro.webm as fallback), served at /speaking-pretest/lexcellence/.
         # The old /stride/ address forwards to the new one, keeping any #section or ?query.
         run: |
           mkdir -p _site/lexcellence _site/stride
-          cp lexcellence/index.html _site/lexcellence/
+          cp lexcellence/index.html lexcellence/intro.mp4 lexcellence/intro.webm _site/lexcellence/
           cat > _site/stride/index.html <<'HTML'
           <!doctype html>
           <html lang="fr"><head><meta charset="utf-8">

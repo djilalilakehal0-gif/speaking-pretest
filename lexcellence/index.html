@@ -336,6 +336,12 @@ body{background:#0a0708 var(--marble) 0 0/1600px auto;color:#f2e6cf}
 .slot .x{background:#0a0708;border-color:var(--gold);color:var(--gold)}
 footer{background:#070405;color:rgba(232,182,83,.6)}
 #skip{z-index:1;background:rgba(10,7,8,.55);border:1px solid rgba(232,182,83,.75);color:#f0c667}
+/* shown on the intro film only when the browser blocks sound until the first tap */
+#ivSound{position:absolute;z-index:1;left:50%;bottom:calc(30*var(--u) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:10px;height:44px;padding:0 22px;border-radius:99px;border:1px solid rgba(232,182,83,.8);background:rgba(10,7,8,.6);color:#f0c667;font:500 12px/1 "DM Mono",monospace;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+#ivSound[hidden]{display:none}
+#ivSound svg{width:18px;height:18px;flex:none}
+@media (prefers-reduced-motion:no-preference){#ivSound:not([hidden]){animation:ivPulse 1.8s ease-in-out infinite}}
+@keyframes ivPulse{50%{box-shadow:0 0 0 6px rgba(232,182,83,.18),0 0 22px rgba(232,182,83,.35)}}
 @media (max-width:819px){
   
   .rib,.arch,.floor,.cbar,.city{display:none}
@@ -565,6 +571,7 @@ footer{background:#070405;color:rgba(232,182,83,.6)}
   </video>
   
   <button id="skip" type="button">Passer l'intro</button>
+  <button id="ivSound" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>Activer le son</button>
 </div>
 
 <svg id="gframe" aria-hidden="true"><defs><linearGradient id="wgP" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a0"/><stop offset=".5" stop-color="#d9a243"/><stop offset="1" stop-color="#7d4c10"/></linearGradient><linearGradient id="wgS" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0bd"/><stop offset=".55" stop-color="#e6b456"/><stop offset="1" stop-color="#94601a"/></linearGradient><linearGradient id="wgC" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffadf"/><stop offset=".6" stop-color="#f0c96e"/><stop offset="1" stop-color="#b98327"/></linearGradient><linearGradient id="gfg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6d27a"/><stop offset=".5" stop-color="#c98a2b"/><stop offset="1" stop-color="#f3c96b"/></linearGradient><linearGradient id="gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".55" stop-color="#e8b653"/><stop offset="1" stop-color="#a8741f"/></linearGradient></defs><path id="gfh" fill="none" stroke="#e8b653" stroke-opacity=".2" stroke-width="8"/><path id="gfp" fill="none" stroke="url(#gfg)" stroke-width="2.4"/></svg>
@@ -1072,7 +1079,9 @@ oM.addEventListener('keydown', e => {
 addEventListener('keydown', e => { if (e.key === 'Escape') orderClose(); });
 
 /* background music: starts as the intro film appears (or on the first tap if the browser blocks autoplay) */
-const bgm = $('#bgm'), volEl = $('#vol'), volFill = $('#volFill');
+const bgm = $('#bgm'), volEl = $('#vol'), volFill = $('#volFill'), ivSound = $('#ivSound');
+bgm.addEventListener('playing', () => { ivSound.hidden = true; });
+ivSound.addEventListener('click', () => { ivSound.hidden = true; if (vol === 0) setVol(.5); else startBgm(); });
 let vol = 0.5, bgmOn = false;
 try { const sv = parseFloat(localStorage.getItem('lx-vol')); if (!isNaN(sv)) vol = Math.min(1, Math.max(0, sv)); } catch (_) {}
 function paintVol() { bgm.volume = vol; volFill.style.width = Math.round(vol * 100) + '%'; volEl.classList.toggle('m', vol === 0); try { localStorage.setItem('lx-vol', vol); } catch (_) {} }
@@ -1080,7 +1089,7 @@ function setVol(v) { vol = Math.round(Math.min(1, Math.max(0, v)) * 10) / 10; pa
 function startBgm() {
   if (bgmOn && !bgm.paused) return;
   const p = bgm.play();
-  if (p && p.then) p.then(() => { bgmOn = true; }).catch(() => { armBgm(); }); else bgmOn = true;
+  if (p && p.then) p.then(() => { bgmOn = true; }).catch(() => { armBgm(); if (!entered) ivSound.hidden = false; }); else bgmOn = true;
 }
 function armBgm() {
   const go = () => { ['pointerup', 'click', 'keydown', 'touchend'].forEach(t => removeEventListener(t, go, true)); if (vol > 0) startBgm(); };
@@ -2176,17 +2185,15 @@ function showLogo() {
   enterHero();
 }
 function startIntro() {
-  const play = () => {
-    if (started || logoShown || entered) return;
-    const pr = iv.play();
-    if (pr && pr.then) pr.then(() => { started = true; }).catch(() => showLogo()); else started = true;
-  };
-  iv.addEventListener('playing', () => { if (!entered && vol > 0) startBgm(); }, {once: true});
-  if (iv.readyState >= 3) play(); else iv.addEventListener('canplay', play, {once: true});
+  iv.muted = true;
+  iv.addEventListener('playing', () => { started = true; if (!entered && vol > 0) startBgm(); }, {once: true});
+  /* ask for playback at once: iPhones only start loading a video when play() is called */
+  const pr = iv.play();
+  if (pr && pr.catch) pr.catch(e => { if (!e || e.name !== 'AbortError') showLogo(); });
   iv.addEventListener('ended', showLogo); iv.addEventListener('error', showLogo);
   const lastSrc = iv.querySelector('source:last-of-type'); if (lastSrc) lastSrc.addEventListener('error', showLogo);
-  setTimeout(() => { if (!started) showLogo(); }, 4500);
-  setTimeout(enterHero, 14000);
+  setTimeout(() => { if (!started) showLogo(); }, 6000);
+  setTimeout(enterHero, 15000);
 }
 $('#skip').addEventListener('click', enterHero);
 
