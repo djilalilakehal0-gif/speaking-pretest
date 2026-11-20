@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>if (window.top === window) location.replace("../#canettes");</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>L'EXCELLENCE — Ice Cold Cans</title>
 <meta name="description" content="L'EXCELLENCE — an interactive 3D soda can showcase. Spin the cans, read the back, chill the lineup.">
@@ -23,6 +24,7 @@
   --sc:#E25B45;--sg:rgba(226,91,69,.55);
 }
 *{box-sizing:border-box;margin:0;padding:0}
+html{overscroll-behavior:none}
 html,body{background:#1D1B1C;color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
 button:focus-visible{outline:2px solid var(--cream);outline-offset:4px}
@@ -476,6 +478,10 @@ setStep(0, true);
 /* ───────────── scroll / carousel input ───────────── */
 const maxScroll = () => document.documentElement.scrollHeight - innerHeight;
 const goY = y => scrollTo({ top: clamp(y * innerHeight, 0, maxScroll()), behavior: 'instant' });
+const EMBED = window.top !== window;
+const closeView = () => parent.postMessage({ type: 'cans:close' }, location.origin);
+$('.logo').addEventListener('click', e => { if (EMBED) { e.preventDefault(); closeView(); } });
+if (EMBED) addEventListener('keydown', e => { if (e.key === 'Escape') closeView(); });
 icons.forEach((b, k) => b.onclick = () => goY(k === 3 ? 99 : .75 + 2.55 * ((k + .5) / 3)));
 
 let sx = scrollY, sv = 0, Y = sx / innerHeight;
