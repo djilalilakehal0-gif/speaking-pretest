@@ -2301,11 +2301,28 @@ if (location.hash === '#canettes') openCans(false);
 .bx-n button[aria-pressed="true"]{background:linear-gradient(170deg,#fff0bd,#e6b456 55%,#b57d22);color:#1a1006;border-color:transparent}
 #openBurgers{position:relative}
 #openBurgers::after{content:"Voir en 3D";position:absolute;right:14px;bottom:14px;padding:8px 14px;border-radius:99px;background:rgba(20,8,8,.7);border:1px solid rgba(232,182,83,.75);color:#e8b653;font:500 11px/1 "DM Mono",monospace;letter-spacing:.16em;text-transform:uppercase;backdrop-filter:blur(6px)}
+#bxS{position:absolute;z-index:1;pointer-events:none;opacity:0;transform:translate3d(0,46px,0);transition:opacity .55s ease,transform .9s cubic-bezier(.16,.84,.24,1)}
+#bx:not(.img) #bxS{display:none}
+#bx.img #bxC{display:none}
+#bx.img .bx-f em{visibility:hidden}
+#bxS.in{opacity:1;transform:none}
+.bx-pc{position:absolute;transform:translate3d(0,var(--o),0);transition:transform 1.3s cubic-bezier(.18,.86,.22,1) var(--d);will-change:transform;backface-visibility:hidden}
+#bxS.go .bx-pc{transform:translate3d(0,0,0)}
+.bx-pc img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
+#bxS.go .bx-pc img{animation:bxf 5.5s ease-in-out calc(var(--d) + 1.3s) infinite}
+@keyframes bxf{50%{transform:translate3d(0,-4px,0)}}
+.bx-lb{position:absolute;display:flex;align-items:center;transform:translate3d(-8px,-50%,0);opacity:0;transition:opacity .6s ease,transform .6s ease;transition-delay:calc(var(--d) + .75s)}
+#bxS.go .bx-lb{opacity:1;transform:translate3d(0,-50%,0)}
+.bx-lb b{position:relative;display:block;height:1px;margin-right:12px;background:linear-gradient(90deg,rgba(232,182,83,.2),#e8b653)}
+.bx-lb b::before{content:"";position:absolute;left:-4px;top:-3.5px;width:8px;height:8px;border-radius:50%;background:#ffe7a0;box-shadow:0 0 10px 2px rgba(232,182,83,.8)}
+.bx-lb span{font:700 clamp(12.5px,1.45vw,20px)/1 "Playfair Display",Georgia,serif;color:#fbe9bd;white-space:nowrap;text-shadow:0 2px 12px rgba(0,0,0,.85)}
+@media (max-width:699px){.bx-lb b{margin-right:6px}.bx-lb span{font-size:11px}}
+@media (prefers-reduced-motion:reduce){.bx-pc,.bx-lb,#bxS{transition-duration:.01s!important}.bx-pc img{animation:none!important}}
 </style>
 <div id="bx" hidden role="dialog" aria-modal="true" aria-labelledby="bxT">
   <canvas id="bxC" aria-hidden="true"></canvas>
   <div class="bx-h"><small>Ingrédients · vue 3D</small><h3 id="bxT"></h3><p id="bxD"></p></div>
-  <div id="bxL" aria-live="polite"></div>
+  <div id="bxS"></div><div id="bxL" aria-live="polite"></div>
   <button id="bxX" type="button" aria-label="Fermer">×</button>
   <div class="bx-f"><div class="bx-n" id="bxN" role="group" aria-label="Choisir un produit"></div><a id="bxO" href="#" target="_blank" rel="noopener">Commander</a><em>Glissez pour tourner</em></div>
 </div>
@@ -2538,15 +2555,47 @@ function frame(now) {
   layers.forEach((L, i) => { const [sx, sy, o] = pts[i]; L.el.style.opacity = o; L.el.style.transform = `translate(${sx.toFixed(1)}px,${(sy - 1).toFixed(1)}px) translateY(-50%)`; L.el.style.left = (Math.min(sx, colX - 10) - sx).toFixed(1) + 'px'; L.line.style.width = Math.max(10, colX - sx) * (.4 + .6 * o) + 'px'; });
   R.render(scene, cam);
 }
+const IMGS = {"Sandwich Végétarien":{"w":549,"layers":[{"f":"p0_0.webp","x":34,"y":100,"w":458,"h":91,"labs":[["Pain baguette",155]]},{"f":"p0_1.webp","x":47,"y":192,"w":426,"h":57,"labs":[["Carottes râpées",221]]},{"f":"p0_2.webp","x":66,"y":250,"w":407,"h":36,"labs":[["Concombre",269]]},{"f":"p0_3.webp","x":55,"y":290,"w":418,"h":44,"labs":[["Tomates",313]]},{"f":"p0_4.webp","x":12,"y":335,"w":514,"h":98,"labs":[["Salade",363],["Pain baguette",412]]}]},"Sandwich Thon":{"w":553,"layers":[{"f":"p1_0.webp","x":30,"y":100,"w":464,"h":92,"labs":[["Pain baguette",153]]},{"f":"p1_1.webp","x":115,"y":199,"w":339,"h":33,"labs":[["Olives noires",218]]},{"f":"p1_2.webp","x":66,"y":242,"w":415,"h":43,"labs":[["Tomates",266]]},{"f":"p1_3.webp","x":0,"y":286,"w":532,"h":150,"labs":[["Thon",313],["Salade",366],["Pain baguette",412]]}]},"Hot-Dog":{"w":344,"layers":[{"f":"p2_0.webp","x":8,"y":559,"w":321,"h":95,"labs":[["Pain hot-dog",610]]},{"f":"p2_1.webp","x":33,"y":665,"w":262,"h":32,"labs":[["Oignons croustillants",681]]},{"f":"p2_2.webp","x":39,"y":707,"w":248,"h":24,"labs":[["Moutarde",718]]},{"f":"p2_3.webp","x":18,"y":746,"w":302,"h":63,"labs":[["Saucisse grillée",773]]},{"f":"p2_4.webp","x":13,"y":817,"w":310,"h":74,"labs":[["Pain hot-dog",857]]}]},"Burger Bœuf":{"w":323,"layers":[{"f":"p3_0.webp","x":31,"y":538,"w":244,"h":90,"labs":[["Brioche au sésame",595]]},{"f":"p3_1.webp","x":50,"y":632,"w":213,"h":34,"labs":[["Oignons rouges",651]]},{"f":"p3_2.webp","x":49,"y":668,"w":218,"h":39,"labs":[["Tomates fraîches",688]]},{"f":"p3_3.webp","x":10,"y":708,"w":278,"h":104,"labs":[["Cheddar fondant",731],["Steak de bœuf grillé",775]]},{"f":"p3_4.webp","x":0,"y":813,"w":295,"h":92,"labs":[["Salade croquante",820],["Pain brioche",866]]}]},"Burger Poulet":{"w":337,"layers":[{"f":"p4_0.webp","x":31,"y":535,"w":255,"h":108,"labs":[["Brioche au sésame",598]]},{"f":"p4_1.webp","x":48,"y":644,"w":249,"h":45,"labs":[["Tomates fraîches",658]]},{"f":"p4_2.webp","x":16,"y":690,"w":280,"h":100,"labs":[["Cheddar fondant",707],["Poulet croustillant",755]]},{"f":"p4_3.webp","x":0,"y":791,"w":310,"h":114,"labs":[["Salade croquante",810],["Pain brioche",862]]}]}};
+const stage = $b('bxS'); let imgName = null, imgTm = 0;
+const preload = () => { if (preload.done) return; preload.done = 1; Object.values(IMGS).forEach(d => d.layers.forEach(L => { const i = new Image(); i.src = 'bx/' + L.f; })); };
+function showImg(name, instant) {
+  imgName = name; clearTimeout(imgTm);
+  const d = IMGS[name], Ls = d.layers, top = Ls[0].y, last = Ls[Ls.length - 1], vw = innerWidth, vh = innerHeight, mob = vw < 700;
+  const GAP = mob ? 16 : 10, labW = mob ? 104 : 270, span = last.y + last.h - top + GAP * (Ls.length - 1);
+  const s = Math.min(mob ? 1 : 1.32, (vh - (mob ? 330 : 300)) / span, (vw - labW - (mob ? 22 : 140)) / d.w);
+  const sw = d.w * s, sh = span * s, colX = sw + (mob ? 8 : 34);
+  stage.style.cssText = `width:${sw}px;height:${sh}px;left:${Math.max(mob ? 8 : 14, (vw - sw - labW) / 2)}px;top:${mob ? 150 + Math.max(0, (vh - 330 - sh) / 2) : Math.max(150, (vh - sh) / 2 - 30)}px`;
+  stage.className = ''; stage.innerHTML = '';
+  let acc = 0; const off = Ls.map(() => 0);
+  for (let i = Ls.length - 2; i >= 0; i--) { acc += Math.max(0, Ls[i + 1].y - (Ls[i].y + Ls[i].h)) + GAP + 7; off[i] = acc; }
+  Ls.forEach((L, i) => {
+    const pc = document.createElement('div'), y = (L.y - top + GAP * i) * s;
+    pc.className = 'bx-pc';
+    pc.style.cssText = `left:${L.x * s}px;top:${y}px;width:${L.w * s}px;height:${L.h * s}px;--o:${off[i] * s}px;--d:${instant ? 0 : i * .09}s`;
+    const im = new Image(); im.src = 'bx/' + L.f; im.alt = ''; im.decoding = 'async'; pc.appendChild(im);
+    L.labs.forEach(([lab, yl]) => {
+      const e = document.createElement('i'), ex = (L.w + 6) * s;
+      e.className = 'bx-lb'; e.style.left = ex + 'px'; e.style.top = (yl - L.y) * s + 'px';
+      e.innerHTML = '<b></b><span></span>'; e.firstChild.style.width = Math.max(14, colX - (L.x * s + ex) - 12) + 'px'; e.lastChild.textContent = lab;
+      pc.appendChild(e);
+    });
+    stage.appendChild(pc);
+  });
+  void stage.offsetWidth;
+  if (instant) { stage.className = 'in go'; return; }
+  requestAnimationFrame(() => { stage.classList.add('in'); imgTm = setTimeout(() => stage.classList.add('go'), 650); });
+}
+addEventListener('resize', () => { if (imgName && !bx.hidden && bx.classList.contains('img')) showImg(imgName, true); });
 function open(name, desc) {
   if (R) close(true);
   $b('bxT').textContent = name; $b('bxD').textContent = desc;
   $b('bxO').href = 'https://wa.me/33134759631?text=' + encodeURIComponent(`Bonjour L'Excellence, je souhaite commander : ${name}.`);
   $b('bxO').textContent = 'Commander · ' + name;
   $b('bxN').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.textContent === name));
-  bx.hidden = false; W = innerWidth; build(name); requestAnimationFrame(() => bx.classList.add('on'));
+  bx.hidden = false; W = innerWidth; requestAnimationFrame(() => bx.classList.add('on'));
   document.documentElement.style.overflow = 'hidden';
-  rotY = -.5; vel = 0; tilt = 0; t0 = lastT = performance.now(); raf = requestAnimationFrame(frame);
+  if (IMGS[name]) { preload(); bx.classList.add('img'); labWrap.innerHTML = ''; showImg(name); }
+  else { imgName = null; bx.classList.remove('img'); stage.innerHTML = ''; build(name); rotY = -.5; vel = 0; tilt = 0; t0 = lastT = performance.now(); raf = requestAnimationFrame(frame); }
   $b('bxX').focus({preventScroll: true});
 }
 function close(now) {
@@ -2578,7 +2627,7 @@ document.querySelectorAll('#m-burger .mp-list li').forEach(li => {
 const ITEMS = [...document.querySelectorAll('#m-burger .mp-list li.bx-it')].map(li => [li.querySelector('span').textContent.trim(), li.querySelector('em').textContent.trim()]);
 ITEMS.forEach(([n, d]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = n; b.addEventListener('click', () => { if (b.getAttribute('aria-pressed') !== 'true') open(n, d); }); $b('bxN').appendChild(b); });
 const ob = document.getElementById('openBurgers');
-if (ob && ITEMS.length) { ob.setAttribute('aria-label', 'Voir les burgers et sandwichs en 3D'); ob.parentNode.addEventListener('click', e => { if (!e.target.closest('#openBurgers')) return; e.stopPropagation(); e.preventDefault(); open(...ITEMS[0]); }, true); }
+if (ob && ITEMS.length) { ob.setAttribute('aria-label', 'Voir les burgers et sandwichs en 3D'); ob.addEventListener('pointerenter', preload); ob.parentNode.addEventListener('click', e => { if (!e.target.closest('#openBurgers')) return; e.stopPropagation(); e.preventDefault(); open(...ITEMS[0]); }, true); }
 </script>
 </body>
 </html>
