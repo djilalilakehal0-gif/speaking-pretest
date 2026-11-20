@@ -121,11 +121,11 @@ jobs:
           mkdir -p _site/maison-vell-runway
           cp maison-vell-runway/index.html maison-vell-runway/*.webp maison-vell-runway/*.png maison-vell-runway/*.mp4 maison-vell-runway/*.mp3 _site/maison-vell-runway/
 
-      - name: Add the SUNFIZZ 3D soda can showcase
-        # A single static file (three.js loads from the jsDelivr CDN) plus its can texture atlas, served at /speaking-pretest/sunfizz/.
+      - name: Add the L'Excellence 3D soda can showcase
+        # A single static file (three.js loads from the jsDelivr CDN) plus its can texture atlas and logo background, served at /speaking-pretest/sunfizz/.
         run: |
           mkdir -p _site/sunfizz
-          cp sunfizz/index.html sunfizz/cans.jpg _site/sunfizz/
+          cp sunfizz/index.html sunfizz/cans.jpg sunfizz/logo.png _site/sunfizz/
 
       - name: Redirect the old portfolio address to djilali.pages.dev
         # The portfolio now lives on Cloudflare Pages (https://djilali.pages.dev, built from portfolio/).
