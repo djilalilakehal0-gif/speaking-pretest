@@ -122,10 +122,21 @@ jobs:
           cp maison-vell-runway/index.html maison-vell-runway/*.webp maison-vell-runway/*.png maison-vell-runway/*.mp4 maison-vell-runway/*.mp3 _site/maison-vell-runway/
 
       - name: Add the L'Excellence 3D soda can showcase
-        # A single static file (three.js loads from the jsDelivr CDN) plus its can texture atlas and logo background, served at /speaking-pretest/sunfizz/.
+        # A single static file (three.js loads from the jsDelivr CDN) plus its can texture atlas and logo background, served at /speaking-pretest/lexcellence/canettes/.
+        # The old /sunfizz/ address forwards to it.
         run: |
-          mkdir -p _site/sunfizz
-          cp sunfizz/index.html sunfizz/cans.jpg sunfizz/logo.png _site/sunfizz/
+          mkdir -p _site/lexcellence/canettes _site/sunfizz
+          cp lexcellence/canettes/index.html lexcellence/canettes/cans.jpg lexcellence/canettes/logo.png _site/lexcellence/canettes/
+          cat > _site/sunfizz/index.html <<'HTML'
+          <!doctype html>
+          <html lang="fr"><head><meta charset="utf-8">
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>L'Excellence — Canettes</title>
+          <meta name="robots" content="noindex">
+          <meta http-equiv="refresh" content="0; url=../lexcellence/canettes/">
+          <script>location.replace("../lexcellence/canettes/" + location.search + location.hash)</script>
+          </head><body><a href="../lexcellence/canettes/">L'Excellence — Canettes</a></body></html>
+          HTML
 
       - name: Redirect the old portfolio address to djilali.pages.dev
         # The portfolio now lives on Cloudflare Pages (https://djilali.pages.dev, built from portfolio/).
