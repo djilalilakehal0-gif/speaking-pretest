@@ -142,7 +142,8 @@ const CANS = [
  ['COCA-COLA','#E20B05'],['MTN DEW','#1E9A35'],['COKE ZERO','#2A2A2D'],['COCA-COLA LIGHT','#C9CCD4'],['DIET COKE','#EFC529'],['DR PEPPER TEN','#A00920'],['PEPSI TWIST','#F0CF10'],
  ['DIET PEPSI','#C9CCD4'],['SPRITE','#0855E3'],['SCHWEPPES','#F5C804'],['CHERRY COKE','#AE071B'],['DIET COKE','#C9CCD4'],['PEPSI MAX','#2A2A2D'],['DIET PEPSI','#C9CCD4'],
  ['DR PEPPER','#C70721'],['PEPSI MAX','#2A2A2D'],['A&W CREAM SODA','#ED7724'],['MTN DEW CODE RED','#BB1722'],['7UP','#07930F'],['PEPSI WILD CHERRY','#0151EE'],['MIRINDA','#F66E07'],
- ['FANTA ORANGE','#F96B03'],['PEPSI','#024DDE'],['DIET DR PEPPER','#C9CCD4'],['DIET COKE','#F3D258'],['PEPSI WILD CHERRY','#0150EE'],['SPRITE CRANBERRY','#F20A5C'],['DIET A&W','#BD6931']
+ ['FANTA ORANGE','#F96B03'],['PEPSI','#024DDE'],['DIET DR PEPPER','#C9CCD4'],['DIET COKE','#F3D258'],['PEPSI WILD CHERRY','#0150EE'],['SPRITE CRANBERRY','#F20A5C'],['DIET A&W','#BD6931'],
+ ['MINUTE MAID ORANGE','#F5820B'],['RED BULL','#1E45B0'],['MINUTE MAID','#E8730C']
 ];
 const N = CANS.length;
 const TILT = [.10,-.15,.07,-.09,.14,-.06,.12,-.13,.08,-.11,.15,-.07,.09,-.14,.06,-.10];
@@ -398,7 +399,7 @@ function bodyCompile(sh) {
       float th = vMapUv.x * 6.2831853;
       float cth = cos(th), sth = sin(th);
       float pu = .012 + (.5 + .5 * sth) * .976;
-      vec4 fTex = texture2D(map, vec2((uCell.x + pu) / 7., (uCell.y + .004 + vMapUv.y * .992) / 4.));
+      vec4 fTex = texture2D(map, vec2((uCell.x + pu) / 7., (uCell.y + .004 + vMapUv.y * .992) / 5.));
       float bu = (th - 1.5707963) / 3.1415926;
       vec4 bTex = texture2D(uBack, vec2(clamp(bu, 0., 1.), vMapUv.y));
       vec3 bc = bTex.rgb;
@@ -442,7 +443,7 @@ function buildCans(atlas) {
     const body = new THREE.MeshPhysicalMaterial({ map: atlas, normalMap: drops, normalScale: new THREE.Vector2(.2, .2), roughness: .34, metalness: .16, clearcoat: .85, clearcoatRoughness: .12, envMapIntensity: 1.25 });
     backLow[i] = backTex(i, .25);
     body.userData.back = { value: backLow[i] };
-    body.userData.cell = { value: new THREE.Vector2(i % 7, 3 - Math.floor(i / 7)) };
+    body.userData.cell = { value: new THREE.Vector2(i % 7, 4 - Math.floor(i / 7)) };
     body.onBeforeCompile = bodyCompile;
     const metal = new THREE.MeshStandardMaterial({ color: 0xdadde3, metalness: 1, roughness: .2, envMapIntensity: 1.7 });
     const mb = new THREE.Mesh(bodyGeo, body); mb.position.y = BODY0 + BODYH / 2; mb.userData.idx = i;
