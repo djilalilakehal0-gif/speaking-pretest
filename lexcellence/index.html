@@ -269,6 +269,7 @@ footer{background:var(--dark);color:rgba(240,232,224,.5);font:400 12px "DM Mono"
 body{background:#0a0708;color:#f2e6cf}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 75% 60% at 50% 40%,rgba(120,8,24,.78),rgba(64,4,14,.6) 48%,rgba(10,7,8,.15) 80%),radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(0,0,0,.6) 100%),var(--marble) center/cover,#0a0708}
 .disp{font-family:"Playfair Display",Georgia,serif;font-weight:800;letter-spacing:.015em;line-height:1}
+@media (max-width:819px){body::before{background:#0a0708 url(page-bg.jpg) center top/100% 100% no-repeat!important}}
 #gframe{position:fixed;inset:0;width:100vw;height:100vh;z-index:48;pointer-events:none}
 /* hero */
 #flavors{background:#0a0708 var(--marble) center/cover}
