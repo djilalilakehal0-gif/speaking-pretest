@@ -511,7 +511,7 @@ icons.forEach((b, k) => b.onclick = () => goY(k === 3 ? 99 : .75 + 2.55 * ((k + 
 let sx = scrollY, sv = 0, Y = sx / innerHeight;
 let car = 0, cT = 0, cv = 0;
 const heroActive = () => Y < .3 && introI > .75;
-const stepPx = () => lerp(.36, .19, K) * innerWidth;
+const stepPx = () => document.documentElement.classList.contains('card') ? CARD_SP() / W * innerWidth : lerp(.36, .19, K) * innerWidth;
 $('#prev').onclick = () => { cT = Math.round(cT) - 1; };
 $('#next').onclick = () => { cT = Math.round(cT) + 1; };
 addEventListener('keydown', e => {
@@ -574,16 +574,27 @@ const rowYf = f => { const i = Math.min(1, Math.floor(f)); return lerp(ROW_Y[i],
 let T = 0;
 
 const CARD = document.documentElement.classList.contains('card');
+/* centre-to-centre gap between cans in the card row (world units) */
+function CARD_HC() { return Math.min(.36 * VH / BH, W / (10 * CW)); }
+function CARD_SP() { return CARD_HC() * CW * 1.12; }
 function heroPose(i, o) {
   const k = K, CB = CARD ? 1.5 : 1, hcH = lerp(.36, .46, k) * VH * CB;
   let hc = hcH / BH; hc = Math.min(hc, lerp(.36, .2, k) * W / CW * CB);
-  const s1 = lerp(.36, .19, k) * (CARD ? 1.28 : 1), s2 = lerp(.25, .13, k) * (CARD ? 1.28 : 1), bottom = lerp(-.3, -.35, k) * VH * (CARD ? 1.12 : 1);
+  let s1 = lerp(.36, .19, k) * (CARD ? 1.28 : 1), s2 = lerp(.25, .13, k) * (CARD ? 1.28 : 1), bottom = lerp(-.3, -.35, k) * VH * (CARD ? 1.12 : 1);
   const d = mod(i - car + N / 2, N) - N / 2, ad = Math.abs(d), sg = Math.sign(d) || 1;
   o.x = Math.sign(d) * (Math.min(ad, 1) * s1 + Math.max(0, ad - 1) * s2) * W;
   o.s = hc * (1 - .3 * Math.min(ad, 1) - .035 * Math.max(0, ad - 1));
   o.y = bottom + o.s * BH / 2 + .05 * VH * Math.min(ad, 1);
   o.z = -Math.min(ad, 6) * .32;
-  o.rz = TILT[i % 16] * sstep(0, 1, ad); o.ry = -d * .2;
+  if (CARD) {
+    /* card: smaller cans in an even row, so a full shelf (8-10 cans) shows at once */
+    hc = CARD_HC(); bottom = -.34 * VH;
+    o.s = hc * (1 - .14 * Math.min(ad, 1));
+    o.x = d * CARD_SP();
+    o.y = bottom + o.s * BH / 2 + .02 * VH * Math.min(ad, 1);
+    o.z = -Math.min(ad, 1) * .25;
+  }
+  o.rz = TILT[i % 16] * sstep(0, 1, ad); o.ry = -d * (CARD ? .08 : .2);
   if (!RM) { o.y += Math.sin(1.1 * T + 1.7 * i) * .035; o.rz += Math.sin(.8 * T + 2.3 * i) * .025; o.ry += Math.sin(.5 * T + i) * .06; }
   // intro
   const p = clamp((introI - .06 * ad) / .62);
