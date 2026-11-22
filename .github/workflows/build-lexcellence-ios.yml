@@ -1,0 +1,79 @@
+name: Build L'Excellence iOS app
+
+# Builds the L'Excellence site (lexcellence/) as an iPhone app with Capacitor and publishes the IPA to GitHub Releases (tag lexcellence-ios-3.N).
+# Signed with the repository's Apple secrets when present (same ones as the Speaking Pre-Test app), otherwise an unsigned IPA for Sideloadly / AltStore.
+
+on:
+  push:
+    branches: [main]
+    paths: ['lexcellence/**', '.github/workflows/build-lexcellence-ios.yml']
+  pull_request:
+    paths: ['lexcellence/**', '.github/workflows/build-lexcellence-ios.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: lexcellence/app
+    env:
+      VERSION: 3.${{ github.run_number }}
+      BUILD: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Copy the website into the app
+        run: npm run prepare:web
+
+      - name: Add iOS platform
+        run: npx cap add ios
+
+      - name: Set version
+        run: |
+          X=ios/App/App.xcodeproj/project.pbxproj
+          sed -i '' -E "s/MARKETING_VERSION = [^;]+;/MARKETING_VERSION = $VERSION;/" $X
+          sed -i '' -E "s/CURRENT_PROJECT_VERSION = [^;]+;/CURRENT_PROJECT_VERSION = $BUILD;/" $X
+
+      - name: Generate app icon and splash from the logo
+        run: npx capacitor-assets generate --ios --iconBackgroundColor '#0a0708' --splashBackgroundColor '#0a0708' --splashBackgroundColorDark '#0a0708'
+
+      - name: Sync web code
+        run: npx cap sync ios
+
+      - name: Build unsigned IPA
+        run: |
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath $RUNNER_TEMP/App.xcarchive archive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+          mkdir -p $RUNNER_TEMP/ipa/Payload
+          cp -R $RUNNER_TEMP/App.xcarchive/Products/Applications/App.app $RUNNER_TEMP/ipa/Payload/
+          (cd $RUNNER_TEMP/ipa && zip -qry ../LExcellence-unsigned.ipa Payload)
+          cp $RUNNER_TEMP/LExcellence-unsigned.ipa LExcellence-unsigned.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lexcellence-ipa
+          path: lexcellence/app/LExcellence-unsigned.ipa
+
+      - name: Publish to GitHub Releases
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: lexcellence-ios-${{ env.VERSION }}
+          name: L'Excellence iOS ${{ env.VERSION }}
+          make_latest: false
+          files: lexcellence/app/LExcellence-unsigned.ipa
+          body: |
+            نسخة آيفون من تطبيق L'Excellence. الملف غير موقّع: ثبّته من الكمبيوتر ببرنامج Sideloadly أو AltStore بحساب Apple ID.
+            iPhone build of L'Excellence. The IPA is unsigned: install it from a computer with Sideloadly or AltStore (Apple ID).
