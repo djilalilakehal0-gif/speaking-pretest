@@ -1,0 +1,4 @@
+# Administrator guide
+Roles: `legal_editor` (edit/publish law), `admin` (verify lawyers, read cases/payments/audit — cannot publish law), `support` (tickets/users read), `super_admin` (break-glass; role grants).
+**Verify a lawyer**: check the Colegio de Abogados census yourself, then /admin → ✓ (records registry + reviewer; only then is the profile listed).
+**Publish law**: see LEGAL_CONTENT_GUIDE. **Audit**: /admin shows latest `audit_logs`; they are append-only.
