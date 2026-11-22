@@ -1724,6 +1724,7 @@ const WING = '<svg viewBox="-208 -30 486 245" aria-hidden="true"><path class="wp
 const logoImg = $('.toplogo');
 let logoFlying = false, logoLastFlight = -1e9, wasDown = false, logoFlyer = null;
 function flyLogo() {
+  return;   // logo flight removed
   if (logoFlying || RM || !logoImg || document.hidden) return;
   const r = logoImg.getBoundingClientRect();
   if (r.width < 20 || +getComputedStyle(logoImg).opacity < .6) return;
