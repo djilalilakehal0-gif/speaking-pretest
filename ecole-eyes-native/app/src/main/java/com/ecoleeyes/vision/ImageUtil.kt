@@ -15,6 +15,13 @@ object ImageUtil {
         return out.toByteArray()
     }
 
+    /** Returns [src] itself if already small enough, otherwise a scaled copy whose longest side is [maxSide]. */
+    fun scaleDown(src: Bitmap, maxSide: Int): Bitmap {
+        val scale = maxSide.toFloat() / maxOf(src.width, src.height)
+        if (scale >= 1f) return src
+        return Bitmap.createScaledBitmap(src, maxOf(1, (src.width * scale).toInt()), maxOf(1, (src.height * scale).toInt()), true)
+    }
+
     fun rotate(src: Bitmap, degrees: Int): Bitmap {
         if (degrees == 0) return src
         val m = Matrix().apply { postRotate(degrees.toFloat()) }

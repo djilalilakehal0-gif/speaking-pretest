@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Counted phrases. Arabic uses all six plural forms (zero, one, two, few 3-10, many 11-99, other 100+). -->
+<resources>
+    <plurals name="say_folder_added">
+        <item quantity="zero">تمت إضافة المجلد. لم أجد أي مستند.</item>
+        <item quantity="one">تمت إضافة المجلد. وجدت مستندًا واحدًا.</item>
+        <item quantity="two">تمت إضافة المجلد. وجدت مستندين.</item>
+        <item quantity="few">تمت إضافة المجلد. وجدت %1$d مستندات.</item>
+        <item quantity="many">تمت إضافة المجلد. وجدت %1$d مستندًا.</item>
+        <item quantity="other">تمت إضافة المجلد. وجدت %1$d مستند.</item>
+    </plurals>
+    <plurals name="say_found_many">
+        <item quantity="zero">لم أجد أي مستند.</item>
+        <item quantity="one">وجدت مستندًا واحدًا: %2$s. قل «اقرأه» لسماعه.</item>
+        <item quantity="two">وجدت مستندين. الأول هو %2$s. قل «اقرأه» لسماعه أو «التالي» للمستند التالي.</item>
+        <item quantity="few">وجدت %1$d مستندات. الأول هو %2$s. قل «اقرأه» لسماعه أو «التالي» للمستند التالي.</item>
+        <item quantity="many">وجدت %1$d مستندًا. الأول هو %2$s. قل «اقرأه» لسماعه أو «التالي» للمستند التالي.</item>
+        <item quantity="other">وجدت %1$d مستند. الأول هو %2$s. قل «اقرأه» لسماعه أو «التالي» للمستند التالي.</item>
+    </plurals>
+    <plurals name="say_reading_start">
+        <item quantity="zero">أقرأ %1$s.</item>
+        <item quantity="one">أقرأ %1$s، صفحة واحدة.</item>
+        <item quantity="two">أقرأ %1$s، صفحتان.</item>
+        <item quantity="few">أقرأ %1$s، %2$d صفحات.</item>
+        <item quantity="many">أقرأ %1$s، %2$d صفحة.</item>
+        <item quantity="other">أقرأ %1$s، %2$d صفحة.</item>
+    </plurals>
+    <plurals name="say_notes_list">
+        <item quantity="zero">ليست لديك ملاحظات.</item>
+        <item quantity="one">لديك ملاحظة واحدة. %2$s</item>
+        <item quantity="two">لديك ملاحظتان، الأحدث أولًا. %2$s</item>
+        <item quantity="few">لديك %1$d ملاحظات، الأحدث أولًا. %2$s</item>
+        <item quantity="many">لديك %1$d ملاحظة، الأحدث أولًا. %2$s</item>
+        <item quantity="other">لديك %1$d ملاحظة، الأحدث أولًا. %2$s</item>
+    </plurals>
+    <plurals name="say_notif_list">
+        <item quantity="zero">ليست لديك إشعارات.</item>
+        <item quantity="one">لديك إشعار واحد. %2$s</item>
+        <item quantity="two">لديك إشعاران. %2$s</item>
+        <item quantity="few">لديك %1$d إشعارات. %2$s</item>
+        <item quantity="many">لديك %1$d إشعارًا. %2$s</item>
+        <item quantity="other">لديك %1$d إشعار. %2$s</item>
+    </plurals>
+    <plurals name="duration_minutes">
+        <item quantity="zero">%1$d دقيقة</item>
+        <item quantity="one">دقيقة واحدة</item>
+        <item quantity="two">دقيقتين</item>
+        <item quantity="few">%1$d دقائق</item>
+        <item quantity="many">%1$d دقيقة</item>
+        <item quantity="other">%1$d دقيقة</item>
+    </plurals>
+    <plurals name="duration_hours">
+        <item quantity="zero">%1$d ساعة</item>
+        <item quantity="one">ساعة واحدة</item>
+        <item quantity="two">ساعتين</item>
+        <item quantity="few">%1$d ساعات</item>
+        <item quantity="many">%1$d ساعة</item>
+        <item quantity="other">%1$d ساعة</item>
+    </plurals>
+</resources>

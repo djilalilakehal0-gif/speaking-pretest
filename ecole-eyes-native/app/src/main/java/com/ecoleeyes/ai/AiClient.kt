@@ -96,6 +96,8 @@ class ClaudeProxyClient(
     private val backoffMs: Long = 600,
     /** Always true in the app (cleartext traffic is also disabled in the manifest). Tests use a local HTTP server. */
     private val requireHttps: Boolean = true,
+    /** Google Play Integrity proof attached to each request when available (see [IntegrityProvider]). */
+    private val integrity: IntegrityProvider? = null,
 ) : AiClient {
 
     override suspend fun complete(request: AiRequest): AiResponse {
@@ -111,10 +113,13 @@ class ClaudeProxyClient(
             put("messages", JsonArray(request.messages))
         }.toString()
 
+        // One integrity token per request body (valid for several minutes, so retries reuse it).
+        val integrityToken = integrity?.let { runCatching { it.token(IntegrityProvider.requestHash(body)) }.getOrNull() }
+
         var lastError: AiException? = null
         for (attempt in 0 until maxAttempts) {
             try {
-                return parse(send(s, body))
+                return parse(send(s, body, integrityToken))
             } catch (e: AiException) {
                 lastError = e
                 val retryable = e is AiException.Server || e is AiException.RateLimited || e is AiException.Timeout
@@ -126,12 +131,13 @@ class ClaudeProxyClient(
         throw lastError ?: AiException.BadResponse("no attempt made")
     }
 
-    private suspend fun send(s: AppSettings, body: String): String {
+    private suspend fun send(s: AppSettings, body: String, integrityToken: String?): String {
         val req = Request.Builder()
             .url(s.backendUrl + "/v1/messages")
             .post(body.toRequestBody("application/json".toMediaType()))
             .header("anthropic-version", "2023-06-01")
             .apply { if (s.appToken.isNotEmpty()) header("x-app-token", s.appToken) }
+            .apply { if (!integrityToken.isNullOrEmpty()) header("x-integrity-token", integrityToken) }
             .build()
         val call = http.newCall(req)
         val response = try {

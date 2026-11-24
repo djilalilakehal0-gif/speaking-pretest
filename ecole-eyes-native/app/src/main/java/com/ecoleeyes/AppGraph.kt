@@ -4,6 +4,7 @@ import android.app.Application
 import com.ecoleeyes.a11y.Feedback
 import com.ecoleeyes.ai.AssistantBrain
 import com.ecoleeyes.ai.ClaudeProxyClient
+import com.ecoleeyes.ai.PlayIntegrityProvider
 import com.ecoleeyes.ai.Prompt
 import com.ecoleeyes.app.BuildConfig
 import com.ecoleeyes.controller.AssistantController
@@ -39,7 +40,8 @@ class AppGraph(app: Application) {
     val docs = DocIndex(app)
     private val db = AppDatabase.create(app)
     val history = HistoryRepository(db, KeystoreCipher())
-    private val client = ClaudeProxyClient({ settings.value }, connectivity, BuildConfig.AI_MODEL)
+    private val integrity = BuildConfig.CLOUD_PROJECT_NUMBER.toLongOrNull()?.let { PlayIntegrityProvider(app, it) }
+    private val client = ClaudeProxyClient({ settings.value }, connectivity, BuildConfig.AI_MODEL, integrity = integrity)
     val brain = AssistantBrain(client)
     private val ocr = OcrEngine(CloudTranscriber { jpeg, lang ->
         brain.oneShot("You transcribe text from photographs for a blind reader. Output only the transcription.", Prompt.transcribe(lang), jpeg, 1500)

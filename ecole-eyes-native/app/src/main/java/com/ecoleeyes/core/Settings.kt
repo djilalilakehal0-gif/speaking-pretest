@@ -25,9 +25,24 @@ data class AppSettings(
     val liveIntervalSec: Int = 6,
     val handsFree: Boolean = false,
     val onboardingDone: Boolean = false,
+    /** Person to call in an emergency (chosen by the user). */
+    val emergencyName: String = "",
+    val emergencyNumber: String = "",
+    /** Public emergency number to *dial* (never auto-called). 112 works on GSM phones in most countries; set the local one. */
+    val emergencyServices: String = "112",
+    /** Opening the camera describes what is in front at once (no button, no question). */
+    val autoDescribeCamera: Boolean = true,
+    /** On the camera screen the microphone stays open between requests (with a sound before each listen). */
+    val cameraListening: Boolean = true,
+    /**
+     * Voice only (default): the app listens after every answer on every screen, and after a pause waits for
+     * "Hey École Eyes" instead of needing the button. A notification is shown while the microphone is on.
+     */
+    val voiceOnly: Boolean = true,
 ) {
     val cloudAllowed: Boolean get() = consent == Consent.GRANTED
     val backendConfigured: Boolean get() = backendUrl.startsWith("https://")
+    val hasEmergencyContact: Boolean get() = emergencyNumber.any { it.isDigit() }
 }
 
 /** Settings are kept in EncryptedSharedPreferences (the token and URL are sensitive). */
@@ -53,6 +68,12 @@ class SettingsStore(context: Context) {
             .putInt("liveSec", next.liveIntervalSec)
             .putBoolean("handsFree", next.handsFree)
             .putBoolean("onboarded", next.onboardingDone)
+            .putString("emName", next.emergencyName)
+            .putString("emNumber", next.emergencyNumber)
+            .putString("emServices", next.emergencyServices)
+            .putBoolean("camAuto", next.autoDescribeCamera)
+            .putBoolean("camListen", next.cameraListening)
+            .putBoolean("voiceOnly", next.voiceOnly)
             .apply()
     }
 
@@ -71,6 +92,12 @@ class SettingsStore(context: Context) {
             liveIntervalSec = prefs.getInt("liveSec", d.liveIntervalSec),
             handsFree = prefs.getBoolean("handsFree", d.handsFree),
             onboardingDone = prefs.getBoolean("onboarded", d.onboardingDone),
+            emergencyName = prefs.getString("emName", null) ?: d.emergencyName,
+            emergencyNumber = prefs.getString("emNumber", null) ?: d.emergencyNumber,
+            emergencyServices = prefs.getString("emServices", null) ?: d.emergencyServices,
+            autoDescribeCamera = prefs.getBoolean("camAuto", d.autoDescribeCamera),
+            cameraListening = prefs.getBoolean("camListen", d.cameraListening),
+            voiceOnly = prefs.getBoolean("voiceOnly", d.voiceOnly),
         ).sanitized()
     }
 
@@ -95,4 +122,7 @@ fun AppSettings.sanitized(): AppSettings = copy(
     backendUrl = backendUrl.trim().trimEnd('/'),
     appToken = appToken.trim(),
     liveIntervalSec = liveIntervalSec.coerceIn(4, 30),
+    emergencyName = emergencyName.trim().take(80),
+    emergencyNumber = emergencyNumber.filter { it.isDigit() || it == '+' || it == ' ' }.trim().take(24),
+    emergencyServices = emergencyServices.filter { it.isDigit() }.take(6).ifEmpty { "112" },
 )

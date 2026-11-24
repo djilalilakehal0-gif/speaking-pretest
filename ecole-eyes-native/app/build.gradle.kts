@@ -30,9 +30,21 @@ android {
         // Backend that holds the AI key. NEVER put an AI provider key here (see backend/README.md).
         buildConfigField("String", "BACKEND_URL", "\"${cfg("ecoleEyesBackendUrl")}\"")
         buildConfigField("String", "APP_TOKEN", "\"${cfg("ecoleEyesAppToken")}\"")
+        // Google Cloud project number for Play Integrity (public, not a secret). Empty = integrity proofs are not sent.
+        buildConfigField("String", "CLOUD_PROJECT_NUMBER", "\"${cfg("ecoleEyesCloudProjectNumber").filter { it.isDigit() }}\"")
         buildConfigField("String", "AI_MODEL", "\"${cfg("ecoleEyesModel", "claude-sonnet-5-5")}\"")
         resourceConfigurations += listOf("en", "fr", "ar")
-        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
+    }
+
+    // On-device ML (OCR, objects, labels, faces) ships native code per CPU type. One APK per CPU keeps downloads small:
+    // app-arm64-v8a-*.apk fits nearly every phone since 2017. Google Play (AAB) does this split automatically.
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a", "armeabi-v7a", "x86_64")
+            isUniversalApk = false
+        }
     }
 
     signingConfigs {
@@ -60,6 +72,12 @@ android {
         }
     }
 
+    // The app switches language itself (Arabic / French / English), so Play must ship every language's strings,
+    // not only the phone's language: otherwise "speak Arabic" on a French phone would find no Arabic text.
+    bundle {
+        language { enableSplit = false }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -70,9 +88,25 @@ android {
         buildConfig = true
     }
     packaging {
+        // Compress native ML libraries inside the APK: roughly halves the download for people on limited mobile data.
+        jniLibs.useLegacyPackaging = true
         resources.excludes += setOf("/META-INF/{AL2.0,LGPL2.1}", "META-INF/DEPENDENCIES", "META-INF/LICENSE*", "META-INF/NOTICE*")
     }
-    testOptions { unitTests { isReturnDefaultValues = true; isIncludeAndroidResources = true } }
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+            isIncludeAndroidResources = true
+            // Robolectric downloads Android framework jars at test time; allow a Maven Central mirror (-ProbolectricRepoUrl=...).
+            all { test ->
+                cfg("robolectricRepoUrl").takeIf { it.isNotEmpty() }?.let { test.systemProperty("robolectric.dependency.repo.url", it) }
+                // Screen images for visual review: -Pscreenshots=true (see ScreenshotTour).
+                if (cfg("screenshots") == "true") {
+                    test.systemProperty("ecoleeyes.screenshots", "true")
+                    test.systemProperty("ecoleeyes.screenshotDir", layout.buildDirectory.dir("screenshots").get().asFile.absolutePath)
+                }
+            }
+        }
+    }
     lint {
         abortOnError = true
         warningsAsErrors = false
@@ -82,13 +116,18 @@ android {
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 
 dependencies {
+    // Security: pdfbox-android pulls BouncyCastle 1.72 (CVE-2024-29857, CVE-2024-30171, CVE-2024-30172, fixed in 1.78+).
+    constraints {
+        listOf("bcprov", "bcpkix", "bcutil").forEach { m ->
+            implementation("org.bouncycastle:$m-jdk15to18:1.87") { because("security fixes; reached through encrypted PDFs") }
+        }
+    }
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.icons)
     implementation(libs.androidx.camera.core)
@@ -99,15 +138,18 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.security.crypto)
-    implementation(libs.androidx.documentfile)
     implementation(libs.androidx.exifinterface)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp)
     implementation(libs.mlkit.text)
+    implementation(libs.mlkit.objects)
+    implementation(libs.mlkit.labels)
+    implementation(libs.mlkit.faces)
+    implementation(libs.androidx.work)
+    implementation(libs.play.integrity)
     implementation(libs.pdfbox.android)
-    debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     testImplementation(libs.junit)
@@ -115,6 +157,9 @@ dependencies {
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
+    testImplementation(libs.androidx.work.testing)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.androidx.test.ext.junit)

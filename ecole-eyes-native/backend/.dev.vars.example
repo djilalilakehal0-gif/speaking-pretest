@@ -1,0 +1,32 @@
+# Copy to .dev.vars for `npx wrangler dev` (never commit .dev.vars). In production use `npx wrangler secret put NAME`.
+
+# Shared token the app sends in x-app-token (also set as ecoleEyesAppToken when building the app).
+APP_TOKEN=change-me-to-a-long-random-string
+
+# --- Provider: "anthropic" (default) or "openai" (any OpenAI-compatible Chat Completions API) ---
+PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-...
+
+# PROVIDER=openai
+# OPENAI_API_KEY=sk-...
+# OPENAI_BASE_URL=https://api.openai.com/v1      # or https://api.mistral.ai/v1, https://openrouter.ai/api/v1, ...
+# OPENAI_MODEL=<a model with image input and tool calling>
+
+# Optional: comma-separated models the app may request (the app sends ecoleEyesModel).
+# ALLOWED_MODELS=claude-sonnet-5-5,claude-haiku-5-5
+
+# --- Daily spending cap and alerts (needs the USAGE KV binding, see wrangler.toml) ---
+# DAILY_REQUEST_LIMIT=2000
+# DAILY_IP_LIMIT=200
+# ALERT_WEBHOOK_URL=https://hooks.slack.com/services/...   or   https://discord.com/api/webhooks/...
+
+# --- Google Play Integrity ---
+# INTEGRITY_MODE=off            # off | monitor | enforce
+# INTEGRITY_ALLOW_SIDELOAD=false
+# GOOGLE_SERVICE_ACCOUNT={"type":"service_account",...}     # secret: never commit a real key
+
+# Emergency stop: refuse every AI request.
+# DISABLED=true
+
+# Local testing only: skip the token check.
+# REQUIRE_APP_TOKEN=false

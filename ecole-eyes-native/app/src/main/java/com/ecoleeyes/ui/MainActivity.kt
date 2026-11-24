@@ -3,6 +3,8 @@ package com.ecoleeyes.ui
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.ContextThemeWrapper
+import android.provider.ContactsContract
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -35,6 +37,26 @@ class MainActivity : ComponentActivity() {
     private val folderLauncher = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { graph.controller.onFolderPicked(it) }
     private val fileLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { graph.controller.onFolderPicked(it) }
     private var lastPermission: String? = null
+    private var lastPermissions: List<String> = emptyList()
+    private val multiPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+        // Granted if the user allowed any of them (e.g. "approximate" location only).
+        lastPermissions.firstOrNull()?.let { graph.controller.onPermissionResult(it, result.values.any { granted -> granted }) }
+    }
+
+    // Emergency contact from the system contact picker: Android grants read access to the one chosen entry only,
+    // so no contacts permission is needed for this path.
+    private val contactLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { res ->
+        val uri = res.data?.data ?: return@registerForActivityResult
+        runCatching {
+            contentResolver.query(uri, arrayOf(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER), null, null, null)?.use { c ->
+                if (c.moveToFirst()) {
+                    val name = c.getString(0).orEmpty(); val number = c.getString(1).orEmpty()
+                    graph.settings.update { it.copy(emergencyName = name, emergencyNumber = number) }
+                    graph.controller.readAloud(graph.l10n.str(graph.settings.value.lang, com.ecoleeyes.app.R.string.say_em_contact_set, name))
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +67,7 @@ class MainActivity : ComponentActivity() {
             graph.controller.events.collect { ev ->
                 when (ev) {
                     is UiEvent.RequestPermission -> { lastPermission = ev.permission; permissionLauncher.launch(ev.permission) }
+                    is UiEvent.RequestPermissions -> { lastPermissions = ev.permissions; multiPermissionLauncher.launch(ev.permissions.toTypedArray()) }
                     UiEvent.PickFolder -> folderLauncher.launch(null)
                     UiEvent.PickFile -> fileLauncher.launch(arrayOf("*/*"))
                     UiEvent.CloseApp -> finishAffinity()
@@ -56,7 +79,7 @@ class MainActivity : ComponentActivity() {
             EcoleEyesTheme {
                 LocalizedRoot(graph) {
                     BackHandler { if (!graph.controller.onSystemBack()) finish() }
-                    AppRoot(graph, onPickFolder = { folderLauncher.launch(null) }, onPickFile = { fileLauncher.launch(arrayOf("application/pdf", "text/plain", "application/rtf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/jpeg", "image/png")) })
+                    AppRoot(graph, onPickFolder = { folderLauncher.launch(null) }, onPickFile = { fileLauncher.launch(arrayOf("application/pdf", "text/plain", "application/rtf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/jpeg", "image/png")) }, onPickContact = { contactLauncher.launch(Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)) })
                 }
             }
         }
@@ -82,11 +105,10 @@ class MainActivity : ComponentActivity() {
 private fun LocalizedRoot(graph: AppGraph, content: @Composable () -> Unit) {
     val lang by graph.settings.state.collectAsState()
     val base = LocalContext.current
-    val ctx = remember(lang.lang, base) {
-        val cfg = Configuration(base.resources.configuration).apply { setLocale(lang.lang.locale); setLayoutDirection(lang.lang.locale) }
-        base.createConfigurationContext(cfg)
-    }
     val cfg = remember(lang.lang, base) { Configuration(base.resources.configuration).apply { setLocale(lang.lang.locale); setLayoutDirection(lang.lang.locale) } }
+    // Wrap (do not replace) the Activity context: Compose finds the Activity through the wrapper chain for permission
+    // launchers, back handling and lifecycle. createConfigurationContext() broke that chain and crashed the camera screen.
+    val ctx = remember(lang.lang, base) { ContextThemeWrapper(base, base.theme).apply { applyOverrideConfiguration(cfg) } }
     CompositionLocalProvider(
         LocalContext provides ctx,
         LocalConfiguration provides cfg,
@@ -96,7 +118,7 @@ private fun LocalizedRoot(graph: AppGraph, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun AppRoot(graph: AppGraph, onPickFolder: () -> Unit, onPickFile: () -> Unit) {
+private fun AppRoot(graph: AppGraph, onPickFolder: () -> Unit, onPickFile: () -> Unit, onPickContact: () -> Unit) {
     val ui by graph.controller.state.collectAsState()
     when (ui.screen) {
         Screen.HOME -> HomeScreen(graph)
@@ -104,7 +126,8 @@ private fun AppRoot(graph: AppGraph, onPickFolder: () -> Unit, onPickFile: () ->
         Screen.CAMERA -> CameraScreen(graph)
         Screen.DOCUMENTS -> DocumentsScreen(graph, files = false, onPickFolder, onPickFile)
         Screen.FILES -> DocumentsScreen(graph, files = true, onPickFolder, onPickFile)
-        Screen.SETTINGS -> SettingsScreen(graph)
+        Screen.EMERGENCY -> EmergencyScreen(graph)
+        Screen.SETTINGS -> SettingsScreen(graph, onPickContact)
         Screen.PRIVACY -> PrivacyScreen(graph)
     }
 }

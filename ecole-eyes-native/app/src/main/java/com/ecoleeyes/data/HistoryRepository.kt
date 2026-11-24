@@ -8,12 +8,14 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.security.MessageDigest
 
+data class Note(val id: Long, val ts: Long, val text: String)
+
 data class ChatLine(val id: Long, val ts: Long, val fromUser: Boolean, val text: String)
 
 @Serializable
 data class SavedPosition(val uri: String, val title: String, val page: Int, val paragraph: Int)
 
-/** Encrypted storage for the visible conversation and for reading positions. */
+/** Encrypted storage for the visible conversation, reading positions and dictated notes. */
 class HistoryRepository(private val db: AppDatabase, private val cipher: TextCipher, private val maxLines: Int = 200) {
 
     val transcript: Flow<List<ChatLine>> = db.messages().observeAll().map { list ->
@@ -40,6 +42,16 @@ class HistoryRepository(private val db: AppDatabase, private val cipher: TextCip
     suspend fun clearPositions() = db.positions().clear()
 
     suspend fun clearAll() { clearConversation(); clearPositions() }
+
+    // ---- notes (kept separately: "clear my history" does not delete the user's notes) ----
+    suspend fun addNote(text: String, now: Long = System.currentTimeMillis()) =
+        db.notes().insert(NoteEntity(ts = now, body = cipher.encrypt(text)))
+
+    /** Newest first. */
+    suspend fun notes(): List<Note> =
+        db.notes().all().mapNotNull { n -> runCatching { Note(n.id, n.ts, cipher.decrypt(n.body)) }.getOrNull() }
+
+    suspend fun clearNotes() = db.notes().clear()
 
     companion object {
         fun keyOf(uri: String): String =
