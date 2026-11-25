@@ -23,7 +23,9 @@ export default function Home() {
   const { width } = useWindowDimensions();
   const wide = width > 680;
   // Title "…. …." → second sentence in gold, like the brand mockup.
-  const [line1, ...rest] = t('hero.title').split(/(?<=[.。])\s+/);
+  // Highlight the key phrase in gold (like the mockup): the part after the last "للحصول على / para obtener / pour obtenir / to getting".
+  const m = t('hero.title').match(/^(.*?(?:للحصول على|para obtener|pour obtenir|to getting))\s+(.+)$/);
+  const [line1, ...rest] = m ? [m[1], m[2]] : [t('hero.title')];
   const tiles = {
     elig: <Tile title={t('shortcut.eligibility')} image={require('../../../assets/brand/clipboard.jpg')} onPress={() => router.push('/eligibility')} />,
     road: <Tile tall title={t('shortcut.pathway')} image={require('../../../assets/brand/road.jpg')} onPress={() => router.push('/start')} />,
@@ -31,7 +33,7 @@ export default function Home() {
   };
   return (
     <Screen style={{ padding: 0, gap: 0 }}>
-      <ImageBackground source={require('../../../assets/brand/hero.jpg')} resizeMode="cover" style={{ height: 240 }} imageStyle={{ opacity: 0.95 }} accessibilityLabel="Madrid">
+      <ImageBackground source={require('../../../assets/brand/hero.jpg')} resizeMode="cover" style={{ height: 240, width: '100%' }} imageStyle={{ opacity: 0.95 }} accessibilityLabel="Madrid">
         <LinearGradient colors={['transparent', C.night]} locations={[0.5, 1]} style={{ flex: 1 }} />
       </ImageBackground>
       <View style={{ padding: 16, gap: 14 }}>

@@ -5,7 +5,7 @@ export const es: Record<string, string> = {
   'nav.dashboard': 'Mi espacio', 'nav.documents': 'Documentos', 'nav.case': 'Mi expediente', 'nav.admin': 'Administración', 'nav.login': 'Iniciar sesión',
   'nav.register': 'Crear cuenta', 'nav.logout': 'Cerrar sesión', 'nav.language': 'Idioma', 'nav.theme': 'Tema',
   'hero.eyebrow': "Pensado para quienes viven en España sin papeles",
-  'hero.title': 'Conoce tus opciones. Prepárate con confianza.',
+  'hero.title': "Tu guía para obtener la tarjeta de residencia en España",
   'hero.sub': 'Información verificada de extranjería, una valoración preliminar de elegibilidad, una caja fuerte de documentos y acceso a abogados de extranjería verificados — en árabe, español, francés e inglés.',
   'hero.cta1': 'Comprobar mi elegibilidad', 'hero.cta2': 'Explorar el centro legal',
   'home.shortcuts': '¿Qué quieres hacer?',

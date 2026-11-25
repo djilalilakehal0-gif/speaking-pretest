@@ -5,7 +5,7 @@ export const en: Record<string, string> = {
   'nav.dashboard': 'My space', 'nav.documents': 'Documents', 'nav.case': 'My case', 'nav.admin': 'Admin', 'nav.login': 'Sign in',
   'nav.register': 'Create account', 'nav.logout': 'Sign out', 'nav.language': 'Language', 'nav.theme': 'Theme',
   'hero.eyebrow': "Made for people living in Spain without papers",
-  'hero.title': 'Understand your options. Prepare with confidence.',
+  'hero.title': "Your guide to getting a Spanish residence card",
   'hero.sub': 'Verified Spanish immigration information, a preliminary eligibility check, a secure document vault and access to verified immigration lawyers — in Arabic, Spanish, French and English.',
   'hero.cta1': 'Check my eligibility', 'hero.cta2': 'Explore the law centre',
   'home.shortcuts': 'What would you like to do?',
