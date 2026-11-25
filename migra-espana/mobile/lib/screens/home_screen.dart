@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/app_state.dart';
+import 'guides_screen.dart';
 import 'start_screen.dart';
 import 'widgets.dart';
 
@@ -10,7 +11,8 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = Scope.of(context);
     final tiles = [
-      (Icons.fact_check_outlined, 'shortcut.eligibility', 2), (Icons.gavel_outlined, 'shortcut.pathway', 1), (Icons.format_list_numbered, 'shortcut.law', 3),
+      (Icons.fact_check_outlined, 'shortcut.eligibility', 2), (Icons.gavel_outlined, 'shortcut.pathway', 1), (Icons.folder_outlined, 'shortcut.documents', 3),
+      (Icons.balance_outlined, 'shortcut.lawyer', 4), (Icons.format_list_numbered, 'shortcut.law', -1),
     ];
     return ScreenList(children: [
       Container(
@@ -33,7 +35,7 @@ class HomeScreen extends StatelessWidget {
       Text(s.t('home.shortcuts'), style: Theme.of(context).textTheme.titleLarge),
       const SizedBox(height: 10),
       for (final t in tiles)
-        Card(child: ListTile(leading: CircleAvatar(backgroundColor: const Color(0xFF101D35), child: Icon(t.$1, color: const Color(0xFFC7A45B))), title: Text(s.t(t.$2)), trailing: const Icon(Icons.chevron_right), onTap: () => go(t.$3))),
+        Card(child: ListTile(leading: CircleAvatar(backgroundColor: const Color(0xFF101D35), child: Icon(t.$1, color: const Color(0xFFC7A45B))), title: Text(s.t(t.$2)), trailing: const Icon(Icons.chevron_right), onTap: () => t.$3 < 0 ? Navigator.push(context, MaterialPageRoute(builder: (_) => Directionality(textDirection: s.rtl ? TextDirection.rtl : TextDirection.ltr, child: Scaffold(appBar: AppBar(title: Text(s.t('nav.guides'))), body: const SafeArea(child: GuidesScreen()))))) : go(t.$3))),
       const SizedBox(height: 12),
       Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(s.t('home.trust.title'), style: Theme.of(context).textTheme.titleMedium), const SizedBox(height: 6), Text(s.t('home.trust.body')), Notice(s.t('home.notLawyer'))]))),
     ]);

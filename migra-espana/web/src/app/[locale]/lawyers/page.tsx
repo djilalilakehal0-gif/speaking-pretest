@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import { PageTitle } from '@/components/PageTitle';
+import { MessageButton } from '@/components/MessageButton';
 import { pageCtx, type P } from '@/lib/page';
 import { LOCALE_NAMES, type Locale } from '@/i18n/config';
 
@@ -27,9 +29,10 @@ export default async function Lawyers({ params }: P) {
               <p className="meta"><span>{t('lawyers.bar')}: {l.bar_association}</span><span>{t('lawyers.languages')}: {l.languages.map((x) => LOCALE_NAMES[x]).join(', ')}</span></p>
               <p>{l.bio?.[locale] ?? l.bio?.es ?? ''}</p>
               {l.consultation_price_cents != null && <p><strong>{t('lawyers.price')}: {(l.consultation_price_cents / 100).toLocaleString(locale, { style: 'currency', currency: l.currency })}</strong></p>}
-              <a className="btn btn-gold" href={`/${locale}/lawyers/${l.id}/book`}>{t('lawyers.book')}</a>
+              <div className="actions" style={{ marginTop: 8 }}><a className="btn btn-gold" href={`/${locale}/lawyers/${l.id}/book`}>{t('lawyers.book')}</a><MessageButton lawyerId={l.id} /></div>
             </article>))}</div>)}
         <p className="banner info" style={{ marginTop: 24 }}>{t('lawyers.disclaimer')}</p>
+        <p><Link href={`/${locale}/lawyer/register`}>{t('reg.link')}</Link></p>
         <h2 style={{ marginTop: 32 }}>{t('nav.lawyers')}</h2>
         <ol className="clean" style={{ columns: '2 280px' }}>{Array.from({ length: 12 }, (_, i) => <li key={i}>{t(`svc.${i + 1}`)}</li>)}</ol>
       </div>

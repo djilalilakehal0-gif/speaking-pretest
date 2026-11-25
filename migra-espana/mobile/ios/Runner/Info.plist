@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Scan your documents into your private vault.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Choose documents to add to your private vault.</string>
 </dict>
 </plist>

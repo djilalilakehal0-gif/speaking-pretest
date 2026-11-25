@@ -5,7 +5,7 @@ A working, tested **web foundation** and **database/security layer**. It is **no
 no native apps, no live backend/Stripe/OpenAI verification, and most legal content still awaits a qualified legal editor.
 
 ## Verified here
-- `npm test`: 65 passing · `tsc` clean · `next build` OK (87 pages).
+- `npm test`: 69 passing · `tsc` clean · `next build` OK (87 pages).
 - DB: migrations apply on Postgres 16; `rls.test.sql` proves: document isolation, grant/revoke/expiry, no role escalation,
   draft law hidden + publish needs date/reviewer, audit append-only, only verified lawyers listed, no double-booking,
   case history automatic, payments not user-writable, consent captured at signup.
@@ -25,6 +25,7 @@ Privacy/Terms text are templates needing counsel review; a DPIA is required (sen
 - [x] Law centre (13 groups) · [x] 14-step guide · [x] vault (upload/sniff/signed URL/share/revoke/log/delete)
 - [x] AI assistant w/ guardrails, PII redaction, verified-only retrieval · [x] Stripe checkout+webhook · [x] booking + overlap guard
 - [x] Case timeline/progress/transitions · [x] admin: lawyer verification, publish, audit · [x] GDPR export/erasure/consent
-- [x] Flutter app v0.1 (info + eligibility, 4 languages/RTL; 13 tests) — no APK/IPA built, no backend screens yet · [ ] OCR/auto-classification · [ ] FCM sender · [ ] secure messaging UI · [ ] invoices/PDFs
-- [ ] lawyer onboarding/registration UI & MFA enrolment UI · [ ] admin analytics/user mgmt/CMS editor UI
+- [x] Flutter app v0.2 (info, eligibility, sign-in, vault with camera scan, lawyers, booking, secure chat; 23 tests against fakes) — no APK/IPA built, not tried on a live backend
+- [x] Lawyer self-registration → admin verification → role grant · [x] secure messaging (DB-enforced: verified lawyers only, immutable messages, suspension cuts access, ID numbers refused) · [ ] OCR/auto-classification · [ ] FCM sender · [ ] invoices/PDFs
+- [ ] MFA enrolment UI (lawyers/staff should be forced to enrol before replying/verifying) · [ ] admin analytics/user mgmt/CMS editor UI
 - [ ] reviews UI · [ ] video consult · [ ] pgvector retrieval · [ ] e2e tests against live Supabase/Stripe · [ ] DPIA, store assets, deploy

@@ -13,7 +13,7 @@ export default async function LawyerDash({ params }: P) {
   if (!user) redirect(`/${locale}/login`);
   const sb = await serverClient();
   const { data: me } = await sb.from('lawyers').select('id, verification').eq('id', user.id).maybeSingle();
-  if (!me) return (<><PageTitle title={t('lawyerdash.title')} /><div className="wrap section"><p className="banner bad">{t('admin.forbidden')}</p></div></>);
+  if (!me) redirect(`/${locale}/lawyer/register`);
   if (me.verification !== 'verified') return (<><PageTitle title={t('lawyerdash.title')} /><div className="wrap section"><p className="banner">{t('lawyerdash.notVerified')}</p></div></>);
 
   const requests = (await sb.from('appointments').select('id, starts_at, status').eq('lawyer_id', user.id).eq('status', 'requested').order('starts_at')).data ?? [];
@@ -23,6 +23,7 @@ export default async function LawyerDash({ params }: P) {
     <>
       <PageTitle title={t('lawyerdash.title')} />
       <div className="wrap section grid g2" style={{ alignItems: 'start' }}>
+        <section className="card"><h3>{t('msg.title')}</h3><a className="btn btn-gold" href={`/${locale}/messages`}>{t('msg.title')}</a></section>
         <section className="card"><h3>{t('lawyerdash.requests')}</h3>
           {requests.length === 0 ? <p className="pending">—</p> : <table><tbody>{requests.map((r: { id: string; starts_at: string }) => (
             <tr key={r.id}><td>{fmt(r.starts_at)}</td><td>

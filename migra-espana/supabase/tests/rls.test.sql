@@ -119,3 +119,57 @@ do $$ begin
 end $$;
 reset role;
 select 'ALL RLS / CONSTRAINT TESTS PASSED' as result;
+
+-- ───── 0003: messaging ─────
+-- (fixtures: lawyer c is 'pending' again at this point; verify for these tests)
+update lawyers set verification='verified', listed=true where id='00000000-0000-0000-0000-00000000000c';
+set role authenticated; select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000a',false);
+-- client cannot open a conversation with an unverified lawyer id / null lawyer
+do $$ begin
+  begin insert into conversations (client_id, lawyer_id) values ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000d'); raise exception 'should have failed';
+  exception when insufficient_privilege then null; end;
+end $$;
+insert into conversations (id, client_id, lawyer_id) values ('30000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000c');
+-- duplicate conversation rejected
+do $$ begin
+  begin insert into conversations (client_id, lawyer_id) values ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-00000000000c'); raise exception 'should have failed';
+  exception when unique_violation then null; end;
+end $$;
+insert into messages (conversation_id, sender_id, body) values ('30000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-00000000000a','hello');
+-- spoofed sender is rejected
+do $$ begin
+  begin insert into messages (conversation_id, sender_id, body) values ('30000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-00000000000c','spoof'); raise exception 'should have failed';
+  exception when insufficient_privilege then null; end;
+end $$;
+-- stranger sees nothing and cannot post
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000b',false);
+do $$ begin
+  assert (select count(*) from messages) = 0, 'stranger must not read messages';
+  assert (select count(*) from conversations) = 0, 'stranger must not see conversations';
+  begin insert into messages (conversation_id, sender_id, body) values ('30000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-00000000000b','intrude'); raise exception 'should have failed';
+  exception when insufficient_privilege then null; end;
+end $$;
+-- lawyer replies, marks read; cannot edit body
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000c',false);
+insert into messages (conversation_id, sender_id, body) values ('30000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-00000000000c','reply');
+do $$ declare n int; begin
+  update messages set read_at = now() where body = 'hello'; get diagnostics n = row_count; assert n = 1, 'recipient can mark read';
+  begin update messages set body = 'tampered' where body = 'hello'; raise exception 'should have failed'; exception when others then if sqlerrm = 'should have failed' then raise; end if; end;
+  update messages set read_at = now() where body = 'reply'; get diagnostics n = row_count; assert n = 0, 'sender cannot mark own message read via recipient policy';
+end $$;
+-- suspended lawyer can no longer post
+reset role; update lawyers set verification='suspended', listed=false where id='00000000-0000-0000-0000-00000000000c';
+set role authenticated; select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000c',false);
+do $$ begin
+  begin insert into messages (conversation_id, sender_id, body) values ('30000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-00000000000c','after suspension'); raise exception 'should have failed';
+  exception when insufficient_privilege then null; end;
+end $$;
+-- self-registration can only create a pending, unlisted profile
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000b',false);
+do $$ begin
+  begin insert into lawyers (id, display_name, bar_association, bar_number, verification, listed) values ('00000000-0000-0000-0000-00000000000b','X','Colegio','1','verified',true); raise exception 'should have failed';
+  exception when insufficient_privilege or check_violation then null; end;
+end $$;
+insert into lawyers (id, display_name, bar_association, bar_number) values ('00000000-0000-0000-0000-00000000000b','Self Reg','Colegio Y','999');
+reset role;
+select 'MESSAGING TESTS PASSED' as result;

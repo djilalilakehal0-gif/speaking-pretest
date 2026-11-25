@@ -46,6 +46,7 @@ export default async function Dashboard({ params }: P) {
           </section>
           <section className="card"><h3>{t('dash.docs')}</h3><p className="price">{docCount}</p><Link className="btn btn-ghost" style={{ color: 'var(--text)' }} href={`/${locale}/documents`}>{t('nav.documents')}</Link></section>
           <section className="card"><h3>{t('dash.appointments')}</h3>{appts.length === 0 ? <p className="pending">{t('dash.noAppointments')}</p> : <ul className="clean">{appts.map((a) => <li key={a.id}>{fmt(a.starts_at)} — {a.status}</li>)}</ul>}<Link href={`/${locale}/lawyers`}>{t('dash.lawyer')} →</Link></section>
+          <section className="card"><h3>{t('msg.title')}</h3><Link className="btn btn-ghost" style={{ color: 'var(--text)' }} href={`/${locale}/messages`}>{t('msg.title')}</Link></section>
           <section className="card"><h3>{t('dash.notifications')}</h3>{notifs.length === 0 ? <p className="pending">{t('dash.noNotifications')}</p> : <ul className="clean">{notifs.map((n) => <li key={n.id}>{n.title[locale] ?? n.title.es}</li>)}</ul>}</section>
         </div>
         <h2 style={{ marginTop: 40 }}>{t('dash.pathways')}</h2>

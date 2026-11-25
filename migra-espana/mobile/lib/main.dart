@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'core/api.dart';
 import 'core/app_state.dart';
+import 'core/auth.dart';
+import 'core/config.dart';
+import 'screens/account_screen.dart';
+import 'screens/lawyers_screen.dart';
+import 'screens/vault_screen.dart';
 import 'screens/eligibility_screen.dart';
-import 'screens/guides_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/law_screen.dart';
 
@@ -12,6 +18,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final state = AppState();
   await state.load();
+  if (Config.configured) {
+    await Supabase.initialize(url: Config.supabaseUrl, anonKey: Config.supabaseAnonKey);
+    state.auth = SupabaseAuth();
+    state.api = HttpApi(Config.apiBase, () => state.auth.accessToken);
+  }
   runApp(Scope(state: state, child: const MigraApp()));
 }
 
@@ -55,7 +66,7 @@ class _ShellState extends State<Shell> {
   @override
   Widget build(BuildContext context) {
     final s = Scope.of(context);
-    final pages = [HomeScreen(go: go), const LawScreen(), const EligibilityScreen(), const GuidesScreen()];
+    final pages = [HomeScreen(go: go), const LawScreen(), const EligibilityScreen(), const VaultScreen(), const LawyersScreen()];
     return Scaffold(
       appBar: AppBar(
         title: Row(children: [const Icon(Icons.shield_outlined, color: gold), const SizedBox(width: 10), Flexible(child: Text('MIGRA ESPAÑA', style: const TextStyle(letterSpacing: 2, fontWeight: FontWeight.w600)))]),
@@ -64,6 +75,9 @@ class _ShellState extends State<Shell> {
             tooltip: s.t('nav.language'), icon: const Icon(Icons.language), onSelected: s.setLocale,
             itemBuilder: (_) => [for (final l in locales) CheckedPopupMenuItem(value: l, checked: l == s.locale, child: Text(localeNames[l]!))],
           ),
+          ListenableBuilder(listenable: s.auth, builder: (context, _) => s.auth.signedIn
+              ? IconButton(tooltip: s.t('nav.logout'), icon: const Icon(Icons.logout), onPressed: s.auth.signOut)
+              : IconButton(tooltip: s.t('nav.login'), icon: const Icon(Icons.account_circle_outlined), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AccountScreen())))),
           IconButton(tooltip: s.t('nav.theme'), icon: const Icon(Icons.brightness_6), onPressed: () => s.toggleTheme(Theme.of(context).brightness)),
         ],
       ),
@@ -74,7 +88,8 @@ class _ShellState extends State<Shell> {
           NavigationDestination(icon: const Icon(Icons.home_outlined), label: s.t('nav.home')),
           NavigationDestination(icon: const Icon(Icons.gavel_outlined), label: s.t('nav.law')),
           NavigationDestination(icon: const Icon(Icons.fact_check_outlined), label: s.t('nav.eligibility')),
-          NavigationDestination(icon: const Icon(Icons.format_list_numbered), label: s.t('nav.guides')),
+          NavigationDestination(icon: const Icon(Icons.folder_outlined), label: s.t('nav.documents')),
+          NavigationDestination(icon: const Icon(Icons.balance_outlined), label: s.t('nav.lawyers')),
         ],
       ),
     );

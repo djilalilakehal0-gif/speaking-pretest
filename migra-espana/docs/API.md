@@ -12,3 +12,8 @@
 | POST/DELETE `/api/gdpr/request`, POST `/api/gdpr/consent`, GET `/api/gdpr/export` | user | |
 | POST `/api/stripe/checkout` · `/api/stripe/webhook` | user · Stripe signature | |
 | POST `/api/admin/lawyers` · `/api/admin/legal-publish` | admin · legal editor+MFA | audited |
+| GET/POST `/api/conversations` | user | list mine / open with a **verified** lawyer (DB policy enforces) |
+| GET/POST `/api/conversations/:id/messages` | parties | rejects ID-number-like text (`identifier_in_message`); notifies the other party; 30 msg/min |
+| POST `/api/lawyers/register` | user | creates a PENDING, unlisted profile only; admin verification grants the `lawyer` role |
+
+All routes accept `Authorization: Bearer <Supabase access token>` (mobile) or the session cookie (web).

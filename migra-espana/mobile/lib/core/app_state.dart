@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
+import 'auth.dart';
 
 const locales = ['es', 'en', 'fr', 'ar'];
 const localeNames = {'es': 'Español', 'en': 'English', 'fr': 'Français', 'ar': 'العربية'};
@@ -13,6 +15,8 @@ class Legal {
 }
 
 class AppState extends ChangeNotifier {
+  AuthService auth = NoBackendAuth();
+  Api? api;   // null when no backend is configured
   String locale = 'es';
   ThemeMode theme = ThemeMode.system;
   final Map<String, Map<String, String>> _dict = {};
