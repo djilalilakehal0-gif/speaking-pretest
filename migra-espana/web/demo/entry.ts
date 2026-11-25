@@ -5,7 +5,8 @@ import { assess, groupByBucket } from '@/lib/eligibility/engine';
 import { ASYLUM_OPTIONS, PERMIT_OPTIONS, QUESTIONS, isVisible } from '@/lib/eligibility/questions';
 import { COUNTRY_CODES } from '@/lib/eligibility/countries';
 import { PATHWAYS } from '@/lib/legal/pathways';
-import { SOURCES } from '@/lib/legal/sources';
+import { SOURCES, RESOURCES } from '@/lib/legal/sources';
+import { HELP_ORGS, HELP_SOURCE } from '@/lib/legal/help';
 import type { Answers, PathwayResult } from '@/lib/eligibility/types';
 import type { SectionKey } from '@/lib/legal/types';
 
@@ -23,7 +24,7 @@ function header() {
   const r = route();
   const link = (h: string, k: string) => `<a href="#${h}" ${r.startsWith(h) ? 'aria-current="page"' : ''}>${esc(t(k))}</a>`;
   return `<header class="hdr"><div class="in"><a class="brand" href="#home"><svg width="34" height="34" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#101d35" stroke="#c7a45b" stroke-width="1.5"/><path d="M32 9 50 15v15c0 11-7.6 18.4-18 23C21.6 48.4 14 41 14 30V15L32 9Z" stroke="#c7a45b" stroke-width="1.6" stroke-linejoin="round"/><path d="M21 41V25.5L32 34l11-8.5V41" stroke="#c7a45b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>MIGRA ESPAÑA<small>${esc(t('brand.tagline'))}</small></span></a>
-  <nav>${link('law', 'nav.law')}${link('eligibility', 'nav.eligibility')}${link('guides', 'nav.guides')}</nav>
+  <nav>${link('law', 'nav.law')}${link('eligibility', 'nav.eligibility')}${link('guides', 'nav.guides')}${link('help', 'help.title')}</nav>
   <select id="lang" aria-label="${esc(t('nav.language'))}">${LOCALES.map((l) => `<option value="${l}" ${l === locale ? 'selected' : ''}>${LOCALE_NAMES[l]}</option>`).join('')}</select>
   <button id="theme" aria-label="${esc(t('nav.theme'))}">◐</button></div></header>`;
 }
@@ -59,7 +60,14 @@ function start() {
   <section class="in sec" style="max-width:820px"><ol class="steps">${[1, 2, 3, 4].map((n) => `<li><div><h3>${esc(t(`start.s${n}.t`))}</h3><p>${esc(t(`start.s${n}.b`))}</p></div></li>`).join('')}</ol>
   <div class="card" style="margin-top:24px"><h2>${esc(t('start.proofTitle'))}</h2><p>${esc(t('start.proofBody'))}</p><ul>${[1, 2, 3, 4].map((n) => `<li>${esc(t(`start.proof${n}`))}</li>`).join('')}</ul><p class="note info">${esc(t('docs.noSelfData'))}</p></div>
   <h2 style="margin-top:26px">${esc(t('start.faqTitle'))}</h2>${[1, 2].map((n) => `<details class="card" style="margin-bottom:10px"><summary><b>${esc(t(`start.faq${n}q`))}</b></summary><p class="note" style="margin-top:10px">${esc(t('start.faqPending'))}</p></details>`).join('')}
-  <p class="note">${esc(t('elig.disclaimer'))}</p></section>`;
+  <p class="note">${esc(t('elig.disclaimer'))}</p><p><a class="btn gold" href="#help">${esc(t('help.title'))}</a></p></section>`;
+}
+
+function help() {
+  const censo = RESOURCES.find((r) => r.key === 'censo')!;
+  return `<div class="title"><div class="in"><h1>${esc(t('help.title'))}</h1><p>${esc(t('help.intro'))}</p></div></div><section class="in sec"><div class="grid">${HELP_ORGS.map((o) => `<article class="card"><h3>${o.url ? `<a href="${o.url}" target="_blank" rel="noopener noreferrer">${esc(o.name)}</a>` : esc(o.name)}</h3><p class="meta">${esc(t('help.scope.' + o.scope))}</p><p><b dir="ltr">${esc(o.phone)}</b>${o.hours ? ` <span class="meta">· ${esc(o.hours)}</span>` : ''}</p></article>`).join('')}</div>
+  <p class="note info">${esc(t('help.note'))} ${esc(t('help.source'))}: <a href="${HELP_SOURCE.url}" target="_blank" rel="noopener noreferrer">${esc(HELP_SOURCE.title)}</a> (${esc(t('help.checked'))} ${HELP_SOURCE.checkedOn}).</p>
+  <p class="note">${esc(t('help.verify'))} <a href="${censo.url}" target="_blank" rel="noopener noreferrer">${esc(censo.name)}</a></p></section>`;
 }
 
 function guides() {
@@ -97,7 +105,7 @@ function results() {
 function render() {
   document.documentElement.lang = locale; document.documentElement.dir = dirOf(locale);
   const r = route(); let body: string;
-  if (r === 'law') body = law(); else if (r.startsWith('law-')) body = pathway(r.slice(4)); else if (r === 'guides') body = guides(); else if (r === 'start') body = start();
+  if (r === 'law') body = law(); else if (r.startsWith('law-')) body = pathway(r.slice(4)); else if (r === 'guides') body = guides(); else if (r === 'start') body = start(); else if (r === 'help') body = help();
   else if (r === 'eligibility') body = done ? results() : question(); else body = home();
   app.innerHTML = header() + `<main>${body}</main><footer><div class="in">© MIGRA ESPAÑA — ${esc(t('footer.disclaimer'))}</div></footer>`;
   const get = () => { const el = document.getElementById('ans') as HTMLInputElement | null; if (el) return el.value; return (document.querySelector('input[name=ans]:checked') as HTMLInputElement | null)?.value ?? ''; };
