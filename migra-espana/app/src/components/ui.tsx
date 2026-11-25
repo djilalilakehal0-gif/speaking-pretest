@@ -23,7 +23,7 @@ export function GoldButton({ label, onPress, icon, disabled, style }: { label: s
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} disabled={disabled} style={({ pressed }) => [{ opacity: disabled ? 0.5 : pressed ? 0.85 : 1, borderRadius: 999 }, s.goldShadow, style]}>
       <LinearGradient colors={[C.goldHi, C.gold, C.goldLo]} style={s.pill}>
         {icon && <Ionicons name={icon} size={20} color={C.onGold} />}
-        <Text style={{ color: C.onGold, fontFamily: F.black, fontSize: 17 }} numberOfLines={1}>{label}</Text>
+        <Text style={{ color: C.onGold, fontFamily: F.black, fontSize: 19 }} numberOfLines={1}>{label}</Text>
       </LinearGradient>
     </Pressable>
   );
@@ -33,7 +33,7 @@ export function OutlineButton({ label, onPress, icon, disabled, style }: { label
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} disabled={disabled} style={({ pressed }) => [s.pill, s.outline, { opacity: disabled ? 0.5 : pressed ? 0.8 : 1 }, style]}>
       {icon && <Ionicons name={icon} size={20} color={C.gold} />}
-      <Text style={{ color: C.ink, fontFamily: F.bold, fontSize: 16 }} numberOfLines={1}>{label}</Text>
+      <Text style={{ color: C.ink, fontFamily: F.bold, fontSize: 18 }} numberOfLines={1}>{label}</Text>
     </Pressable>
   );
 }
@@ -52,7 +52,7 @@ export function RuleTitle({ text }: { text: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10 }}>
       <LinearGradient colors={['transparent', C.gold]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ flex: 1, height: 2 }} />
-      <Txt w="black" style={{ color: C.goldHi, fontSize: 22, lineHeight: 32, textAlign: 'center', flexShrink: 1 }}>{text}</Txt>
+      <Txt w="black" style={{ color: C.goldHi, fontSize: 27, lineHeight: 38, textAlign: 'center', flexShrink: 1 }}>{text}</Txt>
       <LinearGradient colors={[C.gold, 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ flex: 1, height: 2 }} />
     </View>
   );
@@ -118,7 +118,7 @@ export function Check({ label, value, onChange }: { label: string; value: boolea
 }
 
 const s = StyleSheet.create({
-  pill: { minHeight: 54, borderRadius: 999, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
+  pill: { minHeight: 62, borderRadius: 999, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
   outline: { borderWidth: 1.5, borderColor: C.gold, backgroundColor: 'rgba(10,21,48,0.55)' },
   goldShadow: { shadowColor: C.gold, shadowOpacity: 0.45, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8 },
   card: { borderRadius: 22, borderWidth: 1, borderColor: C.line, padding: 16, gap: 8, overflow: 'hidden' },

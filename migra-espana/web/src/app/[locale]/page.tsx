@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
 import { Icon } from '@/components/Icon';
+import { PosterHero } from '@/components/PosterHero';
 import { pageCtx, type P } from '@/lib/page';
 
 export default async function Home({ params }: P) {
@@ -9,11 +10,11 @@ export default async function Home({ params }: P) {
     <>
       <section className="wrap">
         <div className="lux-hero">
-          <div className="photo" role="img" aria-label="Madrid" />
+          <PosterHero locale={locale} alt={`MIGRA ESPAÑA — ${t('brand.tagline')}`} />
           <div className="copy">
             <span className="eyebrow-line">{t('hero.eyebrow')}</span>
             <h1>{t('hero.title').split(/(?<=[.。])\s+/).map((x, i, a) => <span key={i} style={{ display: 'block' }}>{x}</span>)}</h1>
-            <p className="lead" style={{ fontSize: '1.08rem', maxWidth: '58ch' }}>{t('hero.sub')}</p>
+            <p className="lead" style={{ maxWidth: '58ch' }}>{t('hero.sub')}</p>
           </div>
         </div>
         <div className="ctas">

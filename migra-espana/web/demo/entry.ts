@@ -11,6 +11,8 @@ import type { Answers, PathwayResult } from '@/lib/eligibility/types';
 import type { SectionKey } from '@/lib/legal/types';
 import { ICON, laurel } from '@/lib/ui/icons';
 import heroImg from './brand/hero.jpg';
+import heroCleanImg from './brand/hero-clean.jpg';
+import { POSTER, posterLabels } from '@/lib/ui/poster';
 import logoImg from './brand/logo.jpg';
 import clipImg from './brand/clipboard.jpg';
 import roadImg from './brand/road.jpg';
@@ -43,10 +45,15 @@ function header() {
     <div class="langrow"><label class="lang">${ICON.pin}<select id="lang" aria-label="${esc(t('nav.language'))}">${LOCALES.map((l) => `<option value="${l}" ${l === locale ? 'selected' : ''}>${LOCALE_NAMES[l]}</option>`).join('')}</select>${ICON.chevronDown}</label><span class="bell" aria-hidden="true">${ICON.globe}</span></div></header>`;
 }
 
+function posterHtml() {
+  const labels = posterLabels(locale);
+  const spans = (labels ?? []).map((l) => `<span class="poster-label" dir="ltr" aria-hidden="true" style="left:${(l.slot.x / POSTER.w) * 100}%;top:${(l.slot.y / POSTER.h) * 100}%;width:${(l.slot.w / POSTER.w) * 100}%;font-size:${(l.size / POSTER.w) * 100}cqw;transform:translate(-50%,-50%) rotate(${l.slot.rot}deg)">${l.lines.map((x) => `<span>${esc(x)}</span>`).join('')}</span>`).join('');
+  return `<div class="poster-wrap"><img src="${labels ? heroCleanImg : heroImg}" alt="MIGRA ESPAÑA" width="1200" height="1311">${spans}</div>`;
+}
+
 function home() {
   const chev = ICON.chevron;
-  return `<section class="in"><div class="hero"><div class="hero-photo" role="img" aria-label="Madrid" style="background-image:url(${heroImg})"></div>
-    <div class="hero-copy"><span class="eyebrow">${esc(t('hero.eyebrow'))}</span><h1>${t('hero.title').split(/(?<=[.。])\s+/).map((x) => `<span style="display:block">${esc(x)}</span>`).join('')}</h1><p class="lead">${esc(t('hero.sub'))}</p></div></div>
+  return `<section class="in"><div class="hero">${posterHtml()}<div class="hero-copy"><span class="eyebrow">${esc(t('hero.eyebrow'))}</span><h1>${t('hero.title').split(/(?<=[.。])\s+/).map((x) => `<span style="display:block">${esc(x)}</span>`).join('')}</h1><p class="lead">${esc(t('hero.sub'))}</p></div></div>
     <div class="ctas"><a class="btn gold" href="#eligibility">${ICON.rocket}${esc(t('hero.cta1'))}</a><a class="btn" href="#law">${ICON.scales}${esc(t('hero.cta2'))}</a><a class="btn" href="#start">${ICON.doc}${esc(t('start.homeLink'))}</a></div></section>
   <section class="in sec"><h2 class="rule-title">${esc(t('home.shortcuts'))}</h2>
     <div class="tiles">
