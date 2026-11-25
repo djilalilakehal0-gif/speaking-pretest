@@ -49,6 +49,8 @@ void main() {
 
   testWidgets('Start page ("no papers") opens from home with all four steps', (tester) async {
     final s = await boot(tester, 'es');
+    await tester.ensureVisible(find.text(s.t('start.homeLink')));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(s.t('start.homeLink')));
     await tester.pumpAndSettle();
     expect(find.text(s.t('start.s1.t')), findsOneWidget);

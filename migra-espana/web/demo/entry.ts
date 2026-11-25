@@ -9,6 +9,13 @@ import { SOURCES, RESOURCES } from '@/lib/legal/sources';
 import { HELP_ORGS, HELP_SOURCE } from '@/lib/legal/help';
 import type { Answers, PathwayResult } from '@/lib/eligibility/types';
 import type { SectionKey } from '@/lib/legal/types';
+import { ICON, laurel } from '@/lib/ui/icons';
+import heroImg from './brand/hero.jpg';
+import logoImg from './brand/logo.jpg';
+import clipImg from './brand/clipboard.jpg';
+import roadImg from './brand/road.jpg';
+import gavelImg from './brand/gavel.jpg';
+import folderImg from './brand/folder.jpg';
 
 let locale: Locale = (['es', 'en', 'fr', 'ar'] as Locale[]).find((l) => navigator.language?.startsWith(l)) ?? 'es';
 let answers: Answers = {}; let qi = 0; let done = false;
@@ -20,22 +27,35 @@ const route = () => location.hash.slice(1) || 'home';
 const SECTIONS: [SectionKey, string][] = [['definition', 'legal.definition'], ['who', 'legal.who'], ['conditions', 'legal.conditions'], ['residence', 'legal.residence'], ['employment', 'legal.employment'], ['renewal', 'legal.renewal']];
 const GROUPS = { A: 'legal.groupA', B: 'legal.groupB', C: 'legal.groupC', D: 'legal.groupD', E: 'legal.groupE' } as const;
 
+function stars() {
+  const pts = Array.from({ length: 9 }, (_, i) => { const a = (200 + i * 14) * Math.PI / 180; return [170 + Math.cos(a) * 140, 300 + Math.sin(a) * 140]; });
+  const star = (x: number, y: number) => `<polygon points="${Array.from({ length: 10 }, (_, k) => { const r = k % 2 ? 6 : 15; const a = (k * 36 - 90) * Math.PI / 180; return `${(x + Math.cos(a) * r).toFixed(1)},${(y + Math.sin(a) * r).toFixed(1)}`; }).join(' ')}" fill="#c7a45b" opacity=".75"/>`;
+  return `<svg class="stars" viewBox="0 0 340 300" aria-hidden="true">${pts.map(([x, y]) => star(x, y)).join('')}</svg>`;
+}
+
 function header() {
   const r = route();
-  const link = (h: string, k: string) => `<a href="#${h}" ${r.startsWith(h) ? 'aria-current="page"' : ''}>${esc(t(k))}</a>`;
-  return `<header class="hdr"><div class="in"><a class="brand" href="#home"><svg width="34" height="34" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#101d35" stroke="#c7a45b" stroke-width="1.5"/><path d="M32 9 50 15v15c0 11-7.6 18.4-18 23C21.6 48.4 14 41 14 30V15L32 9Z" stroke="#c7a45b" stroke-width="1.6" stroke-linejoin="round"/><path d="M21 41V25.5L32 34l11-8.5V41" stroke="#c7a45b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>MIGRA ESPAÑA<small>${esc(t('brand.tagline'))}</small></span></a>
-  <nav>${link('law', 'nav.law')}${link('eligibility', 'nav.eligibility')}${link('guides', 'nav.guides')}${link('help', 'help.title')}</nav>
-  <select id="lang" aria-label="${esc(t('nav.language'))}">${LOCALES.map((l) => `<option value="${l}" ${l === locale ? 'selected' : ''}>${LOCALE_NAMES[l]}</option>`).join('')}</select>
-  <button id="theme" aria-label="${esc(t('nav.theme'))}">◐</button></div></header>`;
+  const link = (h: string, k: string, icon: string) => `<a href="#${h}" ${r.startsWith(h) ? 'aria-current="page"' : ''}>${icon}<span>${esc(t(k))}</span></a>`;
+  return `${stars()}<header class="in"><div class="mast"><div class="flag" aria-hidden="true"><i></i></div><img class="seal" src="${logoImg}" alt="">
+    <div class="brandrow">${laurel()}<div><div class="wordmark">MIGRA ESPAÑA</div><div class="tag">${esc(t('brand.tagline'))}</div></div>${laurel(true)}</div></div>
+    <nav class="navwrap" aria-label="Main"><a class="homebtn" href="#home">${ICON.home}${esc(t('nav.home'))}</a><span class="bell" aria-hidden="true">${ICON.bell}</span>
+      <div class="pill-nav">${link('law', 'nav.law', ICON.book)}${link('eligibility', 'nav.eligibility', ICON.people)}${link('guides', 'nav.guides', ICON.scales)}${link('help', 'help.title', ICON.chat)}</div></nav>
+    <div class="langrow"><label class="lang">${ICON.pin}<select id="lang" aria-label="${esc(t('nav.language'))}">${LOCALES.map((l) => `<option value="${l}" ${l === locale ? 'selected' : ''}>${LOCALE_NAMES[l]}</option>`).join('')}</select>${ICON.chevronDown}</label><span class="bell" aria-hidden="true">${ICON.globe}</span></div></header>`;
 }
 
 function home() {
-  const sc: [string, string, string][] = [['eligibility', '✓', 'shortcut.eligibility'], ['law', '⚖', 'shortcut.pathway'], ['guides', '❖', 'shortcut.law']];
-  return `<section class="hero"><div class="in"><p class="eyebrow">${esc(t('hero.eyebrow'))}</p><h1>${esc(t('hero.title'))}</h1><p class="lead">${esc(t('hero.sub'))}</p>
-  <div class="actions"><a class="btn gold" href="#eligibility">${esc(t('hero.cta1'))}</a><a class="btn ghost" href="#law">${esc(t('hero.cta2'))}</a><a class="btn ghost" href="#start">${esc(t('start.homeLink'))}</a></div></div></section>
-  <section class="in sec"><h2>${esc(t('home.shortcuts'))}</h2><div class="grid">${sc.map(([h, i, k]) => `<a class="card" href="#${h}"><span class="ico">${i}</span><h3>${esc(t(k))}</h3></a>`).join('')}</div>
-  <div class="card" style="margin-top:20px"><h3>${esc(t('home.trust.title'))}</h3><p>${esc(t('home.trust.body'))}</p><p class="note">${esc(t('home.notLawyer'))}</p></div>
-  <p class="note demo">${esc(t('common.demo'))}</p></section>`;
+  const chev = ICON.chevron;
+  return `<section class="in"><div class="hero"><div class="hero-photo" role="img" aria-label="Madrid" style="background-image:url(${heroImg})"></div>
+    <div class="hero-copy"><span class="eyebrow">${esc(t('hero.eyebrow'))}</span><h1>${esc(t('hero.title'))}</h1><p class="lead">${esc(t('hero.sub'))}</p></div></div>
+    <div class="ctas"><a class="btn gold" href="#eligibility">${ICON.rocket}${esc(t('hero.cta1'))}</a><a class="btn" href="#law">${ICON.scales}${esc(t('hero.cta2'))}</a><a class="btn" href="#start">${ICON.doc}${esc(t('start.homeLink'))}</a></div></section>
+  <section class="in sec"><h2 class="rule-title">${esc(t('home.shortcuts'))}</h2>
+    <div class="tiles">
+      <a class="tile t-elig" href="#eligibility"><h3>${chev}${esc(t('shortcut.eligibility'))}</h3><img src="${clipImg}" alt=""></a>
+      <a class="tile t-road" href="#start"><h3>${chev}${esc(t('shortcut.pathway'))}</h3><img src="${roadImg}" alt=""></a>
+      <a class="tile t-law" href="#law"><h3>${chev}${esc(t('shortcut.law'))}</h3><img src="${gavelImg}" alt=""></a>
+    </div>
+    <div class="trust"><div class="ribbon" aria-hidden="true"><i></i></div><div><h3>${ICON.badge}${esc(t('home.trust.title'))}</h3><p>${esc(t('home.trust.body'))}</p><p class="meta" style="margin:0">${esc(t('home.notLawyer'))}</p></div><img src="${folderImg}" alt=""></div>
+    <p class="note info" style="margin-top:18px">${esc(t('common.demo'))}</p></section>`;
 }
 
 function law() {
@@ -84,7 +104,7 @@ function question() {
   const help = t('q.help.' + q.code); const last = qi >= vis.length - 1;
   return `<div class="title"><div class="in"><h1>${esc(t('elig.title'))}</h1><p>${esc(t('elig.intro'))}</p></div></div><section class="in sec" style="max-width:780px"><div class="card"><div class="bar"><i style="width:${((qi + 1) / vis.length) * 100}%"></i></div>
   <p class="meta">${esc(t('elig.question'))} ${qi + 1} ${esc(t('elig.of'))} ${vis.length}${q.additional ? ' · ' + esc(t('elig.additional')) : ''}</p><h2>${esc(t('q.' + q.code))}</h2>${help !== 'q.help.' + q.code ? `<p class="pending">${esc(help)}</p>` : ''}${input}
-  <div class="actions"><button class="btn ghost dk" id="back" ${qi === 0 ? 'disabled' : ''}>${esc(t('common.back'))}</button><button class="btn gold" id="next">${esc(last ? t('elig.seeResults') : t('common.next'))}</button></div><p class="pending">${esc(t('elig.disclaimer'))}</p></div></section>`;
+  <div class="actions"><button class="btn" id="back" ${qi === 0 ? 'disabled' : ''}>${esc(t('common.back'))}</button><button class="btn gold" id="next">${esc(last ? t('elig.seeResults') : t('common.next'))}</button></div><p class="pending">${esc(t('elig.disclaimer'))}</p></div></section>`;
 }
 
 function card(r: PathwayResult) {
@@ -107,7 +127,7 @@ function render() {
   const r = route(); let body: string;
   if (r === 'law') body = law(); else if (r.startsWith('law-')) body = pathway(r.slice(4)); else if (r === 'guides') body = guides(); else if (r === 'start') body = start(); else if (r === 'help') body = help();
   else if (r === 'eligibility') body = done ? results() : question(); else body = home();
-  app.innerHTML = header() + `<main>${body}</main><footer><div class="in">© MIGRA ESPAÑA — ${esc(t('footer.disclaimer'))}</div></footer>`;
+  app.innerHTML = header() + `<main>${body}</main><footer class="in"><div>© MIGRA ESPAÑA — ${esc(t('footer.disclaimer'))}</div></footer>`;
   const get = () => { const el = document.getElementById('ans') as HTMLInputElement | null; if (el) return el.value; return (document.querySelector('input[name=ans]:checked') as HTMLInputElement | null)?.value ?? ''; };
   document.getElementById('lang')?.addEventListener('change', (e) => { locale = (e.target as HTMLSelectElement).value as Locale; render(); });
   document.getElementById('theme')?.addEventListener('click', () => { const d = document.documentElement; const cur = d.dataset.theme ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); d.dataset.theme = cur === 'dark' ? 'light' : 'dark'; });

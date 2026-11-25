@@ -26,14 +26,20 @@ Future<void> main() async {
   runApp(Scope(state: state, child: const MigraApp()));
 }
 
-ThemeData _theme(Brightness b) {
-  final dark = b == Brightness.dark;
-  final scheme = ColorScheme.fromSeed(seedColor: navy, brightness: b, primary: dark ? gold : navy, secondary: gold, surface: dark ? const Color(0xFF131F38) : Colors.white);
+const goldHi = Color(0xFFF1D48A), goldLo = Color(0xFFA9842F), night = Color(0xFF0A1530), glass = Color(0xFF16284A);
+
+/// Single-theme luxury night look (brand mockup): navy stage, gold accents, rounded glass cards.
+ThemeData luxTheme() {
+  final scheme = ColorScheme.fromSeed(seedColor: navy, brightness: Brightness.dark, primary: gold, onPrimary: navy, secondary: goldHi, surface: glass, onSurface: const Color(0xFFF4F6F9));
   return ThemeData(
-    useMaterial3: true, colorScheme: scheme, scaffoldBackgroundColor: dark ? const Color(0xFF0B1426) : greyBg,
-    appBarTheme: const AppBarTheme(backgroundColor: navy, foregroundColor: Colors.white),
-    cardTheme: CardThemeData(elevation: 0, color: scheme.surface, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: BorderSide(color: dark ? const Color(0xFF26385C) : const Color(0xFFDFE4EC)))),
-    filledButtonTheme: FilledButtonThemeData(style: FilledButton.styleFrom(backgroundColor: gold, foregroundColor: navy, minimumSize: const Size(48, 48), textStyle: const TextStyle(fontWeight: FontWeight.w600))),
+    useMaterial3: true, colorScheme: scheme, scaffoldBackgroundColor: night,
+    appBarTheme: const AppBarTheme(backgroundColor: night, foregroundColor: goldHi, centerTitle: true, elevation: 0),
+    cardTheme: CardThemeData(elevation: 0, color: glass.withValues(alpha: .85), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22), side: BorderSide(color: gold.withValues(alpha: .45)))),
+    filledButtonTheme: FilledButtonThemeData(style: FilledButton.styleFrom(backgroundColor: gold, foregroundColor: navy, minimumSize: const Size(48, 52), shape: const StadiumBorder(), textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16))),
+    outlinedButtonTheme: OutlinedButtonThemeData(style: OutlinedButton.styleFrom(foregroundColor: Colors.white, side: const BorderSide(color: gold, width: 1.5), minimumSize: const Size(48, 52), shape: const StadiumBorder(), textStyle: const TextStyle(fontWeight: FontWeight.w700))),
+    navigationBarTheme: NavigationBarThemeData(backgroundColor: const Color(0xFF0B1630), indicatorColor: gold.withValues(alpha: .22), labelTextStyle: WidgetStateProperty.all(const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)), iconTheme: WidgetStateProperty.resolveWith((s) => IconThemeData(color: s.contains(WidgetState.selected) ? goldHi : gold))),
+    inputDecorationTheme: InputDecorationTheme(filled: true, fillColor: const Color(0xFF0E1C3D), border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: gold.withValues(alpha: .4)))),
+    dividerColor: gold.withValues(alpha: .3),
   );
 }
 
@@ -48,7 +54,7 @@ class MigraApp extends StatelessWidget {
       locale: Locale(s.locale), // Arabic => RTL automatically
       supportedLocales: const [Locale('es'), Locale('en'), Locale('fr'), Locale('ar')],
       localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
-      theme: _theme(Brightness.light), darkTheme: _theme(Brightness.dark), themeMode: s.theme,
+      theme: luxTheme(), darkTheme: luxTheme(), themeMode: ThemeMode.dark,
       home: const Shell(),
     );
   }
@@ -69,7 +75,13 @@ class _ShellState extends State<Shell> {
     final pages = [HomeScreen(go: go), const LawScreen(), const EligibilityScreen(), const VaultScreen(), const LawyersScreen()];
     return Scaffold(
       appBar: AppBar(
-        title: Row(children: [const Icon(Icons.shield_outlined, color: gold), const SizedBox(width: 10), Flexible(child: Text('MIGRA ESPAÑA', style: const TextStyle(letterSpacing: 2, fontWeight: FontWeight.w600)))]),
+        toolbarHeight: 72,
+        leading: Padding(padding: const EdgeInsets.all(8), child: ClipOval(child: Image.asset('assets/brand/logo.jpg', fit: BoxFit.cover))),
+        title: Column(mainAxisSize: MainAxisSize.min, children: [
+          ShaderMask(shaderCallback: (r) => const LinearGradient(colors: [goldHi, gold, goldLo], begin: Alignment.topCenter, end: Alignment.bottomCenter).createShader(r),
+            child: const Text('MIGRA ESPAÑA', style: TextStyle(color: Colors.white, fontFamily: 'serif', fontSize: 22, fontWeight: FontWeight.w700, letterSpacing: 2.5))),
+          Text(s.t('brand.tagline'), style: const TextStyle(color: goldHi, fontSize: 13, fontWeight: FontWeight.w700)),
+        ]),
         actions: [
           PopupMenuButton<String>(
             tooltip: s.t('nav.language'), icon: const Icon(Icons.language), onSelected: s.setLocale,
@@ -78,7 +90,6 @@ class _ShellState extends State<Shell> {
           ListenableBuilder(listenable: s.auth, builder: (context, _) => s.auth.signedIn
               ? IconButton(tooltip: s.t('nav.logout'), icon: const Icon(Icons.logout), onPressed: s.auth.signOut)
               : IconButton(tooltip: s.t('nav.login'), icon: const Icon(Icons.account_circle_outlined), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AccountScreen())))),
-          IconButton(tooltip: s.t('nav.theme'), icon: const Icon(Icons.brightness_6), onPressed: () => s.toggleTheme(Theme.of(context).brightness)),
         ],
       ),
       body: SafeArea(child: pages[tab]),

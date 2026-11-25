@@ -22,3 +22,4 @@ flutter:
   assets:
     - assets/legal.json
     - assets/i18n/
+    - assets/brand/
