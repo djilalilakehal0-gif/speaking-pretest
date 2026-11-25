@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../core/app_state.dart';
 import 'widgets.dart';
 
@@ -25,6 +26,16 @@ class StartScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(s.t('start.faqTitle'), style: Theme.of(context).textTheme.titleLarge),
           for (var n = 1; n <= 2; n++) Card(child: ExpansionTile(title: Text(s.t('start.faq${n}q')), childrenPadding: const EdgeInsets.all(12), children: [Notice(s.t('start.faqPending'))])),
+          const SizedBox(height: 8),
+          Text(s.t('help.title'), style: Theme.of(context).textTheme.titleLarge), Text(s.t('help.intro')),
+          for (final o in (s.legal.help['orgs'] as List).cast<Map<String, dynamic>>())
+            Card(child: ListTile(
+              title: Text(o['name'] as String, style: const TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text('${s.t('help.scope.${o['scope']}')}\n${o['phone']}${o['hours'] != null ? ' · ${o['hours']}' : ''}'), isThreeLine: true,
+              trailing: IconButton(tooltip: s.t('help.call'), icon: const Icon(Icons.call), onPressed: () => launchUrl(Uri(scheme: 'tel', path: (o['phone'] as String).replaceAll(' ', '')))),
+            )),
+          Notice('${s.t('help.note')} ${s.t('help.source')}: ${(s.legal.help['source'] as Map)['title']} (${s.t('help.checked')} ${(s.legal.help['source'] as Map)['checkedOn']}).'),
+          Notice(s.t('help.verify')),
           Notice(s.t('elig.disclaimer')),
           const SizedBox(height: 8),
           FilledButton(onPressed: () => Navigator.pop(context), child: Text(s.t('start.cta'))),

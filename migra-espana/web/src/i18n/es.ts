@@ -218,4 +218,13 @@ export const es: Record<string, string> = {
   "reg.done": "Recibido. Verificaremos tu colegiación con tu Colegio antes de listar tu perfil.",
   "reg.exists": "Ya existe un perfil de abogado para esta cuenta.",
   "reg.link": "¿Eres abogado/a? Regístrate",
+  "help.title": "Orientación jurídica gratuita",
+  "help.intro": "Organizaciones que ofrecen asesoramiento jurídico gratuito. Son organizaciones, no abogados individuales.",
+  "help.scope.asylum": "Asesoramiento gratuito para solicitantes de asilo, personas refugiadas y apátridas",
+  "help.scope.asylum_and_extranjeria": "Asilo y asesoramiento de extranjería para personas cuya solicitud de asilo fue denegada",
+  "help.note": "Los teléfonos se han copiado de una página de ACNUR España y pueden cambiar. Los servicios tienen un alcance y una capacidad limitados: llama para preguntar si pueden ayudarte con tu caso.",
+  "help.source": "Fuente",
+  "help.checked": "Consultado el",
+  "help.verify": "Antes de contratar a un abogado, comprueba su colegiación en el censo oficial.",
+  "help.call": "Llamar",
 };

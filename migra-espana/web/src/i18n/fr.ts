@@ -218,4 +218,13 @@ export const fr: Record<string, string> = {
   "reg.done": "Reçu. Nous vérifierons votre inscription auprès de votre Colegio avant de lister votre profil.",
   "reg.exists": "Un profil d'avocat existe déjà pour ce compte.",
   "reg.link": "Vous êtes avocat(e) ? Inscrivez-vous",
+  "help.title": "Orientation juridique gratuite",
+  "help.intro": "Organisations qui offrent des conseils juridiques gratuits. Ce sont des organisations, pas des avocats individuels.",
+  "help.scope.asylum": "Conseils gratuits pour les demandeurs d'asile, les réfugiés et les apatrides",
+  "help.scope.asylum_and_extranjeria": "Asile, et conseils en droit des étrangers (extranjería) pour les personnes dont la demande d'asile a été refusée",
+  "help.note": "Les numéros sont copiés d'une page d'ACNUR Espagne et peuvent changer. Les services ont une portée et une capacité limitées : appelez pour demander s'ils peuvent aider dans votre cas.",
+  "help.source": "Source",
+  "help.checked": "Consulté le",
+  "help.verify": "Avant d'engager un avocat, vérifiez son inscription dans le registre officiel du barreau.",
+  "help.call": "Appeler",
 };

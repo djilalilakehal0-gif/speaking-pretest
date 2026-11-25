@@ -11,7 +11,8 @@ const localeNames = {'es': 'Español', 'en': 'English', 'fr': 'Français', 'ar':
 class Legal {
   final String snapshot;
   final List<Map<String, dynamic>> pathways, sources, resources;
-  Legal(this.snapshot, this.pathways, this.sources, this.resources);
+  final Map<String, dynamic> help;
+  Legal(this.snapshot, this.pathways, this.sources, this.resources, this.help);
 }
 
 class AppState extends ChangeNotifier {
@@ -29,7 +30,7 @@ class AppState extends ChangeNotifier {
     }
     final j = jsonDecode(await rootBundle.loadString('assets/legal.json')) as Map<String, dynamic>;
     List<Map<String, dynamic>> lst(String k) => (j[k] as List).cast<Map<String, dynamic>>();
-    legal = Legal(j['snapshot'] as String, lst('pathways'), lst('sources'), lst('resources'));
+    legal = Legal(j['snapshot'] as String, lst('pathways'), lst('sources'), lst('resources'), j['help'] as Map<String, dynamic>);
     try {
       final p = await SharedPreferences.getInstance();
       final saved = p.getString('locale');

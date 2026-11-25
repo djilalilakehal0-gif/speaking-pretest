@@ -217,4 +217,13 @@ export const en: Record<string, string> = {
   "reg.done": "Received. We will verify your registration with your Colegio before your profile is listed.",
   "reg.exists": "A lawyer profile already exists for this account.",
   "reg.link": "Are you a lawyer? Register",
+  "help.title": "Free legal orientation",
+  "help.intro": "Organisations that offer free legal advice. These are organisations, not individual lawyers.",
+  "help.scope.asylum": "Free advice for asylum seekers, refugees and stateless people",
+  "help.scope.asylum_and_extranjeria": "Asylum, and immigration (extranjería) advice for people whose asylum claim was refused",
+  "help.note": "Phone numbers are copied from a UNHCR Spain page and may change. Services have limited scope and capacity: call to ask whether they can help with your case.",
+  "help.source": "Source",
+  "help.checked": "Read on",
+  "help.verify": "Before hiring any lawyer, check the registration in the official bar census.",
+  "help.call": "Call",
 };

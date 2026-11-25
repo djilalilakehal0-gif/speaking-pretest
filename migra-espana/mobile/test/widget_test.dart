@@ -54,5 +54,9 @@ void main() {
     expect(find.text(s.t('start.s1.t')), findsOneWidget);
     await tester.scrollUntilVisible(find.text(s.t('start.s4.t')), 200);
     expect(find.text(s.t('start.s4.t')), findsOneWidget);
+    await tester.scrollUntilVisible(find.text(s.t('help.title')), 300);
+    expect(find.text(s.t('help.title')), findsOneWidget);
+    await tester.scrollUntilVisible(find.text(s.t('help.verify')), 300);
+    expect(find.text(s.t('help.verify')), findsOneWidget);
   });
 }

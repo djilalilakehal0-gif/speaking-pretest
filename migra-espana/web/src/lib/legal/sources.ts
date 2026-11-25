@@ -31,5 +31,6 @@ export const RESOURCES: { key: string; name: string; url: string; kind: string }
   { key: 'policia', name: 'Policía Nacional', url: 'https://www.policia.es', kind: 'police' },
   { key: 'justicia', name: 'Ministerio de Justicia', url: 'https://www.mjusticia.gob.es', kind: 'ministry' },
   { key: 'exteriores', name: 'Ministerio de Asuntos Exteriores — servicios consulares', url: 'https://www.exteriores.gob.es', kind: 'consular' },
+  { key: 'censo', name: 'Censo de Letrados — Abogacía Española (check any lawyer before hiring)', url: 'https://www.abogacia.es/servicios-abogacia/censo-de-letrados/', kind: 'verification' },
   { key: 'aeat', name: 'Agencia Tributaria', url: 'https://sede.agenciatributaria.gob.es', kind: 'tax' },
 ];
