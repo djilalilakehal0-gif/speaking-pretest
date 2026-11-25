@@ -236,4 +236,5 @@ export const en: Record<string, string> = {
   "contact.remove": "Remove my contact numbers",
   "lawyers.call": "Call",
   "lawyers.whatsapp": "WhatsApp",
+  "pay.disclosureRequired": "You must read and accept the disclosure before paying.",
 };

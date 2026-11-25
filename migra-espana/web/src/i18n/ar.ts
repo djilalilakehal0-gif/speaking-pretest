@@ -237,4 +237,5 @@ export const ar: Record<string, string> = {
   "contact.remove": "إزالة أرقام التواصل",
   "lawyers.call": "اتصال",
   "lawyers.whatsapp": "واتساب",
+  "pay.disclosureRequired": "يجب أن تقرأ المعلومات وتوافق عليها قبل الدفع.",
 };

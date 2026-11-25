@@ -195,3 +195,14 @@ set role authenticated; select set_config('request.jwt.claim.sub','00000000-0000
 do $$ begin assert (select count(*) from lawyers where id='00000000-0000-0000-0000-00000000000b') = 0, 'unlisted lawyer contact hidden from public'; end $$;
 reset role;
 select 'CONTACT TESTS PASSED' as result;
+
+-- ───── 0005: payment disclosure acceptances ─────
+set role authenticated; select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000b',false);
+insert into payment_disclosure_acceptances (user_id, tier, disclosure_version, locale) values ('00000000-0000-0000-0000-00000000000b','premium','2026-11-25-v1','es');
+do $$ begin assert (select count(*) from payment_disclosure_acceptances) = 1, 'user can record own acceptance'; end $$;
+do $$ begin begin insert into payment_disclosure_acceptances (user_id, tier, disclosure_version, locale) values ('00000000-0000-0000-0000-00000000000a','premium','v','es'); raise exception 'should have failed';
+  exception when insufficient_privilege then null; end; end $$;
+reset role;
+do $$ begin begin update payment_disclosure_acceptances set locale = 'en'; raise exception 'should have failed';
+  exception when others then if sqlerrm = 'should have failed' then raise; end if; end; end $$;
+select 'DISCLOSURE TESTS PASSED' as result;

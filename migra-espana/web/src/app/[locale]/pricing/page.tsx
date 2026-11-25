@@ -20,7 +20,7 @@ export default async function Pricing({ params }: P) {
                 <p className="price">{price === null ? '—' : `€${price}`}{price !== null && p.tier !== 'free' && <small style={{ fontSize: '.9rem', fontFamily: 'var(--sans)' }}> {t('pricing.perMonth')}</small>}</p>
                 <ul className="clean">{p.features.map((f) => <li key={f}>{t(f)}</li>)}</ul>
                 {p.tier === 'free' ? <Link className="btn btn-ghost" style={{ color: 'var(--text)' }} href={`/${locale}/register`}>{t('auth.register')}</Link>
-                  : <CheckoutButton tier={p.tier} />}
+                  : <CheckoutButton tier={p.tier} planName={t(name[p.tier])} price={price === null ? null : `€${price}`} />}
               </article>);
           })}
         </div>
