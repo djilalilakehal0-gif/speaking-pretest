@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { PageTitle } from '@/components/PageTitle';
+import { ContactEditor } from '@/components/ContactEditor';
 import { ActionButton } from '@/components/ActionButton';
 import { currentUser, serverClient, supabaseConfigured } from '@/lib/supabase/server';
 import { pageCtx, type P } from '@/lib/page';
@@ -12,7 +13,7 @@ export default async function LawyerDash({ params }: P) {
   const user = await currentUser();
   if (!user) redirect(`/${locale}/login`);
   const sb = await serverClient();
-  const { data: me } = await sb.from('lawyers').select('id, verification').eq('id', user.id).maybeSingle();
+  const { data: me } = await sb.from('lawyers').select('id, verification, contact_phone, contact_whatsapp').eq('id', user.id).maybeSingle();
   if (!me) redirect(`/${locale}/lawyer/register`);
   if (me.verification !== 'verified') return (<><PageTitle title={t('lawyerdash.title')} /><div className="wrap section"><p className="banner">{t('lawyerdash.notVerified')}</p></div></>);
 
@@ -23,6 +24,7 @@ export default async function LawyerDash({ params }: P) {
     <>
       <PageTitle title={t('lawyerdash.title')} />
       <div className="wrap section grid g2" style={{ alignItems: 'start' }}>
+        <ContactEditor phone={me.contact_phone} whatsapp={me.contact_whatsapp} />
         <section className="card"><h3>{t('msg.title')}</h3><a className="btn btn-gold" href={`/${locale}/messages`}>{t('msg.title')}</a></section>
         <section className="card"><h3>{t('lawyerdash.requests')}</h3>
           {requests.length === 0 ? <p className="pending">—</p> : <table><tbody>{requests.map((r: { id: string; starts_at: string }) => (

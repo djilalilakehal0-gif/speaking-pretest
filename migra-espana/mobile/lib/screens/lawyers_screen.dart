@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../core/api.dart';
 import '../core/app_state.dart';
 import 'account_screen.dart';
@@ -63,7 +64,9 @@ class _LawyersScreenState extends State<LawyersScreen> {
           Text('${s.t('lawyers.bar')}: ${l.bar}\n${s.t('lawyers.languages')}: ${l.languages.map((x) => localeNames[x] ?? x).join(', ')}'),
           if (l.priceCents != null) Text('${s.t('lawyers.price')}: ${(l.priceCents! / 100).toStringAsFixed(2)} ${l.currency}', style: const TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 10),
-          Wrap(spacing: 10, runSpacing: 8, children: [FilledButton(onPressed: () => book(l), child: Text(s.t('lawyers.book'))), OutlinedButton(onPressed: () => message_(l), child: Text(s.t('msg.open')))]),
+          Wrap(spacing: 10, runSpacing: 8, children: [FilledButton(onPressed: () => book(l), child: Text(s.t('lawyers.book'))), OutlinedButton(onPressed: () => message_(l), child: Text(s.t('msg.open'))),
+            if (l.phone != null) OutlinedButton.icon(icon: const Icon(Icons.call), onPressed: () => launchUrl(telUri(l.phone!)), label: Text('${s.t('lawyers.call')} ${l.phone}')),
+            if (l.whatsapp != null) OutlinedButton.icon(icon: const Icon(Icons.chat), onPressed: () => launchUrl(whatsappUri(l.whatsapp!), mode: LaunchMode.externalApplication), label: Text(s.t('lawyers.whatsapp')))]),
         ]))),
       Notice(s.t('lawyers.disclaimer')),
     ]);

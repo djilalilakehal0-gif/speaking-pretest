@@ -11,6 +11,10 @@ class ApiException implements Exception {
   String toString() => 'ApiException($status, $code)';
 }
 
+/// E.164 -> wa.me link (digits only, no plus).
+Uri whatsappUri(String e164) => Uri.parse('https://wa.me/${e164.replaceFirst('+', '')}');
+Uri telUri(String e164) => Uri(scheme: 'tel', path: e164);
+
 class VaultDoc {
   final String id, category, fileName;
   final String? expiresOn;
@@ -29,8 +33,9 @@ class Lawyer {
   final List<String> languages;
   final int? priceCents;
   final String currency;
-  Lawyer(this.id, this.name, this.bar, this.languages, this.priceCents, this.currency);
-  factory Lawyer.fromJson(Map<String, dynamic> j) => Lawyer(j['id'], j['display_name'], j['bar_association'], (j['languages'] as List).cast<String>(), j['consultation_price_cents'] as int?, (j['currency'] ?? 'EUR') as String);
+  final String? phone, whatsapp;   // public only after verification + the lawyer's consent (enforced in the database)
+  Lawyer(this.id, this.name, this.bar, this.languages, this.priceCents, this.currency, {this.phone, this.whatsapp});
+  factory Lawyer.fromJson(Map<String, dynamic> j) => Lawyer(j['id'], j['display_name'], j['bar_association'], (j['languages'] as List).cast<String>(), j['consultation_price_cents'] as int?, (j['currency'] ?? 'EUR') as String, phone: j['contact_phone'] as String?, whatsapp: j['contact_whatsapp'] as String?);
 }
 
 class Conversation {

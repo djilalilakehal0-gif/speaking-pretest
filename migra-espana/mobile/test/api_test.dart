@@ -58,4 +58,17 @@ void main() {
     expect(VaultDoc('1', 'passport', 'p', '2027-06-01').expiringSoon(now), isFalse);
     expect(VaultDoc('1', 'passport', 'p', null).expiringSoon(now), isFalse);
   });
+
+  test('lawyer contact is parsed and links are well formed', () async {
+    final api = HttpApi('https://x.test', () => null, MockClient((_) async => http.Response(jsonEncode([
+      {'id': 'l1', 'display_name': 'A', 'bar_association': 'ICAM', 'languages': ['es'], 'consultation_price_cents': null, 'currency': 'EUR', 'contact_phone': '+34600111222', 'contact_whatsapp': '+212600111222'},
+      {'id': 'l2', 'display_name': 'B', 'bar_association': 'ICAM', 'languages': ['ar'], 'consultation_price_cents': null, 'currency': 'EUR', 'contact_phone': null, 'contact_whatsapp': null},
+    ]), 200)));
+    final l = await api.listLawyers();
+    expect(l[0].phone, '+34600111222');
+    expect(whatsappUri(l[0].whatsapp!).toString(), 'https://wa.me/212600111222');
+    expect(telUri(l[0].phone!).toString(), 'tel:+34600111222');
+    expect(l[1].phone, isNull);
+    expect(l[1].whatsapp, isNull);
+  });
 }

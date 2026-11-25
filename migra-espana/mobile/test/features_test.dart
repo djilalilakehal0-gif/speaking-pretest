@@ -28,7 +28,7 @@ class FakeApi implements Api {
   @override Future<void> uploadDocument({required Uint8List bytes, required String fileName, required String mime, required String category, String? expiresOn}) async {}
   @override Future<Uri> signedUrl(String id) async => Uri.parse('https://signed.test/$id');
   @override Future<void> deleteDocument(String id) async { deleted.add(id); docs.removeWhere((d) => d.id == id); }
-  @override Future<List<Lawyer>> listLawyers() async => [Lawyer('l1', 'Ana Pérez', 'ICAM', ['es', 'ar'], 5000, 'EUR')];
+  @override Future<List<Lawyer>> listLawyers() async => [Lawyer('l1', 'Ana Pérez', 'ICAM', ['es', 'ar'], 5000, 'EUR', phone: '+34600111222', whatsapp: '+34600111222')];
   @override Future<String> openConversation(String lawyerId) async => 'c1';
   @override Future<List<Conversation>> listConversations() async => [Conversation('c1', 'Ana Pérez', 'hola', true)];
   @override Future<List<Message>> messages(String id) async => [Message('m1', 'hola', '2026-11-22T10:00:00Z', false), for (final b in sent) Message('x$b', b, '2026-11-22T10:01:00Z', true)];
@@ -97,6 +97,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Ana Pérez'), findsOneWidget);
     expect(find.text(s.t('lawyers.verified')), findsOneWidget);
+    expect(find.textContaining('+34600111222'), findsOneWidget);
+    expect(find.text(s.t('lawyers.whatsapp')), findsOneWidget);
     await tester.tap(find.widgetWithText(OutlinedButton, s.t('msg.open')));
     await tester.pumpAndSettle();
     expect(find.text(s.t('msg.note')), findsOneWidget);

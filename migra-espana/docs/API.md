@@ -17,3 +17,4 @@
 | POST `/api/lawyers/register` | user | creates a PENDING, unlisted profile only; admin verification grants the `lawyer` role |
 
 All routes accept `Authorization: Bearer <Supabase access token>` (mobile) or the session cookie (web).
+| PATCH `/api/lawyers/me` | lawyer | edit or withdraw public phone/WhatsApp (E.164; consent required; no numbers = removal) |

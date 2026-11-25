@@ -13,6 +13,8 @@ export async function POST(req: Request) {
   const { error } = await sb.from('lawyers').insert({
     id: a.user.id, display_name: p.data.displayName, bar_association: p.data.barAssociation, bar_number: p.data.barNumber,
     languages: p.data.languages, bio: p.data.bio ? { es: p.data.bio } : {},
+    contact_phone: p.data.contactPhone ?? null, contact_whatsapp: p.data.contactWhatsapp ?? null,
+    contact_consent_at: p.data.contactPhone || p.data.contactWhatsapp ? new Date().toISOString() : null,
   });
   if (error) return fail(error.code === '23505' ? 409 : 500, error.code === '23505' ? 'already_registered' : 'db_error');
   await sb.from('lawyer_verifications').insert({ lawyer_id: a.user.id, status: 'pending' });

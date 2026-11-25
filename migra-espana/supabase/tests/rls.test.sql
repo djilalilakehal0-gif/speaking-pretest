@@ -173,3 +173,25 @@ end $$;
 insert into lawyers (id, display_name, bar_association, bar_number) values ('00000000-0000-0000-0000-00000000000b','Self Reg','Colegio Y','999');
 reset role;
 select 'MESSAGING TESTS PASSED' as result;
+
+-- ───── 0004: lawyer contact ─────
+do $$ begin
+  begin update lawyers set contact_phone = '+34600111222' where id='00000000-0000-0000-0000-00000000000b'; raise exception 'should have failed';
+  exception when check_violation then null; end;                       -- no consent => rejected
+  begin update lawyers set contact_phone = '0600 111 222', contact_consent_at = now() where id='00000000-0000-0000-0000-00000000000b'; raise exception 'should have failed';
+  exception when check_violation then null; end;                       -- not E.164 => rejected
+  update lawyers set contact_phone = '+34600111222', contact_whatsapp = '+212600111222', contact_consent_at = now(), verification='verified', listed=true where id='00000000-0000-0000-0000-00000000000b';
+end $$;
+set role authenticated; select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000a',false);
+do $$ begin assert (select contact_whatsapp from lawyers where id='00000000-0000-0000-0000-00000000000b') = '+212600111222', 'verified+listed lawyer contact visible'; end $$;
+-- a lawyer can withdraw contact (set null) but cannot self-verify/list
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000b',false);
+update lawyers set contact_phone = null, contact_whatsapp = null where id='00000000-0000-0000-0000-00000000000b';
+do $$ begin assert (select contact_phone is null and contact_whatsapp is null from lawyers where id='00000000-0000-0000-0000-00000000000b'), 'contact can be withdrawn'; end $$;
+reset role;
+-- pending (unlisted) lawyers' contact is not public
+update lawyers set contact_phone='+34600111222', contact_consent_at=now(), verification='pending', listed=false where id='00000000-0000-0000-0000-00000000000b';
+set role authenticated; select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000a',false);
+do $$ begin assert (select count(*) from lawyers where id='00000000-0000-0000-0000-00000000000b') = 0, 'unlisted lawyer contact hidden from public'; end $$;
+reset role;
+select 'CONTACT TESTS PASSED' as result;
