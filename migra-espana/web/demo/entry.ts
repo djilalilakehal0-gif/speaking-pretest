@@ -46,7 +46,7 @@ function header() {
 function home() {
   const chev = ICON.chevron;
   return `<section class="in"><div class="hero"><div class="hero-photo" role="img" aria-label="Madrid" style="background-image:url(${heroImg})"></div>
-    <div class="hero-copy"><span class="eyebrow">${esc(t('hero.eyebrow'))}</span><h1>${esc(t('hero.title'))}</h1><p class="lead">${esc(t('hero.sub'))}</p></div></div>
+    <div class="hero-copy"><span class="eyebrow">${esc(t('hero.eyebrow'))}</span><h1>${t('hero.title').split(/(?<=[.。])\s+/).map((x) => `<span style="display:block">${esc(x)}</span>`).join('')}</h1><p class="lead">${esc(t('hero.sub'))}</p></div></div>
     <div class="ctas"><a class="btn gold" href="#eligibility">${ICON.rocket}${esc(t('hero.cta1'))}</a><a class="btn" href="#law">${ICON.scales}${esc(t('hero.cta2'))}</a><a class="btn" href="#start">${ICON.doc}${esc(t('start.homeLink'))}</a></div></section>
   <section class="in sec"><h2 class="rule-title">${esc(t('home.shortcuts'))}</h2>
     <div class="tiles">

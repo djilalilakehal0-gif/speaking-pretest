@@ -12,7 +12,7 @@ export default async function Home({ params }: P) {
           <div className="photo" role="img" aria-label="Madrid" />
           <div className="copy">
             <span className="eyebrow-line">{t('hero.eyebrow')}</span>
-            <h1>{t('hero.title')}</h1>
+            <h1>{t('hero.title').split(/(?<=[.。])\s+/).map((x, i, a) => <span key={i} style={{ display: 'block' }}>{x}</span>)}</h1>
             <p className="lead" style={{ fontSize: '1.08rem', maxWidth: '58ch' }}>{t('hero.sub')}</p>
           </div>
         </div>

@@ -23,9 +23,10 @@ export default function Home() {
   const { width } = useWindowDimensions();
   const wide = width > 680;
   // Title "…. …." → second sentence in gold, like the brand mockup.
-  // Highlight the key phrase in gold (like the mockup): the part after the last "للحصول على / para obtener / pour obtenir / to getting".
-  const m = t('hero.title').match(/^(.*?(?:للحصول على|para obtener|pour obtenir|to getting))\s+(.+)$/);
-  const [line1, ...rest] = m ? [m[1], m[2]] : [t('hero.title')];
+  // One sentence per line; the last one in gold (like the brand mockup).
+  const parts = t('hero.title').split(/(?<=[.。])\s+/);
+  const last = parts.length > 1 ? parts[parts.length - 1] : '';
+  const first = parts.length > 1 ? parts.slice(0, -1).join('\n') : parts[0];
   const tiles = {
     elig: <Tile title={t('shortcut.eligibility')} image={require('../../../assets/brand/clipboard.jpg')} onPress={() => router.push('/eligibility')} />,
     road: <Tile tall title={t('shortcut.pathway')} image={require('../../../assets/brand/road.jpg')} onPress={() => router.push('/start')} />,
@@ -41,7 +42,7 @@ export default function Home() {
           <Txt w="bold" style={{ color: C.goldHi, fontSize: 16 }}>{t('hero.eyebrow')}</Txt>
           <LinearGradient colors={['transparent', C.gold, 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ height: 2, width: 170 }} />
         </View>
-        <Txt w="black" style={{ fontSize: 34, lineHeight: 48 }}>{line1}{rest.length > 0 && <Txt w="black" style={{ fontSize: 34, lineHeight: 48, color: C.goldHi }}>{'\n' + rest.join(' ')}</Txt>}</Txt>
+        <Txt w="black" style={{ fontSize: 34, lineHeight: 48 }}>{first}{last !== '' && <Txt w="black" style={{ fontSize: 34, lineHeight: 48, color: C.goldHi }}>{'\n' + last}</Txt>}</Txt>
         <Txt style={{ fontSize: 15.5, lineHeight: 26 }}>{t('hero.sub')}</Txt>
         <GoldButton icon="rocket-outline" label={t('hero.cta1')} onPress={() => router.push('/eligibility')} />
         <OutlineButton icon="scale-outline" label={t('hero.cta2')} onPress={() => router.push('/law')} />

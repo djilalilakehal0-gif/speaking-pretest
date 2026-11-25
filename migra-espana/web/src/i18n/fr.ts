@@ -5,7 +5,7 @@ export const fr: Record<string, string> = {
   'nav.dashboard': 'Mon espace', 'nav.documents': 'Documents', 'nav.case': 'Mon dossier', 'nav.admin': 'Administration', 'nav.login': 'Se connecter',
   'nav.register': 'Créer un compte', 'nav.logout': 'Se déconnecter', 'nav.language': 'Langue', 'nav.theme': 'Thème',
   'hero.eyebrow': "Conçu pour les personnes sans papiers en Espagne",
-  'hero.title': "Votre guide pour obtenir la carte de séjour espagnole",
+  'hero.title': "Connaissez vos droits. Préparez votre dossier. Commencez en confiance.",
   'hero.sub': "Informations vérifiées sur l'immigration en Espagne, évaluation préliminaire d'éligibilité, coffre-fort de documents et accès à des avocats vérifiés — en arabe, espagnol, français et anglais.",
   'hero.cta1': 'Vérifier mon éligibilité', 'hero.cta2': 'Explorer le centre juridique',
   'home.shortcuts': 'Que souhaitez-vous faire ?',
