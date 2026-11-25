@@ -73,6 +73,7 @@ export function Results({ res }: { res: Assessment }) {
           <h2>{t(`elig.${b}`)}</h2>
           <div className="grid">{g[b].map((r) => <PathwayCard key={r.pathway} r={r} />)}</div>
         </section>))}
+      {res.results.length > 0 && <Checklist res={res} />}
       {res.needsLawyerReview && (
         <div className="card" style={{ borderColor: 'var(--gold)' }}>
           <h3>{t('elig.lawyerTitle')}</h3>
@@ -92,5 +93,19 @@ function PathwayCard({ r }: { r: PathwayResult }) {
       {list(t('elig.met'), r.met)}{list(t('elig.missing'), r.missing)}{list(t('elig.notMet'), r.notMet)}
       {list(t('elig.docsNeeded'), r.documents, 'doc.')}{list(t('elig.nextSteps'), r.nextSteps)}
     </article>
+  );
+}
+
+/** Personal checklist: union of documents across the identified pathways, ticked locally (nothing is sent anywhere). */
+function Checklist({ res }: { res: Assessment }) {
+  const { t } = useI18n();
+  const docs = [...new Set(res.results.filter((r) => r.bucket !== 'not_met').flatMap((r) => r.documents))];
+  const [done, setDone] = useState<Record<string, boolean>>({});
+  if (docs.length === 0) return null;
+  return (
+    <section className="card" style={{ marginBlock: 26 }}>
+      <h2>{t('checklist.title')}</h2><p className="pending">{t('checklist.hint')}</p>
+      <div className="opts">{docs.map((d) => (<label key={d} className="opt"><input type="checkbox" checked={!!done[d]} onChange={(e) => setDone((x) => ({ ...x, [d]: e.target.checked }))} />{t(`doc.${d}`)}</label>))}</div>
+    </section>
   );
 }

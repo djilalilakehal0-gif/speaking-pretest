@@ -15,6 +15,7 @@ export default async function Home({ params }: P) {
           <div className="actions">
             <Link className="btn btn-gold" href={`/${locale}/eligibility`}>{t('hero.cta1')}</Link>
             <Link className="btn btn-ghost" href={`/${locale}/law`}>{t('hero.cta2')}</Link>
+            <Link className="btn btn-ghost" href={`/${locale}/start`}>{t('start.homeLink')}</Link>
           </div>
         </div>
       </section>

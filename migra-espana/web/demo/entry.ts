@@ -31,7 +31,7 @@ function header() {
 function home() {
   const sc: [string, string, string][] = [['eligibility', '✓', 'shortcut.eligibility'], ['law', '⚖', 'shortcut.pathway'], ['guides', '❖', 'shortcut.law']];
   return `<section class="hero"><div class="in"><p class="eyebrow">${esc(t('hero.eyebrow'))}</p><h1>${esc(t('hero.title'))}</h1><p class="lead">${esc(t('hero.sub'))}</p>
-  <div class="actions"><a class="btn gold" href="#eligibility">${esc(t('hero.cta1'))}</a><a class="btn ghost" href="#law">${esc(t('hero.cta2'))}</a></div></div></section>
+  <div class="actions"><a class="btn gold" href="#eligibility">${esc(t('hero.cta1'))}</a><a class="btn ghost" href="#law">${esc(t('hero.cta2'))}</a><a class="btn ghost" href="#start">${esc(t('start.homeLink'))}</a></div></div></section>
   <section class="in sec"><h2>${esc(t('home.shortcuts'))}</h2><div class="grid">${sc.map(([h, i, k]) => `<a class="card" href="#${h}"><span class="ico">${i}</span><h3>${esc(t(k))}</h3></a>`).join('')}</div>
   <div class="card" style="margin-top:20px"><h3>${esc(t('home.trust.title'))}</h3><p>${esc(t('home.trust.body'))}</p><p class="note">${esc(t('home.notLawyer'))}</p></div>
   <p class="note demo">${esc(t('common.demo'))}</p></section>`;
@@ -51,6 +51,15 @@ function pathway(slug: string) {
   ${SECTIONS.map(([k, lab]) => { const items = p.sections[k]; return `<h3>${esc(t(lab))}</h3>` + (p.verifiedSections.includes(k) && items?.length ? `<ul>${items.map((i) => `<li>${esc(i[locale])}</li>`).join('')}</ul>` : `<p class="pending">${esc(t('legal.pendingSection'))}</p>`); }).join('')}
   <h3>${esc(t('legal.fees'))}</h3><p class="pending">${esc(t('legal.feesNote'))}</p><h3>${esc(t('legal.remedies'))}</h3><p>${esc(t('legal.remediesGeneric'))}</p>
   <h3>${esc(t('legal.references'))}</h3><ul>${srcs.map((s) => `<li><a href="${s.url}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a> — ${esc(s.issuer)}</li>`).join('')}</ul></section>`;
+}
+
+
+function start() {
+  return `<section class="hero"><div class="in"><p class="eyebrow">${esc(t('start.eyebrow'))}</p><h1 style="font-size:clamp(1.8rem,4.5vw,2.8rem)">${esc(t('start.title'))}</h1><p class="lead">${esc(t('start.sub'))}</p><div class="actions"><a class="btn gold" href="#eligibility">${esc(t('start.cta'))}</a></div></div></section>
+  <section class="in sec" style="max-width:820px"><ol class="steps">${[1, 2, 3, 4].map((n) => `<li><div><h3>${esc(t(`start.s${n}.t`))}</h3><p>${esc(t(`start.s${n}.b`))}</p></div></li>`).join('')}</ol>
+  <div class="card" style="margin-top:24px"><h2>${esc(t('start.proofTitle'))}</h2><p>${esc(t('start.proofBody'))}</p><ul>${[1, 2, 3, 4].map((n) => `<li>${esc(t(`start.proof${n}`))}</li>`).join('')}</ul><p class="note info">${esc(t('docs.noSelfData'))}</p></div>
+  <h2 style="margin-top:26px">${esc(t('start.faqTitle'))}</h2>${[1, 2].map((n) => `<details class="card" style="margin-bottom:10px"><summary><b>${esc(t(`start.faq${n}q`))}</b></summary><p class="note" style="margin-top:10px">${esc(t('start.faqPending'))}</p></details>`).join('')}
+  <p class="note">${esc(t('elig.disclaimer'))}</p></section>`;
 }
 
 function guides() {
@@ -80,6 +89,7 @@ function results() {
   ${res.monthsInSpain !== null ? `<p class="meta">${esc(t('elig.monthsInSpain'))}: <b>${res.monthsInSpain} ${esc(t('elig.months'))}</b> · ${esc(t('common.lastVerified'))}: ${res.rulesSnapshotDate}</p>` : ''}
   ${res.results.length === 0 ? `<p class="card">${esc(t('elig.empty'))}</p>` : ''}
   ${(['eligible', 'needs_info', 'not_met'] as const).map((b) => g[b].length ? `<h2 style="margin-top:26px">${esc(t('elig.' + b))}</h2><div class="stack">${g[b].map(card).join('')}</div>` : '').join('')}
+  ${(() => { const d = [...new Set(res.results.filter((x) => x.bucket !== 'not_met').flatMap((x) => x.documents))]; return d.length ? `<div class="card" style="margin-top:24px"><h2>${esc(t('checklist.title'))}</h2><p class="pending">${esc(t('checklist.hint'))}</p><div class="opts">${d.map((c) => `<label class="opt"><input type="checkbox">${esc(t('doc.' + c))}</label>`).join('')}</div></div>` : ''; })()}
   ${res.needsLawyerReview ? `<div class="card gold-b"><h3>${esc(t('elig.lawyerTitle'))}</h3><ul>${res.lawyerReviewReasons.map((x) => `<li>${esc(t('elig.reason.' + x))}</li>`).join('')}</ul></div>` : ''}
   <div class="actions"><button class="btn gold" id="restart">${esc(t('elig.restart'))}</button></div></section>`;
 }
@@ -87,7 +97,7 @@ function results() {
 function render() {
   document.documentElement.lang = locale; document.documentElement.dir = dirOf(locale);
   const r = route(); let body: string;
-  if (r === 'law') body = law(); else if (r.startsWith('law-')) body = pathway(r.slice(4)); else if (r === 'guides') body = guides();
+  if (r === 'law') body = law(); else if (r.startsWith('law-')) body = pathway(r.slice(4)); else if (r === 'guides') body = guides(); else if (r === 'start') body = start();
   else if (r === 'eligibility') body = done ? results() : question(); else body = home();
   app.innerHTML = header() + `<main>${body}</main><footer><div class="in">© MIGRA ESPAÑA — ${esc(t('footer.disclaimer'))}</div></footer>`;
   const get = () => { const el = document.getElementById('ans') as HTMLInputElement | null; if (el) return el.value; return (document.querySelector('input[name=ans]:checked') as HTMLInputElement | null)?.value ?? ''; };
