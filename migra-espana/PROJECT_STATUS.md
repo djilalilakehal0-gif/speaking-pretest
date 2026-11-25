@@ -25,6 +25,6 @@ Privacy/Terms text are templates needing counsel review; a DPIA is required (sen
 - [x] Law centre (13 groups) · [x] 14-step guide · [x] vault (upload/sniff/signed URL/share/revoke/log/delete)
 - [x] AI assistant w/ guardrails, PII redaction, verified-only retrieval · [x] Stripe checkout+webhook · [x] booking + overlap guard
 - [x] Case timeline/progress/transitions · [x] admin: lawyer verification, publish, audit · [x] GDPR export/erasure/consent
-- [ ] Flutter apps (scaffold only) · [ ] OCR/auto-classification · [ ] FCM sender · [ ] secure messaging UI · [ ] invoices/PDFs
+- [x] Flutter app v0.1 (info + eligibility, 4 languages/RTL; 13 tests) — no APK/IPA built, no backend screens yet · [ ] OCR/auto-classification · [ ] FCM sender · [ ] secure messaging UI · [ ] invoices/PDFs
 - [ ] lawyer onboarding/registration UI & MFA enrolment UI · [ ] admin analytics/user mgmt/CMS editor UI
 - [ ] reviews UI · [ ] video consult · [ ] pgvector retrieval · [ ] e2e tests against live Supabase/Stripe · [ ] DPIA, store assets, deploy

@@ -1,31 +1,30 @@
-# MIGRA ESPAÑA — *Tu camino legal*
+# Project status (2026-11-22)
 
-Multilingual (AR/ES/FR/EN, RTL) Spanish-immigration information platform: law centre, preliminary eligibility engine,
-secure document vault, verified-lawyer marketplace, case tracking, AI assistant (RAG over verified law only), Stripe billing,
-admin & lawyer dashboards. **Read `PROJECT_STATUS.md` first — it states exactly what is done, tested and still missing.**
+## Honest summary
+A working, tested **web foundation** and **database/security layer**. It is **not** the complete ecosystem in the brief:
+no native apps, no live backend/Stripe/OpenAI verification, and most legal content still awaits a qualified legal editor.
 
-```
-migra-espana/
-  web/        Next.js 15 + TypeScript (site, dashboards, /api routes)
-  supabase/   SQL migrations (schema, RLS, storage) + DB security tests
-  mobile/     Flutter scaffold (not built — see docs/MOBILE.md)
-  docs/       ARCHITECTURE, PRIVACY_AND_SECURITY, LEGAL_CONTENT_GUIDE, API, USER_GUIDE, ADMIN_GUIDE
-```
+## Verified here
+- `npm test`: 65 passing · `tsc` clean · `next build` OK (87 pages).
+- DB: migrations apply on Postgres 16; `rls.test.sql` proves: document isolation, grant/revoke/expiry, no role escalation,
+  draft law hidden + publish needs date/reviewer, audit append-only, only verified lawyers listed, no double-booking,
+  case history automatic, payments not user-writable, consent captured at signup.
+- Browser (Chromium): 14 pages × 4 languages — correct `dir`, no overflow at 390px, no console/hydration errors;
+  Arabic eligibility flow end-to-end; assistant disabled without consent.
 
-## Run (works with no credentials — "demo mode", nothing persisted)
-```bash
-cd web && cp .env.example .env.local && npm ci
-npm run dev            # http://localhost:3000  (redirects to your language)
-npm test               # 65 unit tests (eligibility, i18n parity, guardrails, RBAC, uploads, plans, cases, slots)
-npm run lint && npm run build
-```
-## Full backend
-1. Create a Supabase project; apply `supabase/migrations/*.sql` in order (`supabase db push`). Fill `.env.local`.
-2. DB tests (needs local Postgres): `bash supabase/tests/run-local.sh` → must print `ALL RLS / CONSTRAINT TESTS PASSED`.
-3. Stripe: create 2 recurring prices, set `STRIPE_PRICE_*`, `NEXT_PUBLIC_PRICE_*_EUR`; webhook → `/api/stripe/webhook`
-   (events: `customer.subscription.*`, `invoice.paid`, `charge.refunded`); enable Stripe Tax.
-4. OpenAI: set `OPENAI_API_KEY`. FCM: see `.env.example` (sender not yet implemented).
-5. Make your first legal editor: insert into `admin_roles` / set `users.role='legal_editor'` via SQL, enrol MFA, then publish rules.
-6. Deploy web to Vercel (root dir `migra-espana/web`), set env vars. Run `npm run check:links` from a networked machine before release.
+## Legal content — READ
+Only facts I confirmed in BOE (RD 1155/2024 arts. 125, 127; preamble 2-year rule; RD 316/2026 amending art. 132.2.a) are
+populated, flagged *draft* until a legal editor publishes. Other pathways show "pending verification"; **no fees, forms, deadlines or
+procedure steps were invented** (they display pending). The 2-year continuity wording, art. 126 criminal-record rule, fees (modelo 790) and
+extraordinary-regularisation status must be checked by a lawyer. Non-Spanish translations are marked *not legally reviewed*.
+URL IDs for LO 4/2000 and Ley 12/2009 and all ministry links are **unverified** (sandbox blocked outbound checks) → run `npm run check:links`.
+Privacy/Terms text are templates needing counsel review; a DPIA is required (sensitive data + AI) and not yet done.
 
-Never commit `.env*`; `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `OPENAI_API_KEY` are server-only.
+## Checklist
+- [x] Schema/RLS/storage/retention · [x] 4-language UI + RTL · [x] eligibility engine (17+2 Qs, 3 buckets, no auto-reject)
+- [x] Law centre (13 groups) · [x] 14-step guide · [x] vault (upload/sniff/signed URL/share/revoke/log/delete)
+- [x] AI assistant w/ guardrails, PII redaction, verified-only retrieval · [x] Stripe checkout+webhook · [x] booking + overlap guard
+- [x] Case timeline/progress/transitions · [x] admin: lawyer verification, publish, audit · [x] GDPR export/erasure/consent
+- [x] Flutter app v0.1 (info + eligibility, 4 languages/RTL; 13 tests) — no APK/IPA built, no backend screens yet · [ ] OCR/auto-classification · [ ] FCM sender · [ ] secure messaging UI · [ ] invoices/PDFs
+- [ ] lawyer onboarding/registration UI & MFA enrolment UI · [ ] admin analytics/user mgmt/CMS editor UI
+- [ ] reviews UI · [ ] video consult · [ ] pgvector retrieval · [ ] e2e tests against live Supabase/Stripe · [ ] DPIA, store assets, deploy
