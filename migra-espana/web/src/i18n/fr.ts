@@ -4,7 +4,7 @@ export const fr: Record<string, string> = {
   'nav.lawyers': 'Avocats', 'nav.assistant': 'Assistant IA', 'nav.pricing': 'Tarifs', 'nav.resources': 'Liens officiels',
   'nav.dashboard': 'Mon espace', 'nav.documents': 'Documents', 'nav.case': 'Mon dossier', 'nav.admin': 'Administration', 'nav.login': 'Se connecter',
   'nav.register': 'Créer un compte', 'nav.logout': 'Se déconnecter', 'nav.language': 'Langue', 'nav.theme': 'Thème',
-  'hero.eyebrow': "L'immigration espagnole, expliquée clairement",
+  'hero.eyebrow': "Conçu pour les personnes sans papiers en Espagne",
   'hero.title': 'Comprenez vos options. Préparez-vous en confiance.',
   'hero.sub': "Informations vérifiées sur l'immigration en Espagne, évaluation préliminaire d'éligibilité, coffre-fort de documents et accès à des avocats vérifiés — en arabe, espagnol, français et anglais.",
   'hero.cta1': 'Vérifier mon éligibilité', 'hero.cta2': 'Explorer le centre juridique',

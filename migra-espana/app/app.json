@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "MIGRA ESPAÑA",
+    "slug": "migra-espana",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "es.migra.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Scan your documents into your private vault.",
+        "NSPhotoLibraryUsageDescription": "Choose documents to add to your private vault."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0a1530",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "es.migra.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font",
+      "expo-localization",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Scan your documents into your private vault.",
+          "photosPermission": "Choose documents to add to your private vault."
+        }
+      ]
+    ],
+    "scheme": "migraespana",
+    "backgroundColor": "#0a1530"
+  }
+}

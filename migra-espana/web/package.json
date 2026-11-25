@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit",
-    "export:mobile": "node scripts/export-mobile-assets.mjs",
+    
     "check:links": "node scripts/check-links.mjs",
     "test": "vitest run"
   },
