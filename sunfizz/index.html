@@ -1,0 +1,909 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SUNFIZZ — Real Fruit Soda</title>
+<meta name="description" content="SUNFIZZ sparkling fruit soda in glass bottles. Real fruit, light fizz, no sugar added.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5B39A">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/barlowcondensed/v13/HTxyL3I-JCGChYJ8VI-L6OO_au7B6xTrW3bmu4kG.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/barlowcondensed/v13/HTxyL3I-JCGChYJ8VI-L6OO_au7B6xTrf3fmu4kG.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/manrope/v23/xn7gYHE41ni1AdIRggexSg.woff2">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+<style>
+@font-face{font-family:"Barlow Condensed";font-style:italic;font-weight:800;font-display:block;src:url(https://fonts.gstatic.com/s/barlowcondensed/v13/HTxyL3I-JCGChYJ8VI-L6OO_au7B6xTrf3fmu4kG.woff2) format("woff2")}
+@font-face{font-family:"Barlow Condensed";font-style:italic;font-weight:900;font-display:block;src:url(https://fonts.gstatic.com/s/barlowcondensed/v13/HTxyL3I-JCGChYJ8VI-L6OO_au7B6xTrW3bmu4kG.woff2) format("woff2")}
+@font-face{font-family:"Manrope";font-style:normal;font-weight:400 700;font-display:swap;src:url(https://fonts.gstatic.com/s/manrope/v23/xn7gYHE41ni1AdIRggexSg.woff2) format("woff2")}
+
+:root{
+  --cocoa:#4A1E17;--coral:#E25B45;--cream:#FFF3EC;--peach:#FCD9C8;--peach2:#F5B39A;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --disp:"Barlow Condensed",Impact,sans-serif;
+  --body:"Manrope",system-ui,sans-serif;
+  --sc:#E25B45;--sg:rgba(226,91,69,.55);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#F5B39A}
+body{font-family:var(--body);color:var(--cocoa);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+
+#gl{position:fixed;left:0;top:0;width:100vw;height:100vh;height:100lvh;display:block;opacity:0;transition:opacity 1s var(--ease);touch-action:pan-y;outline:none}
+body.ready #gl{opacity:1}
+#track{height:805vh;pointer-events:none}
+
+/* NAV */
+.nav{position:fixed;left:0;right:0;top:0;height:84px;z-index:5;display:flex;align-items:center;justify-content:center;color:var(--cream);opacity:0;transform:translateY(-12px);transition:opacity .9s var(--ease),transform .9s var(--ease);pointer-events:none}
+body.intro-ui .nav{opacity:1;transform:none}
+.logo{position:relative;font:900 italic 40px/1 var(--disp);letter-spacing:-.01em;text-shadow:0 1px 14px rgba(120,40,20,.18);color:inherit;text-decoration:none;pointer-events:auto;cursor:pointer}
+.logo sup{position:absolute;left:100%;top:-.1em;margin-left:2px;font:600 9px/1 var(--body);letter-spacing:0;text-shadow:none}
+.nav-r{position:absolute;right:48px;top:0;bottom:0;display:flex;align-items:center;gap:34px;pointer-events:auto}
+.menu-btn{display:flex;align-items:center;gap:10px;min-width:32px;min-height:32px;color:var(--cream);font:700 13px/1 var(--body);letter-spacing:.08em}
+.menu-btn .grid{display:grid;grid-template-columns:4px 4px;gap:3px}
+.menu-btn .grid i{width:4px;height:4px;border-radius:1.5px;background:currentColor}
+.shop{font:800 12px/1 var(--body);letter-spacing:.08em;color:var(--cream);border:1.5px solid var(--cream);border-radius:999px;padding:9px 24px;transition:background .3s var(--ease),color .3s var(--ease)}
+.shop:hover{background:var(--cream);color:var(--cocoa)}
+
+/* HERO */
+#hero{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0;visibility:hidden}
+.title{position:absolute;left:3.4vw;top:max(92px,11vh);margin:0;display:grid;width:max-content;max-width:94vw;overflow:hidden;font:900 italic clamp(54px,7.4vw,112px)/1 var(--disp);letter-spacing:-.015em;color:var(--cocoa);text-transform:uppercase;padding:0 .06em .05em 0;margin-bottom:-.05em}
+.title span{grid-area:1/1;white-space:nowrap;will-change:transform}
+.arrows{position:absolute;right:3.2vw;bottom:max(40px,6vh);display:flex;gap:16px;pointer-events:auto}
+.arr{width:52px;height:52px;border-radius:50%;border:2px solid rgba(255,243,236,.95);background:rgba(255,243,236,.08);box-shadow:0 4px 18px rgba(150,60,30,.12);display:grid;place-items:center;color:var(--cream);transition:background .3s var(--ease),transform .3s var(--ease)}
+.arr:hover{background:rgba(255,243,236,.22);transform:scale(1.06)}
+.arr:active{transform:scale(.96)}
+.arr svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.strip{position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,transparent,var(--sc) 18%,#fff 50%,var(--sc) 82%,transparent);box-shadow:0 0 22px 6px var(--sg),0 0 70px 18px var(--sg)}
+
+/* STORY */
+#story{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;visibility:hidden}
+.icons{position:absolute;left:4.4vw;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:22px}
+.ic{width:58px;height:58px;border-radius:50%;border:2px solid var(--cream);color:var(--cream);display:grid;place-items:center;pointer-events:auto;transition:background .45s var(--ease),color .45s var(--ease),transform .45s var(--ease)}
+.ic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ic.on{background:var(--cream);color:var(--coral);transform:scale(1.08)}
+.copy{position:absolute;left:51.5vw;top:50%;transform:translateY(-46%);width:min(36vw,520px)}
+.tag{display:flex;align-items:center;gap:12px;font:700 11px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--cocoa)}
+.tag i{width:22px;height:22px;border-radius:7px;background:var(--coral);flex:none}
+.tag span,.sbody{transition:filter .5s var(--ease),opacity .5s var(--ease)}
+.out{filter:blur(8px);opacity:0}
+.stitle{position:relative;margin:20px 0 18px;min-height:1.8em;font:900 italic clamp(64px,7.6vw,118px)/.9 var(--disp);letter-spacing:-.02em;color:var(--cocoa);text-transform:uppercase}
+.stitle .bars{position:absolute;left:0;top:.08em;width:100%;opacity:0;transition:opacity .2s;pointer-events:none}
+.stitle .bars i{display:block;height:.36em;margin-bottom:.2em;border-radius:99px;background:rgba(74,30,23,.18);filter:blur(6px)}
+.stitle .bars i:nth-child(1){width:80%}.stitle .bars i:nth-child(2){width:56%}
+.stitle.loading .txt{opacity:0}
+.stitle.loading .bars{opacity:1}
+.sbody{margin:0;font:400 clamp(15px,1.25vw,19px)/1.6 var(--body);color:rgba(74,30,23,.86)}
+
+.nogl-msg{display:none;position:fixed;inset:0;place-items:center;text-align:center;padding:24px;font:900 italic 48px/1 var(--disp);color:var(--cocoa)}
+body.nogl .nogl-msg{display:grid}
+
+/* RESPONSIVE */
+@media (max-width:820px),(orientation:portrait){
+  .nav{height:68px}
+  .logo{font-size:30px}
+  .menu-btn span{display:none}
+  .nav-r{right:16px;gap:6px}
+  .shop{padding:8px 16px}
+  .menu-btn{min-width:28px;justify-content:center}
+  .title{left:20px;top:max(78px,10vh);font-size:clamp(46px,13vw,80px)}
+  .arr{width:48px;height:48px}
+  .arrows{right:20px;bottom:max(32px,5vh)}
+  .copy{left:20px;right:20px;width:auto;top:max(86px,11vh);transform:none}
+  .stitle{font-size:clamp(50px,13vw,84px);margin:16px 0 14px}
+  .sbody{font-size:15px}
+  .icons{left:auto;right:20px;top:auto;bottom:max(28px,4vh);transform:none;flex-direction:row;gap:12px}
+  .ic{width:44px;height:44px}
+  .ic svg{width:20px;height:20px}
+}
+@media (max-width:360px){
+  .logo{font-size:25px}
+  .shop{padding:7px 11px}
+}
+@media (max-height:520px) and (min-aspect-ratio:1/1){
+  .icons{left:3vw;right:auto;top:50%;bottom:auto;transform:translateY(-50%);flex-direction:column;gap:12px}
+  .ic{width:44px;height:44px}
+  .copy{left:51.5vw;right:auto;width:min(36vw,520px);top:50%;transform:translateY(-46%)}
+  .stitle{font-size:clamp(40px,6vw,64px);margin:12px 0}
+  .title{font-size:clamp(40px,6vw,64px);top:max(70px,11vh);left:3.4vw}
+  .sbody{font-size:14px}
+  .arrows{right:3.2vw;bottom:24px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01s!important}
+}
+</style>
+</head>
+<body>
+<canvas id="gl" aria-label="SUNFIZZ sparkling fruit soda bottles"></canvas>
+
+<header class="nav">
+  <a class="logo" id="logo" href="#" aria-label="SUNFIZZ">SUNFIZZ<sup>™</sup></a>
+  <div class="nav-r">
+    <button class="menu-btn" id="menu" aria-label="Menu"><span class="grid"><i></i><i></i><i></i><i></i></span><span>MENU</span></button>
+    <button class="shop" id="shop">SHOP</button>
+  </div>
+</header>
+
+<section id="hero" aria-label="Flavours">
+  <h1 class="title" id="title" aria-live="polite"><span>PEACH FIZZ</span></h1>
+  <div class="arrows">
+    <button class="arr" id="prev" aria-label="Previous flavour"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <button class="arr" id="next" aria-label="Next flavour"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  </div>
+  <div class="strip"></div>
+</section>
+
+<section id="story" aria-label="Story">
+  <div class="icons">
+    <button class="ic on" aria-label="Real fruit"><svg viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="M5 19c3-5 6-8 10-10"/></svg></button>
+    <button class="ic" aria-label="Light fizz"><svg viewBox="0 0 24 24"><circle cx="9" cy="14.5" r="4.2"/><circle cx="16.5" cy="8" r="2.7"/><circle cx="17" cy="17" r="1.5"/></svg></button>
+    <button class="ic" aria-label="No sugar added"><svg viewBox="0 0 24 24"><path d="M12 7.5c-4-1.4-7.5 1.5-7.5 5.8 0 4 3 7 7.5 7s7.5-3 7.5-7c0-4.300-3.500-7.200-7.500-5.800z"/><path d="M12 7.5c0-2 1-3.500 3-4.500"/><path d="M12 7.500c-.8-1.800-2.500-2.500-4-2.300"/></svg></button>
+    <button class="ic" aria-label="The lineup"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.500v2.500M12 19v2.500M2.500 12H5M19 12h2.500M5.300 5.300l1.800 1.800M16.900 16.900l1.800 1.800M5.300 18.700l1.800-1.800M16.900 7.100l1.800-1.800"/></svg></button>
+  </div>
+  <div class="copy">
+    <div class="tag"><i></i><span id="tagT">01 — Fruit</span></div>
+    <h2 class="stitle" id="stitle"><span class="txt" id="stTxt">REAL FRUIT</span><span class="bars"><i></i><i></i></span></h2>
+    <p class="sbody" id="sbody">Made with real fruit juice and a splash of sparkling water. Bright, refreshing and naturally delicious.</p>
+  </div>
+</section>
+
+<div id="track"></div>
+<div class="nogl-msg">SUNFIZZ needs WebGL to pour.</div>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* ───────── helpers ───────── */
+const $ = s => document.querySelector(s);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const eio = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const eoc = t => 1 - Math.pow(1 - t, 3);
+const eob = (t, s = 1.15) => 1 + (s + 1) * Math.pow(t - 1, 3) + s * Math.pow(t - 1, 2);
+const mod = (n, m) => ((n % m) + m) % m;
+const TAU = Math.PI * 2;
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const hex3 = h => { const n = parseInt(h.slice(1), 16); return new THREE.Vector3((n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255); };
+
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ───────── data ───────── */
+const FL = [
+  { n: 'PEACH FIZZ',   liq: '#F27A3C', cap: '#E25B45', ink: '#E8673E', fr: 'peach' },
+  { n: 'APRICOT FIZZ', liq: '#F39A2E', cap: '#E58A2A', ink: '#E8942F', fr: 'apricot' },
+  { n: 'ROSE FIZZ',    liq: '#EC6E8F', cap: '#D9567A', ink: '#D9567A', fr: 'rose petal' },
+  { n: 'BLOOD ORANGE', liq: '#D63A2C', cap: '#C7332B', ink: '#C7332B', fr: 'blood orange' },
+  { n: 'MANGO FIZZ',   liq: '#F4AA2C', cap: '#E39A22', ink: '#E7A229', fr: 'mango' },
+  { n: 'RASPBERRY',    liq: '#D6436A', cap: '#C93A5C', ink: '#C93A5C', fr: 'raspberry' },
+  { n: 'GUAVA FIZZ',   liq: '#EF7464', cap: '#E2665E', ink: '#E2665E', fr: 'guava' },
+  { n: 'NECTARINE',    liq: '#EA5A30', cap: '#D9502F', ink: '#D9502F', fr: 'nectarine' }
+];
+const N = 16, BH = 2.43;
+const TILT = [.10, -.15, .07, -.09, .14, -.06, .12, -.13, .08, -.11, .15, -.07, .09, -.14, .06, -.10];
+const STEPS = [
+  { tag: '01 — Fruit',   title: 'REAL FRUIT',     body: 'Made with real fruit juice and a splash of sparkling water. Bright, refreshing and naturally delicious.' },
+  { tag: '02 — Bubbles', title: 'LIGHT FIZZ',     body: 'Fine bubbles, never harsh. A soft sparkle that lifts the fruit instead of hiding it under gas.' },
+  { tag: '03 — Sugar',   title: 'NO SUGAR ADDED', body: 'Sweetened only by ripe fruit, with 40% less sugar than classic soda and nothing artificial inside.' }
+];
+const SHEET_URL = 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261120_070622_93733524-ae88-4030-bcf5-052bfac8f786.png&w=2048&q=90';
+
+/* ───────── assets ───────── */
+const loadImg = src => new Promise(res => { const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+const withTimeout = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
+
+async function boot() {
+  const fontsP = withTimeout(Promise.all([
+    document.fonts.load('italic 900 120px "Barlow Condensed"', 'SUNFIZZ'),
+    document.fonts.load('italic 800 60px "Barlow Condensed"', 'SUNFIZZ'),
+    document.fonts.load('500 25px Manrope', 'abc'),
+    document.fonts.load('700 13px Manrope', 'abc')
+  ]).then(() => document.fonts.ready), 7000);
+  const [, sheet] = await Promise.all([fontsP, withTimeout(loadImg(SHEET_URL), 12000)]);
+
+  /* ───────── renderer / scene ───────── */
+  const canvas = $('#gl');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  const dprMax = Math.min(window.devicePixelRatio || 1, 1.5);
+  let dpr = dprMax;
+  const maxAniso = renderer.capabilities.getMaxAnisotropy();
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(30, 1, .1, 100);
+  camera.position.set(0, 0, 10);
+  camera.lookAt(0, 0, 0);
+  const VH = 20 * Math.tan(15 * Math.PI / 180);
+
+  /* environment: emissive strips → long vertical streaks on the glass */
+  {
+    const envScene = new THREE.Scene();
+    envScene.background = new THREE.Color('#2c1b17');
+    const plane = (w, h, col, k, x, y, z) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(k), side: THREE.DoubleSide }));
+      m.position.set(x, y, z); m.lookAt(0, 0, 0); envScene.add(m);
+    };
+    plane(1.0, 16, '#ffffff', 7, -5.5, 0, 4.2);
+    plane(.55, 16, '#ffffff', 5, 4.8, .5, 3.6);
+    plane(.35, 16, '#fff4ea', 3.5, 1.4, 0, 6.5);
+    plane(12, 2.5, '#fff1e6', 2.4, 0, 7.5, 1.5);
+    plane(10, 9, '#ff9466', 1.3, 0, -1, -8);
+    plane(7, 8, '#ffc6a8', 1.1, -8, -1, -3);
+    plane(7, 8, '#ffb08c', .9, 8, -1, -2);
+    const pm = new THREE.PMREMGenerator(renderer);
+    scene.environment = pm.fromScene(envScene, .035).texture;
+    pm.dispose();
+  }
+  const dl = new THREE.DirectionalLight(0xffffff, 1.1); dl.position.set(-3, 5, 6); scene.add(dl);
+  scene.add(new THREE.AmbientLight(0xffe8dc, .35));
+
+  /* ───────── background shader ───────── */
+  function msTex(blur) {
+    const c = document.createElement('canvas'); c.width = 2048; c.height = 1024;
+    const g = c.getContext('2d');
+    g.fillStyle = '#000'; g.fillRect(0, 0, 2048, 1024);
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = '#fff';
+    const lines = ['REAL FRUIT', 'REAL FIZZ'];
+    const sizes = lines.map(t => { g.font = 'italic 900 400px "Barlow Condensed"'; return 400 * 1880 / g.measureText(t).width; });
+    const caps = sizes.map(s => s * .7), gap = 70;
+    let y = (1024 - (caps[0] + caps[1] + gap)) / 2;
+    const hasFilter = 'filter' in g;
+    if (hasFilter) g.filter = `blur(${blur}px)`;
+    lines.forEach((t, i) => {
+      g.font = `italic 900 ${sizes[i]}px "Barlow Condensed"`;
+      y += caps[i];
+      if (hasFilter) g.fillText(t, 1024, y);
+      else { g.shadowColor = '#fff'; g.shadowBlur = blur * 1.3; g.shadowOffsetX = 4000; g.fillText(t, 1024 - 4000, y); }
+      y += gap;
+    });
+    const tx = new THREE.CanvasTexture(c);
+    tx.colorSpace = THREE.NoColorSpace; tx.anisotropy = maxAniso;
+    return tx;
+  }
+  const bgMat = new THREE.ShaderMaterial({
+    depthTest: false, depthWrite: false,
+    uniforms: {
+      uTime: { value: 0 }, uAspect: { value: 1.7 },
+      uTop: { value: new THREE.Vector3() }, uBot: { value: new THREE.Vector3() }, uGlowCol: { value: new THREE.Vector3() },
+      uGlowPos: { value: new THREE.Vector2(.5, .2) }, uGlowAmt: { value: 0 }, uGlowRad: { value: 2 },
+      uClouds: { value: 0 }, uFloor: { value: 0 },
+      uTxtAmt: { value: 0 }, uSharp: { value: 0 }, uTxtY: { value: .5 }, uTxtW: { value: .92 }, uTxtDrift: { value: 0 },
+      tSharp: { value: msTex(5) }, tSoft: { value: msTex(26) }
+    },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.999, 1.0); }`,
+    fragmentShader: `
+      precision highp float;
+      varying vec2 vUv;
+      uniform float uTime, uAspect, uGlowAmt, uGlowRad, uClouds, uFloor, uTxtAmt, uSharp, uTxtY, uTxtW, uTxtDrift;
+      uniform vec3 uTop, uBot, uGlowCol; uniform vec2 uGlowPos;
+      uniform sampler2D tSharp, tSoft;
+      float hash(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }
+      float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+        return mix(mix(hash(i),hash(i+vec2(1,0)),f.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x), f.y); }
+      float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*vn(p); p=p*2.03+vec2(17.1,9.7); a*=.5; } return v; }
+      void main(){
+        vec2 uv = vUv;
+        vec3 col = mix(uBot, uTop, uv.y);
+        vec2 q = (uv - uGlowPos) * vec2(uAspect, 1.);
+        float g = exp(-dot(q,q) * uGlowRad);
+        col = mix(col, uGlowCol, clamp(uGlowAmt * g, 0., 1.));
+        col += uGlowCol * uFloor * (1. - smoothstep(0., .5, uv.y)) * .55;
+        if (uClouds > .001) {
+          vec2 p = uv * vec2(uAspect, 1.) * 1.35 + uTime * vec2(.022, .011);
+          float c = fbm(p) + .32 * fbm(p * 1.8 + 3.7);
+          c = smoothstep(.42, .86, c);
+          col = mix(col, vec3(1., .902, .855), c * .5 * uClouds);
+        }
+        if (uTxtAmt > .001) {
+          float tx = (uv.x - .5) / uTxtW + .5 + uTxtDrift;
+          float ty = (uv.y - uTxtY) / (uTxtW * uAspect * .5) + .5;
+          if (tx > 0. && tx < 1. && ty > 0. && ty < 1.) {
+            float v = mix(texture2D(tSoft, vec2(tx,ty)).r, texture2D(tSharp, vec2(tx,ty)).r, uSharp);
+            float gr = hash(gl_FragCoord.xy + floor(uTime * 24.) * 7.13);
+            v *= mix(.82, 1.18, gr);
+            col = mix(col, vec3(1., .945, .91), clamp(v, 0., 1.) * uTxtAmt * .78);
+          }
+        }
+        col += (hash(gl_FragCoord.xy + fract(uTime) * 100.) - .5) * .045;
+        gl_FragColor = vec4(col, 1.);
+      }`
+  });
+  const bg = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat);
+  bg.frustumCulled = false; bg.renderOrder = -100;
+  scene.add(bg);
+
+  const PAL = {
+    hero:  { top: hex3('#EE9F84'), bot: hex3('#F7BBA2'), glow: hex3('#FFD8C4'), gx: .5, gy: .2, amt: .42, rad: 2.4, clouds: 0, floor: 0 },
+    story: { top: hex3('#F6B8A0'), bot: hex3('#F09C7F'), glow: hex3('#FFE6D8'), gx: .36, gy: .5, amt: .5, rad: 1.6, clouds: 0, floor: 0 },
+    man:   { top: hex3('#F29A87'), bot: hex3('#E7806E'), glow: hex3('#FFD2C2'), gx: .5, gy: .42, amt: .45, rad: 1.8, clouds: 1, floor: 0 },
+    line:  { top: hex3('#3E150E'), bot: hex3('#250A06'), glow: hex3('#7A2E1A'), gx: .3, gy: .05, amt: 0, rad: 2, clouds: 0, floor: 1 }
+  };
+  const palCur = { top: new THREE.Vector3(), bot: new THREE.Vector3(), glow: new THREE.Vector3() };
+  function mixPal(o, p, q, t) {
+    o.top = (o.top || new THREE.Vector3()).copy(p.top).lerp(q.top, t);
+    o.bot = (o.bot || new THREE.Vector3()).copy(p.bot).lerp(q.bot, t);
+    o.glow = (o.glow || new THREE.Vector3()).copy(p.glow).lerp(q.glow, t);
+    for (const k of ['gx', 'gy', 'amt', 'rad', 'clouds', 'floor']) o[k] = lerp(p[k], q[k], t);
+    return o;
+  }
+  const palA = {}, palB = {}, palC = {}, palD = {};
+
+  /* ───────── canvas textures: labels ───────── */
+  const tex = (c, srgb = true) => { const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = maxAniso; return t; };
+
+  function brush(g, x, y, w, h, seed, rot = 0, fill = '#FFF3EC') {
+    const r = rng(seed), pts = [], n = 44;
+    for (let i = 0; i <= n; i++) pts.push([w * i / n, (r() - .5) * 6]);
+    for (let i = 1; i <= 10; i++) pts.push([w + (r() - .5) * 10, h * i / 10]);
+    for (let i = n - 1; i >= 0; i--) pts.push([w * i / n, h + (r() - .5) * 6]);
+    for (let i = 9; i >= 1; i--) pts.push([(r() - .5) * 10, h * i / 10]);
+    g.save(); g.translate(x + w / 2, y + h / 2); g.rotate(rot); g.translate(-w / 2, -h / 2);
+    g.beginPath();
+    const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    const m0 = mid(pts[pts.length - 1], pts[0]);
+    g.moveTo(m0[0], m0[1]);
+    for (let i = 0; i < pts.length; i++) { const nx = pts[(i + 1) % pts.length], m = mid(pts[i], nx); g.quadraticCurveTo(pts[i][0], pts[i][1], m[0], m[1]); }
+    g.closePath(); g.fillStyle = fill; g.fill(); g.restore();
+  }
+
+  const frontTex = FL.map((f, i) => {
+    const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
+    const g = c.getContext('2d');
+    if (sheet) {
+      const cw = sheet.naturalWidth / 2, ch = sheet.naturalHeight / 4;
+      g.drawImage(sheet, (i % 2) * cw, Math.floor(i / 2) * ch, cw, ch, 0, 0, 1024, 512);
+    } else {
+      brush(g, 30, 70, 964, 400, 100 + i, -.07);
+      g.textAlign = 'center'; g.fillStyle = f.ink;
+      g.font = 'italic 900 230px "Barlow Condensed"'; g.fillText('SUNFIZZ', 512, 300);
+      g.font = 'italic 800 64px "Barlow Condensed"'; g.fillText(f.n, 512, 380);
+    }
+    return tex(c);
+  });
+
+  function drawIcon(g, kind, cx, cy, ink) {
+    g.strokeStyle = ink; g.lineWidth = 5; g.lineCap = 'round'; g.lineJoin = 'round';
+    g.beginPath(); g.arc(cx, cy, 38, 0, TAU); g.stroke();
+    g.lineWidth = 4; g.beginPath();
+    if (kind === 0) {
+      g.moveTo(cx - 14, cy + 14); g.quadraticCurveTo(cx - 17, cy - 13, cx + 14, cy - 14); g.quadraticCurveTo(cx + 17, cy + 15, cx - 14, cy + 14);
+      g.moveTo(cx - 14, cy + 14); g.lineTo(cx + 5, cy - 5);
+    } else if (kind === 1) {
+      g.arc(cx - 8, cy + 6, 9, 0, TAU); g.moveTo(cx + 15, cy - 6); g.arc(cx + 9, cy - 6, 6, 0, TAU); g.moveTo(cx + 14, cy + 12); g.arc(cx + 10, cy + 12, 4, 0, TAU);
+    } else {
+      g.arc(cx, cy + 4, 14, 0, TAU); g.moveTo(cx, cy - 10); g.lineTo(cx + 3, cy - 18); g.moveTo(cx, cy - 10); g.quadraticCurveTo(cx - 8, cy - 18, cx - 11, cy - 12);
+    }
+    g.stroke();
+  }
+  const backTex = FL.map((f, i) => {
+    const c = document.createElement('canvas'); c.width = 1024; c.height = 700;
+    const g = c.getContext('2d');
+    brush(g, 40, 22, 944, 664, 300 + i, 0);
+    g.fillStyle = f.ink; g.textAlign = 'center';
+    g.font = 'italic 900 104px "Barlow Condensed"'; g.fillText('SUNFIZZ', 512, 118);
+    g.font = 'italic 800 30px "Barlow Condensed"'; if ('letterSpacing' in g) g.letterSpacing = '4px';
+    g.fillText('SPARKLING FRUIT SODA', 512, 156); if ('letterSpacing' in g) g.letterSpacing = '0px';
+    const rows = [['REAL FRUIT', `18% ${f.fr} juice, never from concentrate`], ['LIGHT FIZZ', 'Fine bubbles, a soft natural sparkle'], ['NO SUGAR ADDED', '4.2 g sugar per 100 ml, all from fruit']];
+    rows.forEach(([h, d], r) => {
+      const x = 150, y = 175 + r * 150;
+      drawIcon(g, r, x + 70, y + 62, f.ink);
+      g.textAlign = 'left'; g.fillStyle = f.ink;
+      g.font = 'italic 800 60px "Barlow Condensed"'; g.fillText(h, x + 135, y + 70);
+      let fs = 25; g.font = `500 ${fs}px Manrope`;
+      while (g.measureText(d).width > 589 && fs > 14) { fs--; g.font = `500 ${fs}px Manrope`; }
+      g.fillText(d, x + 135, y + 110);
+    });
+    g.textAlign = 'center'; g.font = '500 22px Manrope'; g.fillText('330 ml · 92 kcal · best served cold', 512, 662);
+    return tex(c);
+  });
+
+  /* glass droplet normal map */
+  function dropNormal() {
+    const S = 512, h = document.createElement('canvas'); h.width = h.height = S;
+    const g = h.getContext('2d'); g.fillStyle = '#000'; g.fillRect(0, 0, S, S);
+    g.globalCompositeOperation = 'lighter';
+    const r = rng(7);
+    for (let i = 0; i < 340; i++) {
+      const x = r() * S, y = r() * S, rad = 2 + r() * 13;
+      for (const ox of [0, -S, S]) for (const oy of [0, -S, S]) {
+        const cx = x + ox, cy = y + oy;
+        if (cx < -rad || cx > S + rad || cy < -rad || cy > S + rad) continue;
+        const gr = g.createRadialGradient(cx, cy, 0, cx, cy, rad);
+        gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+        g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, rad, 0, TAU); g.fill();
+      }
+    }
+    const src = g.getImageData(0, 0, S, S).data, out = g.createImageData(S, S), st = 2.2 * 4;
+    const H = (x, y) => src[((y + S) % S * S + (x + S) % S) * 4] / 255;
+    for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+      const dx = (H(x + 1, y) - H(x - 1, y)) * st, dy = (H(x, y + 1) - H(x, y - 1)) * st;
+      const l = Math.hypot(dx, dy, 1), o = (y * S + x) * 4;
+      out.data[o] = (-dx / l * .5 + .5) * 255; out.data[o + 1] = (dy / l * .5 + .5) * 255; out.data[o + 2] = (1 / l * .5 + .5) * 255; out.data[o + 3] = 255;
+    }
+    g.globalCompositeOperation = 'source-over'; g.putImageData(out, 0, 0);
+    const t = new THREE.CanvasTexture(h); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 2.4); t.anisotropy = maxAniso;
+    return t;
+  }
+
+  /* ───────── geometry / materials ───────── */
+  const prof = pts => new THREE.CatmullRomCurve3(pts.map(([r, y]) => new THREE.Vector3(r, y, 0)), false, 'centripetal');
+  const glassGeo = new THREE.LatheGeometry(prof([[0, 0], [.40, 0], [.485, .022], [.515, .085], [.52, .16], [.52, 1.08], [.524, 1.2], [.517, 1.33], [.47, 1.5], [.385, 1.69], [.295, 1.86], [.24, 2.0], [.217, 2.12], [.21, 2.21], [.226, 2.245], [.229, 2.31], [.214, 2.34], [.18, 2.345]]).getPoints(140).map(p => new THREE.Vector2(Math.max(0, p.x), p.y)), 112);
+  const liqMid = prof([[.38, .06], [.465, .09], [.49, .16], [.49, 1.08], [.493, 1.2], [.487, 1.33], [.443, 1.5], [.36, 1.69], [.272, 1.86], [.214, 2.0], [.196, 2.12], [.19, 2.24]]).getPoints(90).map(p => new THREE.Vector2(Math.max(0, p.x), p.y));
+  const liquidGeo = new THREE.LatheGeometry([new THREE.Vector2(0, .06), ...liqMid, new THREE.Vector2(0, 2.24)], 96);
+  const capGeo = new THREE.LatheGeometry([[.246, 2.285], [.254, 2.3], [.252, 2.36], [.244, 2.39], [.222, 2.415], [.17, 2.425], [0, 2.425]].map(([r, y]) => new THREE.Vector2(r, y)), 126);
+  {
+    const p = capGeo.attributes.position;
+    for (let v = 0; v < p.count; v++) {
+      const x = p.getX(v), y = p.getY(v), z = p.getZ(v);
+      if (y < 2.4) { const f = 1 + .04 * Math.pow(Math.max(0, Math.cos(21 * Math.atan2(x, z))), .7); p.setXYZ(v, x * f, y, z * f); }
+    }
+    capGeo.computeVertexNormals();
+  }
+  const frontGeo = new THREE.CylinderGeometry(.528, .528, .94, 72, 1, true, -(.94 * 2 / .528) / 2, .94 * 2 / .528);
+  const backGeo = new THREE.CylinderGeometry(.528, .528, .88, 56, 1, true, Math.PI - 1.2, 2.4);
+
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0x000000, roughness: .04, transparent: true, opacity: .07, depthWrite: false,
+    clearcoat: 1, clearcoatRoughness: .05, envMapIntensity: 2.1, ior: 1.5,
+    normalMap: dropNormal(), normalScale: new THREE.Vector2(.42, .42)
+  });
+  glassMat.onBeforeCompile = s => {
+    s.fragmentShader = s.fragmentShader.replace('#include <opaque_fragment>', `
+      float fr_ = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), 2.2);
+      float mx_ = max(outgoingLight.r, max(outgoingLight.g, outgoingLight.b));
+      diffuseColor.a = clamp(diffuseColor.a + fr_ * 0.3 + smoothstep(0.22, 1.1, mx_) * 0.9, 0.0, 1.0);
+      #include <opaque_fragment>`);
+  };
+  glassMat.customProgramCacheKey = () => 'sunfizz-glass';
+
+  function backMaterial(i) {
+    const u = { uSweep: { value: new THREE.Vector3() }, uDim: { value: new THREE.Vector3() }, uStrPos: { value: 0 }, uStrInt: { value: 0 }, uStrRow: { value: -1 } };
+    const m = new THREE.MeshPhysicalMaterial({ map: backTex[i % 8], alphaTest: .5, roughness: .55, clearcoat: .25, envMapIntensity: 1 });
+    m.onBeforeCompile = s => {
+      Object.assign(s.uniforms, u);
+      s.fragmentShader = s.fragmentShader
+        .replace('#include <common>', `#include <common>
+          uniform vec3 uSweep; uniform vec3 uDim; uniform float uStrPos; uniform float uStrInt; uniform float uStrRow;`)
+        .replace('#include <map_fragment>', `
+          #ifdef USE_MAP
+          vec4 sampledDiffuseColor = texture2D( map, vMapUv );
+          vec3 lab = sampledDiffuseColor.rgb;
+          float yy = (1.0 - vMapUv.y) * 700.0;
+          float ul = (vMapUv.x * 1024.0 - 150.0) / 724.0;
+          float inX = step(0.0, ul) * step(ul, 1.0);
+          vec3 cream = vec3(1.0, 0.896, 0.839);
+          vec3 gc = pow(max(lab, vec3(0.0)), vec3(0.4545));
+          float paper = smoothstep(0.72, 0.90, dot(gc, vec3(0.2126, 0.7152, 0.0722)));
+          for (int r = 0; r < 3; r++) {
+            float y0 = 175.0 + 150.0 * float(r);
+            float inR = step(y0, yy) * step(yy, y0 + 140.0) * inX;
+            float p = r == 0 ? uSweep.x : (r == 1 ? uSweep.y : uSweep.z);
+            float dm = r == 0 ? uDim.x : (r == 1 ? uDim.y : uDim.z);
+            float edge = mix(0.12, 0.9, p);
+            float mk = (1.0 - smoothstep(edge - 0.03, edge + 0.03, ul)) * smoothstep(0.12, 0.30, ul) * (1.0 - smoothstep(0.72, 0.90, ul));
+            mk *= step(0.001, p) * inR;
+            lab = mix(lab, vec3(1.0), mk * paper * 0.85);
+            lab *= 1.0 - mk * (1.0 - paper) * 0.25;
+            lab = mix(lab, cream, dm * 0.66 * inR);
+            if (abs(float(r) - uStrRow) < 0.5) {
+              float rv = (yy - y0) / 140.0;
+              float dd = ul - (rv - 0.5) * 0.35;
+              float sx = exp(-pow((dd - uStrPos) / 0.07, 2.0));
+              lab = mix(lab, vec3(1.0), sx * uStrInt * paper * inR);
+            }
+          }
+          diffuseColor *= vec4(lab, sampledDiffuseColor.a);
+          #endif`);
+    };
+    m.customProgramCacheKey = () => 'sunfizz-back';
+    return { m, u };
+  }
+
+  /* ───────── bottles ───────── */
+  const bottles = [], glassMeshes = [];
+  for (let i = 0; i < N; i++) {
+    const fi = i % 8, f = FL[fi];
+    const group = new THREE.Group(); group.rotation.order = 'ZYX';
+    const inner = new THREE.Group(); inner.position.y = -BH / 2; group.add(inner);
+    const liqBase = new THREE.Color(f.liq), capBase = new THREE.Color(f.cap);
+    const liquidMat = new THREE.MeshPhysicalMaterial({ color: liqBase.clone(), roughness: .22, emissive: liqBase.clone(), emissiveIntensity: .4, clearcoat: .7, side: THREE.DoubleSide });
+    const capMat = new THREE.MeshStandardMaterial({ color: capBase.clone(), metalness: .55, roughness: .32, side: THREE.DoubleSide });
+    const frontMat = new THREE.MeshPhysicalMaterial({ map: frontTex[fi], alphaTest: .5, roughness: .55, clearcoat: .25 });
+    const back = backMaterial(i);
+    const glass = new THREE.Mesh(glassGeo, glassMat); glass.userData.i = i; glass.renderOrder = 2;
+    const liquid = new THREE.Mesh(liquidGeo, liquidMat);
+    const cap = new THREE.Mesh(capGeo, capMat);
+    const front = new THREE.Mesh(frontGeo, frontMat); front.position.y = .6;
+    const bk = new THREE.Mesh(backGeo, back.m); bk.position.y = .62;
+    inner.add(liquid, cap, front, bk, glass);
+    scene.add(group);
+    glassMeshes.push(glass);
+    bottles.push({ group, liquidMat, capMat, frontMat, backMat: back.m, backU: back.u, liqBase, capBase, L: -1, hv: 0 });
+  }
+  /* row y centres (pivot-relative, unscaled) */
+  const ROWLY = [245, 395, 545].map(yc => .62 + (.5 - yc / 700) * .88 - BH / 2);
+  const rowAt = f => { const i = Math.min(2, Math.floor(f)), j = Math.min(2, i + 1); return lerp(ROWLY[i], ROWLY[j], f - i); };
+
+  /* row glow */
+  function softTex(w, h, fn) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d'), im = g.createImageData(w, h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const a = clamp(fn(x / (w - 1), y / (h - 1))) * 255, o = (y * w + x) * 4; im.data[o] = im.data[o + 1] = im.data[o + 2] = a; im.data[o + 3] = 255; }
+    g.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(c); return t;
+  }
+  const glowRow = new THREE.Mesh(
+    new THREE.CylinderGeometry(.544, .544, .3, 48, 1, true, Math.PI - 1.05, 2.1),
+    new THREE.MeshBasicMaterial({ map: softTex(256, 64, (u, v) => sstep(0, .22, u) * (1 - sstep(.78, 1, u)) * Math.sin(Math.PI * v)), color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.FrontSide })
+  );
+  glowRow.renderOrder = 4; glowRow.visible = false;
+
+  /* hero disc */
+  const disc = new THREE.Group();
+  const discBody = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, .05, 72), new THREE.MeshPhysicalMaterial({ color: 0xfff1ea, roughness: .12, transparent: true, opacity: .22, depthWrite: false, clearcoat: 1, envMapIntensity: 1.4 }));
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1, .007, 8, 160), ringMat); ring.rotation.x = Math.PI / 2; ring.position.y = .025;
+  const discGlowMat = new THREE.MeshBasicMaterial({ map: softTex(128, 128, (u, v) => Math.pow(clamp(1 - Math.hypot(u - .5, v - .5) * 2), 1.6)), color: 0xffffff, transparent: true, opacity: .55, blending: THREE.AdditiveBlending, depthWrite: false });
+  const discGlow = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.1), discGlowMat); discGlow.rotation.x = -Math.PI / 2; discGlow.position.y = .03;
+  disc.add(discBody, ring, discGlow); disc.renderOrder = 1; scene.add(disc);
+  discBody.renderOrder = ring.renderOrder = discGlow.renderOrder = 1;
+
+  /* precompile */
+  bottles.forEach(b => b.group.visible = true);
+  try { await (renderer.compileAsync ? renderer.compileAsync(scene, camera) : renderer.compile(scene, camera)); } catch (e) { renderer.compile(scene, camera); }
+
+  /* ───────── layout ───────── */
+  let cw = 1, ch = 1, aspect = 1.7, W = 9, k = 1;
+  const Ly = {};
+  function resize() {
+    cw = canvas.clientWidth || innerWidth; ch = canvas.clientHeight || innerHeight;
+    renderer.setPixelRatio(dpr); renderer.setSize(cw, ch, false);
+    aspect = cw / ch; camera.aspect = aspect; camera.updateProjectionMatrix();
+    W = VH * aspect; k = sstep(.72, 1.25, aspect);
+    Ly.s1 = lerp(.36, .15, k); Ly.s2 = lerp(.25, .104, k);
+    Ly.hc = Math.min(lerp(.38, .5, k) * VH / BH, lerp(.36, .2, k) * W / 1.05);
+    Ly.base = lerp(-.3, -.35, k) * VH;
+    const Hs = lerp(.9, 1.08, k) * VH;
+    Ly.sc0 = Hs / BH; Ly.x0 = lerp(0, -.17, k) * W; Ly.y0 = lerp(.15, .44, k) * VH - Hs / 2; Ly.rz0 = lerp(.12, .3, k);
+    Ly.scCu = Math.min(Ly.sc0 * lerp(1.25, 1.22, k), lerp(.78, .36, k) * W / 1.04);
+    Ly.xCu = lerp(0, -.165, k) * W; Ly.rowT = lerp(-.19, 0, k) * VH;
+    Ly.manSc = Math.min(lerp(.5, .7, k) * VH, .36 * W * BH / 1.05) / BH; Ly.manY = lerp(-.16, -.1, k) * VH;
+    Ly.lineSc = lerp(.42, .6, k) * VH / BH;
+    bgMat.uniforms.uAspect.value = aspect; bgMat.uniforms.uTxtY.value = lerp(.47, .5, k); bgMat.uniforms.uTxtW.value = lerp(1.02, .92, k);
+  }
+  new ResizeObserver(resize).observe(canvas);
+  addEventListener('resize', resize);
+  resize();
+
+  /* ───────── poses ───────── */
+  const mk = () => ({ x: 0, y: 0, z: 0, sc: 1, ry: 0, rz: 0 });
+  const lp = (o, a, b, t) => { o.x = lerp(a.x, b.x, t); o.y = lerp(a.y, b.y, t); o.z = lerp(a.z, b.z, t); o.sc = lerp(a.sc, b.sc, t); o.ry = lerp(a.ry, b.ry, t); o.rz = lerp(a.rz, b.rz, t); return o; };
+  const H = mk(), G = mk(), M = mk(), Lp = mk(), P1 = mk(), P2 = mk(), P3 = mk();
+  let T = 0, introT = reduced ? 99 : 0;
+  const INTRO = 1.9;
+  let car = 0, carV = 0, carTarget = 0, hoverIdx = -1;
+  const wrapD = d => mod(d + N / 2, N) - N / 2;
+
+  function heroPose(i, d, o) {
+    const sg = Math.sign(d), ad = Math.abs(d), m1 = Math.min(ad, 1), m2 = Math.max(0, ad - 1);
+    o.x = sg * (m1 * Ly.s1 + m2 * Ly.s2) * W;
+    o.sc = Ly.hc * (1 - .3 * m1 - .035 * m2);
+    o.y = Ly.base + .05 * VH * m1 + o.sc * BH / 2;
+    o.z = -Math.min(ad, 6) * .32;
+    o.rz = TILT[i] * sstep(0, 1, ad);
+    o.ry = -d * .2;
+    if (!reduced) { o.y += Math.sin(1.1 * T + 1.7 * i) * .035; o.rz += Math.sin(.8 * T + 2.3 * i) * .025; o.ry += Math.sin(.5 * T + i) * .06; }
+    o.y += .09 * bottles[i].hv;
+    const p = clamp((introT - .06 * ad) / .62);
+    if (p < 1) {
+      const wc = 1 - m1, ec = eoc(p), eb = eob(p);
+      o.y -= .75 * VH * (1 - ec) * wc;
+      o.x += sg * .85 * W * (1 - eb) * (1 - wc);
+      o.rz += sg * .5 * (1 - eb) * (1 - wc);
+    }
+  }
+  function storyPose(s, o, act) {
+    const turn = eio(clamp(s / .12));
+    o.sc = lerp(Ly.sc0, Ly.scCu, turn); o.x = lerp(Ly.x0, Ly.xCu, turn); o.z = 0;
+    o.rz = lerp(Ly.rz0, .025, turn);
+    const k3 = s * 3, st = Math.min(2, Math.floor(k3));
+    const f = Math.min(2, st + sstep(.6, 1, k3 - Math.floor(k3)));
+    G.f = f;
+    const yRow = Ly.rowT - rowAt(f) * o.sc;
+    o.y = lerp(Ly.y0, yRow, turn);
+    o.ry = Math.PI * turn + ((f - 1) * .14 + (reduced ? 0 : Math.sin(.7 * T) * .025)) * turn;
+  }
+  function lineupPose(slot, l, cRaw, o, entrance) {
+    const u = slot - eio(l) * 2;
+    o.sc = Ly.lineSc;
+    o.z = 1.4 - 1.55 * u;
+    o.x = lerp(-.3 * W * .86, .48 * W * 3.19, u / 15) + Math.min(0, u) * .35 * W;
+    o.y = -.43 * VH * .86 + Ly.lineSc * BH / 2;
+    o.ry = -.38 + Math.sin(.8 * u + 2.5 * l) * .12; o.rz = 0;
+    if (entrance) {
+      const ec = eio(clamp((cRaw - (slot % 5) / 5 * .15) / .85)), dir = slot % 2 ? 1 : -1;
+      o.x += dir * 1.25 * W * ((10 - o.z) / 10) * (1 - ec);
+      o.y += .05 * VH * (1 - ec);
+      o.ry += dir * 1.2 * (1 - ec);
+    }
+  }
+
+  /* ───────── scroll spring ───────── */
+  history.scrollRestoration = 'manual';
+  let sy = scrollY, sv = 0;
+  function stepScroll(dt) {
+    const w = reduced ? 40 : 5.6, target = scrollY, n = Math.max(1, Math.ceil(dt * 240)), h = dt / n;
+    for (let i = 0; i < n; i++) { sv += (-2 * w * sv - w * w * (sy - target)) * h; sy += sv * h; }
+  }
+  function stepCar(dt) {
+    const kk = 46, c = 2 * Math.sqrt(kk), n = Math.max(1, Math.ceil(dt * 240)), h = dt / n;
+    for (let i = 0; i < n; i++) { carV += (-c * carV - kk * (car - carTarget)) * h; car += carV * h; }
+  }
+  const goY = Yt => scrollTo({ top: Math.min(Yt * innerHeight, document.documentElement.scrollHeight - innerHeight), behavior: 'instant' });
+
+  /* ───────── DOM refs / hero title ───────── */
+  const heroEl = $('#hero'), storyEl = $('#story'), titleEl = $('#title');
+  const icons = [...document.querySelectorAll('.ic')];
+  const tagT = $('#tagT'), stTitle = $('#stitle'), stTxt = $('#stTxt'), sbody = $('#sbody');
+
+  function rollTitle(name, dir) {
+    const old = [...titleEl.children];
+    const n = document.createElement('span'); n.textContent = name;
+    n.style.transform = `translateY(${dir > 0 ? 100 : -100}%)`; titleEl.appendChild(n);
+    n.getBoundingClientRect();
+    const tr = 'transform .62s var(--ease)';
+    n.style.transition = tr; n.style.transform = 'translateY(0)';
+    old.forEach(o => { o.style.transition = tr; o.style.transform = `translateY(${dir > 0 ? -100 : 100}%)`; setTimeout(() => o.remove(), 700); });
+  }
+
+  /* story copy with decode reveal */
+  let stepNow = -1, decTok = 0;
+  const GL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  function scramble(txt, tok) {
+    stTitle.classList.remove('loading');
+    const t0 = performance.now();
+    const tick = () => {
+      if (tok !== decTok) return;
+      const p = clamp((performance.now() - t0) / 520);
+      let out = '';
+      for (let j = 0; j < txt.length; j++) out += (txt[j] === ' ' || j < p * txt.length) ? txt[j] : GL[Math.floor(Math.random() * GL.length)];
+      stTxt.textContent = out;
+      if (p < 1) requestAnimationFrame(tick); else stTxt.textContent = txt;
+    };
+    tick();
+  }
+  function setStep(i) {
+    if (i === stepNow) return;
+    const first = stepNow < 0; stepNow = i;
+    const st = STEPS[i], tok = ++decTok;
+    icons.forEach((el, j) => el.classList.toggle('on', j === i));
+    if (first) return;
+    tagT.classList.add('out'); sbody.classList.add('out'); stTitle.classList.add('loading');
+    tagT.textContent = st.tag; requestAnimationFrame(() => tagT.classList.remove('out'));
+    setTimeout(() => { if (tok === decTok) { sbody.textContent = st.body; sbody.classList.remove('out'); } }, 160);
+    setTimeout(() => { if (tok === decTok) scramble(st.title, tok); }, 230);
+  }
+
+  /* ───────── input ───────── */
+  const canInteract = () => introT > 1.2 && scrollY < innerHeight * .02;
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  function pick(ev) {
+    const r = canvas.getBoundingClientRect();
+    ndc.set((ev.clientX - r.left) / r.width * 2 - 1, -((ev.clientY - r.top) / r.height * 2 - 1));
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects(glassMeshes.filter((g, i) => bottles[i].group.visible), false)[0];
+    return hit ? hit.object.userData.i : -1;
+  }
+  let drag = null;
+  canvas.addEventListener('pointerdown', e => {
+    if (!canInteract() || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+    carTarget = car;
+    drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, car0: car, moved: 0, active: false, lastT: performance.now(), lastMove: performance.now(), prev: car, v: 0 };
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (drag && e.pointerId === drag.id) {
+      const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+      drag.moved = Math.max(drag.moved, Math.hypot(dx, dy));
+      if (drag.moved > 6) drag.active = true;
+      if (drag.active) {
+        const now = performance.now(), nt = drag.car0 - dx / (Ly.s1 * innerWidth);
+        const dts = Math.max(1, now - drag.lastT) / 1000;
+        drag.v = lerp(drag.v, clamp((nt - drag.prev) / dts, -14, 14), .35);
+        drag.prev = nt; drag.lastT = now; drag.lastMove = now; carTarget = nt;
+        canvas.style.cursor = 'grabbing';
+      }
+    } else if (canInteract() && e.pointerType === 'mouse') {
+      const i = pick(e), d = i < 0 ? 0 : Math.abs(wrapD(i - car));
+      hoverIdx = i >= 0 && d > .5 ? i : -1;
+      canvas.style.cursor = hoverIdx >= 0 ? 'pointer' : 'grab';
+    }
+  });
+  const endDrag = (e, cancel) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const d = drag; drag = null;
+    if (cancel) { carTarget = Math.round(car); return; }
+    if (!d.active) {
+      const i = pick(e);
+      if (i >= 0) carTarget = Math.round(car) + Math.round(wrapD(i - car));
+      else carTarget = Math.round(car);
+    } else {
+      const v = performance.now() - d.lastMove > 90 ? 0 : d.v;
+      carTarget = Math.round(car + v * .22);
+    }
+    canvas.style.cursor = canInteract() ? 'grab' : 'default';
+  };
+  canvas.addEventListener('pointerup', e => endDrag(e, false));
+  canvas.addEventListener('pointercancel', e => endDrag(e, true));
+  canvas.addEventListener('pointerleave', () => { if (!drag) hoverIdx = -1; });
+  let wheelT = 0;
+  canvas.addEventListener('wheel', e => {
+    if (!canInteract() || Math.abs(e.deltaX) <= Math.abs(e.deltaY) * 1.2) return;
+    e.preventDefault();
+    carTarget += e.deltaX / 220;
+    clearTimeout(wheelT); wheelT = setTimeout(() => { carTarget = Math.round(carTarget); }, 130);
+  }, { passive: false });
+  const step = n => { if (canInteract()) carTarget = Math.round(carTarget) + n; };
+  $('#prev').addEventListener('click', () => step(-1));
+  $('#next').addEventListener('click', () => step(1));
+  addEventListener('keydown', e => { if (e.key === 'ArrowLeft') step(-1); else if (e.key === 'ArrowRight') step(1); });
+  $('#shop').addEventListener('click', () => goY(7.05));
+  $('#menu').addEventListener('click', () => goY(.75 + 1 / 6 * 2.55 * .5 + .02));
+  $('#logo').addEventListener('click', e => { e.preventDefault(); goY(0); });
+  icons.forEach((el, j) => el.addEventListener('click', () => goY(j === 3 ? 7.05 : .75 + (j + .5) / 3 * 2.55)));
+
+  /* ───────── frame loop ───────── */
+  const fc = new THREE.Color(FL[0].cap), fcT = new THREE.Color(), white = new THREE.Color(1, 1, 1);
+  let centreIdx = 0, sIdx = 0, strikeActive = -2;
+  const sweep = [0, 0, 0], dim = [0, 0, 0];
+  let strT = 1, strRow = -1, glowY = ROWLY[0], glowOp = 0, glowParent = null;
+  let last = 0, avg = 16.7, lastDrop = -1e9, lastRise = 0, scCss = '', uiOn = false, started = 0;
+
+  function frame(ts) {
+    requestAnimationFrame(frame);
+    const rawDt = last ? ts - last : 16.7; last = ts;
+    const dt = Math.min(.05, rawDt / 1000); T += dt;
+    if (!started) started = ts;
+    if (introT < INTRO) introT = Math.min(INTRO, introT + dt);
+    if (!uiOn && introT >= INTRO * .7) { uiOn = true; document.body.classList.add('intro-ui'); }
+
+    /* adaptive resolution */
+    if (introT >= INTRO) {
+      avg = lerp(avg, Math.min(rawDt, 100), .1);
+      if (avg > 19.5 && dpr > .7 && ts - lastDrop > 700) { dpr = Math.max(.7, dpr - .15); lastDrop = ts; lastRise = ts; renderer.setPixelRatio(dpr); renderer.setSize(cw, ch, false); }
+      else if (avg < 17.3 && dpr < dprMax && ts - lastDrop > 8000 && ts - lastRise > 1200) { dpr = Math.min(dprMax, dpr + .05); lastRise = ts; renderer.setPixelRatio(dpr); renderer.setSize(cw, ch, false); }
+    }
+
+    stepScroll(dt); stepCar(dt);
+    const Y = sy / innerHeight;
+    const a = eio(clamp(Y / .75)), s = clamp((Y - .75) / 2.55), bb = eio(clamp((Y - 3.3) / .65)), m = clamp((Y - 3.95) / 1.05);
+    const cRaw = clamp((Y - 5) / .7), c = eio(cRaw), l = clamp((Y - 5.7) / 1.35);
+
+    /* centre tracking & title */
+    const ci = mod(Math.round(car), N);
+    if (ci !== centreIdx) {
+      const dd = wrapD(ci - centreIdx);
+      if (FL[ci % 8].n !== FL[centreIdx % 8].n) rollTitle(FL[ci % 8].n, dd >= 0 ? 1 : -1);
+      centreIdx = ci;
+    }
+    if (Y < .01) sIdx = mod(Math.round(carTarget), N);
+
+    /* story state */
+    const act = s >= .11 ? Math.min(2, Math.floor(s * 3)) : -1;
+    if (act !== strikeActive) { strikeActive = act; if (act >= 0) { strT = 0; strRow = act; } }
+    for (let r = 0; r < 3; r++) {
+      sweep[r] = clamp(sweep[r] + (r === act ? dt / .6 : -dt / .6 * 1.4));
+      dim[r] += ((act >= 0 && r !== act ? 1 : 0) - dim[r]) * (1 - Math.exp(-7 * dt));
+    }
+    strT = Math.min(1, strT + dt / .95);
+    setStep(act < 0 ? 0 : act);
+
+    /* flavour colour smoothing */
+    fcT.set(FL[centreIdx % 8].cap); fc.lerp(fcT, 1 - Math.exp(-4 * dt));
+
+    /* poses */
+    storyPose(s, G);
+    M.x = 0; M.z = 0; M.rz = 0; M.sc = Ly.manSc; M.y = Ly.manY; M.ry = TAU * (1 + (reduced ? 0 : eio(m)));
+    for (let i = 0; i < N; i++) {
+      const b = bottles[i], d = wrapD(i - car);
+      b.hv += ((hoverIdx === i && Math.abs(d) > .5 ? 1 : 0) - b.hv) * (1 - Math.exp(-10 * dt));
+      heroPose(i, d, H);
+      let P, Lh = 1 - sstep(0, 1, Math.abs(d));
+      if (i === sIdx) {
+        lp(P1, H, G, a); lp(P2, P1, M, bb);
+        lineupPose(0, l, 0, Lp, false); Lp.ry += reduced ? TAU : 2 * TAU;
+        lp(P3, P2, Lp, c); P = P3;
+      } else {
+        const sg = Math.sign(d) || 1;
+        H.x += sg * .9 * W * a; H.sc *= 1 - .25 * a;
+        const slot = mod(i - sIdx, N);
+        lineupPose(slot, l, cRaw, Lp, true);
+        P = lp(P1, H, Lp, sstep(.5, 1, a));
+        Lh += b.hv * .5;
+      }
+      Lh = lerp(Lh, 1, a);
+      const g = b.group;
+      g.position.set(P.x, P.y, P.z); g.rotation.set(0, P.ry, P.rz); g.scale.setScalar(P.sc);
+      const depth = 10 - P.z, hw = depth / 10 * W / 2, hh = depth / 10 * VH / 2;
+      g.visible = depth > 1.2 && Math.abs(P.x) - .65 * P.sc < hw && Math.abs(P.y) - 1.3 * P.sc < hh;
+      Lh = clamp(Lh);
+      if (Math.abs(Lh - b.L) > .002) {
+        b.L = Lh;
+        b.liquidMat.color.copy(b.liqBase).multiplyScalar(.42 + .58 * Lh);
+        b.liquidMat.emissiveIntensity = .08 + .34 * Lh;
+        b.frontMat.color.setScalar((.48 + .52 * Lh) * 1.28);
+        b.backMat.color.setScalar((.48 + .52 * Lh) * 1.28);
+        b.capMat.color.copy(b.capBase).multiplyScalar(.5 + .5 * Lh);
+      }
+    }
+    /* back-label highlight uniforms on the story bottle */
+    bottles.forEach((b, i) => {
+      const u = b.backU;
+      if (i === sIdx) {
+        u.uSweep.value.set(eio(sweep[0]), eio(sweep[1]), eio(sweep[2]));
+        u.uDim.value.set(dim[0], dim[1], dim[2]);
+        u.uStrRow.value = strRow;
+        u.uStrPos.value = lerp(-.15, 1.15, eoc(strT));
+        u.uStrInt.value = strT >= 1 ? 0 : Math.sin(Math.PI * strT) * .6;
+      } else { u.uSweep.value.set(0, 0, 0); u.uDim.value.set(0, 0, 0); u.uStrInt.value = 0; }
+    });
+    /* row glow */
+    const sb = bottles[sIdx].group;
+    if (glowParent !== sb) { sb.add(glowRow); glowParent = sb; }
+    glowY += ((act >= 0 ? ROWLY[act] : ROWLY[0]) - glowY) * (1 - Math.exp(-8 * dt));
+    glowRow.position.y = glowY;
+    glowOp += ((act >= 0 ? 1 : 0) - glowOp) * (1 - Math.exp(-6 * dt));
+    glowRow.material.opacity = glowOp * (.2 + .05 * Math.sin(2.2 * T)) * (1 - bb);
+    glowRow.visible = glowRow.material.opacity > .004;
+
+    /* disc */
+    {
+      const di = eoc(clamp(introT / .9)), vis = (1 - sstep(0, .5, a)) * di;
+      disc.visible = vis > .01;
+      const sc = Ly.hc * (.6 + .4 * di);
+      disc.scale.set(sc * 1.25, Ly.hc * 1.2, sc * 1.25);
+      disc.position.set(0, Ly.base - .03 * Ly.hc - (1 - di) * .3 * VH - a * .4 * VH, 0);
+      ringMat.color.copy(fc).lerp(white, .25).multiplyScalar(1.5); ringMat.opacity = vis;
+      discGlowMat.color.copy(fc); discGlowMat.opacity = .55 * vis;
+      discBody.material.opacity = .22 * vis;
+    }
+
+    /* background */
+    {
+      mixPal(palA, PAL.hero, PAL.story, a); mixPal(palB, palA, PAL.man, bb); mixPal(palC, palB, PAL.line, c);
+      const p = palC, u = bgMat.uniforms;
+      u.uTop.value.copy(p.top); u.uBot.value.copy(p.bot); u.uGlowCol.value.copy(p.glow);
+      u.uGlowPos.value.set(p.gx, p.gy); u.uGlowAmt.value = p.amt; u.uGlowRad.value = p.rad; u.uClouds.value = p.clouds; u.uFloor.value = p.floor;
+      u.uTxtAmt.value = bb * (1 - c);
+      u.uSharp.value = .62 * eoc(m);
+      u.uTxtDrift.value = (m - .5) * .03 * (reduced ? 0 : 1);
+      u.uTime.value = T;
+    }
+
+    /* overlays */
+    {
+      const introUi = clamp((introT / INTRO - .75) / .25);
+      const ho = (1 - sstep(.02, .35, Y)) * introUi;
+      heroEl.style.opacity = ho; heroEl.style.visibility = ho < .01 ? 'hidden' : 'visible';
+      const so = sstep(.5, .8, Y) * (1 - sstep(3.3, 3.55, Y));
+      storyEl.style.opacity = so; storyEl.style.visibility = so < .01 ? 'hidden' : 'visible';
+      if (ho >= .01) {
+        const [r, g, bl] = fc.toArray().map(v => Math.round(Math.pow(v, 1 / 2.2) * 255));
+        const css = `${r},${g},${bl}`;
+        if (css !== scCss) { scCss = css; heroEl.style.setProperty('--sc', `rgb(${css})`); heroEl.style.setProperty('--sg', `rgba(${css},.55)`); }
+      }
+      if (!drag) canvas.style.cursor = canInteract() ? (hoverIdx >= 0 ? 'pointer' : 'grab') : 'default';
+    }
+
+    renderer.render(scene, camera);
+  }
+  requestAnimationFrame(frame);
+  document.body.classList.add('ready');
+}
+
+boot().catch(err => { console.error(err); document.body.classList.add('nogl'); });
+</script>
+</body>
+</html>
