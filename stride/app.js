@@ -358,13 +358,15 @@ function goSection(id){
 $$('[data-go]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();goSection(a.dataset.go)}));
 
 /* ================= cart ================= */
-let cartN=0;const cartEl=$('#cartN'),basket=$('#basket');
+let cartN=0;const cartEl=$('#cartN'),basket=$('#basket'); /* the basket button was removed from the nav */
 function renderCart(){
+  if(!cartEl)return;
   cartEl.textContent=cartN;cartEl.style.display=cartN?'block':'none';
   if(!RM)cartEl.animate([{transform:'scale(0)'},{transform:'scale(1.5)',offset:.55},{transform:'scale(1)'}],{duration:350,easing:'ease-out'});
 }
-function bump(){if(!RM)basket.animate([{transform:'scale(1)'},{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:320,easing:'ease-out'})}
+function bump(){if(basket&&!RM)basket.animate([{transform:'scale(1)'},{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:320,easing:'ease-out'})}
 function flyToCart(els,add=1){
+  if(!basket)return;
   if(RM){cartN+=add;renderCart();return}
   const bk=basket.getBoundingClientRect(),bx=bk.left+bk.width/2,by=bk.top+bk.height/2;let done=0;
   els.forEach((el,i)=>{
