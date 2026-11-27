@@ -345,10 +345,11 @@ function startDrift(){
 }
 
 /* ================= nav ================= */
-const secEls=['flavors','inside','shop','range'].map(id=>document.getElementById(id));
+const secEls=['flavors','inside','shop','range','boissons','infos'].map(id=>document.getElementById(id));
+const SEC_LINK=[0,1,2,2,3,3];
 const links=$$('#pill a'),hl=$('#pill .hl'),navEl=$('#nav'),pillEl=$('#pill');
 let activeSec=-1;
-function placeHl(){const a=links[Math.min(Math.max(0,activeSec),links.length-1)];if(!a)return;hl.style.left=a.offsetLeft+'px';hl.style.width=a.offsetWidth+'px'}
+function placeHl(){const a=links[SEC_LINK[Math.max(0,activeSec)]];if(!a)return;hl.style.left=a.offsetLeft+'px';hl.style.width=a.offsetWidth+'px'}
 function goSection(id){
   smooth_.active=false;
   const el=document.getElementById(id);const y=el.getBoundingClientRect().top+scrollY;
@@ -411,7 +412,7 @@ function pokeScale(now,t0){const t=(now-t0)/500;if(t<0||t>=1)return[1,1];
   for(let i=0;i<3;i++){const a=kf[i],b=kf[i+1];if(t<=b[0]){const u=(t-a[0])/(b[0]-a[0]);return[lerp(a[1],b[1],u),lerp(a[2],b[2],u)]}}return[1,1]}
 // reveal-on-view
 const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target)}}),{threshold:.18});
-[$('#shopHead'),$('#shopCap'),cardsEl,$('#bHead'),$('#menus'),$('#iHead'),$('#infoGrid')].forEach(el=>io.observe(el));
+[$('#shopHead'),$('#shopCap'),cardsEl,$('#bHead'),$('#menus'),$('#iHead'),$('#infoGrid'),$('#dHead'),$('#cansFrame')].forEach(el=>io.observe(el));
 let strip_done=false;
 
 /* ================= animated plates (click to play) ================= */
@@ -571,7 +572,7 @@ function frame(now){
   });
   // nav
   let act=0;secEls.forEach((s,i)=>{if(s.getBoundingClientRect().top<=vh*.35)act=i});
-  if(act!==activeSec){activeSec=act;links.forEach((a,i)=>a.classList.toggle('on',i===Math.min(act,links.length-1)));placeHl();
+  if(act!==activeSec){activeSec=act;links.forEach((a,i)=>a.classList.toggle('on',i===SEC_LINK[act]));placeHl();
     pillEl.classList.toggle('light',act===2);navEl.classList.toggle('dark',act!==2)}
   // 3D
   if(!glReady)return;
