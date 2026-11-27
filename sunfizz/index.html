@@ -430,18 +430,9 @@ async function boot() {
 
   /* ───────── geometry / materials ───────── */
   const prof = pts => new THREE.CatmullRomCurve3(pts.map(([r, y]) => new THREE.Vector3(r, y, 0)), false, 'centripetal');
-  const glassGeo = new THREE.LatheGeometry(prof([[0, 0], [.40, 0], [.485, .022], [.515, .085], [.52, .16], [.52, 1.08], [.524, 1.2], [.517, 1.33], [.47, 1.5], [.385, 1.69], [.295, 1.86], [.24, 2.0], [.217, 2.12], [.21, 2.21], [.226, 2.245], [.229, 2.31], [.214, 2.34], [.18, 2.345]]).getPoints(140).map(p => new THREE.Vector2(Math.max(0, p.x), p.y)), 112);
-  const liqMid = prof([[.38, .06], [.465, .09], [.49, .16], [.49, 1.08], [.493, 1.2], [.487, 1.33], [.443, 1.5], [.36, 1.69], [.272, 1.86], [.214, 2.0], [.196, 2.12], [.19, 2.24]]).getPoints(90).map(p => new THREE.Vector2(Math.max(0, p.x), p.y));
-  const liquidGeo = new THREE.LatheGeometry([new THREE.Vector2(0, .06), ...liqMid, new THREE.Vector2(0, 2.24)], 96);
-  const capGeo = new THREE.LatheGeometry([[.246, 2.285], [.254, 2.3], [.252, 2.36], [.244, 2.39], [.222, 2.415], [.17, 2.425], [0, 2.425]].map(([r, y]) => new THREE.Vector2(r, y)), 126);
-  {
-    const p = capGeo.attributes.position;
-    for (let v = 0; v < p.count; v++) {
-      const x = p.getX(v), y = p.getY(v), z = p.getZ(v);
-      if (y < 2.4) { const f = 1 + .04 * Math.pow(Math.max(0, Math.cos(21 * Math.atan2(x, z))), .7); p.setXYZ(v, x * f, y, z * f); }
-    }
-    capGeo.computeVertexNormals();
-  }
+  const glassGeo = new THREE.LatheGeometry(prof([[0, .08], [.30, .07], [.38, .02], [.44, 0], [.49, .05], [.52, .14], [.52, .6], [.52, 1.1], [.52, 1.6], [.52, 1.95], [.505, 2.08], [.47, 2.18], [.445, 2.25], [.45, 2.30]]).getPoints(120).map(p => new THREE.Vector2(clamp(p.x, 0, .52), p.y)), 112);
+  const capGeo = new THREE.LatheGeometry([[.46, 2.29], [.465, 2.34], [.44, 2.375], [.40, 2.36], [.38, 2.335], [0, 2.335]].map(([r, y]) => new THREE.Vector2(r, y)), 96);
+  const tabGeo = new THREE.BoxGeometry(.3, .018, .13);
   const frontGeo = new THREE.CylinderGeometry(.528, .528, .94, 72, 1, true, -(.94 * 2 / .528) / 2, .94 * 2 / .528);
   const backGeo = new THREE.CylinderGeometry(.528, .528, .88, 56, 1, true, Math.PI - 1.2, 2.4);
 
@@ -508,23 +499,23 @@ async function boot() {
     const fi = i % 8, f = FL[fi];
     const group = new THREE.Group(); group.rotation.order = 'ZYX';
     const inner = new THREE.Group(); inner.position.y = -BH / 2; group.add(inner);
-    const liqBase = new THREE.Color(f.liq), capBase = new THREE.Color(f.cap);
-    const liquidMat = new THREE.MeshPhysicalMaterial({ color: liqBase.clone(), roughness: .22, emissive: liqBase.clone(), emissiveIntensity: .4, clearcoat: .7, side: THREE.DoubleSide });
-    const capMat = new THREE.MeshStandardMaterial({ color: capBase.clone(), metalness: .55, roughness: .32, side: THREE.DoubleSide });
+    const liqBase = new THREE.Color(f.liq), capBase = new THREE.Color('#d9dadf');
+    const liquidMat = new THREE.MeshPhysicalMaterial({ color: liqBase.clone(), metalness: .85, roughness: .28, envMapIntensity: 1.7, clearcoat: .6, clearcoatRoughness: .12, emissive: liqBase.clone(), emissiveIntensity: .4, normalMap: glassMat.normalMap, normalScale: new THREE.Vector2(.12, .12) });
+    const capMat = new THREE.MeshStandardMaterial({ color: capBase.clone(), metalness: 1, roughness: .22, envMapIntensity: 1.5, side: THREE.DoubleSide });
     const frontMat = new THREE.MeshPhysicalMaterial({ map: frontTex[fi], alphaTest: .5, roughness: .55, clearcoat: .25 });
     const back = backMaterial(i);
-    const glass = new THREE.Mesh(glassGeo, glassMat); glass.userData.i = i; glass.renderOrder = 2;
-    const liquid = new THREE.Mesh(liquidGeo, liquidMat);
+    const glass = new THREE.Mesh(glassGeo, liquidMat); glass.userData.i = i; glass.renderOrder = 2;
+    const tab = new THREE.Mesh(tabGeo, capMat); tab.position.set(0, 2.345, .02);
     const cap = new THREE.Mesh(capGeo, capMat);
-    const front = new THREE.Mesh(frontGeo, frontMat); front.position.y = .6;
-    const bk = new THREE.Mesh(backGeo, back.m); bk.position.y = .62;
-    inner.add(liquid, cap, front, bk, glass);
+    const front = new THREE.Mesh(frontGeo, frontMat); front.position.y = 1.1;
+    const bk = new THREE.Mesh(backGeo, back.m); bk.position.y = 1.12;
+    inner.add(cap, tab, front, bk, glass);
     scene.add(group);
     glassMeshes.push(glass);
     bottles.push({ group, liquidMat, capMat, frontMat, backMat: back.m, backU: back.u, liqBase, capBase, L: -1, hv: 0 });
   }
   /* row y centres (pivot-relative, unscaled) */
-  const ROWLY = [245, 395, 545].map(yc => .62 + (.5 - yc / 700) * .88 - BH / 2);
+  const ROWLY = [245, 395, 545].map(yc => 1.12 + (.5 - yc / 700) * .88 - BH / 2);
   const rowAt = f => { const i = Math.min(2, Math.floor(f)), j = Math.min(2, i + 1); return lerp(ROWLY[i], ROWLY[j], f - i); };
 
   /* row glow */
