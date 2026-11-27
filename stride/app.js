@@ -1,5 +1,8 @@
-import * as THREE from 'three';
-import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+let THREE=null,RoomEnvironment=null;
+try{
+  THREE=await import('three');
+  ({RoomEnvironment}=await import('three/addons/environments/RoomEnvironment.js'));
+}catch(err){console.error('three.js failed to load',err)}
 
 /* ================= data ================= */
 const SW=2688,SH=1520;
@@ -42,6 +45,7 @@ let geoF,geoB;
 let sheetImg=null;
 
 function initGL(){
+  if(!THREE)return false;
   try{
     renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
   }catch(e){console.warn('WebGL unavailable',e);return false}
@@ -54,6 +58,7 @@ function initGL(){
   envTex=pm.fromScene(new RoomEnvironment(),0.04).texture;
   scene.add(new THREE.AmbientLight(0xffffff,.55));
   const key=new THREE.DirectionalLight(0xffffff,1.1);key.position.set(-.6,.9,1.4);scene.add(key);
+  ray=new THREE.Raycaster();
   buildGeo();
   // shadow texture
   const sc=document.createElement('canvas');sc.width=sc.height=128;const x=sc.getContext('2d');
@@ -283,9 +288,9 @@ function next(n=1){lastInteract=performance.now();goTo(target+n)}
 
 /* ---- hero input ---- */
 function slotPx(){return 245*ARC.u*ARC.spread}
-const ray=new THREE.Raycaster()||null;
+let ray=null;
 function hitBar(cx,cy){
-  if(!renderer)return null;
+  if(!renderer||!ray)return null;
   const nd=new THREE.Vector2(cx/vw*2-1,-(cy/vh)*2+1);ray.setFromCamera(nd,camera);
   const ms=[];for(const b of bars)if(b.group.visible&&b.j!=null)ms.push(b.front);
   const hit=ray.intersectObjects(ms,false)[0];return hit?hit.object.userData.bar:null;
