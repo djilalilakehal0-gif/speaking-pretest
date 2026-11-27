@@ -1,16 +1,10 @@
-<body class="locked">
+<body>
 <script>(function(){if(location.search.indexOf('debug')<0)return;var p=document.createElement('pre');p.id='dbg';p.style.cssText='position:fixed;left:8px;top:70px;z-index:9999;max-width:92vw;max-height:45vh;overflow:auto;margin:0;padding:10px;background:rgba(0,0,0,.85);color:#9f9;font:11px/1.4 monospace;white-space:pre-wrap;pointer-events:none';document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(p)});var lv=document.createElement('div');lv.style.cssText='color:#ff9;margin-top:4px';window.dbgLive=function(m){if(!lv.parentNode)p.appendChild(lv);lv.textContent=m};window.dbg=function(m){p.insertBefore(document.createTextNode(m+'\n'),lv.parentNode?lv:null)};window.addEventListener('error',function(e){window.dbg('ERROR: '+e.message)});window.addEventListener('unhandledrejection',function(e){window.dbg('REJECT: '+(e.reason&&e.reason.message||e.reason))});window.dbg('debug on, UA: '+navigator.userAgent)})()</script>
-<script>setTimeout(function(){var i=document.getElementById('intro');if(i&&i.style.display!=='none'&&!document.body.classList.contains('entered')){i.style.display='none';document.body.classList.remove('locked');document.body.classList.add('entered')}},12000)</script>
+
 <canvas id="gl"></canvas>
 
-<div id="intro">
-  <video id="vid" muted playsinline preload="auto" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261116_131908_b6239896-c077-450c-ad91-575153973fcf.mp4"></video>
-  <div class="stamp"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#1c1a1f"/><path d="M7.5 25.5 14 14l4 6 3-4.5 7.5 10" fill="none" stroke="#f0e8e0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><b>STRIDE</b></div>
-  <button id="skip" type="button">Skip intro</button>
-</div>
-
 <header id="nav">
-  <a class="brand" href="#flavors" data-go="flavors"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="disc" cx="18" cy="18" r="18"/><path class="mt" d="M7.5 25.5 14 14l4 6 3-4.5 7.5 10"/></svg><span>STRIDE</span></a>
+  <a class="brand" href="#flavors" data-go="flavors"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="disc" cx="18" cy="18" r="18"/><path class="mt" d="M18 8c.6 3.6 5.8 5.4 5.8 10.6a5.8 5.8 0 0 1-11.6 0c0-2.6 1.4-3.6 2.4-5.6.8 1.6 1.6 1.8 2.2-1.6"/></svg><span>CHICKEN</span></a>
   <nav class="pill" id="pill" aria-label="Sections"><i class="hl"></i>
     <a href="#flavors" data-go="flavors">Flavors</a><a href="#inside" data-go="inside">Inside</a><a href="#shop" data-go="shop">Shop</a><a href="#range" data-go="range">Range</a>
   </nav>
@@ -54,8 +48,8 @@
 
 <section id="shop" aria-label="Shop">
   <div class="shead">
-    <h2 class="rv disp" id="shopHead"><span class="ln"><span>Grab</span></span><span class="ln"><span>a bag</span></span></h2>
-    <p class="scap" id="shopCap">Five bold flavours. Same<br>real ingredients. Pick your<br>favourite (or try them all).</p>
+    <h2 class="rv disp" id="shopHead"><span class="ln"><span>Pick</span></span><span class="ln"><span>your cut</span></span></h2>
+    <p class="scap" id="shopCap">Seven cuts. Same slow-roast<br>recipe. Pick your favourite<br>(or try them all).</p>
   </div>
   <div class="cards" id="cards"></div>
 </section>

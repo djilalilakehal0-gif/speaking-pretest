@@ -7,18 +7,19 @@ try{
 }catch(err){console.error('three.js failed to load',err);dbg('three.js FAILED: '+err.message)}
 
 /* ================= data ================= */
-const SW=2688,SH=1520;
-const SHEET_URL='https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261116_132032_30242d8c-5062-4d60-8a3d-238f0a2ff788.png&w=2200&q=85';
+const IMG=__ITEMS__;
+const uri=k=>`data:image/webp;base64,${IMG[k].b64}`;
 const FL=[
- {name:'Peanut Cocoa',color:'#b79474',box:[98,145,403,849],bit:1,ing:'Peanuts, oats, dates, cocoa, pea protein, sea salt.'},
- {name:'Berry Oat',color:'#ab9ac4',box:[620,145,402,849],bit:0,ing:'Oats, blueberries, raspberries, dates, pea protein, almonds.'},
- {name:'Salted Caramel',color:'#d1ad6c',box:[1137,145,402,849],bit:2,ing:'Dates, cashews, oats, pea protein, sea salt, vanilla.'},
- {name:'Mint Chip',color:'#94bdb4',box:[1661,145,402,849],bit:3,ing:'Oats, dark chocolate, almonds, pea protein, peppermint oil.'},
- {name:'Strawberry',color:'#d396a7',box:[2184,145,403,849],bit:4,ing:'Oats, strawberries, dates, cashews, pea protein, lemon.'}];
-const BITS=[[650,1090,340,305],[110,1125,280,255],[1175,1110,320,285],[1680,1085,380,305],[2280,1095,250,295]];
-const BH=(849+8)/(403+8);
-const CHICKEN_FLAV=4; // flavour slot whose artwork is the roast-chicken photo
-const CHICKEN_URI='data:image/webp;base64,__CHICKEN__';
+ {name:'Glazed Wings',color:'#f6a6c9',key:'wings'},
+ {name:'Drumstick',color:'#f291bd',key:'drumstick'},
+ {name:'Juicy Thigh',color:'#ee88b4',key:'thigh'},
+ {name:'Roast Chicken',color:'#f79fc6',key:'whole'},
+ {name:'Grilled Breast',color:'#f08fba',key:'breast'},
+ {name:'Skewers',color:'#f7acd0',key:'skewers'},
+ {name:'Leg Quarter',color:'#ec84b0',key:'legquarter'}];
+const N=FL.length, START=3;
+const BIT_KEYS=['parsley','strawberry','garlic'];
+const BH=1.05, PS=.74;
 
 /* ================= utils ================= */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -34,16 +35,9 @@ const glide=bez(.25,.75,.2,1), entrEase=bez(.16,1,.3,1);
 function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const root=document.documentElement, body=document.body;
 
-function cropCss(box,pad){let[x,y,w,h]=box;x-=pad;y-=pad;w+=2*pad;h+=2*pad;
-  return{bs:`${SW/w*100}% ${SH/h*100}%`,bp:`${x/(SW-w)*100}% ${y/(SH-h)*100}%`,ar:w/h}}
-function spr(el,box,pad){const c=cropCss(box,pad);el.classList.add('spr');el.style.backgroundSize=c.bs;el.style.backgroundPosition=c.bp;el.style.aspectRatio=c.ar}
-function wrapSpr(el,f){
-  if(f===CHICKEN_FLAV){
-    el.classList.add('spr');
-    el.style.backgroundImage=`url("${CHICKEN_URI}")`;el.style.backgroundSize='contain';el.style.backgroundPosition='center';el.style.aspectRatio=(403+8)/(849+8);
-  }else{el.style.backgroundImage='';spr(el,FL[f].box,4)}
-}
-const bitSpr=(el,b)=>spr(el,BITS[b],0);
+function imgSpr(el,key,ar){el.classList.add('spr');el.style.backgroundImage=`url("${uri(key)}")`;el.style.backgroundSize='contain';el.style.backgroundPosition='center';if(ar)el.style.aspectRatio=ar}
+function wrapSpr(el,f){imgSpr(el,FL[f].key,1/BH)}
+function bitSpr(el,b){const k=BIT_KEYS[b];imgSpr(el,k,IMG[k].w/IMG[k].h)}
 
 let vw=innerWidth, vh=innerHeight, phone=vw<820;
 
@@ -52,7 +46,6 @@ const canvas=$('#gl');
 let renderer=null,scene,camera,envTex,glReady=false,gl=null;
 const bars=[]; let trav=null, shadowTex=null, texs=[];
 let geoF,geoB;
-let sheetImg=null;
 
 function initGL(){
   if(!THREE)return false;
@@ -66,8 +59,8 @@ function initGL(){
   camera=new THREE.PerspectiveCamera(30,1,10,8000);
   const pm=new THREE.PMREMGenerator(renderer);
   envTex=pm.fromScene(new RoomEnvironment(),0.04).texture;
-  scene.add(new THREE.AmbientLight(0xffffff,.55));
-  const key=new THREE.DirectionalLight(0xffffff,1.1);key.position.set(-.6,.9,1.4);scene.add(key);
+  scene.add(new THREE.AmbientLight(0xffffff,.7));
+  const key=new THREE.DirectionalLight(0xffffff,.8);key.position.set(-.6,.9,1.4);scene.add(key);
   ray=new THREE.Raycaster();
   buildGeo();
   // shadow texture
@@ -81,14 +74,13 @@ function initGL(){
   return true;
 }
 function buildGeo(){
-  const CR=.062;
+  const CR=0;
   const g=new THREE.PlaneGeometry(1,BH,30,64);
   const p=g.attributes.position,uv=g.attributes.uv;
   for(let i=0;i<p.count;i++){
     const u=uv.getX(i),v=uv.getY(i),ex=Math.abs(2*u-1),ev=Math.min(v,1-v);let z;
-    if(ev<CR)z=.006+.006*Math.abs(Math.sin(u*Math.PI*34));
-    else{const across=Math.pow(Math.max(0,1-Math.pow(ex,2.6)),.62),along=Math.pow(clamp((ev-CR)/.11),.7);
-      z=.012+.118*across*along+.004*Math.sin(23*u+31*v)*across}
+    {const across=Math.pow(Math.max(0,1-Math.pow(ex,2.6)),.62),along=Math.pow(clamp((ev-CR)/.11),.7);
+      z=.01+.035*across*along}
     p.setZ(i,z);
   }
   g.computeVertexNormals();geoF=g;
@@ -98,7 +90,7 @@ function buildGeo(){
   b.index.needsUpdate=true;b.computeVertexNormals();geoB=b;
 }
 function mkMat(){
-  const m=new THREE.MeshPhysicalMaterial({transparent:true,alphaTest:.5,roughness:.45,metalness:0,clearcoat:.5,clearcoatRoughness:.32,envMapIntensity:.42,envMap:envTex});
+  const m=new THREE.MeshPhysicalMaterial({transparent:true,alphaTest:.5,roughness:.7,metalness:0,clearcoat:.12,clearcoatRoughness:.5,envMapIntensity:.3,envMap:envTex,emissive:0xffffff,emissiveIntensity:.55});
   m.onBeforeCompile=sh=>{sh.fragmentShader=sh.fragmentShader.replace('#include <alphatest_fragment>','#ifdef USE_ALPHATEST\nif(diffuseColor.a<alphaTest*opacity)discard;\n#endif')};
   return m;
 }
@@ -112,7 +104,7 @@ function makeBar(i){
   const b={i,group,front,back,fm,bm,shadow,sm,flav:-1,j:null};
   front.userData.bar=b;return b;
 }
-function setFlav(b,f){if(b.flav===f)return;b.flav=f;b.fm.map=texs[f].front;b.bm.map=texs[f].back;b.fm.needsUpdate=b.bm.needsUpdate=true}
+function setFlav(b,f){if(b.flav===f)return;b.flav=f;b.fm.map=b.fm.emissiveMap=texs[f].front;b.bm.map=b.bm.emissiveMap=texs[f].back;b.fm.needsUpdate=b.bm.needsUpdate=true}
 function place(b,s){
   if(!s||s.op<=.01){b.group.visible=false;b.shadow.visible=false;return}
   const sc=s.h/BH,sx=s.sx||1,sy=s.sy||1;
@@ -139,67 +131,23 @@ function resizeGL(){
 
 /* ---- textures ---- */
 function mix(hex,to,t){const a=parseInt(hex.slice(1),16),b=parseInt(to.slice(1),16);const c=s=>Math.round(((a>>s)&255)*(1-t)+((b>>s)&255)*t);return`rgb(${c(16)},${c(8)},${c(0)})`}
-let chickenImg=null;
-function buildTextures(img){
-  texs=FL.map((f,fi)=>{
-    const[x,y,w,h]=f.box,sc=img.naturalWidth/SW;
-    const W=Math.round((w+8)*1.5*.75),H=Math.round(W*BH);
-    const fc=document.createElement('canvas');fc.width=W;fc.height=H;
-    fc.getContext('2d').drawImage(img,(x-4)*sc,(y-4)*sc,(w+8)*sc,(h+8)*sc,0,0,W,H);
-    if(fi===CHICKEN_FLAV&&chickenImg){
-      const cc=fc.getContext('2d');cc.clearRect(0,0,W,H);
-      const iw=W*.98,ih=iw*chickenImg.naturalHeight/chickenImg.naturalWidth;
-      cc.drawImage(chickenImg,(W-iw)/2,(H-ih)/2,iw,ih);
-      const bk=document.createElement('canvas');bk.width=W;bk.height=H;const bx=bk.getContext('2d');
-      bx.translate(W,0);bx.scale(-1,1);bx.drawImage(fc,0,0);
-      const mk2=cv=>{const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t};
-      return{front:mk2(fc),back:mk2(bk)};
-    }
-    // back
-    const bc=document.createElement('canvas');bc.width=W;bc.height=H;const c=bc.getContext('2d');
-    c.save();c.translate(W,0);c.scale(-1,1);c.drawImage(fc,0,0);c.restore();
-    c.globalCompositeOperation='source-atop';
-    c.globalAlpha=.9;c.fillStyle=f.color;c.fillRect(0,.075*H,W,.85*H);
-    c.globalAlpha=.35;c.fillRect(0,0,W,.075*H);c.fillRect(0,.925*H,W,.075*H);
-    c.globalAlpha=1;
-    const gr=c.createLinearGradient(0,0,W,0);
-    gr.addColorStop(0,'rgba(0,0,0,.10)');gr.addColorStop(.28,'rgba(255,255,255,.14)');gr.addColorStop(.5,'rgba(255,255,255,0)');gr.addColorStop(.8,'rgba(0,0,0,.04)');gr.addColorStop(1,'rgba(0,0,0,.14)');
-    c.fillStyle=gr;c.fillRect(0,.075*H,W,.85*H);
-    c.globalCompositeOperation='source-over';
-    const ink=mix(f.color,'#1c1a1f',.78);
-    c.fillStyle=ink;c.textBaseline='middle';c.textAlign='center';
-    c.font=`400 ${.085*W}px 'Archivo Black'`;c.fillText('STRIDE',W/2,.15*H);
-    c.font=`500 ${.042*W}px 'DM Mono'`;c.fillText(`${f.name.toUpperCase()} · 50 G`,W/2,.185*H);
-    // nutrition panel
-    c.fillStyle='rgba(255,255,255,.92)';rr(c,.15*W,.215*H,.70*W,.36*H,.03*W);c.fill();
-    c.fillStyle=ink;c.textAlign='left';
-    c.font=`400 ${.058*W}px 'Archivo Black'`;c.fillText('NUTRITION',.19*W,.25*H);
-    c.font=`400 ${.032*W}px 'DM Mono'`;c.fillText('Serving size 1 bar (50 g)',.19*W,.2765*H);
-    c.fillRect(.19*W,.2925*H,.62*W,Math.max(2,.004*H));
-    const rows=[['Calories','210'],['Protein','12 g'],['Total fat','9 g'],['Carbohydrate','22 g'],['Fibre','6 g'],['Sugars','8 g'],['Salt','0.2 g']];
-    rows.forEach((r,i)=>{const yy=.3205*H+i*.034*H;c.font=`${i<2?500:400} ${.034*W}px 'DM Mono'`;c.textAlign='left';c.fillText(r[0],.19*W,yy);c.textAlign='right';c.fillText(r[1],.81*W,yy);
-      c.fillStyle='rgba(28,26,31,.25)';c.fillRect(.19*W,yy+.0165*H,.62*W,1);c.fillStyle=ink});
-    // ingredients
-    c.textAlign='center';c.font=`500 ${.036*W}px 'DM Mono'`;c.fillText('INGREDIENTS',W/2,.62*H);
-    c.textAlign='left';c.font=`400 ${.034*W}px 'DM Mono'`;
-    const words=f.ing.split(' ');let line='',ly=.65*H;const maxW=.70*W;
-    words.forEach(wd=>{const t=line?line+' '+wd:wd;if(c.measureText(t).width>maxW&&line){c.fillText(line,.15*W,ly);ly+=.022*H;line=wd}else line=t});
-    if(line)c.fillText(line,.15*W,ly);
-    // barcode
-    const bx=.25*W,bw=.50*W,by=.735*H,bh=.115*H;
-    c.fillStyle='#fff';rr(c,bx,by,bw,bh,.02*W);c.fill();
-    const R=rng(fi*977+13);c.fillStyle='#1c1a1f';let px=bx+.04*W;const endx=bx+bw-.04*W;
-    while(px<endx){const bwid=Math.max(1,(.004+R()*.009)*W);if(px+bwid>endx)break;c.fillRect(px,by+.012*H,bwid,bh*.64);px+=bwid+(.003+R()*.008)*W}
-    c.textAlign='center';c.font=`400 ${.026*W}px 'DM Mono'`;c.fillText(`5 0${fi}7 1${fi}2 3${fi}6 98${fi}`,W/2,by+bh*.84);
-    c.font=`500 ${.036*W}px 'DM Mono'`;c.fillText('PRESSED, NOT BAKED',W/2,.885*H);
+const tex_imgs={};
+function buildTextures(){
+  texs=FL.map(f=>{
+    const img=tex_imgs[f.key],W=512,H=Math.round(W*BH);
+    const fc=document.createElement('canvas');fc.width=W;fc.height=H;const c=fc.getContext('2d');
+    const r=Math.min(W*.96/img.naturalWidth,H*.96/img.naturalHeight),iw=img.naturalWidth*r,ih=img.naturalHeight*r;
+    c.drawImage(img,(W-iw)/2,(H-ih)/2,iw,ih);
+    const bk=document.createElement('canvas');bk.width=W;bk.height=H;const b=bk.getContext('2d');
+    b.translate(W,0);b.scale(-1,1);b.drawImage(fc,0,0);
     const mk=cv=>{const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t};
-    return{front:mk(fc),back:mk(bc)};
+    return{front:mk(fc),back:mk(bk)};
   });
 }
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 
 /* ================= state ================= */
-let pos=-2.6, target=1, tween=null, shown=1;
+let pos=START-3.6, target=START, tween=null, shown=START;
 let lastInteract=performance.now(), lastAuto=0, autoOn=!RM, entered=false;
 let drag=null, vel=0;
 const hero=$('#flavors'), arcEl=$('#arc'), titleEl=$('#title'), countEl=$('#count'), revealEl=$('#reveal');
@@ -217,9 +165,9 @@ function arcState(k,j,now){
   const ak=Math.min(Math.abs(k),4),a=Math.min(3,Math.floor(ak)),t=ak-a,A=SL[a],B=SL[a+1],sg=Math.sign(k);
   const L=i=>lerp(A[i],B[i],t),{u,spread}=ARC;
   const op=ak<=3.3?1:ak>=3.9?0:1-(ak-3.3)/.6;
-  let y=ARC.top+ARC.cy+L(1)*u,rz=sg*L(3);
+  let y=ARC.top+ARC.cy+L(1)*u,rz=sg*L(3)*.6;
   if(!RM){const b=Math.sin(now/4600*Math.PI*2+1.37*j);y-=(.5*b+.5)*9*u;rz+=.4*b}
-  return{x:ARC.cx+sg*L(0)*u*spread,y,h:L(2)*u,rz,ry:sg*L(4),rx:0,z:-Math.abs(Math.min(Math.abs(k),4))*34*u,op,sx:1,sy:1,shadow:1};
+  return{x:ARC.cx+sg*L(0)*u*spread,y,h:L(2)*u*PS,rz,ry:sg*L(4)*.4,rx:0,z:-Math.abs(Math.min(Math.abs(k),4))*34*u,op,sx:1,sy:1,shadow:1};
 }
 function lerpState(a,b,t){const o={};for(const k of['x','y','h','rz','ry','rx','z','op','shadow','sx','sy'])o[k]=lerp(a[k]??(k==='sx'||k==='sy'||k==='shadow'?1:0),b[k]??(k==='sx'||k==='sy'||k==='shadow'?1:0),t);return o}
 
@@ -302,8 +250,8 @@ function goTo(t,durOverride){
   const dur=durOverride??(650+160*Math.max(0,d-1));
   if(RM){pos=t;tween=null}else if(d>1e-4)tween={from,to:t,t0:performance.now(),dur,ease:glide};else tween=null;
   clearTimeout(flavTimer);
-  const fi=mod(t,5);
-  if(fi!==shown)flavTimer=setTimeout(()=>{if(mod(target,5)!==shown)changeFlavour(mod(target,5),lastDir)},RM?0:dur*.12);
+  const fi=mod(t,N);
+  if(fi!==shown)flavTimer=setTimeout(()=>{if(mod(target,N)!==shown)changeFlavour(mod(target,N),lastDir)},RM?0:dur*.12);
 }
 function next(n=1){lastInteract=performance.now();goTo(target+n)}
 
@@ -374,7 +322,7 @@ setInterval(()=>{
 let pokeHero=0;
 
 /* ---- floating bits ---- */
-const BITCFG=[[.12,.20,120,-18,0],[.86,.18,96,22,2],[.07,.74,84,12,3],[.655,.15,78,-10,4],[.205,.885,70,30,1]];
+const BITCFG=[[.12,.20,120,-18,0],[.86,.18,96,22,0],[.07,.74,84,12,0],[.655,.15,78,-10,1],[.205,.885,70,30,2]];
 BITCFG.forEach((c,i)=>{
   const el=document.createElement('i');el.className='bit';
   el.style.cssText=`--x:${c[0]};--y:${c[1]};--s:${c[2]};--r:${c[3]}deg;--i:${i}`;
@@ -501,15 +449,15 @@ buy.addEventListener('click',()=>{
 renderPack();
 let startedFull=false;
 new IntersectionObserver((es,ob)=>{es.forEach(en=>{if(en.isIntersecting&&!startedFull){startedFull=true;ob.disconnect();
-  if(touched)return;[0,1,2].forEach((n,k)=>setTimeout(()=>{if(!touched)addToPack(mod(shown+n,5))},[250,410,570][k]))}})},{threshold:.3}).observe($('#range'));
+  if(touched)return;[0,1,2].forEach((n,k)=>setTimeout(()=>{if(!touched)addToPack(mod(shown+n,N))},[250,410,570][k]))}})},{threshold:.3}).observe($('#range'));
 
 /* ================= section 2 ================= */
 const inside=$('#inside'),inFront=$('#inFront'),inBar=$('#inBar'),inDark=$('#inDark'),inNum=$('#inNum'),inHead=$('#inHead'),inCap=$('#inCap'),fwrap=$('#fwrap'),stormEl=$('#storm');
 const STEPS=[
- {h:'Real food,<br>first',c:'Oats, nuts, fruit.<br>Nothing you can\'t say.',a:0},
- {h:'Pressed,<br>not baked',c:'Real ingredients.<br>Clean energy.',a:180},
- {h:'Wrapped<br>same day',c:'Cold-pressed at dawn.<br>Sealed by noon.',a:360},
- {h:null,c:'12g plant protein.<br>No crash.',a:720}];
+ {h:'Slow roasted,<br>every time',c:'Free-range birds.<br>Nothing you can\'t say.',a:0},
+ {h:'Glazed,<br>not fried',c:'Honey, herbs, fire.<br>Crisp skin, juicy inside.',a:180},
+ {h:'Fresh<br>every day',c:'Prepared at dawn.<br>On your table by noon.',a:360},
+ {h:null,c:'Slow roasted.<br>Seriously juicy.',a:720}];
 function step4Html(){return FL[shown].name.split(' ').map(w=>w.length>9?`<span style="font-size:.72em">${w}</span>`:w).join('<br>')}
 const stepHtml=s=>s===3?step4Html():STEPS[s].h;
 let s2={step:0,angle:0,tw:null};
@@ -541,9 +489,9 @@ icons[0].classList.add('on');
 const R3=rng(7);const storm=[];
 for(let i=0;i<20;i++){
   const el=document.createElement('i');stormEl.append(el);
-  storm.push({el,a:R3()*Math.PI*2,ph:i/20+R3()*.03,spin:(R3()*2-1)*360,sz:.7+R3()*.7,own:R3()<.7,bit:Math.floor(R3()*5)});
+  storm.push({el,a:R3()*Math.PI*2,ph:i/20+R3()*.03,spin:(R3()*2-1)*360,sz:.7+R3()*.7,own:R3()<.7,bit:Math.floor(R3()*3)});
 }
-function recolorStorm(){storm.forEach(p=>{bitSpr(p.el,p.own?FL[shown].bit:p.bit)})}
+function recolorStorm(){storm.forEach(p=>{if(p.own)wrapSpr(p.el,shown);else bitSpr(p.el,p.bit)})}
 recolorStorm();
 
 /* ================= frames / scaling ================= */
@@ -622,12 +570,12 @@ function frame(now){
   const base=Math.floor(pos);
   for(let j=base-5;j<=base+5;j++){
     if(j===jT)continue;
-    const b=bars[mod(j,11)];b.j=j;setFlav(b,mod(j,5));
+    const b=bars[mod(j,11)];b.j=j;setFlav(b,mod(j,N));
     const s=arcState(j-pos,j,now);s.op*=fo;
     place(b,s);
   }
   // traveller
-  trav.j=jT;setFlav(trav,mod(jT,5));
+  trav.j=jT;setFlav(trav,mod(jT,N));
   const A=arcState(jT-pos,jT,now);
   let S=A;
   const br=inBar.getBoundingClientRect();
@@ -636,7 +584,7 @@ function frame(now){
   const B={x:br.left+br.width/2,y:br.top+br.height/2+bob,h:br.height,rz:14,ry:angB,rx:0,z:0,op:1,shadow:1,sx:1,sy:1};
   if(p1>0)S=lerpState(A,B,smooth(p1));
   if(p3>0){
-    const card=cardsEl.children[mod(jT,5)],pk=card.querySelector('.pk'),cr=pk.getBoundingClientRect(),ti=tilt[mod(jT,5)];
+    const card=cardsEl.children[mod(jT,N)],pk=card.querySelector('.pk'),cr=pk.getBoundingClientRect(),ti=tilt[mod(jT,N)];
     ti.x=lerp(ti.x,ti.hover?ti.tx:0,.2);ti.y=lerp(ti.y,ti.hover?ti.ty:0,.2);
     const C={x:cr.left+cr.width/2,y:cr.top+cr.height/2,h:cr.height,rz:0,ry:Math.round(angB/360)*360+ti.x*14,rx:-ti.y*14,z:30,op:1,shadow:.7,sx:1,sy:1};
     S=lerpState(B,C,smooth(p3));
@@ -648,54 +596,34 @@ function frame(now){
   renderer.render(scene,camera);
 }
 
-/* ================= intro / entrance ================= */
-const intro=$('#intro'),vid=$('#vid');
-let introLogo=false,vidStarted=false;
+/* ================= entrance / boot ================= */
 function enterHero(){
   if(entered)return;entered=true;
-  intro.classList.add('out');setTimeout(()=>intro.style.display='none',600);
   body.classList.remove('locked');body.classList.add('entered');
   lastInteract=performance.now();
-  setTitle(FL[1].name,1,true);setCount(1,false);markLive();
+  setTitle(FL[START].name,1,true);setCount(START,false);markLive();
   const go=()=>{
-    if(RM){pos=1;tween=null}else tween={from:-2.6,to:1,t0:performance.now(),dur:1700,ease:entrEase};
-    pos=-2.6;if(RM)pos=1;
+    if(RM){pos=START;tween=null}else{pos=START-3.6;tween={from:pos,to:START,t0:performance.now(),dur:1700,ease:entrEase}}
     startDrift();
   };
   if(glReady||!renderer)go();else{let w=0;const iv=setInterval(()=>{w+=100;if(glReady||w>2500){clearInterval(iv);go()}},100)}
   fitTitle();
 }
-function showLogo(){
-  if(entered||introLogo)return;introLogo=true;try{vid.pause()}catch(e){}
-  intro.classList.add('logo');
-  setTimeout(enterHero,380+650);
-}
-$('#skip').addEventListener('click',enterHero);
-if(RM){enterHero()}
-else{
-  const start=()=>{try{vid.currentTime=.55}catch(e){}vid.play().catch(()=>{})};
-  setTimeout(()=>{if(vid.readyState>=3)start();else vid.addEventListener('canplay',start,{once:true})},0);
-  vid.addEventListener('playing',()=>{vidStarted=true});
-  vid.addEventListener('ended',showLogo);vid.addEventListener('error',showLogo);
-  vid.addEventListener('timeupdate',()=>{if(vid.currentTime>=4.6)showLogo()});
-  setTimeout(()=>{if(!vidStarted)showLogo()},3500);
-  setTimeout(enterHero,9000);
-}
-
-/* ================= boot ================= */
 addEventListener('resize',()=>{resizeGL();sizeFrames();fitTitle();placeHl()});
 async function boot(){
   const ok=initGL();
   sizeFrames();
   try{await Promise.all([document.fonts.load("400 100px 'Archivo Black'"),document.fonts.load("400 20px 'DM Mono'"),document.fonts.load("500 20px 'DM Mono'"),document.fonts.load("700 20px 'Inter'"),document.fonts.load("800 20px 'Inter'"),document.fonts.load("500 20px 'Inter'"),document.fonts.load("600 20px 'Inter'")])}catch(e){}
   fitTitle();placeHl();
-  if(!ok)return;
-  const img=new Image();img.crossOrigin='anonymous';
-  img.onload=async()=>{sheetImg=img;try{const ci=new Image();ci.src=CHICKEN_URI;await ci.decode();chickenImg=ci}catch(e){dbg('chicken decode failed')}dbg('sheet loaded '+img.naturalWidth+'x'+img.naturalHeight);try{buildTextures(img);glReady=true;dbg('textures built, 3D ready');body.classList.add('gl');$('#shop').classList.add('gl');markLive()}catch(e){console.error(e);dbg('TEXTURE ERROR: '+e.message)}};
-  img.onerror=()=>{console.warn('sheet failed to load');dbg('sheet FAILED to load (network/CORS)')};
-  img.src=SHEET_URL;
+  if(ok){
+    try{
+      await Promise.all(FL.map(f=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>{tex_imgs[f.key]=i;res()};i.onerror=()=>rej(new Error('image '+f.key));i.src=uri(f.key)})));
+      buildTextures();glReady=true;dbg('textures built, 3D ready');body.classList.add('gl');$('#shop').classList.add('gl');markLive();
+    }catch(e){console.error(e);dbg('TEXTURE ERROR: '+e.message)}
+  }
+  enterHero();
 }
-setTitle(FL[1].name,1,false);setCount(1,false);
+setTitle(FL[START].name,1,false);setCount(START,false);
 requestAnimationFrame(frame);
 boot();
 window.__stride={get pos(){return pos},get target(){return target},goTo,get glReady(){return glReady},enterHero,bars:()=>bars};
