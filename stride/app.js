@@ -16,7 +16,11 @@ const FL=[
  {name:'Poulet rôti',color:'#f79fc6',key:'whole',bg:'#0a0a09'},
  {name:'Blanc grillé',color:'#f08fba',key:'breast',bg:'#0d0b09'},
  {name:'Brochettes',color:'#f7acd0',key:'skewers',bg:'#0b0a0c'},
- {name:'Quart de poulet',color:'#ec84b0',key:'legquarter',bg:'#0e0b0a'}];
+ {name:'Quart de poulet',color:'#ec84b0',key:'legquarter',bg:'#0e0b0a'},
+ {name:'Tenders croustillants',color:'#f4a0b6',key:'tenders',bg:'#0b0a09'},
+ {name:'Nems dorés',color:'#f08cae',key:'rolls',bg:'#0d0a0a'},
+ {name:'Saucisse grillée',color:'#ee82a6',key:'sausage',bg:'#0a0909'},
+ {name:'Beignet sucré',color:'#f7a9c4',key:'donut',bg:'#0c0a0a'}];
 const N=FL.length, START=3;
 const BIT_KEYS=['parsley','strawberry','garlic'];
 const BH=1.05, PS=.82;
@@ -206,7 +210,7 @@ function crossfade(el,apply,o){
   setTimeout(()=>{if(el._xt!==tok)return;a.cancel();apply();const b=el.animate([{translate:'0 14px',opacity:0},{translate:'0 0',opacity:1}],{duration:o.in,easing:o.ei,fill:'backwards'});xfAnim.set(el,[b])},o.out+o.gap);
 }
 function setCount(idx,anim=true){
-  const txt='0'+(idx+1);
+  const txt=String(idx+1).padStart(2,'0');
   if(!anim)countEl.textContent=txt;else crossfade(countEl,()=>countEl.textContent=txt,{out:220,gap:60,in:380,eo:'cubic-bezier(.5,0,.75,0)',ei:'cubic-bezier(.22,1,.36,1)'});
 }
 

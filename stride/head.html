@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Chicken : rôti lentement, vraiment juteux</title>
-<meta name="description" content="Sept morceaux de poulet rôti lentement. Glacé, pas frit.">
+<meta name="description" content="Onze spécialités de poulet rôti et de croustillant. Glacé, pas frit.">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -120,7 +120,7 @@ body.entered #auto{animation:fadeIn .6s ease-out .74s forwards}
 .in .rv .ln>span,.rv.in .ln>span{transform:none}
 .scap{position:absolute;left:calc(var(--w)*1128);top:calc(var(--w)*132);font:400 calc(var(--w)*15.5)/1.42 'DM Mono',monospace;margin:0;white-space:nowrap;opacity:0;translate:0 24px;transition:opacity 1s var(--ease),translate 1s var(--ease)}
 .scap.in{opacity:1;translate:0 0}
-.cards{display:grid;grid-template-columns:repeat(7,1fr);gap:calc(var(--w)*14);margin-top:calc(var(--w)*24);perspective:1200px}
+.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:calc(var(--w)*14);margin-top:calc(var(--w)*24);perspective:1200px}
 .card{position:relative;height:calc(var(--w)*390);border-radius:calc(var(--w)*22);background:var(--c);transform-style:preserve-3d;opacity:0;translate:0 24px;
   transition:opacity .9s var(--ease) calc(var(--i)*80ms),translate .9s var(--ease) calc(var(--i)*80ms),transform .15s,box-shadow .15s}
 .cards.in .card{opacity:1;translate:0 0}
@@ -151,7 +151,7 @@ body.entered #auto{animation:fadeIn .6s ease-out .74s forwards}
 .slot .x{position:absolute;left:50%;top:50%;width:calc(var(--w)*48);height:calc(var(--w)*48);min-width:34px;min-height:34px;margin:calc(var(--w)*-24) 0 0 calc(var(--w)*-24);border-radius:50%;background:var(--dark);border:2px solid var(--cream);display:grid;place-items:center;transition:translate .45s var(--ease),scale .45s var(--ease)}
 .slot .x svg{width:42%;height:42%;stroke:var(--cream);stroke-width:2;stroke-linecap:round}
 .slot.full .x{translate:0 calc(var(--w)*-108);scale:.85}
-.thumbs{position:relative;z-index:1;display:flex;gap:calc(var(--w)*14);margin-top:calc(var(--w)*36)}
+.thumbs{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:calc(var(--w)*16) calc(var(--w)*14);max-width:calc(var(--w)*690);margin-top:calc(var(--w)*36)}
 .thumb{width:calc(var(--w)*84);text-align:center}
 .thumb .sq{position:relative;height:calc(var(--w)*84);border-radius:calc(var(--w)*16);background:var(--c);display:grid;place-items:center}
 .thumb .sq .spr{width:calc(var(--w)*62);transition:translate .25s var(--ease)}
@@ -217,8 +217,8 @@ body.entered #auto{animation:fadeIn .6s ease-out .74s forwards}
   .slot .bar{width:88px}
   .slot .x{width:40px;height:40px;margin:-20px 0 0 -20px}
   .slot.full .x{translate:0 -60px}
-  .thumbs{gap:0;justify-content:space-between;margin-top:20px}
-  .thumb{width:13.2%}
+  .thumbs{gap:12px 1.5%;justify-content:flex-start;max-width:none;margin-top:20px}
+  .thumb{width:18%}
   .thumb .sq{height:auto;aspect-ratio:1;border-radius:10px}.thumb .sq .spr{width:76%}
   .thumb .nm{font-size:7.5px;margin-top:6px}
   .thumb .rg{width:20px;height:20px;font-size:10px;right:4px;top:4px}
