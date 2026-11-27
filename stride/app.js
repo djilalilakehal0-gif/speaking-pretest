@@ -411,7 +411,7 @@ function pokeScale(now,t0){const t=(now-t0)/500;if(t<0||t>=1)return[1,1];
   for(let i=0;i<3;i++){const a=kf[i],b=kf[i+1];if(t<=b[0]){const u=(t-a[0])/(b[0]-a[0]);return[lerp(a[1],b[1],u),lerp(a[2],b[2],u)]}}return[1,1]}
 // reveal-on-view
 const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target)}}),{threshold:.18});
-[$('#shopHead'),$('#shopCap'),cardsEl,$('#bHead'),$('#menus')].forEach(el=>io.observe(el));
+[$('#shopHead'),$('#shopCap'),cardsEl,$('#bHead'),$('#menus'),$('#iHead'),$('#infoGrid')].forEach(el=>io.observe(el));
 let strip_done=false;
 
 /* ================= animated plates ================= */
