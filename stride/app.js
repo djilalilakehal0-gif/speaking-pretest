@@ -346,7 +346,7 @@ function startDrift(){
 const secEls=['flavors','inside','shop','range'].map(id=>document.getElementById(id));
 const links=$$('#pill a'),hl=$('#pill .hl'),navEl=$('#nav'),pillEl=$('#pill');
 let activeSec=-1;
-function placeHl(){const a=links[Math.max(0,activeSec)];if(!a)return;hl.style.left=a.offsetLeft+'px';hl.style.width=a.offsetWidth+'px'}
+function placeHl(){const a=links[Math.min(Math.max(0,activeSec),links.length-1)];if(!a)return;hl.style.left=a.offsetLeft+'px';hl.style.width=a.offsetWidth+'px'}
 function goSection(id){
   smooth_.active=false;
   const el=document.getElementById(id);const y=el.getBoundingClientRect().top+scrollY;
@@ -564,7 +564,7 @@ function frame(now){
   });
   // nav
   let act=0;secEls.forEach((s,i)=>{if(s.getBoundingClientRect().top<=vh*.35)act=i});
-  if(act!==activeSec){activeSec=act;links.forEach((a,i)=>a.classList.toggle('on',i===act));placeHl();
+  if(act!==activeSec){activeSec=act;links.forEach((a,i)=>a.classList.toggle('on',i===Math.min(act,links.length-1)));placeHl();
     pillEl.classList.toggle('light',act===2);navEl.classList.toggle('dark',act!==2)}
   // 3D
   if(!glReady)return;
