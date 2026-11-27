@@ -10,13 +10,13 @@ try{
 const IMG=__ITEMS__;
 const uri=k=>`data:image/webp;base64,${IMG[k].b64}`;
 const FL=[
- {name:'Ailes glacées',color:'#f6a6c9',key:'wings'},
- {name:'Pilon',color:'#f291bd',key:'drumstick'},
- {name:'Cuisse juteuse',color:'#ee88b4',key:'thigh'},
- {name:'Poulet rôti',color:'#f79fc6',key:'whole'},
- {name:'Blanc grillé',color:'#f08fba',key:'breast'},
- {name:'Brochettes',color:'#f7acd0',key:'skewers'},
- {name:'Quart de poulet',color:'#ec84b0',key:'legquarter'}];
+ {name:'Ailes glacées',color:'#f6a6c9',key:'wings',bg:'#0b0908'},
+ {name:'Pilon',color:'#f291bd',key:'drumstick',bg:'#0e0a09'},
+ {name:'Cuisse juteuse',color:'#ee88b4',key:'thigh',bg:'#0c0a0b'},
+ {name:'Poulet rôti',color:'#f79fc6',key:'whole',bg:'#0a0a09'},
+ {name:'Blanc grillé',color:'#f08fba',key:'breast',bg:'#0d0b09'},
+ {name:'Brochettes',color:'#f7acd0',key:'skewers',bg:'#0b0a0c'},
+ {name:'Quart de poulet',color:'#ec84b0',key:'legquarter',bg:'#0e0b0a'}];
 const N=FL.length, START=3;
 const BIT_KEYS=['parsley','strawberry','garlic'];
 const BH=1.05, PS=.86;
@@ -237,7 +237,7 @@ let liveIdx=-1;
 function changeFlavour(idx,dir){
   if(idx===shown&&liveIdx===idx)return;
   shown=idx;
-  startReveal(FL[idx].color);
+  startReveal(FL[idx].bg);
   setTitle(FL[idx].name,dir,true);setCount(idx);
   markLive();refreshStep4();recolorStorm();
 }
@@ -561,7 +561,7 @@ function frame(now){
   // nav
   let act=0;secEls.forEach((s,i)=>{if(s.getBoundingClientRect().top<=vh*.35)act=i});
   if(act!==activeSec){activeSec=act;links.forEach((a,i)=>a.classList.toggle('on',i===act));placeHl();
-    pillEl.classList.toggle('light',act===2);navEl.classList.toggle('dark',act===3)}
+    pillEl.classList.toggle('light',act===2);navEl.classList.toggle('dark',act!==2)}
   // 3D
   if(!glReady)return;
   const jT=Math.round(target),p1=clamp(1-ir.top/vh),p3=clamp((vh-sr.top)/(.7*vh));
