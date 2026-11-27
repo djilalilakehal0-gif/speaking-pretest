@@ -39,7 +39,7 @@ body.entered #nav{animation:navIn .9s cubic-bezier(.22,.9,.24,1)}
 .brand{display:flex;align-items:center;gap:calc(var(--n)*10);font:800 calc(var(--n)*15.5) 'Inter',sans-serif;letter-spacing:.06em;text-decoration:none;color:inherit}
 .brand svg{width:calc(var(--n)*36);height:calc(var(--n)*36);flex:none}
 .brand{justify-self:start;width:fit-content;background:#0a0808;border-radius:calc(var(--n)*14);padding:calc(var(--n)*5) calc(var(--n)*14) calc(var(--n)*5) calc(var(--n)*10);box-shadow:0 0 0 1px rgba(244,196,70,.18)}
-.brand .logo{display:block;height:calc(var(--n)*46);width:auto}
+.brand .logo{display:block;height:calc(var(--n)*70);width:auto}
 .brand .disc{fill:var(--ink);transition:fill .4s}.brand .mt{fill:none;stroke:var(--cream);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .4s}
 #nav.dark{color:var(--cream)}
 #nav.dark .brand .disc{fill:#ff6f9f}#nav.dark .brand .mt{stroke:#1a0a12}
@@ -191,7 +191,7 @@ body.entered #auto{animation:fadeIn .6s ease-out .74s forwards}
   body.entered #nav{animation:fadeNav .6s ease-out}
   @keyframes fadeNav{from{opacity:0}to{opacity:1}}
   :root{--n:1px}
-  .brand{padding:4px 10px 4px 8px;border-radius:12px}.brand .logo{height:34px}
+  .brand{padding:4px 10px 4px 8px;border-radius:12px}.brand .logo{height:46px}
   .pill{position:fixed;left:50%;translate:-50% 0;bottom:calc(14px + env(safe-area-inset-bottom));background:rgba(255,255,255,.55);z-index:60}
   .pill a{height:34px;padding:0 15px;font-size:14px}
   .pill .hl{top:5px;bottom:5px}
