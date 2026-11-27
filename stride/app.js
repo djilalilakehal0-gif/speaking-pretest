@@ -416,16 +416,9 @@ let strip_done=false;
 
 /* ================= animated plates ================= */
 (function(){
-  const poster=$('#poster');if(!poster)return;
-  const plates=$$('#poster .plate');
-  const PW=1199;
-  const boxes=plates.map(p=>p.dataset.box.split(',').map(Number));
-  const cs=boxes.map(b=>[b[0]+b[2]/2,b[1]+b[3]/2]);
-  const cx=cs.reduce((s,c)=>s+c[0],0)/cs.length,cy=cs.reduce((s,c)=>s+c[1],0)/cs.length;
-  const CYCLE=9500;let vis=false,t0=0;
-  new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis)t0=performance.now()},{threshold:.05}).observe(poster);
   const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
   const seg=(t,a,b)=>clamp((t-a)/(b-a));
+  const CYCLE=9500;
   function pose(t){
     /* grow, rise, fall, orbit around each other, settle back */
     const grow=ease(seg(t,0,.18)),shrink=ease(seg(t,.88,1));
@@ -437,18 +430,28 @@ let strip_done=false;
     const rad=1-.28*Math.sin(Math.PI*orb);
     return{scale,dy,ang,rad};
   }
+  const rigs=$$('.poster').map(poster=>{
+    const plates_=[...poster.querySelectorAll('.plate')];if(!plates_.length)return null;
+    const boxes=plates_.map(p=>p.dataset.box.split(',').map(Number));
+    const cs=boxes.map(b=>[b[0]+b[2]/2,b[1]+b[3]/2]);
+    const cx=cs.reduce((s,c)=>s+c[0],0)/cs.length,cy=cs.reduce((s,c)=>s+c[1],0)/cs.length;
+    const r={poster,plates:plates_,cs,cx,cy,PW:+poster.dataset.pw||1199,vis:false,t0:0};
+    new IntersectionObserver(es=>{r.vis=es[0].isIntersecting;if(r.vis)r.t0=performance.now()},{threshold:.05}).observe(poster);
+    return r;
+  }).filter(Boolean);
   function frame(now){
     requestAnimationFrame(frame);
-    if(window.dbgLive&&now-(window._dp||0)>500){window._dp=now;window.dbgPlates&&window.dbgPlates('plates vis='+vis+' RM='+RM+' w='+poster.clientWidth)}
-    if(!vis||RM)return;
-    const k=poster.clientWidth/PW;
-    const t=((now-t0)%CYCLE)/CYCLE,p=pose(t);
-    if(window.dbgPlates&&now-(window._dq||0)>500){window._dq=now;window.dbgPlates('plates vis='+vis+' RM='+RM+' phase='+t.toFixed(2)+' scale='+p.scale.toFixed(2))}
-    plates.forEach((el,i)=>{
-      const rx=cs[i][0]-cx,ry=cs[i][1]-cy;
-      const c=Math.cos(p.ang),s=Math.sin(p.ang);
-      const nx=(rx*c-ry*s)*p.rad,ny=(rx*s+ry*c)*p.rad;
-      el.style.transform='translate('+((nx-rx)*k)+'px,'+((ny-ry+p.dy)*k)+'px) scale('+p.scale+')';
+    rigs.forEach((r,ri)=>{
+      if(window.dbgPlates&&ri===0&&now-(window._dq||0)>500){window._dq=now;window.dbgPlates('plates vis='+r.vis+' RM='+RM+' posters='+rigs.length+' phase='+((((now-r.t0)%CYCLE)/CYCLE)).toFixed(2))}
+      if(!r.vis||RM)return;
+      const k=r.poster.clientWidth/r.PW;
+      const t=((now-r.t0)%CYCLE)/CYCLE,p=pose(t);
+      r.plates.forEach((el,i)=>{
+        const rx=r.cs[i][0]-r.cx,ry=r.cs[i][1]-r.cy;
+        const c=Math.cos(p.ang),s=Math.sin(p.ang);
+        const nx=(rx*c-ry*s)*p.rad,ny=(rx*s+ry*c)*p.rad;
+        el.style.transform='translate('+((nx-rx)*k)+'px,'+((ny-ry+p.dy)*k)+'px) scale('+p.scale+')';
+      });
     });
   }
   requestAnimationFrame(frame);
