@@ -204,6 +204,11 @@ body.entered #auto{animation:fadeIn .6s ease-out .74s forwards}
 .ibtn.ghost{border:1.5px solid #e9b440;color:#f2c24e;background:rgba(0,0,0,.28)}
 .ibtn:hover{filter:brightness(1.12)}
 .poster2{aspect-ratio:1260/840}
+.poster{cursor:pointer;-webkit-user-select:none;user-select:none;outline-offset:3px}
+.poster:focus-visible{outline:2px solid #f4c446}
+.poster .phint{position:absolute;left:50%;bottom:calc(var(--w)*14);translate:-50% 0;z-index:5;padding:calc(var(--w)*9) calc(var(--w)*20);border-radius:99px;background:rgba(10,8,6,.82);border:1.5px solid rgba(244,196,70,.6);color:#f4c446;font:700 max(12px,calc(var(--w)*14)) 'Inter',sans-serif;letter-spacing:.04em;white-space:nowrap;pointer-events:none;transition:opacity .4s}
+.poster.playing .phint{opacity:0}
+.poster:hover .phint{background:rgba(244,196,70,.95);color:#1a1006}
 .poster .pbg{width:100%;height:100%;object-fit:cover}
 /* ---------- desktop short ---------- */
 @media(min-width:820px) and (max-height:560px){

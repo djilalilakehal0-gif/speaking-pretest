@@ -414,11 +414,11 @@ const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.t
 [$('#shopHead'),$('#shopCap'),cardsEl,$('#bHead'),$('#menus'),$('#iHead'),$('#infoGrid')].forEach(el=>io.observe(el));
 let strip_done=false;
 
-/* ================= animated plates ================= */
+/* ================= animated plates (click to play) ================= */
 (function(){
   const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
   const seg=(t,a,b)=>clamp((t-a)/(b-a));
-  const CYCLE=18000;
+  const CYCLE=14000;
   function pose(t){
     /* grow, rise, fall, orbit around each other, settle back */
     const grow=ease(seg(t,0,.18)),shrink=ease(seg(t,.88,1));
@@ -431,21 +431,25 @@ let strip_done=false;
     return{scale,dy,ang,rad};
   }
   const rigs=$$('.poster').map(poster=>{
-    const plates_=[...poster.querySelectorAll('.plate')];if(!plates_.length)return null;
-    const boxes=plates_.map(p=>p.dataset.box.split(',').map(Number));
+    const plates=[...poster.querySelectorAll('.plate')];if(!plates.length)return null;
+    const boxes=plates.map(p=>p.dataset.box.split(',').map(Number));
     const cs=boxes.map(b=>[b[0]+b[2]/2,b[1]+b[3]/2]);
     const cx=cs.reduce((s,c)=>s+c[0],0)/cs.length,cy=cs.reduce((s,c)=>s+c[1],0)/cs.length;
-    const r={poster,plates:plates_,cs,cx,cy,PW:+poster.dataset.pw||1199,vis:false,t0:0};
-    new IntersectionObserver(es=>{r.vis=es[0].isIntersecting;if(r.vis)r.t0=performance.now()},{threshold:.05}).observe(poster);
+    const r={poster,plates,cs,cx,cy,PW:+poster.dataset.pw||1199,playing:false,t0:0,hint:poster.querySelector('.phint')};
+    const play=()=>{if(r.playing)return;r.playing=true;r.t0=performance.now();poster.classList.add('playing')};
+    poster.addEventListener('click',play);
+    poster.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();play()}});
+    r.play=play;
     return r;
   }).filter(Boolean);
   function frame(now){
     requestAnimationFrame(frame);
     rigs.forEach((r,ri)=>{
-      if(window.dbgPlates&&ri===0&&now-(window._dq||0)>500){window._dq=now;window.dbgPlates('plates vis='+r.vis+' RM='+RM+' posters='+rigs.length+' phase='+((((now-r.t0)%CYCLE)/CYCLE)).toFixed(2))}
-      if(!r.vis||RM)return;
-      const k=r.poster.clientWidth/r.PW;
-      const t=((now-r.t0)%CYCLE)/CYCLE,p=pose(t);
+      if(window.dbgPlates&&ri===0&&now-(window._dq||0)>500){window._dq=now;window.dbgPlates('plates playing='+r.playing+' RM='+RM+' posters='+rigs.length)}
+      if(!r.playing)return;
+      const t=(now-r.t0)/CYCLE;
+      if(t>=1){r.playing=false;r.poster.classList.remove('playing');r.plates.forEach(el=>{el.style.transform=''});return}
+      const k=r.poster.clientWidth/r.PW,p=pose(t);
       r.plates.forEach((el,i)=>{
         const rx=r.cs[i][0]-r.cx,ry=r.cs[i][1]-r.cy;
         const c=Math.cos(p.ang),s=Math.sin(p.ang);
@@ -455,6 +459,7 @@ let strip_done=false;
     });
   }
   requestAnimationFrame(frame);
+  window.__plates={play:()=>rigs.forEach(r=>r.play())};
 })();
 
 /* ================= section 2 ================= */
