@@ -164,7 +164,7 @@ let ARC={cx:0,cy:0,u:1,spread:1,H:0,top:0};
 function computeArc(r){
   const H=r.height;let u,cy,spread=1;
   if(phone){u=Math.min(vw/560,H/980);cy=H*.4;spread=1.02}
-  else{u=Math.min(vw/1440,vh/900);cy=H/2+135*u}
+  else{u=Math.min(vw/1440,vh/900);cy=H/2+205*u}
   ARC={cx:vw/2,cy,u,spread,H,top:r.top};
 }
 function arcState(k,j,now){
@@ -173,7 +173,7 @@ function arcState(k,j,now){
   const op=ak<=3.3?1:ak>=3.9?0:1-(ak-3.3)/.6;
   let y=ARC.top+ARC.cy+L(1)*u,rz=sg*L(3)*.6;
   if(!RM){const b=Math.sin(now/4600*Math.PI*2+1.37*j);y-=(.5*b+.5)*9*u;rz+=.4*b}
-  return{x:ARC.cx+sg*L(0)*u*spread,y,h:L(2)*u*(phone?PS:.58),rz,ry:sg*L(4)*.4,rx:0,z:-Math.abs(Math.min(Math.abs(k),4))*34*u,op,sx:1,sy:1,shadow:1};
+  return{x:ARC.cx+sg*L(0)*u*spread,y,h:L(2)*u*(phone?PS:.45),rz,ry:sg*L(4)*.4,rx:0,z:-Math.abs(Math.min(Math.abs(k),4))*34*u,op,sx:1,sy:1,shadow:1};
 }
 function lerpState(a,b,t){const o={};for(const k of['x','y','h','rz','ry','rx','z','op','shadow','sx','sy'])o[k]=lerp(a[k]??(k==='sx'||k==='sy'||k==='shadow'?1:0),b[k]??(k==='sx'||k==='sy'||k==='shadow'?1:0),t);return o}
 
