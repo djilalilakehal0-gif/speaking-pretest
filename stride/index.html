@@ -266,7 +266,7 @@ body.entered #auto{animation:fadeIn .6s ease-out .74s forwards}
 </style>
 </head>
 <body class="locked">
-<script>(function(){if(location.search.indexOf('debug')<0)return;var p=document.createElement('pre');p.id='dbg';p.style.cssText='position:fixed;left:8px;bottom:8px;z-index:9999;max-width:92vw;max-height:45vh;overflow:auto;margin:0;padding:10px;background:rgba(0,0,0,.85);color:#9f9;font:11px/1.4 monospace;white-space:pre-wrap;pointer-events:none';document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(p)});window.dbg=function(m){p.textContent+=m+'\n'};window.addEventListener('error',function(e){window.dbg('ERROR: '+e.message)});window.addEventListener('unhandledrejection',function(e){window.dbg('REJECT: '+(e.reason&&e.reason.message||e.reason))});window.dbg('debug on, UA: '+navigator.userAgent)})()</script>
+<script>(function(){if(location.search.indexOf('debug')<0)return;var p=document.createElement('pre');p.id='dbg';p.style.cssText='position:fixed;left:8px;top:70px;z-index:9999;max-width:92vw;max-height:45vh;overflow:auto;margin:0;padding:10px;background:rgba(0,0,0,.85);color:#9f9;font:11px/1.4 monospace;white-space:pre-wrap;pointer-events:none';document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(p)});var lv=document.createElement('div');lv.style.cssText='color:#ff9;margin-top:4px';window.dbgLive=function(m){if(!lv.parentNode)p.appendChild(lv);lv.textContent=m};window.dbg=function(m){p.insertBefore(document.createTextNode(m+'\n'),lv.parentNode?lv:null)};window.addEventListener('error',function(e){window.dbg('ERROR: '+e.message)});window.addEventListener('unhandledrejection',function(e){window.dbg('REJECT: '+(e.reason&&e.reason.message||e.reason))});window.dbg('debug on, UA: '+navigator.userAgent)})()</script>
 <script>setTimeout(function(){var i=document.getElementById('intro');if(i&&i.style.display!=='none'&&!document.body.classList.contains('entered')){i.style.display='none';document.body.classList.remove('locked');document.body.classList.add('entered')}},12000)</script>
 <canvas id="gl"></canvas>
 
@@ -914,6 +914,7 @@ function frame(now){
   setStep(clamp(st,0,3),now);
   if(s2.tw){const t=(now-s2.tw.t0)/s2.tw.dur;if(t>=1){s2.angle=s2.tw.to;s2.tw=null}else s2.angle=lerp(s2.tw.from,s2.tw.to,-(Math.cos(Math.PI*t)-1)/2)}
   const q=clamp((p-.76)/.24);
+  if(window.dbgLive&&now-(window._dl||0)>400){window._dl=now;window.dbgLive('p='+p.toFixed(2)+' step='+s2.step+' angle='+Math.round(s2.angle)+' q='+q.toFixed(2)+' RM='+RM+' fps~'+Math.round(1000/Math.max(1,dt)))}
   const fade=1-clamp(4*q);
   fwrap.style.opacity=fade;inNum.style.opacity=fade;
   inDark.style.opacity=clamp(3.5*q)*.42;

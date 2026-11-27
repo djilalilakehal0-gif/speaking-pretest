@@ -578,6 +578,7 @@ function frame(now){
   setStep(clamp(st,0,3),now);
   if(s2.tw){const t=(now-s2.tw.t0)/s2.tw.dur;if(t>=1){s2.angle=s2.tw.to;s2.tw=null}else s2.angle=lerp(s2.tw.from,s2.tw.to,-(Math.cos(Math.PI*t)-1)/2)}
   const q=clamp((p-.76)/.24);
+  if(window.dbgLive&&now-(window._dl||0)>400){window._dl=now;window.dbgLive('p='+p.toFixed(2)+' step='+s2.step+' angle='+Math.round(s2.angle)+' q='+q.toFixed(2)+' RM='+RM+' fps~'+Math.round(1000/Math.max(1,dt)))}
   const fade=1-clamp(4*q);
   fwrap.style.opacity=fade;inNum.style.opacity=fade;
   inDark.style.opacity=clamp(3.5*q)*.42;
