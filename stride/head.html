@@ -173,6 +173,10 @@ body.entered #auto{animation:fadeIn .6s ease-out .74s forwards}
 .menus figure{margin:0;opacity:0;translate:0 28px;transition:opacity .9s var(--ease),translate .9s var(--ease)}
 .menus figure:nth-child(2){transition-delay:.12s}
 .menus.in figure{opacity:1;translate:0 0}
+.poster{position:relative;overflow:hidden;border-radius:calc(var(--w)*22);box-shadow:0 0 0 1px rgba(244,196,70,.22),0 calc(var(--w)*30) calc(var(--w)*60) calc(var(--w)*-24) rgba(244,150,40,.35)}
+.poster .pbg{border-radius:0;box-shadow:none}
+.poster .plate{position:absolute;display:block;height:auto;border-radius:0;box-shadow:none;will-change:transform;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+.poster .pov{position:absolute;left:0;width:100%;height:auto;border-radius:0;box-shadow:none;pointer-events:none}
 .menus img{display:block;width:100%;height:auto;border-radius:calc(var(--w)*22);box-shadow:0 0 0 1px rgba(244,196,70,.22),0 calc(var(--w)*30) calc(var(--w)*60) calc(var(--w)*-24) rgba(244,150,40,.35)}
 /* ---------- desktop short ---------- */
 @media(min-width:820px) and (max-height:560px){

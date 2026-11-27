@@ -412,6 +412,44 @@ const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.t
 [$('#shopHead'),$('#shopCap'),cardsEl,$('#bHead'),$('#menus')].forEach(el=>io.observe(el));
 let strip_done=false;
 
+/* ================= animated plates ================= */
+(function(){
+  const poster=$('#poster');if(!poster)return;
+  const plates=$$('#poster .plate');
+  const PW=1199;
+  const boxes=plates.map(p=>p.dataset.box.split(',').map(Number));
+  const cs=boxes.map(b=>[b[0]+b[2]/2,b[1]+b[3]/2]);
+  const cx=cs.reduce((s,c)=>s+c[0],0)/cs.length,cy=cs.reduce((s,c)=>s+c[1],0)/cs.length;
+  const CYCLE=13000;let vis=false,t0=0;
+  new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis)t0=performance.now()},{threshold:.15}).observe(poster);
+  const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  const seg=(t,a,b)=>clamp((t-a)/(b-a));
+  function pose(t){
+    /* grow, rise, fall, orbit around each other, settle back */
+    const grow=ease(seg(t,0,.18)),shrink=ease(seg(t,.88,1));
+    const scale=1+.12*(grow-shrink);
+    const up=ease(seg(t,.18,.38)),down=ease(seg(t,.38,.58));
+    const dy=-40*(up-down);
+    const orb=ease(seg(t,.58,.86));
+    const ang=orb*Math.PI*2;
+    const rad=1-.28*Math.sin(Math.PI*orb);
+    return{scale,dy,ang,rad};
+  }
+  function frame(now){
+    requestAnimationFrame(frame);
+    if(!vis||RM)return;
+    const k=poster.clientWidth/PW;
+    const t=((now-t0)%CYCLE)/CYCLE,p=pose(t);
+    plates.forEach((el,i)=>{
+      const rx=cs[i][0]-cx,ry=cs[i][1]-cy;
+      const c=Math.cos(p.ang),s=Math.sin(p.ang);
+      const nx=(rx*c-ry*s)*p.rad,ny=(rx*s+ry*c)*p.rad;
+      el.style.transform='translate('+((nx-rx)*k)+'px,'+((ny-ry+p.dy)*k)+'px) scale('+p.scale+')';
+    });
+  }
+  requestAnimationFrame(frame);
+})();
+
 /* ================= section 2 ================= */
 const inside=$('#inside'),inFront=$('#inFront'),inBar=$('#inBar'),inDark=$('#inDark'),inNum=$('#inNum'),inHead=$('#inHead'),inCap=$('#inCap'),fwrap=$('#fwrap'),stormEl=$('#storm');
 const STEPS=[
