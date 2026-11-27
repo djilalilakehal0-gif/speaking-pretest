@@ -1,8 +1,10 @@
+const dbg=m=>{try{window.dbg&&window.dbg(m)}catch(e){}};
 let THREE=null,RoomEnvironment=null;
 try{
   THREE=await import('three');
   ({RoomEnvironment}=await import('three/addons/environments/RoomEnvironment.js'));
-}catch(err){console.error('three.js failed to load',err)}
+  dbg('three.js loaded r'+THREE.REVISION);
+}catch(err){console.error('three.js failed to load',err);dbg('three.js FAILED: '+err.message)}
 
 /* ================= data ================= */
 const SW=2688,SH=1520;
@@ -48,7 +50,7 @@ function initGL(){
   if(!THREE)return false;
   try{
     renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
-  }catch(e){console.warn('WebGL unavailable',e);return false}
+  }catch(e){console.warn('WebGL unavailable',e);dbg('WebGL FAILED: '+e.message);return false}
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.NoToneMapping;
   renderer.setClearColor(0x000000,0);
@@ -67,6 +69,7 @@ function initGL(){
   for(let i=0;i<12;i++){bars.push(makeBar(i));}
   trav=bars[11];
   resizeGL();
+  dbg('WebGL renderer ready');
   return true;
 }
 function buildGeo(){
@@ -669,8 +672,8 @@ async function boot(){
   fitTitle();placeHl();
   if(!ok)return;
   const img=new Image();img.crossOrigin='anonymous';
-  img.onload=()=>{sheetImg=img;try{buildTextures(img);glReady=true;body.classList.add('gl');$('#shop').classList.add('gl');markLive()}catch(e){console.error(e)}};
-  img.onerror=()=>console.warn('sheet failed to load');
+  img.onload=()=>{sheetImg=img;dbg('sheet loaded '+img.naturalWidth+'x'+img.naturalHeight);try{buildTextures(img);glReady=true;dbg('textures built, 3D ready');body.classList.add('gl');$('#shop').classList.add('gl');markLive()}catch(e){console.error(e);dbg('TEXTURE ERROR: '+e.message)}};
+  img.onerror=()=>{console.warn('sheet failed to load');dbg('sheet FAILED to load (network/CORS)')};
   img.src=SHEET_URL;
 }
 setTitle(FL[1].name,1,false);setCount(1,false);
