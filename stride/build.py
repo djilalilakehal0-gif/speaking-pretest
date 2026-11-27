@@ -6,5 +6,5 @@ for fam,w,fn in faces:
     b=base64.b64encode(open(f'{f}/{fn}.woff2','rb').read()).decode()
     css+=f"@font-face{{font-family:'{fam}';font-style:normal;font-weight:{w};font-display:swap;src:url(data:font/woff2;base64,{b}) format('woff2')}}\n"
 head=open(d+'/head.html').read().replace('/*FONTS*/',css)
-out=head+open(d+'/body.html').read()+'<script type="module">\n'+open(d+'/app.js').read()+'\n</script>\n</body>\n</html>\n'
+out=head+open(d+'/body.html').read()+'<script type="module">\n'+open(d+'/app.js').read().replace('__CHICKEN__',open(d+'/chicken.b64').read().strip())+'\n</script>\n</body>\n</html>\n'
 open(d+'/index.html','w').write(out);print(len(out))

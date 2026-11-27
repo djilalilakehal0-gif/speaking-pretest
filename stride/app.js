@@ -17,6 +17,8 @@ const FL=[
  {name:'Strawberry',color:'#d396a7',box:[2184,145,403,849],bit:4,ing:'Oats, strawberries, dates, cashews, pea protein, lemon.'}];
 const BITS=[[650,1090,340,305],[110,1125,280,255],[1175,1110,320,285],[1680,1085,380,305],[2280,1095,250,295]];
 const BH=(849+8)/(403+8);
+const CHICKEN_FLAV=4; // flavour slot whose artwork is the roast-chicken photo
+const CHICKEN_URI='data:image/webp;base64,__CHICKEN__';
 
 /* ================= utils ================= */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -35,7 +37,13 @@ const root=document.documentElement, body=document.body;
 function cropCss(box,pad){let[x,y,w,h]=box;x-=pad;y-=pad;w+=2*pad;h+=2*pad;
   return{bs:`${SW/w*100}% ${SH/h*100}%`,bp:`${x/(SW-w)*100}% ${y/(SH-h)*100}%`,ar:w/h}}
 function spr(el,box,pad){const c=cropCss(box,pad);el.classList.add('spr');el.style.backgroundSize=c.bs;el.style.backgroundPosition=c.bp;el.style.aspectRatio=c.ar}
-const wrapSpr=(el,f)=>spr(el,FL[f].box,4), bitSpr=(el,b)=>spr(el,BITS[b],0);
+function wrapSpr(el,f){
+  if(f===CHICKEN_FLAV){
+    el.classList.add('spr');
+    el.style.backgroundImage=`url("${CHICKEN_URI}")`;el.style.backgroundSize='contain';el.style.backgroundPosition='center';el.style.aspectRatio=(403+8)/(849+8);
+  }else{el.style.backgroundImage='';spr(el,FL[f].box,4)}
+}
+const bitSpr=(el,b)=>spr(el,BITS[b],0);
 
 let vw=innerWidth, vh=innerHeight, phone=vw<820;
 
@@ -131,12 +139,22 @@ function resizeGL(){
 
 /* ---- textures ---- */
 function mix(hex,to,t){const a=parseInt(hex.slice(1),16),b=parseInt(to.slice(1),16);const c=s=>Math.round(((a>>s)&255)*(1-t)+((b>>s)&255)*t);return`rgb(${c(16)},${c(8)},${c(0)})`}
+let chickenImg=null;
 function buildTextures(img){
   texs=FL.map((f,fi)=>{
     const[x,y,w,h]=f.box,sc=img.naturalWidth/SW;
     const W=Math.round((w+8)*1.5*.75),H=Math.round(W*BH);
     const fc=document.createElement('canvas');fc.width=W;fc.height=H;
     fc.getContext('2d').drawImage(img,(x-4)*sc,(y-4)*sc,(w+8)*sc,(h+8)*sc,0,0,W,H);
+    if(fi===CHICKEN_FLAV&&chickenImg){
+      const cc=fc.getContext('2d');cc.clearRect(0,0,W,H);
+      const iw=W*.98,ih=iw*chickenImg.naturalHeight/chickenImg.naturalWidth;
+      cc.drawImage(chickenImg,(W-iw)/2,(H-ih)/2,iw,ih);
+      const bk=document.createElement('canvas');bk.width=W;bk.height=H;const bx=bk.getContext('2d');
+      bx.translate(W,0);bx.scale(-1,1);bx.drawImage(fc,0,0);
+      const mk2=cv=>{const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t};
+      return{front:mk2(fc),back:mk2(bk)};
+    }
     // back
     const bc=document.createElement('canvas');bc.width=W;bc.height=H;const c=bc.getContext('2d');
     c.save();c.translate(W,0);c.scale(-1,1);c.drawImage(fc,0,0);c.restore();
@@ -397,7 +415,7 @@ function flyToCart(els,add=1){
   els.forEach((el,i)=>{
     const r=el.getBoundingClientRect(),cs=getComputedStyle(el);
     const c=document.createElement('div');c.className='fly spr';
-    c.style.cssText=`left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;background-size:${cs.backgroundSize};background-position:${cs.backgroundPosition}`;
+    c.style.cssText=`left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;background-image:${cs.backgroundImage};background-size:${cs.backgroundSize};background-position:${cs.backgroundPosition}`;
     body.append(c);
     const dx=bx-(r.left+r.width/2),dy=by-(r.top+r.height/2),k=Math.min(.2,30/r.height),lift=Math.min(160,.35*Math.abs(dy)+60);
     const a=c.animate([
@@ -673,7 +691,7 @@ async function boot(){
   fitTitle();placeHl();
   if(!ok)return;
   const img=new Image();img.crossOrigin='anonymous';
-  img.onload=()=>{sheetImg=img;dbg('sheet loaded '+img.naturalWidth+'x'+img.naturalHeight);try{buildTextures(img);glReady=true;dbg('textures built, 3D ready');body.classList.add('gl');$('#shop').classList.add('gl');markLive()}catch(e){console.error(e);dbg('TEXTURE ERROR: '+e.message)}};
+  img.onload=async()=>{sheetImg=img;try{const ci=new Image();ci.src=CHICKEN_URI;await ci.decode();chickenImg=ci}catch(e){dbg('chicken decode failed')}dbg('sheet loaded '+img.naturalWidth+'x'+img.naturalHeight);try{buildTextures(img);glReady=true;dbg('textures built, 3D ready');body.classList.add('gl');$('#shop').classList.add('gl');markLive()}catch(e){console.error(e);dbg('TEXTURE ERROR: '+e.message)}};
   img.onerror=()=>{console.warn('sheet failed to load');dbg('sheet FAILED to load (network/CORS)')};
   img.src=SHEET_URL;
 }
