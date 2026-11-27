@@ -841,7 +841,7 @@ let strip_done=false;
 (function(){
   const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
   const seg=(t,a,b)=>clamp((t-a)/(b-a));
-  const CYCLE=9500;
+  const CYCLE=18000;
   function pose(t){
     /* grow, rise, fall, orbit around each other, settle back */
     const grow=ease(seg(t,0,.18)),shrink=ease(seg(t,.88,1));
