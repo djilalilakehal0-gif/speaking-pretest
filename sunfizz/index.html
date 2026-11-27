@@ -126,7 +126,7 @@ body.nogl .nogl-msg{display:grid}
 </header>
 
 <section id="hero" aria-label="Flavours">
-  <h1 class="title" id="title" aria-live="polite"><span>PEACH FIZZ</span></h1>
+  <h1 class="title" id="title" aria-live="polite"><span>COCA-COLA</span></h1>
   <div class="arrows">
     <button class="arr" id="prev" aria-label="Previous flavour"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
     <button class="arr" id="next" aria-label="Next flavour"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
@@ -171,14 +171,14 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ───────── data ───────── */
 const FL = [
-  { n: 'PEACH FIZZ',   liq: '#F27A3C', cap: '#E25B45', ink: '#E8673E', fr: 'peach' },
-  { n: 'APRICOT FIZZ', liq: '#F39A2E', cap: '#E58A2A', ink: '#E8942F', fr: 'apricot' },
-  { n: 'ROSE FIZZ',    liq: '#EC6E8F', cap: '#D9567A', ink: '#D9567A', fr: 'rose petal' },
-  { n: 'BLOOD ORANGE', liq: '#D63A2C', cap: '#C7332B', ink: '#C7332B', fr: 'blood orange' },
-  { n: 'MANGO FIZZ',   liq: '#F4AA2C', cap: '#E39A22', ink: '#E7A229', fr: 'mango' },
-  { n: 'RASPBERRY',    liq: '#D6436A', cap: '#C93A5C', ink: '#C93A5C', fr: 'raspberry' },
-  { n: 'GUAVA FIZZ',   liq: '#EF7464', cap: '#E2665E', ink: '#E2665E', fr: 'guava' },
-  { n: 'NECTARINE',    liq: '#EA5A30', cap: '#D9502F', ink: '#D9502F', fr: 'nectarine' }
+  { n: 'COCA-COLA',       liq: '#D81F26', cap: '#D81F26', ink: '#D81F26', fr: 'cola' },
+  { n: 'FANTA',           liq: '#F7941D', cap: '#F7941D', ink: '#EE7A0C', fr: 'orange' },
+  { n: 'SPRITE',          liq: '#1FA54A', cap: '#1FA54A', ink: '#1A9040', fr: 'lemon-lime' },
+  { n: 'PEPSI',           liq: '#1B4FA8', cap: '#1B4FA8', ink: '#1B4FA8', fr: 'cola' },
+  { n: 'DR PEPPER',       liq: '#8B1A2B', cap: '#8B1A2B', ink: '#8B1A2B', fr: 'spiced cherry' },
+  { n: '7UP',             liq: '#3FA535', cap: '#3FA535', ink: '#2E9A3B', fr: 'lemon-lime' },
+  { n: 'MIRINDA',         liq: '#F28C1E', cap: '#F28C1E', ink: '#E8741A', fr: 'orange' },
+  { n: 'COCA-COLA LIGHT', liq: '#C9CDD2', cap: '#D81F26', ink: '#D81F26', fr: 'cola' }
 ];
 const N = 16, BH = 2.43;
 const TILT = [.10, -.15, .07, -.09, .14, -.06, .12, -.13, .08, -.11, .15, -.07, .09, -.14, .06, -.10];
@@ -358,7 +358,7 @@ async function boot() {
     while (g.measureText(f.n).width > 540 && fs > 40) { fs -= 4; g.font = `italic 900 ${fs}px "Barlow Condensed"`; }
     g.fillText(f.n, 512, 215 + fs * .38);
     g.font = 'italic 800 46px "Barlow Condensed"'; if ('letterSpacing' in g) g.letterSpacing = '6px';
-    g.fillText('SPARKLING FRUIT SODA', 512, 400); if ('letterSpacing' in g) g.letterSpacing = '0px';
+    g.fillText('SPARKLING SODA', 512, 400); if ('letterSpacing' in g) g.letterSpacing = '0px';
     return tex(c);
   });
 
@@ -385,8 +385,8 @@ async function boot() {
     while (g.measureText(f.n).width > 760 && bs > 50) { bs -= 4; g.font = `italic 900 ${bs}px "Barlow Condensed"`; }
     g.fillText(f.n, 512, 118);
     g.font = 'italic 800 30px "Barlow Condensed"'; if ('letterSpacing' in g) g.letterSpacing = '4px';
-    g.fillText('SPARKLING FRUIT SODA', 512, 156); if ('letterSpacing' in g) g.letterSpacing = '0px';
-    const rows = [['REAL FRUIT', `18% ${f.fr} juice, never from concentrate`], ['LIGHT FIZZ', 'Fine bubbles, a soft natural sparkle'], ['NO SUGAR ADDED', '4.2 g sugar per 100 ml, all from fruit']];
+    g.fillText('SPARKLING SODA', 512, 156); if ('letterSpacing' in g) g.letterSpacing = '0px';
+    const rows = [['REAL FRUIT', `Real ${f.fr} taste, bold and refreshing`], ['LIGHT FIZZ', 'Fine bubbles, a soft natural sparkle'], ['NO SUGAR ADDED', '4.2 g sugar per 100 ml, all from fruit']];
     rows.forEach(([h, d], r) => {
       const x = 150, y = 175 + r * 150;
       drawIcon(g, r, x + 70, y + 62, f.ink);
