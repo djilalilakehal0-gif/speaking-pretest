@@ -420,16 +420,16 @@ let strip_done=false;
   const boxes=plates.map(p=>p.dataset.box.split(',').map(Number));
   const cs=boxes.map(b=>[b[0]+b[2]/2,b[1]+b[3]/2]);
   const cx=cs.reduce((s,c)=>s+c[0],0)/cs.length,cy=cs.reduce((s,c)=>s+c[1],0)/cs.length;
-  const CYCLE=13000;let vis=false,t0=0;
-  new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis)t0=performance.now()},{threshold:.15}).observe(poster);
+  const CYCLE=9500;let vis=false,t0=0;
+  new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis)t0=performance.now()},{threshold:.05}).observe(poster);
   const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
   const seg=(t,a,b)=>clamp((t-a)/(b-a));
   function pose(t){
     /* grow, rise, fall, orbit around each other, settle back */
     const grow=ease(seg(t,0,.18)),shrink=ease(seg(t,.88,1));
-    const scale=1+.12*(grow-shrink);
+    const scale=1+.17*(grow-shrink);
     const up=ease(seg(t,.18,.38)),down=ease(seg(t,.38,.58));
-    const dy=-40*(up-down);
+    const dy=-52*(up-down);
     const orb=ease(seg(t,.58,.86));
     const ang=orb*Math.PI*2;
     const rad=1-.28*Math.sin(Math.PI*orb);
@@ -437,9 +437,11 @@ let strip_done=false;
   }
   function frame(now){
     requestAnimationFrame(frame);
+    if(window.dbgLive&&now-(window._dp||0)>500){window._dp=now;window.dbgPlates&&window.dbgPlates('plates vis='+vis+' RM='+RM+' w='+poster.clientWidth)}
     if(!vis||RM)return;
     const k=poster.clientWidth/PW;
     const t=((now-t0)%CYCLE)/CYCLE,p=pose(t);
+    if(window.dbgPlates&&now-(window._dq||0)>500){window._dq=now;window.dbgPlates('plates vis='+vis+' RM='+RM+' phase='+t.toFixed(2)+' scale='+p.scale.toFixed(2))}
     plates.forEach((el,i)=>{
       const rx=cs[i][0]-cx,ry=cs[i][1]-cy;
       const c=Math.cos(p.ang),s=Math.sin(p.ang);
