@@ -19,7 +19,7 @@ const FL=[
  {name:'Leg Quarter',color:'#ec84b0',key:'legquarter'}];
 const N=FL.length, START=3;
 const BIT_KEYS=['parsley','strawberry','garlic'];
-const BH=1.05, PS=.74;
+const BH=1.05, PS=.86;
 
 /* ================= utils ================= */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
