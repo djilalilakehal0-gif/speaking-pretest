@@ -352,15 +352,13 @@ async function boot() {
   const frontTex = FL.map((f, i) => {
     const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
     const g = c.getContext('2d');
-    if (sheet) {
-      const cw = sheet.naturalWidth / 2, ch = sheet.naturalHeight / 4;
-      g.drawImage(sheet, (i % 2) * cw, Math.floor(i / 2) * ch, cw, ch, 0, 0, 1024, 512);
-    } else {
-      brush(g, 30, 70, 964, 400, 100 + i, -.07);
-      g.textAlign = 'center'; g.fillStyle = f.ink;
-      g.font = 'italic 900 230px "Barlow Condensed"'; g.fillText('SUNFIZZ', 512, 300);
-      g.font = 'italic 800 64px "Barlow Condensed"'; g.fillText(f.n, 512, 380);
-    }
+    brush(g, 30, 70, 964, 400, 100 + i, -.07);
+    g.textAlign = 'center'; g.fillStyle = f.ink;
+    let fs = 250; g.font = `italic 900 ${fs}px "Barlow Condensed"`;
+    while (g.measureText(f.n).width > 540 && fs > 40) { fs -= 4; g.font = `italic 900 ${fs}px "Barlow Condensed"`; }
+    g.fillText(f.n, 512, 215 + fs * .38);
+    g.font = 'italic 800 46px "Barlow Condensed"'; if ('letterSpacing' in g) g.letterSpacing = '6px';
+    g.fillText('SPARKLING FRUIT SODA', 512, 400); if ('letterSpacing' in g) g.letterSpacing = '0px';
     return tex(c);
   });
 
@@ -383,7 +381,9 @@ async function boot() {
     const g = c.getContext('2d');
     brush(g, 40, 22, 944, 664, 300 + i, 0);
     g.fillStyle = f.ink; g.textAlign = 'center';
-    g.font = 'italic 900 104px "Barlow Condensed"'; g.fillText('SUNFIZZ', 512, 118);
+    let bs = 104; g.font = `italic 900 ${bs}px "Barlow Condensed"`;
+    while (g.measureText(f.n).width > 760 && bs > 50) { bs -= 4; g.font = `italic 900 ${bs}px "Barlow Condensed"`; }
+    g.fillText(f.n, 512, 118);
     g.font = 'italic 800 30px "Barlow Condensed"'; if ('letterSpacing' in g) g.letterSpacing = '4px';
     g.fillText('SPARKLING FRUIT SODA', 512, 156); if ('letterSpacing' in g) g.letterSpacing = '0px';
     const rows = [['REAL FRUIT', `18% ${f.fr} juice, never from concentrate`], ['LIGHT FIZZ', 'Fine bubbles, a soft natural sparkle'], ['NO SUGAR ADDED', '4.2 g sugar per 100 ml, all from fruit']];
