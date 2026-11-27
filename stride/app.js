@@ -32,7 +32,9 @@ const lerp=(a,b,t)=>a+(b-a)*t;
 const mod=(n,m)=>((n%m)+m)%m;
 const smooth=t=>t*t*(3-2*t);
 const D2R=Math.PI/180;
-const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FM=/[?&]motion\b/.test(location.search);
+if(FM)document.documentElement.classList.add('fm');
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches&&!FM;
 const FINE=matchMedia('(pointer:fine)').matches;
 function bez(x1,y1,x2,y2){return t=>{if(t<=0)return 0;if(t>=1)return 1;let a=0,b=1,m=.5;for(let i=0;i<28;i++){m=(a+b)/2;const u=3*(1-m)*(1-m)*m*x1+3*(1-m)*m*m*x2+m*m*m;if(u<t)a=m;else b=m}m=(a+b)/2;return 3*(1-m)*(1-m)*m*y1+3*(1-m)*m*m*y2+m*m*m}}
 const glide=bez(.25,.75,.2,1), entrEase=bez(.16,1,.3,1);

@@ -252,12 +252,12 @@ body.entered #auto{animation:fadeIn .6s ease-out .74s forwards}
   #count{font-size:40px;top:70px}
 }
 @media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important;transition:none!important}
-  body.entered #play,body.entered #count,body.entered #auto{opacity:1}
-  body.entered .rings,body.entered .emblem{opacity:1}
-  body.entered .bit{opacity:.55}
-  .rv .ln>span{transform:none}.scap,.card{opacity:1;translate:0 0}
-  .bhead .ln>span{transform:none}
+  :root:not(.fm) *,:root:not(.fm) *::before,:root:not(.fm) *::after{animation:none!important;transition:none!important}
+  :root:not(.fm) body.entered #play,:root:not(.fm) body.entered #count,:root:not(.fm) body.entered #auto{opacity:1}
+  :root:not(.fm) body.entered .rings,:root:not(.fm) body.entered .emblem{opacity:1}
+  :root:not(.fm) body.entered .bit{opacity:.55}
+  :root:not(.fm) .rv .ln>span{transform:none}:root:not(.fm) .scap,:root:not(.fm) .card{opacity:1;translate:0 0}
+  :root:not(.fm) .bhead .ln>span{transform:none}
 }
 </style>
 </head>
