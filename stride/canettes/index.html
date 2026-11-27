@@ -155,7 +155,7 @@ const STEPS = [
 const ROWS = [['ICE COLD','Best served at 4 °C, straight from the fridge'],['FINE FIZZ','Sealed sparkle, released with one crack'],['RECYCLABLE','Infinitely recyclable aluminium']];
 
 /* geometry constants (world units, pivot at mid-height) */
-const LOGO_AR = 1600 / 520;
+const LOGO_AR = 1800 / 520;
 const BH = 2.43, R = .68, CW = 1.36, BODY0 = .17, BODY1 = 2.13, BODYH = BODY1 - BODY0;
 const BACK_W = 1024, BACK_H = 940;
 const ROW_C = [350, 500, 650];                         // row centres on the back canvas
@@ -757,9 +757,10 @@ function frame(ts) {
   U.uTime.value = T; U.uTxtAmt.value = b * (1 - c); U.uTxtMix.value = eoc(m) * .62; U.uTxtShift.value = RM ? 0 : (m - .5) * .03;
   U.uTxtY.value = lerp(.47, .5, K); U.uTxtW.value = lerp(1.02, .92, K);
   {
-    let lw = lerp(.8, .28, K), lh = lw * aspect / LOGO_AR;
-    if (lh > .3) { lw *= .3 / lh; lh = .3; }
-    U.uLogoBox.value.set(.5, 1 - lerp(.24, .215, K), lw, lh);
+    let lw = lerp(.8, .28, K), lh = lw * aspect / LOGO_AR, ly = lerp(.24, .215, K);
+    if (CARD) { lw = .92; lh = lw * aspect / LOGO_AR; if (lh > .46) { lw *= .46 / lh; lh = .46; } ly = .275; }
+    else if (lh > .3) { lw *= .3 / lh; lh = .3; }
+    U.uLogoBox.value.set(.5, 1 - ly, lw, lh);
     U.uLogoAmt.value = U.uLogo.value ? lerp(1, .08, a) * lerp(1, .8, c) : 0;
   }
 
