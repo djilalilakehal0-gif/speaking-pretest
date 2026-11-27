@@ -10,13 +10,13 @@ try{
 const IMG=__ITEMS__;
 const uri=k=>`data:image/webp;base64,${IMG[k].b64}`;
 const FL=[
- {name:'Glazed Wings',color:'#f6a6c9',key:'wings'},
- {name:'Drumstick',color:'#f291bd',key:'drumstick'},
- {name:'Juicy Thigh',color:'#ee88b4',key:'thigh'},
- {name:'Roast Chicken',color:'#f79fc6',key:'whole'},
- {name:'Grilled Breast',color:'#f08fba',key:'breast'},
- {name:'Skewers',color:'#f7acd0',key:'skewers'},
- {name:'Leg Quarter',color:'#ec84b0',key:'legquarter'}];
+ {name:'Ailes glacées',color:'#f6a6c9',key:'wings'},
+ {name:'Pilon',color:'#f291bd',key:'drumstick'},
+ {name:'Cuisse juteuse',color:'#ee88b4',key:'thigh'},
+ {name:'Poulet rôti',color:'#f79fc6',key:'whole'},
+ {name:'Blanc grillé',color:'#f08fba',key:'breast'},
+ {name:'Brochettes',color:'#f7acd0',key:'skewers'},
+ {name:'Quart de poulet',color:'#ec84b0',key:'legquarter'}];
 const N=FL.length, START=3;
 const BIT_KEYS=['parsley','strawberry','garlic'];
 const BH=1.05, PS=.86;
@@ -381,7 +381,7 @@ const tilt=FL.map(()=>({x:0,y:0,tx:0,ty:0,hover:false,down:false}));
 FL.forEach((f,i)=>{
   const [a,...b]=f.name.split(' ');
   const c=document.createElement('article');c.className='card';c.style.cssText=`--c:${f.color};--i:${i}`;c.dataset.f=i;
-  c.innerHTML=`<div class="nm disp">${a}${b.length?'<br>'+b.join(' '):''}</div><div class="pk"></div><button class="add" type="button" aria-label="Add a bag of ${f.name} to the cart"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg></button>`;
+  c.innerHTML=`<div class="nm disp">${a}${b.length?'<br>'+b.join(' '):''}</div><div class="pk"></div><button class="add" type="button" aria-label="Ajouter ${f.name} au panier"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg></button>`;
   wrapSpr(c.querySelector('.pk'),i);cardsEl.append(c);
   const st=tilt[i];
   const apply=()=>{c.style.transform=st.hover?`translateY(-8px) rotateX(${-st.ty*12}deg) rotateY(${st.tx*12}deg)${st.down?' scale(.97)':''}`:(st.down?'scale(.97)':'');c.style.boxShadow=st.hover?'0 24px 40px -18px rgba(40,30,20,.35)':''};
@@ -414,7 +414,7 @@ const slotsEl=$('#slots'),thumbsEl=$('#thumbs'),buy=$('#buy'),buyL=$('#buyL'),gl
 const SLOTPOS=[[50.2,37],[34.8,59.3],[64.8,59.3]];
 const slotEls=SLOTPOS.map((p,i)=>{
   const s=document.createElement('div');s.className='slot';s.style.left=p[0]+'%';s.style.top=p[1]+'%';
-  s.innerHTML=`<div class="bar"></div><button class="x" type="button" aria-label="Remove or add bar"><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15"/></svg></button>`;
+  s.innerHTML=`<div class="bar"></div><button class="x" type="button" aria-label="Retirer ou ajouter un morceau"><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15"/></svg></button>`;
   s.querySelector('.x').addEventListener('click',()=>{touched=true;if(pack[i]!=null){pack[i]=null;renderPack()}});
   slotsEl.append(s);return s;
 });
@@ -433,17 +433,17 @@ function renderPack(){
     const f=pack[i],bar=s.querySelector('.bar');s.classList.toggle('full',f!=null);
     if(f!=null&&bar.dataset.f!=f){wrapSpr(bar,f);bar.dataset.f=f;bar.classList.remove('rise');void bar.offsetWidth;bar.classList.add('rise')}
     if(f==null){bar.dataset.f='';bar.classList.remove('rise')}
-    s.querySelector('.x').setAttribute('aria-label',f==null?'Empty slot':'Remove '+FL[f].name);
+    s.querySelector('.x').setAttribute('aria-label',f==null?'Emplacement vide':'Retirer '+FL[f].name);
   });
   thumbEls.forEach((t,i)=>{const n=pack.filter(x=>x===i).length,rg=t.querySelector('.rg');rg.classList.toggle('on',n>0);rg.textContent=n>1?n:'✓'});
   const empty=pack.filter(x=>x==null).length;
-  if(!buy.classList.contains('done')){buy.disabled=empty>0;buyL.textContent=empty?`Pick ${empty} more`:'Add to cart'}
+  if(!buy.classList.contains('done')){buy.disabled=empty>0;buyL.textContent=empty?`Encore ${empty} à choisir`:'Ajouter au panier'}
 }
 buy.addEventListener('click',()=>{
   if(buy.disabled||pack.includes(null))return;
   const srcs=slotEls.map(s=>s.querySelector('.bar'));
   flyToCart(srcs,1);
-  setTimeout(()=>{pack.fill(null);buy.classList.add('done');buyL.textContent='Added to cart';buy.disabled=false;renderPack();
+  setTimeout(()=>{pack.fill(null);buy.classList.add('done');buyL.textContent='Ajouté au panier';buy.disabled=false;renderPack();
     setTimeout(()=>{buy.classList.remove('done');renderPack()},1600)},60);
 });
 renderPack();
@@ -454,10 +454,10 @@ new IntersectionObserver((es,ob)=>{es.forEach(en=>{if(en.isIntersecting&&!starte
 /* ================= section 2 ================= */
 const inside=$('#inside'),inFront=$('#inFront'),inBar=$('#inBar'),inDark=$('#inDark'),inNum=$('#inNum'),inHead=$('#inHead'),inCap=$('#inCap'),fwrap=$('#fwrap'),stormEl=$('#storm');
 const STEPS=[
- {h:'Slow roasted,<br>every time',c:'Free-range birds.<br>Nothing you can\'t say.',a:0},
- {h:'Glazed,<br>not fried',c:'Honey, herbs, fire.<br>Crisp skin, juicy inside.',a:180},
- {h:'Fresh<br>every day',c:'Prepared at dawn.<br>On your table by noon.',a:360},
- {h:null,c:'Slow roasted.<br>Seriously juicy.',a:720}];
+ {h:'Rôti lentement,<br>à chaque fois',c:'Poulets fermiers.<br>Rien que du vrai.',a:0},
+ {h:'Glacé,<br>pas frit',c:'Miel, herbes, feu.<br>Peau croustillante, cœur juteux.',a:180},
+ {h:'Frais<br>chaque jour',c:'Préparé à l\'aube.<br>Sur votre table à midi.',a:360},
+ {h:null,c:'Rôti lentement.<br>Vraiment juteux.',a:720}];
 function step4Html(){return FL[shown].name.split(' ').map(w=>w.length>9?`<span style="font-size:.72em">${w}</span>`:w).join('<br>')}
 const stepHtml=s=>s===3?step4Html():STEPS[s].h;
 let s2={step:0,angle:0,tw:null};

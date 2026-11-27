@@ -6,12 +6,12 @@
 <header id="nav">
   <a class="brand" href="#flavors" data-go="flavors"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="disc" cx="18" cy="18" r="18"/><path class="mt" d="M18 8c.6 3.6 5.8 5.4 5.8 10.6a5.8 5.8 0 0 1-11.6 0c0-2.6 1.4-3.6 2.4-5.6.8 1.6 1.6 1.8 2.2-1.6"/></svg><span>CHICKEN</span></a>
   <nav class="pill" id="pill" aria-label="Sections"><i class="hl"></i>
-    <a href="#flavors" data-go="flavors">Flavors</a><a href="#inside" data-go="inside">Inside</a><a href="#shop" data-go="shop">Shop</a><a href="#range" data-go="range">Range</a>
+    <a href="#flavors" data-go="flavors">Saveurs</a><a href="#inside" data-go="inside">Recette</a><a href="#shop" data-go="shop">Boutique</a><a href="#range" data-go="range">Pack</a>
   </nav>
   <div class="nr">
-    <span class="chip off">% OFF</span>
-    <button class="chip" id="basket" type="button" aria-label="Basket"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11a1.5 1.5 0 0 1-1.5 1.3H7.7A1.5 1.5 0 0 1 6.2 19L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span id="cartN">0</span></button>
-    <button class="dibs" type="button">First dibs</button>
+    <span class="chip off">PROMO</span>
+    <button class="chip" id="basket" type="button" aria-label="Panier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11a1.5 1.5 0 0 1-1.5 1.3H7.7A1.5 1.5 0 0 1 6.2 19L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span id="cartN">0</span></button>
+    <button class="dibs" type="button">Priorité</button>
   </div>
 </header>
 
@@ -20,13 +20,13 @@
   <div class="rings"></div>
   <div class="bits" id="bits"></div>
   <div class="arc" id="arc"></div>
-  <button id="play" type="button" aria-label="Next flavour"><svg viewBox="0 0 18 18"><path d="M3 9h12"/><path d="M10 4l5 5-5 5"/></svg></button>
+  <button id="play" type="button" aria-label="Morceau suivant"><svg viewBox="0 0 18 18"><path d="M3 9h12"/><path d="M10 4l5 5-5 5"/></svg></button>
   <h1 id="title" class="disp" aria-live="polite"></h1>
   <div id="count" class="disp" aria-hidden="true">02</div>
-  <button id="auto" type="button" aria-pressed="true"><span class="ring"><svg class="gp gpause" viewBox="0 0 10 10"><rect x="1.5" y="1" width="2.4" height="8" rx="1"/><rect x="6.1" y="1" width="2.4" height="8" rx="1"/></svg><svg class="gp gplay" viewBox="0 0 10 10"><path d="M2.5 1.2 8.6 5 2.5 8.8Z"/></svg></span>Autoplay</button>
+  <button id="auto" type="button" aria-pressed="true"><span class="ring"><svg class="gp gpause" viewBox="0 0 10 10"><rect x="1.5" y="1" width="2.4" height="8" rx="1"/><rect x="6.1" y="1" width="2.4" height="8" rx="1"/></svg><svg class="gp gplay" viewBox="0 0 10 10"><path d="M2.5 1.2 8.6 5 2.5 8.8Z"/></svg></span>Lecture auto</button>
 </section>
 
-<section id="inside" aria-label="What's inside">
+<section id="inside" aria-label="La recette">
   <div class="pin">
     <div class="in-dark" id="inDark"></div>
     <div class="frame" id="backFrame"><div class="in-num disp" id="inNum">01</div><div id="inBar"></div></div>
@@ -36,27 +36,27 @@
   <div class="fwrap" id="fwrap"><div class="frame" id="frontFrame">
     <h2 class="in-head disp" id="inHead"></h2>
     <div class="in-icons" id="inIcons">
-      <button type="button" aria-label="Real food"><svg viewBox="0 0 24 24"><path d="M5 19C5 10 10 5 19 5c0 9-5 14-14 14Z"/><path d="M5 19 13 11"/></svg></button>
-      <button type="button" aria-label="Pressed"><svg viewBox="0 0 24 24"><ellipse cx="8" cy="8" rx="2" ry="3.2" transform="rotate(-30 8 8)"/><ellipse cx="16" cy="8" rx="2" ry="3.2" transform="rotate(30 16 8)"/><ellipse cx="8" cy="16" rx="2" ry="3.2" transform="rotate(30 8 16)"/><ellipse cx="16" cy="16" rx="2" ry="3.2" transform="rotate(-30 16 16)"/></svg></button>
-      <button type="button" aria-label="Wrapped same day"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-      <button type="button" aria-label="Protein"><svg viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l9-11h-6Z"/></svg></button>
+      <button type="button" aria-label="Poulets fermiers"><svg viewBox="0 0 24 24"><path d="M5 19C5 10 10 5 19 5c0 9-5 14-14 14Z"/><path d="M5 19 13 11"/></svg></button>
+      <button type="button" aria-label="Glacé"><svg viewBox="0 0 24 24"><ellipse cx="8" cy="8" rx="2" ry="3.2" transform="rotate(-30 8 8)"/><ellipse cx="16" cy="8" rx="2" ry="3.2" transform="rotate(30 16 8)"/><ellipse cx="8" cy="16" rx="2" ry="3.2" transform="rotate(30 8 16)"/><ellipse cx="16" cy="16" rx="2" ry="3.2" transform="rotate(-30 16 16)"/></svg></button>
+      <button type="button" aria-label="Frais chaque jour"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
+      <button type="button" aria-label="Juteux"><svg viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l9-11h-6Z"/></svg></button>
     </div>
     <div class="in-cap" id="inCap"></div>
   </div></div>
   <div id="storm"></div>
 </div>
 
-<section id="shop" aria-label="Shop">
+<section id="shop" aria-label="Boutique">
   <div class="shead">
-    <h2 class="rv disp" id="shopHead"><span class="ln"><span>Pick</span></span><span class="ln"><span>your cut</span></span></h2>
-    <p class="scap" id="shopCap">Seven cuts. Same slow-roast<br>recipe. Pick your favourite<br>(or try them all).</p>
+    <h2 class="rv disp" id="shopHead"><span class="ln"><span>Choisissez</span></span><span class="ln"><span>votre morceau</span></span></h2>
+    <p class="scap" id="shopCap">Sept morceaux, même recette<br>lente. Choisissez votre<br>préféré (ou goûtez-les tous).</p>
   </div>
   <div class="cards" id="cards"></div>
 </section>
 
-<section id="range" aria-label="Build your pack">
-  <h2 class="bhead disp" id="bHead"><span class="ln"><span>Build your</span></span><span class="ln"><span><b class="three">3</b>pack &amp;</span></span><span class="ln"><span>save $1.49</span></span></h2>
+<section id="range" aria-label="Composez votre pack">
+  <h2 class="bhead disp" id="bHead"><span class="ln"><span>Pack de <b class="three">3</b></span></span><span class="ln"><span>&amp; économisez</span></span><span class="ln"><span>1,49 €</span></span></h2>
   <div class="gwrap" id="gwrap"><div id="glow"></div><div id="slots"></div></div>
   <div class="thumbs" id="thumbs"></div>
-  <button id="buy" type="button" disabled><span id="buyL">Pick 3 more</span><span class="pr">$7.48</span></button>
+  <button id="buy" type="button" disabled><span id="buyL">Encore 3 à choisir</span><span class="pr">7,48 €</span></button>
 </section>
