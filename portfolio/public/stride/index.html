@@ -337,7 +337,7 @@ const FL=[
  {name:'Quart de poulet',color:'#ec84b0',key:'legquarter',bg:'#0e0b0a'}];
 const N=FL.length, START=3;
 const BIT_KEYS=['parsley','strawberry','garlic'];
-const BH=1.05, PS=.86;
+const BH=1.05, PS=.82;
 
 /* ================= utils ================= */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -471,7 +471,7 @@ let drag=null, vel=0;
 const hero=$('#flavors'), arcEl=$('#arc'), titleEl=$('#title'), countEl=$('#count'), revealEl=$('#reveal');
 
 /* ---- arc ---- */
-const SL=[[0,0,430,0,0],[245,24,330,4,16],[452,44,312,8,26],[660,80,296,12,34],[860,118,280,15,40]];
+const SL=[[0,0,430,0,0],[335,24,310,4,16],[535,44,270,8,26],[680,80,235,12,34],[800,118,210,15,40]];
 let ARC={cx:0,cy:0,u:1,spread:1,H:0,top:0};
 function computeArc(r){
   const H=r.height;let u,cy,spread=1;
@@ -574,7 +574,7 @@ function goTo(t,durOverride){
 function next(n=1){lastInteract=performance.now();goTo(target+n)}
 
 /* ---- hero input ---- */
-function slotPx(){return 245*ARC.u*ARC.spread}
+function slotPx(){return SL[1][0]*ARC.u*ARC.spread}
 let ray=null;
 function hitBar(cx,cy){
   if(!renderer||!ray)return null;
