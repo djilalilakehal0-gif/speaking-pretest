@@ -409,51 +409,8 @@ function pokeScale(now,t0){const t=(now-t0)/500;if(t<0||t>=1)return[1,1];
   for(let i=0;i<3;i++){const a=kf[i],b=kf[i+1];if(t<=b[0]){const u=(t-a[0])/(b[0]-a[0]);return[lerp(a[1],b[1],u),lerp(a[2],b[2],u)]}}return[1,1]}
 // reveal-on-view
 const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target)}}),{threshold:.18});
-[$('#shopHead'),$('#shopCap'),cardsEl,$('#bHead')].forEach(el=>io.observe(el));
+[$('#shopHead'),$('#shopCap'),cardsEl,$('#bHead'),$('#menus')].forEach(el=>io.observe(el));
 let strip_done=false;
-
-/* ================= builder ================= */
-const pack=[null,null,null];let touched=false,lastPick=3;
-const slotsEl=$('#slots'),thumbsEl=$('#thumbs'),buy=$('#buy'),buyL=$('#buyL'),glow=$('#glow');
-const SLOTPOS=[[50.2,37],[34.8,59.3],[64.8,59.3]];
-const slotEls=SLOTPOS.map((p,i)=>{
-  const s=document.createElement('div');s.className='slot';s.style.left=p[0]+'%';s.style.top=p[1]+'%';
-  s.innerHTML=`<div class="bar"></div><button class="x" type="button" aria-label="Retirer ou ajouter un morceau"><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15"/></svg></button>`;
-  s.querySelector('.x').addEventListener('click',()=>{touched=true;if(pack[i]!=null){pack[i]=null;renderPack()}});
-  slotsEl.append(s);return s;
-});
-const thumbEls=FL.map((f,i)=>{
-  const t=document.createElement('button');t.type='button';t.className='thumb';
-  t.innerHTML=`<div class="sq" style="--c:${f.color}"><div class="spr"></div><span class="rg"></span></div><div class="nm">${f.name}</div>`;
-  wrapSpr(t.querySelector('.spr'),i);
-  t.addEventListener('click',()=>{touched=true;addToPack(i)});
-  thumbsEl.append(t);return t;
-});
-function hexA(h,a){const n=parseInt(h.slice(1),16);return`rgba(${n>>16},${(n>>8)&255},${n&255},${a})`}
-function addToPack(f){const i=pack.indexOf(null);if(i<0)return;pack[i]=f;lastPick=f;
-  glow.style.setProperty('--g',hexA(FL[f].color,.72));glow.classList.remove('pulse');void glow.offsetWidth;glow.classList.add('pulse');renderPack()}
-function renderPack(){
-  slotEls.forEach((s,i)=>{
-    const f=pack[i],bar=s.querySelector('.bar');s.classList.toggle('full',f!=null);
-    if(f!=null&&bar.dataset.f!=f){wrapSpr(bar,f);bar.dataset.f=f;bar.classList.remove('rise');void bar.offsetWidth;bar.classList.add('rise')}
-    if(f==null){bar.dataset.f='';bar.classList.remove('rise')}
-    s.querySelector('.x').setAttribute('aria-label',f==null?'Emplacement vide':'Retirer '+FL[f].name);
-  });
-  thumbEls.forEach((t,i)=>{const n=pack.filter(x=>x===i).length,rg=t.querySelector('.rg');rg.classList.toggle('on',n>0);rg.textContent=n>1?n:'✓'});
-  const empty=pack.filter(x=>x==null).length;
-  if(!buy.classList.contains('done')){buy.disabled=empty>0;buyL.textContent=empty?`Encore ${empty} à choisir`:'Ajouter au panier'}
-}
-buy.addEventListener('click',()=>{
-  if(buy.disabled||pack.includes(null))return;
-  const srcs=slotEls.map(s=>s.querySelector('.bar'));
-  flyToCart(srcs,1);
-  setTimeout(()=>{pack.fill(null);buy.classList.add('done');buyL.textContent='Ajouté au panier';buy.disabled=false;renderPack();
-    setTimeout(()=>{buy.classList.remove('done');renderPack()},1600)},60);
-});
-renderPack();
-let startedFull=false;
-new IntersectionObserver((es,ob)=>{es.forEach(en=>{if(en.isIntersecting&&!startedFull){startedFull=true;ob.disconnect();
-  if(touched)return;[0,1,2].forEach((n,k)=>setTimeout(()=>{if(!touched)addToPack(mod(shown+n,N))},[250,410,570][k]))}})},{threshold:.3}).observe($('#range'));
 
 /* ================= section 2 ================= */
 const inside=$('#inside'),inFront=$('#inFront'),inBar=$('#inBar'),inDark=$('#inDark'),inNum=$('#inNum'),inHead=$('#inHead'),inCap=$('#inCap'),fwrap=$('#fwrap'),stormEl=$('#storm');
